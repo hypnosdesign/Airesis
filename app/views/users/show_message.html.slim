@@ -1,8 +1,0 @@
-.card
-  .image-container
-    = avatar(@user, size: 120)
-    - if @user == current_user
-      .caption
-        a
-          = t('pages.users.show.edit_image')
-= render 'users/message'

@@ -1,0 +1,18 @@
+<% @page_title = "#{t('.title')} #{@group.name}" %>
+<% @extend = true %>
+
+<div id="forums_container">
+  <h1 id="forums_title" class="text-2xl font-bold mb-4"><%= t('.title') %></h1>
+  <%= render @categories %>
+</div>
+
+<% if is_group_admin? @group %>
+  <% content_for :left_panel do %>
+    <div class="card bg-base-200 p-4">
+      <h4 class="font-bold mb-2"><%= t('frm.admin.area') %></h4>
+      <%= link_to t("area", scope: "frm.admin"), group_frm_admin_root_url(@group), class: 'btn btn-sm' %>
+    </div>
+  <% end %>
+<% end %>
+
+<%= render partial: '/frm/application/forem_footer' %>

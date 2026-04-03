@@ -1,0 +1,5 @@
+var container_ = $('<div id="quorum_container" class="reveal-modal medium" data-reveal></div>');
+$('body').append(container_);
+container_.html("<%= j(render(partial: 'quorums/form', locals: { button_name: t('buttons.update') })) %>");
+airesis_reveal(container_);
+new AiresisFormValidation(container_.find('form'));

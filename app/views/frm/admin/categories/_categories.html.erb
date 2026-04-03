@@ -1,0 +1,17 @@
+<% @categories.each do |category| %>
+  <tr class="forum <%= cycle("odd", "even") %>">
+    <td><%= category.name %></td>
+    <td>
+      <%= link_to edit_group_frm_admin_category_url(@group, category), class: "btn btn-sm", remote: true, data: { disable_with: t('loading') } do %>
+        <i class="fa-solid fa-pencil"></i>
+        <%= t('edit', scope: 'frm.admin.categories') %>
+      <% end %>
+    </td>
+    <td>
+      <%= link_to group_frm_admin_category_url(@group, category), method: :delete, data: { confirm: t('delete_confirm', scope: 'frm.admin.categories') }, remote: true, class: "btn btn-sm btn-error" do %>
+        <i class="fa-regular fa-trash-can"></i>
+        <%= t('delete', scope: 'frm.admin.categories') %>
+      <% end %>
+    </td>
+  </tr>
+<% end %>

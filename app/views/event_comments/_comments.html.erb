@@ -1,0 +1,5 @@
+<div style="clear:both;" id="eventComments" class="eventComments">
+  <% @event_comments.each do |comment| %>
+    <%= render partial: 'events/comment', locals: { comment: comment } %>
+  <% end %>
+</div>

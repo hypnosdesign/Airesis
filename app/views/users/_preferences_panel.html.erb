@@ -1,0 +1,35 @@
+<div class="card bg-base-200 p-4" data-ijs="settings-menu">
+  <h4 class="font-bold mb-2"><%= t('pages.users.left_panel.title') %></h4>
+  <ul class="menu">
+    <li class="general_info">
+      <%= link_to user_url(current_user) do %>
+        <i class="fa-solid fa-gears"></i>
+        <%= t('pages.users.left_panel.general_info') %>
+      <% end %>
+    </li>
+    <li class="alarm_and_notifications">
+      <%= link_to alarm_preferences_users_url do %>
+        <i class="fa-solid fa-bell"></i>
+        <%= t('pages.users.left_panel.alarm_and_notifications') %>
+      <% end %>
+    </li>
+    <li class="geographic_borders">
+      <%= link_to border_preferences_users_url do %>
+        <i class="fa-solid fa-image"></i>
+        <%= t('pages.users.left_panel.geographic_borders') %>
+      <% end %>
+    </li>
+    <li class="account_and_policy">
+      <%= link_to privacy_preferences_users_url do %>
+        <i class="fa-solid fa-key"></i>
+        <%= t('pages.users.left_panel.account_and_privacy') %>
+      <% end %>
+    </li>
+    <li class="statistics">
+      <%= link_to statistics_users_url do %>
+        <i class="fa-solid fa-chart-bar"></i>
+        <%= t('pages.users.left_panel.statistics') %>
+      <% end %>
+    </li>
+  </ul>
+</div>

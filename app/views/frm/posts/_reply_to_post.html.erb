@@ -1,0 +1,38 @@
+<table class="table posts">
+  <tr>
+    <td class="user_post" rowspan="2">
+      <a name="post-<%= post.id %>"></a>
+      <div class="user">
+        <div class="username font-semibold">
+          <%= link_to post.user.fullname, post.user %>
+        </div>
+        <div class="icon mt-2">
+          <%= avatar(post.user, size: 100) %>
+        </div>
+      </div>
+    </td>
+    <td>
+      <div class="post-header">
+        <a href="#post-<%= post.id %>">
+          <div class="post-when text-sm text-base-content/60">
+            <time datetime="<%= post.created_at.to_s(:db) %>">
+              <%= "#{time_ago_in_words(post.created_at)} #{t("ago")}" %>
+            </time>
+            <% if post.reply_to %>
+              <span class="in-reply-to">
+                <%= link_to "#{t('frm.posts.post.in_reply_to')} #{post.reply_to.user.name}", "#post-#{post.reply_to.id}" %>
+              </span>
+            <% end %>
+          </div>
+        </a>
+      </div>
+    </td>
+  </tr>
+  <tr>
+    <td>
+      <div class="post-body prose max-w-none">
+        <%= sanitize post.text %>
+      </div>
+    </td>
+  </tr>
+</table>

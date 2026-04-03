@@ -1,0 +1,24 @@
+<% @page_title = t('pages.blogs.edit.title', title: @blog.title) %>
+<div class="card bg-base-200 p-4">
+  <div class="w-full mb-4">
+    <h2 class="text-xl font-bold"><%= t('pages.blogs.edit.title', title: @blog.title) %></h2>
+  </div>
+  <%= simple_form_for @blog do |f| %>
+    <div class="w-full mb-4">
+      <%= f.error_notification %>
+      <%= f.input :title, required: true %>
+    </div>
+    <div class="w-full flex gap-2">
+      <%= link_to t('pages.blogs.edit.back_to_blog'), @blog, class: 'btn' %>
+      <%= f.button :button, class: 'btn btn-primary' do %>
+        <i class="fa-solid fa-floppy-disk"></i>
+        <%= t('buttons.update') %>
+      <% end %>
+    </div>
+  <% end %>
+</div>
+
+<% content_for :left_panel do %>
+  <%= render 'blog_posts/admin_links' %>
+  <%= render 'blogs/left_panel' %>
+<% end %>
