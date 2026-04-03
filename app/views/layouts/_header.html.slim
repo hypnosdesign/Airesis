@@ -1,6 +1,0 @@
-#fb-root data-user-like-url=user_likes_url data-app-id=ENV['FACEBOOK_APP_ID'] data-locale=I18n.locale.to_s.gsub('-','_')
-
-= render '/layouts/top_menu'
-
-- if user_signed_in? && !Rails.env.test?
-  = subscribe_to "/notifications/#{current_user.id}"
