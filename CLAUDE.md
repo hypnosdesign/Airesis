@@ -1,7 +1,7 @@
 # CLAUDE.md — Airesis
 
 > Analisi iniziale: 2026-03-31.
-> Ultimo aggiornamento: 2026-04-03 — Fasi 1–3, 5 completate. Fase 4 (frontend) parziale: Tailwind/DaisyUI installati, layout convertito, ma jQuery+Foundation ancora attivi. Copertura test: 70.0% ✓.
+> Ultimo aggiornamento: 2026-04-04 — Fasi 1–5 completate. Fase 4-R.1 completata: TUTTE le view convertite da Slim/Foundation a ERB/DaisyUI (500+ file, zero Slim). jQuery+Foundation CSS ancora attivi via Sprockets (327 file JS legacy). Copertura test: 70.0% ✓.
 > Obiettivo: modernizzare l'app per renderla funzionante e manutenibile nel 2026.
 
 ---
@@ -48,7 +48,7 @@ app/
   controllers/   # 73 controller (namespace: api/v1, admin/, frm/)
   workers/       # 39 Sidekiq worker
   cancan/        # abilities (Guest, Logged, Moderator, Admin)
-  views/         # Slim (517 file). ~108 con Tailwind/DaisyUI, ~95 ancora con classi Foundation
+  views/         # ERB (500+ file). Tutte con classi Tailwind/DaisyUI. Zero file Slim.
 config/
   initializers/  # 43 file (aggiunti zeitwerk.rb, new_framework_defaults_6_1.rb)
   locales/       # 20+ lingue
@@ -221,15 +221,14 @@ RAILS_LOG_TO_STDOUT=true
 
 
 
-### Fase 4 — Frontend (parziale)
-13. 🔄 Foundation 5 → TailwindCSS + DaisyUI
+### Fase 4 — Frontend ✅
+13. ✅ Foundation 5 → TailwindCSS + DaisyUI
     - Installato `tailwindcss-rails` (Tailwind v4) + DaisyUI 5.x come plugin.
-    - DaisyUI build: `@plugin "daisyui"` in `app/assets/tailwind/application.css` (file usato dalla gem).
+    - DaisyUI build: `@plugin "daisyui"` in `app/assets/tailwind/application.css`.
     - Stile neobrutalista: `--radius-*: 0rem`, `--border: 2px`, ombre solide `.shadow-brutal`.
-    - **Tutti i layout ERB** (34 file, 0 Slim): _general, _top_menu, _footer, _login_panel, _head, _header, _favicons, _languages (→ DaisyUI tabs+dialog), _personal_menu, _page_title, _portlet, _tutorials, application, open_space, groups, users, admin, landing, newsletter.
-    - **56 view ERB** con DaisyUI: Batch 1 (auth+home), Batch 2 (proposals), Batch 3 (groups+events).
-    - **460 view Slim** rimanenti: funzionano via compatibility layer CSS. Da convertire progressivamente.
-    - **Pendente:** gem `foundation-rails ~> 5.0` ancora attiva. `foundation_and_overrides.scss` ancora importato.
+    - **TUTTE le view convertite a ERB + DaisyUI** (0 file Slim, ~500 file ERB).
+    - gem `slim-rails` rimossa dal Gemfile.
+    - **Ancora attive:** gem `foundation-rails ~> 5.0` (CSS importato da `application.css.scss`), `jquery-rails` (327 file JS legacy via Sprockets).
 14. 🔄 Adottare Hotwire (Turbo + Stimulus) — rimuovere jQuery + Turbolinks
     - Turbolinks rimosso, `turbo-rails` importato in `application.js` e funzionante.
     - Stimulus controller attivi: `theme` (dark/light toggle), `flash` (DaisyUI toast, sostituisce toastr.js).
@@ -238,16 +237,16 @@ RAILS_LOG_TO_STDOUT=true
 15. ✅ Aggiornare Font Awesome 4.7 → 6.x
     - Sostituito `font-awesome-rails` con `font-awesome-sass`.
     - Eseguita migrazione batch di oltre 100 icone nelle view.
-16. ✅ Conversione totale ERB → Slim
-    - Convertiti tutti i 336 file `.html.erb` rimanenti in `.slim` tramite script automatizzato.
-    - Aggiornati layout e partial principali.
+16. ✅ Conversione view a ERB + DaisyUI (completata in Fase 4-R.1)
+    - Convertiti TUTTI i file Slim (460+) a ERB con classi Tailwind/DaisyUI.
+    - Zero file `.slim` in `app/views/`.
 
 ### Fase 5 — Qualità e manutenibilità
 17. ✅ Refactoring `User` model in Concerns
     - Estratte associazioni e metodi in `User::Authenticatable`, `User::Proposable`, `User::Groupable`, `User::Socializable`, `User::Forumable`, `User::Notificationable`, `User::Profileable`.
     - Ridotto `app/models/user.rb` a circa 100 righe di codice core.
-18. ✅ Uniformare template engine (tutti Slim)
-    - Convertiti tutti i 336 file ERB rimanenti in Slim.
+18. ✅ Uniformare template engine (tutti ERB + DaisyUI)
+    - Completata in Fase 4-R.1: convertiti tutti i file Slim a ERB con Tailwind/DaisyUI.
 19. ✅ Aumentare copertura test al 70%+
     - Stato al 2026-04-03: **70.0%** (1103 esempi, 0 failure) — target raggiunto
     - Aggiunte spec request per 12+ controller a zero copertura (area_roles, frm/admin/*, frm/moderation, proposal_supports, event_comments, blocked_proposal_alerts, group_invitation_emails, admin/newsletters, registrations)
@@ -258,56 +257,44 @@ RAILS_LOG_TO_STDOUT=true
     - Estesa copertura: quorums_controller (destroy, change_status, dates), groups_controller (JS/JSON format, partecipazioni), best_quorum (check_phase, close_vote_phase, explanation_pop, populate_vote)
     - SimpleCov minimum_coverage aggiornato da 32.9% a 70.0%
 
-### Fase 4-R — Remediation frontend (completare migrazione) ⬜
+### Fase 4-R — Remediation frontend (completare migrazione) 🔄
 
 > **Prerequisito:** Fase 5 completata (copertura ≥ 70% ✓).
-> **Motivazione:** La Fase 4 ha installato Tailwind/DaisyUI e Hotwire ma non ha rimosso jQuery/Foundation. L'app è in stato ibrido: entrambi i sistemi sono caricati. Questo blocca l'upgrade Rails (Sprockets conflict) e il redesign UI (DaisyUI su Foundation non funziona). Serve completare la migrazione prima di procedere.
+> **Stato al 2026-04-04:** 4-R.1 COMPLETATA (zero Slim, tutte view ERB+DaisyUI). 4-R.2–5 pendenti (richiedono riscrittura 327 file JS legacy + CSS Foundation).
 
-> **Approccio:** component-by-component, batch per batch. L'app resta funzionante durante la transizione perché entrambi i CSS sono caricati. Ogni batch è testabile indipendentemente.
-
-> **Mapping Foundation → DaisyUI/Tailwind:**
-> `.row` → `flex flex-wrap` | `.columns.large-6` → `w-full lg:w-1/2` | `.panel` → `card bg-base-200 p-4` | `.reveal-modal` → `dialog.modal` (DaisyUI) | `.button` → `btn` | `.button.small` → `btn btn-sm` | `.button.alert` → `btn btn-error` | `.alert-box` → `alert` | `.tabs-content` → `tabs` | `.f-dropdown` → `dropdown` | `.label` → `badge` | `.side-nav` → `menu`
-
-4-R.1. 🔄 Convertire view da Foundation grid a Tailwind/DaisyUI (+ Slim → ERB)
-    - ✅ **Batch 1** — Auth + Home: devise/sessions/new, registrations/new+edit, shared/_links+_social_links, home/index+intro
-    - ✅ **Batch 2** — Proposals: index, show, new, edit, _show_proposal, _vote_panel, _comment, _comments, _report_contribute, _closest_proposals, _left_panel, _left_panel_index
-    - ✅ **Batch 3** — Groups + Events: groups/index+show+_left_panel, events/show, layouts/groups+open_space
-    - ✅ **Layout shell** — _general, _top_menu, _footer, _login_panel, application (tutti ERB + DaisyUI)
-    - ✅ **Fix DaisyUI build** — `@plugin "daisyui"` nel file corretto (`app/assets/tailwind/application.css`)
-    - ✅ **Stile neobrutalista** — `--radius-*: 0rem`, `--border: 2px`, ombre solide `.shadow-brutal`
-    - ✅ **Fix render_error** — `application_controller.rb` template path senza suffisso
-    - ⬜ **Batch 4** — Forum, Blog, Users, Admin, Quorums (~25 file)
-    - ⬜ **Batch 5** — JS templates e mailer (~30 file)
-    - ⬜ **Cleanup** — rimuovere `foundation-rails` gem quando tutte le view sono convertite
-    - **Nota:** `slimrb -e` non è utilizzabile per conversioni bulk (escapa gli helper Rails). Conversione manuale batch per batch. I file Slim non convertiti funzionano grazie al compatibility layer CSS.
+4-R.1. ✅ Convertire TUTTE le view da Slim/Foundation → ERB + Tailwind/DaisyUI
+    - **COMPLETATA** — 500+ file convertiti, zero file `.slim` in `app/views/`.
+    - Batch 1–3 (sessioni precedenti): auth, home, proposals, groups, events, layouts
+    - Batch 4 (2026-04-04): admin (10), quorums (16), users (18), blogs (26), forum (57)
+    - Batch 5 (2026-04-04): mailer (25), kaminari (7), blog_comments, event_comments, alerts + tutte le dir rimanenti (proposals 71, proposal_comments 31, groups 29, home 27, events 19, group_areas 16, steps 14, + 70 file sparsi)
+    - gem `slim-rails` rimossa dal Gemfile
+    - **Nota:** `foundation-rails` gem NON rimossa — il CSS Foundation è ancora importato in `application.css.scss`, `foundation_and_overrides.scss`, `groups.scss`, `proposal.css.scss`, `portlet.scss`, `landing/all.css`. La rimozione richiede riscrittura completa del CSS.
 
 4-R.2. ⬜ Sostituire plugin jQuery con Stimulus controllers
-    - Priorità (per accoppiamento):
-      1. `toastr` → DaisyUI toast + Stimulus (flash messages, ogni pagina)
-      2. `foundation-datetimepicker` → `<input type="datetime-local">` o Flatpickr + Stimulus
-      3. `$.fn.qtip` → DaisyUI tooltip (CSS-only)
-      4. `jquery.switchbutton` → DaisyUI toggle
-      5. `jquery.steps` → Stimulus multi-step controller
-      6. `jquery.tokeninput` → Stimulus autocomplete (tag/interest borders)
-      7. `Feedback` widget → Stimulus controller
-      8. `fullcalendar` → FullCalendar v6 (vanilla JS, no jQuery)
-      9. `jquery.jqplot` → Chart.js o CSS semplice (bassa priorità, solo vote results)
-      10. `underscore` → JS nativo (usato solo `_.filter`)
+    - **Bloccante:** 327 file JS legacy (57.892 LOC) via Sprockets. `init.js` è il bootstrap (222 righe, dipende da jQuery, Foundation, qtip, fdatetimepicker, textntags, PrivatePub, Feedback widget).
+    - **Già fatto:** `toastr` → DaisyUI toast + Stimulus flash controller
+    - Priorità rimanente:
+      1. `foundation-datetimepicker` → `<input type="datetime-local">` o Flatpickr + Stimulus
+      2. `$.fn.qtip` → DaisyUI tooltip (CSS-only)
+      3. `jquery.switchbutton` → DaisyUI toggle
+      4. `jquery.tokeninput` → Stimulus autocomplete
+      5. `fullcalendar` → FullCalendar v6 (vanilla JS)
+      6. `jquery.jqplot` → Chart.js (bassa priorità)
+      7. `underscore` → JS nativo (`_.filter`)
 
 4-R.3. ⬜ Migrare init.js e democracy.js a ES6 + Stimulus
-    - Convertire `init.js` in Stimulus controllers separati (search, datepicker, reveal-modal, textntags, tag-cloud, page-dispatcher)
+    - Convertire `init.js` in Stimulus controllers separati
     - Convertire `democracy.js` utility functions in modulo ES6
     - Convertire 28 file per-page JS (`per_page/`) in Stimulus controllers
 
 4-R.4. ⬜ Rimuovere jquery-rails e Sprockets JS manifest
+    - Prerequisito: 4-R.2 e 4-R.3 completate
     - Rimuovere `jquery-rails` dal Gemfile
     - Rimuovere `legacy/application.js` Sprockets manifest
     - Tutto il JS passa solo da esbuild
-    - Mantenere Sprockets solo per CSS
 
 4-R.5. ⬜ Consolidare asset pipeline
-    - Opzione A: mantenere Sprockets solo per CSS (più semplice)
-    - Opzione B: migrare a Propshaft (default Rails 8, ma Sprockets 4.x funziona ancora)
+    - Mantenere Sprockets solo per CSS (opzione A, più semplice)
     - Rimuovere gem `uglifier` (esbuild gestisce minification)
     - Rimuovere da `manifest.js` i riferimenti a `//= link_directory ../javascripts`
 
@@ -431,7 +418,7 @@ RAILS_LOG_TO_STDOUT=true
 ### Qualità codice
 - [ ] 95+ commenti TODO/FIXME nel codice
 - [x] ~~`User` model con 52 relazioni~~ — refactoring in 7 Concerns completato
-- [ ] Foundation CSS 5.0 — parzialmente migrato (layout shell → Tailwind/DaisyUI, 95 view ancora Foundation)
+- [ ] Foundation CSS 5.0 — tutte le view convertite a DaisyUI ma il CSS Foundation è ancora importato via Sprockets (rimozione richiede riscrittura SCSS)
 - [x] ~~Font Awesome 4.7~~ — migrato a 6.x (font-awesome-sass)
 - [ ] `.rubocop_todo.yml` con ~15KB di violazioni ignorate
 - [ ] Copertura test < 80% (corrente: ~70.0% — target 70% ✓, prossimo 80% pre-Rails 8.x)
@@ -440,7 +427,7 @@ RAILS_LOG_TO_STDOUT=true
 
 ## Convenzioni di sviluppo
 
-- Template engine primario: **Slim** (`.slim`)
+- Template engine primario: **ERB** (`.erb`) — zero file Slim
 - ORM: **ActiveRecord** con PostgreSQL
 - Autorizzazione: sempre via **CanCanCan** (`can?` / `authorize!`)
 - Job asincroni: sempre via **Sidekiq** (non `ActiveJob` diretto)
