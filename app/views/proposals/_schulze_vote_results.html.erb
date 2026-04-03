@@ -1,0 +1,61 @@
+<div>
+<dl class="tabs" data-tab="">
+<dd class="active">
+<%= ::Temple::Utils.escape_html((link_to t('.results'), '#results')) %>
+</dd><dd>
+<%= ::Temple::Utils.escape_html((link_to t('.votes'), '#votes')) %>
+</dd></dl><div class="tabs-content">
+<div class="content active" id="results">
+<b>
+<%= ::Temple::Utils.escape_html((t('pages.proposals.results.total', count: @proposal.schulze_votes.sum(:count)))) %>
+</b><table>
+<thead>
+<th>
+<%= ::Temple::Utils.escape_html((t('.solution'))) %>
+</th><th>
+<%= ::Temple::Utils.escape_html((t('.points'))) %>
+</th></thead><tbody>
+<% solution_ids = @proposal.solutions.pluck(:id)
+Solution.where(proposal_id: @proposal.id).order('schulze_score desc').each do |solution|
+ %><tr>
+<td>
+<%= ::Temple::Utils.escape_html((raw t("pages.proposals.edit.new_solution_title.#{@proposal.proposal_type.name.downcase}", num: solution_ids.index(solution.id)+1))) %>
+<%= ::Temple::Utils.escape_html((solution.title.to_s)) %>
+</td><td style="text-align: center">
+<%= ::Temple::Utils.escape_html((solution.schulze_score)) %>
+</td></tr><% end %></tbody></table><hr />
+<table id="votes_table">
+<thead>
+<th>
+<%= ::Temple::Utils.escape_html((t('pages.proposals.results.name_surname_column'))) %>
+</th><th>
+<%= ::Temple::Utils.escape_html((t('pages.proposals.results.date_time_column'))) %>
+</th><% unless @proposal.secret_vote
+ %><th>
+<%= ::Temple::Utils.escape_html((t('pages.proposals.results.vote_column'))) %>
+</th><% end %></thead><% @proposal.user_votes.each do |user_vote|
+ %><tr>
+<td>
+<%= ::Temple::Utils.escape_html((user_vote.user.fullname)) %>
+</td><td>
+<%= ::Temple::Utils.escape_html((l user_vote.created_at)) %>
+</td><% unless @proposal.secret_vote
+ %><td>
+<%= ::Temple::Utils.escape_html((@proposal.is_schulze? ? user_vote.desc_vote_schulze : user_vote.vote_type.description)) %>
+</td><% end %></tr><% end %></table></div><div class="content" id="votes">
+<b>
+<%= ::Temple::Utils.escape_html((t('.random_ordered_votes'))) %>
+</b><table id="cast_table">
+<thead>
+<th>
+<%= ::Temple::Utils.escape_html((t('.number_of_voters'))) %>
+</th><th>
+<%= ::Temple::Utils.escape_html((t('.vote'))) %>
+</th></thead><tbody>
+<% @proposal.schulze_votes.each do |vote|
+ %><tr>
+<td>
+<%= ::Temple::Utils.escape_html((vote.count)) %>
+</td><td>
+<%= ::Temple::Utils.escape_html((vote.description)) %>
+</td></tr><% end %></tbody></table></div></div></div>

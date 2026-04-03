@@ -1,0 +1,3 @@
+<% _slim_controls1 = fields_for "posts[#{post.id}]" do |f| %><% _slim_controls2 = ''.dup; 
+; _slim_controls2 << ((::Temple::Utils.escape_html((render "/frm/moderation/options", f: f))).to_s); 
+; _slim_controls2 %><% end %><%= ::Temple::Utils.escape_html((_slim_controls1)) %><br />

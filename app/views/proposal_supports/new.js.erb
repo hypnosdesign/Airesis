@@ -1,0 +1,5 @@
+var container_ = $('
+<div class="reveal-modal medium" data-reveal="" id="proposal_support">
+</div>'); container_.html("
+<%= ::Temple::Utils.escape_html((j render 'proposal_supports/panel')) %>
+"); airesis_reveal(container_); 

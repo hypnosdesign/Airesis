@@ -1,0 +1,14 @@
+<% @proposal = Proposal.find(@data[:proposal_id])
+@user = User.find(@data[:user_id])
+@alert_url = check_alert_url(@alert, host: @alert.user.locale.host, l: @alert.user.locale.lang)
+_slim_controls1 = email_h1 do %><% _slim_controls2 = ''.dup; 
+; _slim_controls2 << ((::Temple::Utils.escape_html((@alert.email_subject))).to_s); 
+; _slim_controls2 %><% end %><%= ::Temple::Utils.escape_html((_slim_controls1)) %><p>
+<%= ::Temple::Utils.escape_html((avatar(@user, size: 40, url: true))) %>
+<%= ::Temple::Utils.escape_html((raw @alert.message)) %>
+</p><% _slim_controls3 = blue_panel do %><% _slim_controls4 = ''.dup; 
+; _slim_controls4 << (" <a href=\"".freeze); 
+; _slim_controls4 << ((::Temple::Utils.escape_html((@alert_url))).to_s); 
+; _slim_controls4 << ("\" style=\"color: #2ba6cb; text-decoration: none;\">Click here".freeze); 
+; _slim_controls4 << (" to view the proposal on Airesis and accept new authors. ".freeze); 
+; _slim_controls4 %><% end %><%= ::Temple::Utils.escape_html((_slim_controls3)) %>

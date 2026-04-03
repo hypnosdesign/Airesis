@@ -1,0 +1,11 @@
+<% if @blogs.total_pages && (@blogs.total_pages > @blogs.current_page)
+ %><div class="loading_groups" id="more_blogs">
+<span>
+<%= ::Temple::Utils.escape_html((link_to t('pages.blogs.index.show_more'), current_url(page: @blogs.current_page+1), remote: true)) %>
+</span></div><div class="loading_groups" id="loading_blogs" style="display:none">
+
+</div><div class="waitDiv">
+<%= ::Temple::Utils.escape_html((image_tag "facebook-loader.gif", alt: "loading...")) %>
+</div><% end %><script type="text/javascript">
+ $(function() { $('#more_blogs a').click(function() { $('#more_blogs').hide(); $('#loading_blogs').show(); return true; }); }) 
+</script>

@@ -1,0 +1,15 @@
+<%= ::Temple::Utils.escape_html((@page_title = t('frm.forum.title'))) %>
+<ul class="breadcrumbs">
+<li>
+<%= ::Temple::Utils.escape_html((link_to t('pages.groups.administration_panel.forum'), group_frm_admin_root_url(@group))) %>
+</li><li>
+<%= ::Temple::Utils.escape_html((link_to t('frm.admin.forum.index'), group_frm_admin_forums_url(@group))) %>
+</li><li class="current">
+<%= ::Temple::Utils.escape_html((t("frm.forum.new"))) %>
+</li></ul><h2>
+<%= ::Temple::Utils.escape_html((t("frm.forum.new"))) %>
+</h2><% _slim_controls1 = simple_form_for @forum, url: group_frm_admin_forums_url(@group) do |f| %><% _slim_controls2 = ''.dup; 
+; _slim_controls2 << ((::Temple::Utils.escape_html((render partial: 'form', locals: {f: f}))).to_s); 
+; _slim_controls2 %><% end %><%= ::Temple::Utils.escape_html((_slim_controls1)) %><% _slim_controls3 = content_for :left_panel do %><% _slim_controls4 = ''.dup; 
+; _slim_controls4 << ((::Temple::Utils.escape_html((render partial: 'groups/administration_panel'))).to_s); 
+; _slim_controls4 %><% end %><%= ::Temple::Utils.escape_html((_slim_controls3)) %>

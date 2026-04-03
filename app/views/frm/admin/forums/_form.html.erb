@@ -1,0 +1,12 @@
+<%= ::Temple::Utils.escape_html((f.input :category_id, collection: @group.categories.all.map { |r| [r.name, r.id, { 'data-tags' => r.tags_data}] })) %>
+<%= ::Temple::Utils.escape_html((f.input :name)) %>
+<%= ::Temple::Utils.escape_html((f.input :description, as: :text)) %>
+<%= ::Temple::Utils.escape_html((f.input :tags_list)) %>
+<%= ::Temple::Utils.escape_html((f.input :visible_outside)) %>
+<h3>
+<%= ::Temple::Utils.escape_html((t('frm.admin.forum.moderator_groups'))) %>
+</h3><%= ::Temple::Utils.escape_html((f.association :mods, collection: @group.mods, as: :check_boxes)) %>
+<%= ::Temple::Utils.escape_html((f.submit class: "btn blue")) %>
+<script type="text/javascript">
+ $(function () { var input = $('#frm_forum_tags_list') if (input != null) { input.tokenInput("<%= ::Temple::Utils.escape_html((tags_path(format: :json ))) %>", { theme: "facebook", crossDomain: false, allowFreeTagging: true, minChars: 3, hintText: "<%= ::Temple::Utils.escape_html((t('digit_tags'))) %>", searchingText: "<%= ::Temple::Utils.escape_html((t('digit_tags'))) %>", prePopulate: <%= ::Temple::Utils.escape_html((raw @forum.tags_data)) %>, preventDuplicates: true, allowTabOut: true, tokenValue: "name", tokenLimit: 5 }) } $('#frm_forum_category').change(function(ev) { var tags_ = $(this).find(':selected').data('tags'); input.tokenInput('clear'); $.each(tags_, function (index, value) { input.tokenInput('add',value); }); }); }); 
+</script>

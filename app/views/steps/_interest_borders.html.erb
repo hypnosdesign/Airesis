@@ -1,0 +1,17 @@
+<h2>
+<%= ::Temple::Utils.escape_html((t('pages.steps.interest_borders.title'))) %>
+</h2><p>
+<%= ::Temple::Utils.escape_html((t('pages.steps.interest_borders.description_html'))) %>
+</p><% _slim_controls1 = simple_form_for current_user do |f| %><% _slim_controls2 = ''.dup; 
+; _slim_controls2 << ("<div".freeze); _slim_controls2 << (" id=\"".freeze); _slim_controls2 << ("border_fields".freeze); _slim_controls2 << ("\"".freeze); _slim_controls2 << (">".freeze); 
+; _slim_controls2 << ((::Temple::Utils.escape_html((f.text_field :interest_borders_tokens, data: {pre: current_user.interest_borders.to_json}))).to_s); 
+; _slim_controls2 << ("</div>".freeze); _slim_controls2 << ("<div".freeze); _slim_controls2 << (" id=\"".freeze); _slim_controls2 << ("loading_borders".freeze); _slim_controls2 << ("\"".freeze); _slim_controls2 << (" style=\"".freeze); _slim_controls2 << ("margin:auto;text-align:center;display:none;".freeze); _slim_controls2 << ("\"".freeze); _slim_controls2 << (">".freeze); 
+; _slim_controls2 << ((::Temple::Utils.escape_html((image_tag 'ajax-loader.gif'))).to_s); 
+; _slim_controls2 << ("<br".freeze); _slim_controls2 << (" />".freeze); 
+; _slim_controls2 << ("</div>".freeze); _slim_controls2 << ("<b".freeze); _slim_controls2 << (">".freeze); 
+; _slim_controls2 << ((::Temple::Utils.escape_html((t('pages.users.border_preferences.updating')))).to_s); 
+; _slim_controls2 << ("</b>".freeze); _slim_controls2 << ((::Temple::Utils.escape_html((f.submit t('buttons.next'), class: 'btn blue', style: "float:right;", id: "submit_borders"))).to_s); 
+; _slim_controls2 %><% end %><%= ::Temple::Utils.escape_html((_slim_controls1)) %><div style="clear: both;">
+</div><script type="text/javascript">
+ $(function () { UsersBorderPreferences.init(); $('#submit_borders').click(function () { $(this).hide(); $('#border_fields').hide(); $('#loading_borders').fadeIn(); return true; }); }); 
+</script>

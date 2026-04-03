@@ -1,0 +1,59 @@
+<% @page_title = t('pages.users.left_panel.alarm_and_notifications')
+_slim_controls1 = render layout: "layouts/page_title", locals: {title: t('pages.user.notifications')} do %><% _slim_controls2 = ''.dup; 
+; 
+; _slim_controls2 %><% end %><%= ::Temple::Utils.escape_html((_slim_controls1)) %><% blocked = @current_user.blocked_notifications.all
+blocked_emails = @current_user.blocked_email_notifications.all
+ %><table>
+<% NotificationCategory.includes(:notification_types).order(:seq).each do |category|
+ %><thead>
+<tr>
+<td class="hide-for-small">
+<%= ::Temple::Utils.escape_html((image_tag "notification_categories/#{category.short.downcase}.png")) %>
+</td><td>
+<%= ::Temple::Utils.escape_html((category.description)) %>
+</td><td class="alerts">
+<%= ::Temple::Utils.escape_html((t('pages.users.alarm_preferences.alerts'))) %>
+</td><td class="emails">
+<%= ::Temple::Utils.escape_html((t('pages.users.alarm_preferences.emails'))) %>
+</td></tr></thead><% category.notification_types.where('id not in (8,15)').each do |type|
+ %><tr>
+<td class="hide-for-small">
+</td><td>
+<%= ::Temple::Utils.escape_html((type.description)) %>
+</td><td style="text-align: center">
+ <input type="checkbox" value="
+<%= ::Temple::Utils.escape_html((type.id)) %>
+" id="block_alert_
+<%= ::Temple::Utils.escape_html((type.id)) %>
+" 
+<% unless blocked.include? type
+ %> checked="true" class="block_alert" 
+<% end %> data-change-notification-block/> 
+</td><td style="text-align: center">
+ <input type="checkbox" value="
+<%= ::Temple::Utils.escape_html((type.id)) %>
+" id="block_email_
+<%= ::Temple::Utils.escape_html((type.id)) %>
+" class="block_email" 
+<% unless blocked_emails.include? type
+ %> checked="true" class="block_email" 
+<% end; if blocked.include? type
+ %> disabled="disabled" title="
+<%= ::Temple::Utils.escape_html(("Devi attivare la notifica per ricevere l'email")) %>
+" 
+<% end %> data-change-email-notification-block/> 
+</td></tr><% end; end %><tr>
+<td class="hide-for-small">
+<%= ::Temple::Utils.escape_html((image_tag "newsletter.png")) %>
+</td><td>
+<%= ::Temple::Utils.escape_html((t('pages.users.alarm_preferences.receive_on_address', email: current_user.email))) %>
+</td><td>
+</td><td style="text-align: center">
+<input type="checkbox" 
+<% if current_user.receive_newsletter?
+ %> checked="true" 
+<% end %> data-change-email-block/> 
+</td></tr></table><% content_for :left_panel do
+if current_user
+ %><%= ::Temple::Utils.escape_html((render partial: 'users/preferences_panel')) %>
+<% end; end %>

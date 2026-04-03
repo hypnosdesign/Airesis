@@ -1,0 +1,6 @@
+<% _slim_controls1 = content_for :left_panel do %><% _slim_controls2 = ''.dup; 
+; _slim_controls2 << ((::Temple::Utils.escape_html((render partial: 'help_menu'))).to_s); 
+; _slim_controls2 %><% end %><%= ::Temple::Utils.escape_html((_slim_controls1)) %><%= ::Temple::Utils.escape_html((render partial: 'help_content')) %>
+<script type="text/javascript">
+ function showSection(id) { $('.quorum_section').hide(); $('#'+id).fadeIn(); } $(function() { $('.quorum_section').hide(); $('#whatis').fadeIn(); }) 
+</script>

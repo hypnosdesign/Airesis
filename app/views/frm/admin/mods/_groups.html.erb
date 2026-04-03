@@ -1,0 +1,30 @@
+<% if @frm_mods.empty?
+ %><h4>
+<%= ::Temple::Utils.escape_html((t('pages.forum_groups.index.create_first'))) %>
+</h4><% else
+ %><table cellspacing="0" class="index table table-striped" id="groups">
+<thead>
+<tr>
+<th>
+<%= ::Temple::Utils.escape_html((t('name', scope: 'frm.admin.mods'))) %>
+</th><th>
+<%= ::Temple::Utils.escape_html((t('edit', scope: 'frm.admin.mods'))) %>
+</th><th>
+<%= ::Temple::Utils.escape_html((t('delete', scope: 'frm.admin.mods'))) %>
+</th></tr></thead><tbody>
+<% @frm_mods.each do |group|
+ %><tr>
+<td>
+<%= ::Temple::Utils.escape_html((link_to group.name, group_frm_admin_mod_url(@group, group))) %>
+<br />
+<% group.members.each do |member|
+ %><%= ::Temple::Utils.escape_html((avatar(member, size: 20))) %>
+<% end %></td><td>
+<% _slim_controls1 = link_to group_frm_admin_mod_url(@group, group), class: 'btn' do %><% _slim_controls2 = ''.dup; 
+; _slim_controls2 << ("<i".freeze); _slim_controls2 << (" class=\"".freeze); _slim_controls2 << ("fa-solid".freeze); _slim_controls2 << (" ".freeze); _slim_controls2 << ("fa-pencil".freeze); _slim_controls2 << ("\"".freeze); _slim_controls2 << (">".freeze); 
+; _slim_controls2 << ("</i>".freeze); _slim_controls2 << ((::Temple::Utils.escape_html((t('edit', scope: 'frm.admin.mods')))).to_s); 
+; _slim_controls2 %><% end %><%= ::Temple::Utils.escape_html((_slim_controls1)) %></td><td>
+<% _slim_controls3 = link_to group_frm_admin_mod_url(@group, group), method: :delete, data: {confirm: t('confirm_delete')}, class: 'btn' do %><% _slim_controls4 = ''.dup; 
+; _slim_controls4 << ("<i".freeze); _slim_controls4 << (" class=\"".freeze); _slim_controls4 << ("fa-regular".freeze); _slim_controls4 << (" ".freeze); _slim_controls4 << ("fa-trash-can".freeze); _slim_controls4 << ("\"".freeze); _slim_controls4 << (">".freeze); 
+; _slim_controls4 << ("</i>".freeze); _slim_controls4 << ((::Temple::Utils.escape_html((t('delete', scope: 'frm.admin.mods')))).to_s); 
+; _slim_controls4 %><% end %><%= ::Temple::Utils.escape_html((_slim_controls3)) %></td></tr><% end %></tbody></table><% end %>

@@ -1,0 +1,12 @@
+<h2>
+<%= ::Temple::Utils.escape_html((t('new', scope: 'frm.admin.category'))) %>
+</h2><% _slim_controls1 = simple_form_for @category, url: group_frm_admin_categories_url(@group), remote: remote do |f| %><% _slim_controls2 = ''.dup; 
+; _slim_controls2 << ((::Temple::Utils.escape_html((f.input :name))).to_s); 
+; _slim_controls2 << ((::Temple::Utils.escape_html((f.input :tags_list))).to_s); 
+; _slim_controls2 << ((::Temple::Utils.escape_html((f.input :visible_outside, inline_label: true))).to_s); 
+; _slim_controls2 << ((::Temple::Utils.escape_html((link_to t('buttons.cancel'),'#', class: 'btn', data: {'reveal-close' => ''}))).to_s); 
+; _slim_controls2 << ((::Temple::Utils.escape_html((link_to t('buttons.go_back'), :back, class: 'btn', data: {back: ''}))).to_s); 
+; _slim_controls2 << ((::Temple::Utils.escape_html((f.submit class: "btn blue"))).to_s); 
+; _slim_controls2 %><% end %><%= ::Temple::Utils.escape_html((_slim_controls1)) %><script type="text/javascript">
+ $(function () { var input = $('#frm_category_tags_list'); if (input != null) { input.tokenInput("<%= ::Temple::Utils.escape_html((tags_path(format: :json ))) %>", { theme: "facebook", crossDomain: false, allowFreeTagging: true, minChars: 3, hintText: "<%= ::Temple::Utils.escape_html((t('digit_tags'))) %>", searchingText: "<%= ::Temple::Utils.escape_html((t('digit_tags'))) %>", preventDuplicates: true, allowTabOut: true, tokenValue: "name", tokenLimit: 5 }) } }); 
+</script>

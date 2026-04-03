@@ -1,0 +1,5 @@
+$('#roles_panel_container').html('
+<%= ::Temple::Utils.escape_html((j render 'group_areas/roles_panel')) %>
+'); $('#roles_table_container').html('
+<%= ::Temple::Utils.escape_html((j render 'group_areas/user_roles_panel')) %>
+'); generateTable();

@@ -1,0 +1,99 @@
+<% if current_user && !Rails.env.test?
+ %><%= ::Temple::Utils.escape_html((subscribe_to blog_blog_post_path(@blog_post.blog, @blog_post))) %>
+<% end; content_for :html_options do
+ %> itemscope itemtype="http://schema.org/Blog" 
+<% end; _slim_controls1 = content_for :head do %><% _slim_controls2 = ''.dup; 
+; _slim_controls2 << (" <meta property=\"og:url\" content=\"".freeze); 
+; _slim_controls2 << ((::Temple::Utils.escape_html((current_url))).to_s); 
+; _slim_controls2 << ("\"/> <meta property=\"og:title\" content=\"".freeze); 
+; _slim_controls2 << ((::Temple::Utils.escape_html((@blog_post.title))).to_s); 
+; _slim_controls2 << ("\"/> ".freeze); 
+; _slim_controls2 << ("<meta".freeze); _slim_controls2 << (" content=\"".freeze); _slim_controls2 << ("article".freeze); _slim_controls2 << ("\"".freeze); _slim_controls2 << (" property=\"".freeze); _slim_controls2 << ("og:type".freeze); _slim_controls2 << ("\"".freeze); _slim_controls2 << (" />".freeze); 
+; _slim_controls2 << (" <meta property=\"og:image\" content=\"".freeze); 
+; _slim_controls2 << ((::Temple::Utils.escape_html((asset_url('logo120.png')))).to_s); 
+; _slim_controls2 << ("\"/> <meta property=\"og:site_name\" content=\"".freeze); 
+; _slim_controls2 << ((::Temple::Utils.escape_html((ENV['APP_LONG_NAME']))).to_s); 
+; _slim_controls2 << ("\"/> <meta property=\"fb:app_id\" content=\"".freeze); 
+; _slim_controls2 << ((::Temple::Utils.escape_html((ENV['FACEBOOK_APP_ID']))).to_s); 
+; _slim_controls2 << ("\"/> <meta property=\"article:published_time\" content=\"".freeze); 
+; _slim_controls2 << ((::Temple::Utils.escape_html((@blog_post.created_at.strftime('%Y/%m/%d')))).to_s); 
+; _slim_controls2 << ("\"> <meta property=\"article:tag\" content=\"".freeze); 
+; _slim_controls2 << ((::Temple::Utils.escape_html((@blog_post.tags_list))).to_s); 
+; _slim_controls2 << ("\"> ".freeze); 
+; _slim_controls2 %><% end %><%= ::Temple::Utils.escape_html((_slim_controls1)) %><% javascript 'endless_page'
+ %><div class="blogPost">
+<script type="text/javascript">
+ var pageURL = "<%= ::Temple::Utils.escape_html((@blog_url)) %>"; 
+</script><div class="card">
+<h1>
+<%= ::Temple::Utils.escape_html((blog_post_label @blog_post)) %>
+<%= ::Temple::Utils.escape_html((@page_title)) %>
+</h1><div class="blogPostBody" itemprop="description">
+<%= ::Temple::Utils.escape_html((sanitize @blog_post.body)) %>
+<div class="clearboth">
+</div></div><div class="blogPostFooter">
+<div class="blogPostPostedAt">
+<% - name = link_to((avatar(@blog_post.user, size: 15, cert: false) + @blog_post.user.fullname), @blog_post.user)
+ %><%= ::Temple::Utils.escape_html((raw t('pages.blog_posts.list_elements.inserted', name: name, date: (l @blog_post.created_at)))) %>
+ | 
+<span class="blogComments">
+<%= ::Temple::Utils.escape_html((link_to t('pages.blog_posts.view.comments', count: @blog_post.blog_comments.count), '#blogPostCommentsContainer')) %>
+</span></div><% if ::Configuration::socialnetwork_active
+ %><div class="post_buttons">
+ <a href="https://twitter.com/share" class="twitter-share-button" data-lang="en" data-text="
+<%= ::Temple::Utils.escape_html((t('twitter.share.blog_post', app: APP_SHORT_NAME, tags: @blog_post.tags.for_twitter))) %>
+" data-url="
+<%= ::Temple::Utils.escape_html((blog_blog_post_url(@blog_post.blog, @blog_post))) %>
+">Tweet
+ | <div class="fb-like" data-href="
+<%= ::Temple::Utils.escape_html((@blog_url)) %>
+" data-width="450" data-layout="button_count" data-show-faces="true" data-send="true">
+</div><% end %></div><% unless @blog_post.tags.blank?
+ %><div class="blogPostTags">
+<span class="tag_label">
+Tags: 
+</span><span class="tags_list">
+<%= ::Temple::Utils.escape_html((raw @blog_post.tags_with_links)) %>
+</span></div><% end %></div></div><div class="blogNewComment" id="blogNewComment">
+<%= ::Temple::Utils.escape_html((render partial: 'blog_comments/new_blog_comment', locals: {blog_comment: @blog_comment})) %>
+</div><div id="blogPostCommentsContainer">
+<%= ::Temple::Utils.escape_html((render partial: 'blog_posts/comments')) %>
+</div><div id="loading_results">
+<span>
+<%= ::Temple::Utils.escape_html((t('pages.blog_posts.show.previous_comments'))) %>
+</span></div><% _slim_controls3 = content_for :left_panel do %><% _slim_controls4 = ''.dup; 
+; if can? :update, @blog_post
+; _slim_controls4 << ("<div".freeze); _slim_controls4 << (" class=\"".freeze); _slim_controls4 << ("mybox".freeze); _slim_controls4 << ("\"".freeze); _slim_controls4 << (">".freeze); 
+; _slim_controls5 = link_to edit_blog_blog_post_path(@blog_post.blog, @blog_post), class: 'btn' do; _slim_controls6 = ''.dup; 
+; _slim_controls6 << ("<i".freeze); _slim_controls6 << (" class=\"".freeze); _slim_controls6 << ("fa-solid".freeze); _slim_controls6 << (" ".freeze); _slim_controls6 << ("fa-pencil".freeze); _slim_controls6 << ("\"".freeze); _slim_controls6 << (">".freeze); 
+; _slim_controls6 << ("</i>".freeze); _slim_controls6 << ((::Temple::Utils.escape_html((t('pages.blog_posts.show.edit_button')))).to_s); 
+; _slim_controls6; end; _slim_controls4 << ((::Temple::Utils.escape_html((_slim_controls5))).to_s); _slim_controls7 = link_to @blog_url, method: :delete, data: {confirm: t('pages.blog_posts.show.delete_button_confirm')}, class: 'btn' do; _slim_controls8 = ''.dup; 
+; _slim_controls8 << ("<i".freeze); _slim_controls8 << (" class=\"".freeze); _slim_controls8 << ("fa-regular".freeze); _slim_controls8 << (" ".freeze); _slim_controls8 << ("fa-trash-can".freeze); _slim_controls8 << ("\"".freeze); _slim_controls8 << (">".freeze); 
+; _slim_controls8 << ("</i>".freeze); _slim_controls8 << ((::Temple::Utils.escape_html((t('pages.blog_posts.show.delete_button')))).to_s); 
+; _slim_controls8; end; _slim_controls4 << ((::Temple::Utils.escape_html((_slim_controls7))).to_s); _slim_controls4 << ("</div>".freeze); end; if ::Configuration.socialnetwork_active
+; _slim_controls4 << ("<div".freeze); _slim_controls4 << (" class=\"".freeze); _slim_controls4 << ("mybox".freeze); _slim_controls4 << ("\"".freeze); _slim_controls4 << (">".freeze); 
+; _slim_controls4 << (" <a href=\"https://twitter.com/share\" class=\"twitter-share-button\" data-lang=\"en\" data-count=\"vertical\" data-text=\"".freeze); 
+; _slim_controls4 << ((::Temple::Utils.escape_html((t('twitter.share.blog_post', app: APP_SHORT_NAME, tags: @blog_post.tags.for_twitter)))).to_s); 
+; _slim_controls4 << ("\">Tweet".freeze); 
+; _slim_controls4 << ((::Temple::Utils.escape_html((raw facebook_like))).to_s); 
+; _slim_controls4 << ("<br".freeze); _slim_controls4 << (" />".freeze); 
+; _slim_controls4 << ("</div>".freeze); end; if @blog_post.groups.count > 0
+; _slim_controls4 << ("<div".freeze); _slim_controls4 << (" class=\"".freeze); _slim_controls4 << ("mybox".freeze); _slim_controls4 << ("\"".freeze); _slim_controls4 << (">".freeze); 
+; _slim_controls4 << ("<h4".freeze); _slim_controls4 << (">".freeze); 
+; _slim_controls4 << ((::Temple::Utils.escape_html(('Published on the following groups'))).to_s); 
+; _slim_controls4 << ("</h4>".freeze); _slim_controls4 << ("</div>".freeze); _slim_controls4 << ("<div".freeze); _slim_controls4 << (" class=\"".freeze); _slim_controls4 << ("mycont".freeze); _slim_controls4 << ("\"".freeze); _slim_controls4 << (">".freeze); 
+; @blog_post.groups.each do |group|
+; _slim_controls4 << ("<div".freeze); _slim_controls4 << (" class=\"".freeze); _slim_controls4 << ("panel".freeze); _slim_controls4 << ("\"".freeze); _slim_controls4 << (">".freeze); 
+; 
+; _slim_controls4 << ("</div>".freeze); _slim_controls4 << ("<div".freeze); _slim_controls4 << (" class=\"".freeze); _slim_controls4 << ("groupcontainer".freeze); _slim_controls4 << ("\"".freeze); _slim_controls4 << (">".freeze); 
+; 
+; _slim_controls4 << ("</div>".freeze); _slim_controls4 << ("<div".freeze); _slim_controls4 << (" class=\"".freeze); _slim_controls4 << ("groupImg24".freeze); _slim_controls4 << ("\"".freeze); _slim_controls4 << (">".freeze); 
+; _slim_controls4 << ((::Temple::Utils.escape_html((group.group_image_tag(24) rescue nil))).to_s); 
+; _slim_controls4 << ("</div>".freeze); _slim_controls4 << ("<div".freeze); _slim_controls4 << (" class=\"".freeze); _slim_controls4 << ("group".freeze); _slim_controls4 << ("\"".freeze); _slim_controls4 << (">".freeze); 
+; _slim_controls4 << ((::Temple::Utils.escape_html((link_to group.name, group_url(group)))).to_s); 
+; _slim_controls4 << ("</div>".freeze); end; _slim_controls4 << ("</div>".freeze); _slim_controls4 << ("<div".freeze); _slim_controls4 << (" class=\"".freeze); _slim_controls4 << ("clearboth".freeze); _slim_controls4 << ("\"".freeze); _slim_controls4 << (">".freeze); 
+; _slim_controls4 << ("</div>".freeze); end; _slim_controls4 %><% end %><%= ::Temple::Utils.escape_html((_slim_controls3)) %><% if @blog
+ %><%= ::Temple::Utils.escape_html((render 'blogs/left_panel')) %>
+<% end %><script type="text/javascript">
+ $(function () { disegnaCountdown(); }); 
+</script>

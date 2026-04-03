@@ -1,0 +1,25 @@
+<table class="posts">
+<tr>
+<td class="user_post" rowspan="2">
+<a name="post-<%= ::Temple::Utils.escape_html((post.id)) %>">
+</a><div class="user span2">
+<div class="username">
+<%= ::Temple::Utils.escape_html((link_to post.user.fullname, post.user)) %>
+</div><div class="icon">
+<%= ::Temple::Utils.escape_html((avatar(post.user, size: 100))) %>
+</div></div></td><td>
+<div class="post-header">
+<a href="#post-<%= ::Temple::Utils.escape_html((post.id)) %>">
+<div class="post-when">
+ <time datetime="
+<%= ::Temple::Utils.escape_html((post.created_at.to_s(:db))) %>
+">
+<%= ::Temple::Utils.escape_html(("#{time_ago_in_words(post.created_at)} #{t("ago")}")) %>
+<% if post.reply_to
+ %><span class="in-reply-to">
+<%= ::Temple::Utils.escape_html((link_to "#{t('frm.posts.post.in_reply_to')} #{post.reply_to.user.name}", "#post-#{post.reply_to.id}")) %>
+</span><% end %></div></a></div></td></tr><tr>
+<td>
+<div class="post-body">
+<%= ::Temple::Utils.escape_html((sanitize post.text)) %>
+</div></td></tr></table>

@@ -1,0 +1,19 @@
+<% if @group
+@quorum_collection = @group.quorums.active
+else
+@quorum_collection = Quorum.visible.order('seq nulls last')
+end %><%= ::Temple::Utils.escape_html((f.input :quorum_id, as: :select, required: true,
+-             collection: @quorum_collection.collect { |p| [p.name, p.id, { 'data-description' => p.description,
+-                                                                           'data-explanation' => p.explanation,
+-                                                                           'data-time_fixed' => p.time_fixed?,
+-                                                                           'data-minutes' => p.minutes }] },
+-             include_blank: t('pages.proposals.new.quorum_prompt'), input_html: { style: 'width: 100%' })) %>
+ <div id="available_quorums_container" title="
+<%= ::Temple::Utils.escape_html((t('pages.quorums.index.title'))) %>
+"> 
+<div class="clearboth">
+</div><p class="panel callout" id="quorum_explanation" style="display:none;">
+
+</p><div class="content" id="choose_votation">
+<div>
+</div></div>

@@ -1,0 +1,12 @@
+<div class="left_panel">
+<ul>
+<li>
+<a href="#" onclick="showSection(&#39;whatis&#39;);return false;">
+<%= ::Temple::Utils.escape_html((t('pages.quorums.index.how_read'))) %>
+</a></li><% @quorums.each do |quorum|
+ %><li>
+<a href="#" onclick="showSection('quorum_'+
+<%= ::Temple::Utils.escape_html((quorum.id)) %>
+);return false;">
+<%= ::Temple::Utils.escape_html((quorum.name)) %>
+</li><% end %></ul></div>

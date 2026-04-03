@@ -1,0 +1,3 @@
+$('[data-proposals-list]').html('
+<%= ::Temple::Utils.escape_html((j render(partial: 'tab_list', locals: {proposals: @proposals}))) %>
+'); 

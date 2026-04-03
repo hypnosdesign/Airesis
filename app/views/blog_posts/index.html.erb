@@ -1,0 +1,12 @@
+<% javascript 'endless_page'
+if @blog_posts.size == 0
+ %><div class="blogPost">
+
+</div><h1>
+<%= ::Temple::Utils.escape_html((t('pages.blogs.show.no_posts'))) %>
+</h1><p>
+<%= ::Temple::Utils.escape_html((t('pages.blogs.show.no_posts_long'))) %>
+</p><% else
+ %><div id="blogPostContainer">
+<%= ::Temple::Utils.escape_html((render collection: @blog_posts, partial: 'blog_post')) %>
+</div><% end %>

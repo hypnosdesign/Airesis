@@ -1,0 +1,8 @@
+<div class="card">
+<div class="image-container">
+<%= ::Temple::Utils.escape_html((avatar(@user, size: 120))) %>
+<% if @user == current_user
+ %><div class="caption">
+<a>
+<%= ::Temple::Utils.escape_html((t('pages.users.show.edit_image'))) %>
+</a></div><% end %></div></div><%= ::Temple::Utils.escape_html((render 'users/message')) %>

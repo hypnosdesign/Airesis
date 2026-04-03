@@ -1,0 +1,8 @@
+<div class="title clearfix">
+<span class="left">
+<%= ::Temple::Utils.escape_html((t('pages.home.index.next_events'))) %>
+</span><%= ::Temple::Utils.escape_html((link_to t('pages.home.index.show_events'), events_path, class: 'btn right')) %>
+</div><div class="scrollable">
+<% if @events.any?
+ %><%= ::Temple::Utils.escape_html((render partial: 'events/mini_event', collection: @events, as: 'event')) %>
+<% end %></div>

@@ -1,0 +1,25 @@
+<% @page_title = "#{@forum.title} - #{@group.name}"
+@extend = true
+ %><div class="forum">
+<%= ::Temple::Utils.escape_html((render partial: 'frm/forums/head', locals: { forum: @forum })) %>
+<%= ::Temple::Utils.escape_html((forem_pages_widget(@topics))) %>
+<table cellspacing="0" class="topics table-striped table">
+<thead>
+<tr>
+<th class="icon">
+</th><th class="byline topic-title">
+<%= ::Temple::Utils.escape_html((t('frm.topic.headings.topic'))) %>
+</th><th class="posts-count">
+<%= ::Temple::Utils.escape_html((t('frm.topic.headings.posts'))) %>
+</th><th class="views-count">
+<%= ::Temple::Utils.escape_html((t('frm.topic.headings.views'))) %>
+</th><th class="latest-post">
+<%= ::Temple::Utils.escape_html((t('frm.topic.headings.latest'))) %>
+</th></tr></thead><tbody>
+<% if @topics.empty?
+ %><tr>
+<td align="center" colspan="5">
+<%= ::Temple::Utils.escape_html((t('frm.topic.none'))) %>
+</td></tr><% end %><%= ::Temple::Utils.escape_html((render @topics)) %>
+</tbody></table><%= ::Temple::Utils.escape_html((forem_pages_widget(@topics))) %>
+</div><%= ::Temple::Utils.escape_html((render partial: '/frm/application/forem_footer')) %>

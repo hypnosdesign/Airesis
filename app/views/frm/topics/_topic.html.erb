@@ -1,0 +1,19 @@
+<tr class="topic 
+<%= ::Temple::Utils.escape_html((cycle('odd', 'even'))) %>
+<%= ::Temple::Utils.escape_html((topic.locked? ? 'locked' : 'unlocked')) %>
+"> 
+ <td<% _temple_html_attributeremover1 = "" %><% if !_temple_html_attributeremover1.empty? %> class="<%= _temple_html_attributeremover1 %>"<% end %> ruby.code="=.icon_classes(topic)">></ruby>
+</td>
+<td class="byline topic-title">
+<div class="subject">
+<%= ::Temple::Utils.escape_html((link_to topic.subject, group_forum_topic_url(@group, @forum, topic))) %>
+</div><div class="started-by">
+<%= ::Temple::Utils.escape_html((t "started_by")) %>
+<%= ::Temple::Utils.escape_html((relevant_posts(topic).first.user)) %>
+</div></td><td class="posts-count text-center">
+<%= ::Temple::Utils.escape_html((relevant_posts(topic).count)) %>
+</td><td class="views-count text-center">
+<%= ::Temple::Utils.escape_html((topic.views_count)) %>
+</td><td class="latest-post">
+<%= ::Temple::Utils.escape_html((link_to_latest_post(topic))) %>
+</td>

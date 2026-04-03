@@ -1,0 +1,7 @@
+<%= ::Temple::Utils.escape_html((@from.fullname)) %>
+ ti ha inviato il seguente messaggio:
+<br />
+<%= ::Temple::Utils.escape_html((raw auto_link((simple_format @body, style: 'font-style: italic;'), html: {target: '_blank'}, sanitize: false))) %>
+ Puoi rispondere a 
+<%= ::Temple::Utils.escape_html((@from.name)) %>
+ rispondendo semplicemente a questa email.

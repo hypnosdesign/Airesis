@@ -1,0 +1,21 @@
+<ul class="breadcrumbs">
+<li>
+<%= ::Temple::Utils.escape_html((link_to t('pages.groups.administration_panel.forum'), group_frm_admin_root_url(@group))) %>
+</li><li class="current">
+<%= ::Temple::Utils.escape_html((t("frm.admin.category.index"))) %>
+</li></ul><table cellspacing="0" class="forums table-striped table" id="forums">
+<thead>
+<tr>
+<th>
+<%= ::Temple::Utils.escape_html((t('category', scope: 'frm.admin.categories'))) %>
+</th><th>
+<%= ::Temple::Utils.escape_html((t('edit', scope: 'frm.admin.categories'))) %>
+</th><th>
+<%= ::Temple::Utils.escape_html((t('delete', scope: 'frm.admin.categories'))) %>
+</th></tr></thead><tbody>
+<%= ::Temple::Utils.escape_html((render partial: 'categories')) %>
+</tbody></table><%= ::Temple::Utils.escape_html((link_to t("frm.admin.category.new_link"), new_group_frm_admin_category_url(@group), class: "btn blue", remote: true, data:{disable_with: t('loading')})) %>
+<br />
+<% _slim_controls1 = content_for :left_panel do %><% _slim_controls2 = ''.dup; 
+; _slim_controls2 << ((::Temple::Utils.escape_html((render partial: 'groups/administration_panel'))).to_s); 
+; _slim_controls2 %><% end %><%= ::Temple::Utils.escape_html((_slim_controls1)) %>

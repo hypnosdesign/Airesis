@@ -1,0 +1,22 @@
+<div id="comment
+<%= ::Temple::Utils.escape_html((comment.id)) %>
+" class="blogComment card" data-comment-id="
+<%= ::Temple::Utils.escape_html((comment.id)) %>
+" 
+<% if comment.collapsed
+ %>data-collapsed 
+<% end %>> 
+<div class="blog-comment-image">
+<%= ::Temple::Utils.escape_html((avatar(comment.user, size: 20))) %>
+<span class="blogPoster">
+<%= ::Temple::Utils.escape_html((link_to_user comment.user)) %>
+</span></div><div class="blog-comment-content">
+<%= ::Temple::Utils.escape_html((raw auto_link((h(comment.body)).gsub(/\n/, '<br/>'), html: {target: '_blank'}, sanitize: false) { |text| truncate(text, length: 15) })) %>
+</div><div class="blog-comment-footer">
+<div title="<%= ::Temple::Utils.escape_html((l comment.created_at)) %>">
+<%= ::Temple::Utils.escape_html((time_in_words comment.created_at)) %>
+<% if can? :destroy, comment
+ %><div style="float:right">
+<%= ::Temple::Utils.escape_html((link_to t('pages.blog_posts.comment.delete_button'), [@blog, @blog_post, comment], method: :delete, data: {remote: true, confirm: t('pages.proposals.show.delete_contribute_confirmation')}, class: "deleteCommentLink")) %>
+</div><% end %></div></div><div style="clear:both;">
+</div>

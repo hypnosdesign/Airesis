@@ -1,0 +1,18 @@
+<% if current_user
+if @my_vote
+if @my_vote == ProposalRanking::POSITIVE
+ %><div class="votedup">
+</div><% elsif @can_vote_again
+ %><%= ::Temple::Utils.escape_html((render partial: 'proposals/ranking_and_spinner', locals: {action: "up"})) %>
+<% end %><%= ::Temple::Utils.escape_html((render partial: 'fragments/votes_and_rank', locals: {object: @proposal})) %>
+<% if @my_vote == ProposalRanking::NEGATIVE
+ %><div class="voteddown">
+</div><% elsif @can_vote_again
+ %><%= ::Temple::Utils.escape_html((render partial: 'proposals/ranking_and_spinner', locals: {action: "down"})) %>
+<% end; else
+ %><%= ::Temple::Utils.escape_html((render partial: 'proposals/ranking_and_spinner', locals: {action: "up"} if @can_vote_again)) %>
+<%= ::Temple::Utils.escape_html((render partial: 'fragments/votes_and_rank', locals: {object: @proposal})) %>
+<%= ::Temple::Utils.escape_html((render partial: 'proposals/ranking_and_spinner', locals: {action: "down"} if @can_vote_again)) %>
+<% end; else
+ %><%= ::Temple::Utils.escape_html((render partial: 'fragments/votes_and_rank', locals: {object: @proposal})) %>
+<% end %>

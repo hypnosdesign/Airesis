@@ -1,0 +1,28 @@
+<% if can?(:read, forum)
+ %> <tr class="forum 
+<%= ::Temple::Utils.escape_html((cycle("odd", "even"))) %>
+"> 
+<td class="forum-description">
+<%= ::Temple::Utils.escape_html((link_to forum.title, group_forum_url(@group,forum), class: "title")) %>
+</td><div class="description">
+<%= ::Temple::Utils.escape_html((forem_format(forum.description))) %>
+</div><td class="topics-count">
+<%= ::Temple::Utils.escape_html((topics_count(forum))) %>
+</td><td class="posts-count">
+<%= ::Temple::Utils.escape_html((posts_count(forum))) %>
+</td><td class="views-count">
+<%= ::Temple::Utils.escape_html((forum.views_count)) %>
+</td><td class="last-post">
+<span class="last_post">
+<% if last_post = forum.last_post_for(current_user)
+ %><%= ::Temple::Utils.escape_html((link_to(last_post.topic.subject, group_forum_topic_url(@group,forum, last_post.topic)))) %>
+<%= ::Temple::Utils.escape_html((t('by'))) %>
+<%= ::Temple::Utils.escape_html((last_post.user)) %>
+<br />
+ <time datetime="
+<%= ::Temple::Utils.escape_html((last_post.created_at.to_s(:db))) %>
+">
+<%= ::Temple::Utils.escape_html(("#{time_ago_in_words(last_post.created_at)}")) %>
+<% else
+ %><%= ::Temple::Utils.escape_html((t('frm.forums.index.none'))) %>
+<% end %></span></td><% end %>

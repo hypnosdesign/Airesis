@@ -1,0 +1,3 @@
+alert('
+<%= ::Temple::Utils.escape_html((t('pages.proposals.new.wait', minutes: ((PROPOSALS_TIME_LIMIT - @elapsed)/60).floor, seconds: ((PROPOSALS_TIME_LIMIT - @elapsed)%60).round(0)))) %>
+') $('#create_proposal_container').foundation('reveal','close');

@@ -1,0 +1,12 @@
+<div class="eventNewComment" id="eventNewComment">
+<% if !user_signed_in?
+ %><h2>
+<%= ::Temple::Utils.escape_html((t('pages.proposals.show.login_to_comment'))) %>
+</h2><% else
+_slim_controls1 = simple_form_for [@event, event_comment], remote: true do |f| %><% _slim_controls2 = ''.dup; 
+; _slim_controls2 << ((::Temple::Utils.escape_html((f.input :body, as: :text, label: t('pages.proposals.show.add_comment'), input_html: { class: 'blogNewCommentField', rows: 5, cols: 70 }))).to_s); 
+; _slim_controls2 << ("<p".freeze); _slim_controls2 << (">".freeze); 
+; _slim_controls2 << ((::Temple::Utils.escape_html((f.submit t('pages.event_comments.new.insert_comment'), data: { disable_with: t('loading') }, class: 'btn green'))).to_s); 
+; _slim_controls2 << ("</p>".freeze); _slim_controls2 %><% end %><%= ::Temple::Utils.escape_html((_slim_controls1)) %><% end %></div><script type="text/javascript">
+ $(function () { $('#event_comment_body').each(function () { if ($(this).attr('data-initialized') != 1) { $(this).charCount({ allowed: <%= ::Temple::Utils.escape_html((CONTRIBUTE_MAX_LENGTH)) %>, warning: 100, counterText: '<%= ::Temple::Utils.escape_html((t('pages.proposals.show.characters_left'))) %> ' }); $(this).elastic(); $(this).attr('data-initialized', 1); } }); }); 
+</script>

@@ -1,0 +1,37 @@
+<% @comment = ProposalComment.find(@data[:comment_id])
+@username = @data[:username]
+@proposal = Proposal.find(@data[:proposal_id])
+@ranking = ProposalCommentRanking.find_by_user_id_and_proposal_comment_id(@alert.user.id, @comment.id)
+@alert_url = check_alert_url(@alert, host: @alert.user.locale.host, l: @alert.user.locale.lang)
+_slim_controls1 = email_h1 do %><% _slim_controls2 = ''.dup; 
+; _slim_controls2 << ((::Temple::Utils.escape_html((raw t('mailer.update_contribute.title', user: @username)))).to_s); 
+; _slim_controls2 %><% end %><%= ::Temple::Utils.escape_html((_slim_controls1)) %><div style="padding: 20px 0 0;clear: both;">
+ <div style="float: left;margin: 0px 5px 5px 0px;" title=" 
+<% if @proposal.is_anonima?
+ %><%= ::Temple::Utils.escape_html((@username)) %>
+<% end %>"> 
+<% if @proposal.is_anonima?
+ %> <img src="https://www.gravatar.com/avatar/
+<%= ::Temple::Utils.escape_html((Digest::MD5.hexdigest(@username))) %>
+?s=40&d=identicon&r=PG"/> 
+<% else
+ %><%= ::Temple::Utils.escape_html((avatar(@comment.user, size: 40, url: true))) %>
+<% end %></div><div style="border: 1px solid #CCCCCC;border-radius: 3px 3px 0px 0px;margin-left: 50px;color: #333333;">
+<div>
+<div style="word-wrap: break-word;margin: 5px;">
+<%= ::Temple::Utils.escape_html((parsed_content(@comment, @proposal.is_anonima?))) %>
+</div><div style="font-size: 0.9em;margin-top: 5px;margin-left: 5px;margin-bottom: 2px;color: #999999;float: left;">
+<% who = @username
+ %><%= ::Temple::Utils.escape_html((raw t('pages.proposals.show.comment_updated_by', when: (l @comment.created_at), who: who))) %>
+<%= ::Temple::Utils.escape_html(("in \"#{@comment.paragraph.section.title}\"" if @comment.paragraph)) %>
+</div><div style="clear:both;">
+</div></div></div><% _slim_controls3 = blue_panel do %><% _slim_controls4 = ''.dup; 
+; _slim_controls4 << ("<p".freeze); _slim_controls4 << (">".freeze); 
+; _slim_controls4 << (" Your evaluation about it is ".freeze); 
+; _slim_controls4 << ("</p>".freeze); _slim_controls4 << ("<b".freeze); _slim_controls4 << (">".freeze); 
+; _slim_controls4 << ((::Temple::Utils.escape_html((I18n.t(@ranking.ranking_type_id, scope: 'ranking_types')))).to_s); 
+; _slim_controls4 << ("</b>".freeze); _slim_controls4 << ("<p".freeze); _slim_controls4 << (">".freeze); 
+; _slim_controls4 << (" You changed your opinion? ".freeze); 
+; _slim_controls4 << ("</p>".freeze); _slim_controls4 << ("<p".freeze); _slim_controls4 << (">".freeze); 
+; _slim_controls4 << ((::Temple::Utils.escape_html((raw t('mailer.update_contribute.view_proposal', click_here: (link_to t('mailer.default.click_here'), @alert_url))))).to_s); 
+; _slim_controls4 << ("</p>".freeze); _slim_controls4 %><% end %><%= ::Temple::Utils.escape_html((_slim_controls3)) %>

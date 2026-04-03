@@ -1,0 +1,24 @@
+<tr>
+<td>
+<% _slim_controls1 = link_to participation.group do %><% _slim_controls2 = ''.dup; 
+; _slim_controls2 << ((::Temple::Utils.escape_html((participation.group_image_tag 20))).to_s); 
+; _slim_controls2 << ("<span".freeze); _slim_controls2 << (" class=\"".freeze); _slim_controls2 << ("show-for-medium-up".freeze); _slim_controls2 << ("\"".freeze); _slim_controls2 << (">".freeze); 
+; _slim_controls2 << ((::Temple::Utils.escape_html((participation.group.name))).to_s); 
+; _slim_controls2 << ("</span>".freeze); _slim_controls2 %><% end %><%= ::Temple::Utils.escape_html((_slim_controls1)) %></td><td>
+<%= ::Temple::Utils.escape_html((participation.participation_role.name)) %>
+ <i class="fa-solid fa-circle-info" id="participation_
+<%= ::Temple::Utils.escape_html((participation.id)) %>
+" data-participation-tooltip>
+<div data-participation-tooltip-text="" style="display: none;">
+<strong>
+<%= ::Temple::Utils.escape_html((t('pages.users.show.what_can_i_do'))) %>
+</strong><ul>
+<li>
+<%= ::Temple::Utils.escape_html((GroupAction::LIST.select { |action| participation.participation_role[action] }.map { |a| I18n.t("db.group_actions.#{a}.description") }.join('</li><li>').html_safe)) %>
+</li></ul></div></td><td class="show-for-medium-up">
+<%= ::Temple::Utils.escape_html((participation.created_at if participation.created_at)) %>
+</td><td>
+<%= ::Temple::Utils.escape_html((participation.created_at.to_i if participation.created_at)) %>
+</td><td>
+<%= ::Temple::Utils.escape_html((link_to t('pages.users.show.get_out_of_group_button'), group_group_participation_url(participation.group, participation), method: :delete, data: { confirm: t('pages.users.show.get_out_of_group_confermation') }, class: 'btn' if can? :destroy, participation)) %>
+</td></tr>

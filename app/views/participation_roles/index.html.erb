@@ -1,0 +1,17 @@
+<% _slim_controls1 = render layout: "layouts/page_title", locals: { title: t('pages.groups.edit_permissions.title') } do %><% _slim_controls2 = ''.dup; 
+; 
+; _slim_controls2 %><% end %><%= ::Temple::Utils.escape_html((_slim_controls1)) %><div id="roles_panel_container">
+<%= ::Temple::Utils.escape_html((render partial: 'groups/roles_panel')) %>
+</div><br />
+<%= ::Temple::Utils.escape_html((link_to t('pages.groups.edit_permissions.new_role'), new_group_participation_role_url(@group), data: { remote: true, disable_with: t('loading') }, class: 'btn blue')) %>
+ <div id="edit_role" title="
+<%= ::Temple::Utils.escape_html((t('pages.groups.edit_permissions.edit_role_title'))) %>
+" class="reveal-modal small" data-reveal> 
+<div class="reveal-modal small" data-reveal="" id="new_role">
+<h2>
+<%= ::Temple::Utils.escape_html((t('pages.groups.edit_permissions.new_role_title'))) %>
+</h2><% @participation_role = ParticipationRole.new(group_id: @group.id)
+ %><%= ::Temple::Utils.escape_html((render(partial: 'participation_roles/form', locals: { button_name: t('buttons.create') }))) %>
+</div><% _slim_controls3 = content_for :left_panel do %><% _slim_controls4 = ''.dup; 
+; _slim_controls4 << ((::Temple::Utils.escape_html((render 'groups/administration_panel'))).to_s); 
+; _slim_controls4 %><% end %><%= ::Temple::Utils.escape_html((_slim_controls3)) %>

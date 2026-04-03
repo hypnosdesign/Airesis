@@ -1,0 +1,12 @@
+<div class="title clearfix">
+<span class="left">
+<%= ::Temple::Utils.escape_html((t('pages.home.index.most_used_tags'))) %>
+</span><%= ::Temple::Utils.escape_html((link_to t('pages.home.index.show_tags'), tags_path, class: 'btn right')) %>
+</div><div class="scrollable">
+<% @tags.each do |tag|
+ %><div class="round label tag">
+ <a href="
+<%= ::Temple::Utils.escape_html((tag_path tag.text)) %>
+">
+<%= ::Temple::Utils.escape_html((tag.text)) %>
+</div><% end %></div>

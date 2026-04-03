@@ -1,0 +1,12 @@
+<% @page_tile = 'Internal Error'
+ %><div class="error_dialog card">
+<div>
+<%= ::Temple::Utils.escape_html((image_tag 'allbroken128.png', style:"margin: auto;display: block;")) %>
+</div><div style="text-align: center;">
+<h1>
+<%= ::Temple::Utils.escape_html((t('error.error_500.title'))) %>
+</h1><p>
+<%= ::Temple::Utils.escape_html((t('error.error_500.description'))) %>
+</p><%= ::Temple::Utils.escape_html((link_to t('buttons.go_back'), :back)) %>
+</div><div style="clear: both;">
+</div></div>

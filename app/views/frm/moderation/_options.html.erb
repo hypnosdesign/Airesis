@@ -1,0 +1,8 @@
+<p>
+<%= ::Temple::Utils.escape_html((f.radio_button "moderation_option", "approve")) %>
+<%= ::Temple::Utils.escape_html((f.label "moderation_option_approve", t('approve', scope: 'forem.posts.moderation'), class: "label label-success")) %>
+</p><p>
+<%= ::Temple::Utils.escape_html((f.radio_button "moderation_option", "spam")) %>
+<%= ::Temple::Utils.escape_html((f.label "moderation_option_spam", t('spam', scope: 'forem.posts.moderation'), class: "label label-important")) %>
+</p><br />
+<%= ::Temple::Utils.escape_html((f.submit t('moderate', scope: 'forem.posts.moderation'), class: "btn btn-primary")) %>

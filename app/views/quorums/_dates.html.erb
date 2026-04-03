@@ -1,0 +1,44 @@
+<div class="inner">
+<div class="clearboth">
+</div><% _slim_controls1 = fields_for 'proposal' do |f| %><% _slim_controls2 = ''.dup; 
+; _slim_controls3 = f.fields_for 'votation' do |v|; _slim_controls4 = ''.dup; 
+; _slim_controls4 << ((::Temple::Utils.escape_html((v.hidden_field 'later'))).to_s); 
+; _slim_controls4 << ("<div".freeze); _slim_controls4 << (" class=\"".freeze); _slim_controls4 << ("choise_a".freeze); _slim_controls4 << ("\"".freeze); _slim_controls4 << (">".freeze); 
+; if @group && (can? :create_date, @group) && !@dates.empty?
+; _slim_controls4 << ((::Temple::Utils.escape_html((v.radio_button 'choise', 'preset', checked: true))).to_s); 
+; end; unless @dates.empty?
+; _slim_controls4 << ((::Temple::Utils.escape_html((v.label 'choise_preset', t('pages.proposals.show.created_events'), class: 'radiolabel'))).to_s); 
+; _slim_controls4 << ("<br".freeze); _slim_controls4 << (" />".freeze); 
+; _slim_controls4 << ("<div".freeze); _slim_controls4 << (" class=\"".freeze); _slim_controls4 << ("inner".freeze); _slim_controls4 << ("\"".freeze); _slim_controls4 << (">".freeze); 
+; _slim_controls4 << ((::Temple::Utils.escape_html((v.select :vote_period_id, options_for_select(@dates), {style: 'width:400px'}))).to_s); 
+; _slim_controls4 << ("</div>".freeze); end; _slim_controls4 << ("</div>".freeze); if !@group || (can? :create_date, @group)
+; _slim_controls4 << ("<div".freeze); _slim_controls4 << (" class=\"".freeze); _slim_controls4 << ("choise_b".freeze); _slim_controls4 << ("\"".freeze); _slim_controls4 << (">".freeze); 
+; unless @dates.empty?
+; _slim_controls4 << ((::Temple::Utils.escape_html((v.radio_button 'choise', 'new'))).to_s); 
+; end; _slim_controls4 << ((::Temple::Utils.escape_html((v.label 'choise_new', t('pages.proposals.show.create_new_votation_period'), class: 'radiolabel'))).to_s); 
+; _slim_controls4 << ("<br".freeze); _slim_controls4 << (" />".freeze); 
+; _slim_controls4 << (" <div class=\"inner\" style=\"opacity: ".freeze); 
+; _slim_controls4 << ((::Temple::Utils.escape_html((@dates.empty? ? 1 : 0.6))).to_s); 
+; _slim_controls4 << ("\"> ".freeze); 
+; _slim_controls4 << ("</div>".freeze); _slim_controls4 << ("<div".freeze); _slim_controls4 << (" class=\"".freeze); _slim_controls4 << ("row".freeze); _slim_controls4 << ("\"".freeze); _slim_controls4 << (">".freeze); 
+; 
+; _slim_controls4 << ("</div>".freeze); _slim_controls4 << ("<div".freeze); _slim_controls4 << (" class=\"".freeze); _slim_controls4 << ("columns".freeze); _slim_controls4 << (" ".freeze); _slim_controls4 << ("large-5".freeze); _slim_controls4 << ("\"".freeze); _slim_controls4 << (" id=\"".freeze); _slim_controls4 << ("start_preset".freeze); _slim_controls4 << ("\"".freeze); _slim_controls4 << (" style=\"".freeze); _slim_controls4 << ("display: block;".freeze); _slim_controls4 << ("\"".freeze); _slim_controls4 << (">".freeze); 
+; _slim_controls4 << ((::Temple::Utils.escape_html((v.label 'start', "#{t('label.from')} "))).to_s); 
+; _slim_controls4 << ("</div>".freeze); _slim_controls4 << ("<div".freeze); _slim_controls4 << (" class=\"".freeze); _slim_controls4 << ("start_vot".freeze); _slim_controls4 << ("\"".freeze); _slim_controls4 << (" data-start-votation=\"".freeze); _slim_controls4 << ("\"".freeze); _slim_controls4 << (">".freeze); 
+; _slim_controls4 << ("</div>".freeze); end; _slim_controls4; end; _slim_controls2 << ((::Temple::Utils.escape_html((_slim_controls3))).to_s); _slim_controls2 %><% end %><%= ::Temple::Utils.escape_html((_slim_controls1)) %></div><div class="columns large-5" id="start_choose" style="display:none">
+<%= ::Temple::Utils.escape_html((v.label 'start', "#{t('label.from')} ")) %>
+<div class="row collapse">
+<div class="columns small-9">
+<%= ::Temple::Utils.escape_html((v.text_field 'start')) %>
+</div><div class="columns small-3">
+<span class="cancel_action postfix">
+X
+</span></div></div><%= ::Temple::Utils.escape_html((v.hidden_field 'start_edited')) %>
+</div><div class="columns large-5 left">
+<% _slim_controls5 = v.label 'end' do %><% _slim_controls6 = ''.dup; 
+; _slim_controls6 << ((::Temple::Utils.escape_html(("#{t('label.to')} "))).to_s); 
+; _slim_controls6 << ((::Temple::Utils.escape_html((v.text_field 'end'))).to_s); 
+; _slim_controls6 %><% end %><%= ::Temple::Utils.escape_html((_slim_controls5)) %></div><div class="clearboth">
+</div><%= ::Temple::Utils.escape_html((link_to t('pages.proposals.show.choose_later'), '#', class: 'btn later', id: 'later', data: {other: t('pages.proposals.show.choose_now')})) %>
+<div class="clearboth">
+</div>

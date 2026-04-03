@@ -1,0 +1,11 @@
+<ul class="breadcrumbs">
+<li>
+<%= ::Temple::Utils.escape_html((link_to t('pages.groups.administration_panel.proposals'), group_quorums_url(@group))) %>
+</li><li class="current">
+<%= ::Temple::Utils.escape_html((@quorum.name)) %>
+</li></ul><br />
+<div class="card">
+<%= ::Temple::Utils.escape_html((render(partial: 'quorums/form', locals: {button_name: t('buttons.update')}))) %>
+</div><% _slim_controls1 = content_for :left_panel do %><% _slim_controls2 = ''.dup; 
+; _slim_controls2 << ((::Temple::Utils.escape_html((render 'groups/administration_panel'))).to_s); 
+; _slim_controls2 %><% end %><%= ::Temple::Utils.escape_html((_slim_controls1)) %>

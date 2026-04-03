@@ -1,0 +1,44 @@
+<table class="row footer">
+<tr>
+<td class="wrapper">
+<table class="six columns">
+<tr>
+<td class="left-text-pad">
+<h5><%= ::Temple::Utils.escape_html((t('mailer.default.footer.connect_with_us'))) %>
+</h5><table class="tiny-button facebook">
+<tr>
+<td>
+<%= ::Temple::Utils.escape_html((link_to 'Facebook', NEWSLETTER_FACEBOOK_URL, target: '_blank')) %>
+</td></tr></table><br />
+<table class="tiny-button twitter">
+<tr>
+<td>
+<%= ::Temple::Utils.escape_html((link_to 'Twitter', NEWSLETTER_TWITTER_URL, target: '_blank')) %>
+</td></tr></table></td><td class="expander">
+</td></tr></table></td><td class="wrapper last">
+<table class="six columns">
+<tr>
+<td class="last right-text-pad">
+<h5><%= ::Temple::Utils.escape_html((t('mailer.default.footer.contact_info'))) %>
+</h5><%= ::Temple::Utils.escape_html((t('mailer.default.footer.email_label'))) %>
+ 
+<%= ::Temple::Utils.escape_html((mail_to ENV['APP_EMAIL_ADDRESS'])) %>
+</td><td class="expander">
+</td></tr></table></td></tr></table><table class="row">
+<tr>
+<td class="wrapper last">
+<table class="twelve columns">
+<tr>
+<td align="center">
+<center>
+<p style="text-align:center;">
+<%= ::Temple::Utils.escape_html((link_to t('mailer.default.terms'), terms_url(host: @user.original_locale.host, l: @user.original_locale.lang), target: '_blank')) %>
+ | 
+<%= ::Temple::Utils.escape_html((link_to t('mailer.default.privacy'), privacy_url(host: @user.original_locale.host, l: @user.original_locale.lang), target: '_blank')) %>
+ | 
+<% if @unregistered
+ %><%= ::Temple::Utils.escape_html((link_to t('mailer.invite.no_more_button'), anymore_group_group_invitation_group_invitation_email_url(@group, @group_invitation, @group_invitation_email.token, email: @group_invitation_email.email))) %>
+<% else
+ %><%= ::Temple::Utils.escape_html((link_to t('mailer.default.edit_preferences'), alarm_preferences_users_url(host: @user.original_locale.host, l: @user.original_locale.lang), target: '_blank')) %>
+<% end %></p></center></td><td class="expander">
+</td></tr></table></td></tr></table>

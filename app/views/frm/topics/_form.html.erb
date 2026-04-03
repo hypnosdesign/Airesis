@@ -1,0 +1,6 @@
+<% _slim_controls1 = simple_form_for @topic, url: group_forum_topics_url(@group, @forum) do |f| %><% _slim_controls2 = ''.dup; 
+; _slim_controls2 << ((::Temple::Utils.escape_html((f.input :subject, label: t('simple_form.labels.topic.subject')))).to_s); 
+; _slim_controls3 = f.simple_fields_for :posts do |post|; _slim_controls4 = ''.dup; 
+; _slim_controls4 << ((::Temple::Utils.escape_html((render partial: 'frm/posts/form', locals: {f: post}))).to_s); 
+; _slim_controls4; end; _slim_controls2 << ((::Temple::Utils.escape_html((_slim_controls3))).to_s); _slim_controls2 << ((::Temple::Utils.escape_html((f.submit t('helpers.submit.topic.create'), class: 'btn blue', data:{disable_with:t('loading')}))).to_s); 
+; _slim_controls2 %><% end %><%= ::Temple::Utils.escape_html((_slim_controls1)) %>

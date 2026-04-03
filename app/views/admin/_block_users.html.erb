@@ -1,0 +1,18 @@
+<div class="card">
+<h3>
+Lock users
+</h3><% _slim_controls1 = form_tag block_admin_users_path do %><% _slim_controls2 = ''.dup; 
+; _slim_controls2 << ((::Temple::Utils.escape_html((label_tag 'Blocca utente'))).to_s); 
+; _slim_controls2 << ((::Temple::Utils.escape_html((text_field_tag 'user_id'))).to_s); 
+; _slim_controls2 << ((::Temple::Utils.escape_html((submit_tag 'Vai!', class: 'btn'))).to_s); 
+; _slim_controls2 %><% end %><%= ::Temple::Utils.escape_html((_slim_controls1)) %></div><div class="card">
+<h3>
+<%= ::Temple::Utils.escape_html(('Elenco utenti bloccati')) %>
+</h3><ul>
+<% User.blocked.each do |user|
+ %><li>
+<%= ::Temple::Utils.escape_html((link_to "#{user.id}: #{user.blocked_name} #{user.blocked_surname} (#{user.email})", user)) %>
+<% _slim_controls3 = link_to unblock_admin_user_path(user) do %><% _slim_controls4 = ''.dup; 
+; _slim_controls4 << ("<i".freeze); _slim_controls4 << (" class=\"".freeze); _slim_controls4 << ("fa-solid".freeze); _slim_controls4 << (" ".freeze); _slim_controls4 << ("fa-unlock".freeze); _slim_controls4 << ("\"".freeze); _slim_controls4 << (">".freeze); 
+; _slim_controls4 << ("</i>".freeze); _slim_controls4 << ((::Temple::Utils.escape_html((t('buttons.unlock')))).to_s); 
+; _slim_controls4 %><% end %><%= ::Temple::Utils.escape_html((_slim_controls3)) %></li><% end %></ul></div>

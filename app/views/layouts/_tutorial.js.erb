@@ -1,0 +1,15 @@
+if ($(window).width() > 768) { $(function () { var intro = introJs(); var portlets = $('.portlet_panel'); intro.setOptions({ steps: 
+<%= ::Temple::Utils.escape_html((yield)) %>
+, doneLabel: '
+<%= ::Temple::Utils.escape_html((j t('tutorial.done_label'))) %>
+', skipLabel: '
+<%= ::Temple::Utils.escape_html((j t('tutorial.skip_label'))) %>
+', nextLabel: '
+<%= ::Temple::Utils.escape_html((t('tutorial.next'))) %>
+ →', prevLabel: '← 
+<%= ::Temple::Utils.escape_html((t('tutorial.back'))) %>
+', exitOnOverlayClick: false }); intro.oncomplete(function () { $.ajax({ url: '
+<%= ::Temple::Utils.escape_html((complete_tutorial_step_path(@step.tutorial, @step))) %>
+' }) }); intro.onexit(function () { $.ajax({ url: '
+<%= ::Temple::Utils.escape_html((complete_tutorial_step_path(@step.tutorial, @step))) %>
+' }) }); intro.start(); }); } 

@@ -1,0 +1,15 @@
+<div class="cont-mess gray scrollable">
+<% @unread.each do |alert|
+ %><li>
+ <a class="card mess new" href="
+<%= ::Temple::Utils.escape_html((calculate_alert_path(alert))) %>
+" data-proposal-id="
+<%= ::Temple::Utils.escape_html((@proposal_id)) %>
+"> 
+</li><div>
+<p class="p2">
+<%= ::Temple::Utils.escape_html((alert.message.html_safe)) %>
+</p></div><div class="p1">
+<%= ::Temple::Utils.escape_html((l alert.created_at)) %>
+</div><% end %></div><div class="clearboth">
+</div>

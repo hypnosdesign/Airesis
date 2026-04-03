@@ -1,0 +1,7 @@
+var event_edit = $('
+<div class="reveal-modal medium" data-reveal="" id="event_edit">
+</div>'); event_edit.html("
+<%= ::Temple::Utils.escape_html((j render 'edit_form')) %>
+"); airesis_reveal(event_edit); $(event_edit).on('opened.fndtn.reveal', function () { EventsEdit.mapManager.refresh(); }); 
+<% content_for :after_page_js do
+end %>

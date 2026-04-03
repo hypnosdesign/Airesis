@@ -1,0 +1,16 @@
+<% @newsletters.each do |newsletter|
+ %><div class="card">
+
+</div><div class="row">
+
+</div><div class="columns">
+<%= ::Temple::Utils.escape_html((newsletter.subject)) %>
+<%= ::Temple::Utils.escape_html((sanitize truncate_html(newsletter.body, length: 100, omission: '...'))) %>
+</div><div class="row">
+
+</div><div class="columns">
+<%= ::Temple::Utils.escape_html((render 'publish_form', newsletter: newsletter)) %>
+</div><%= ::Temple::Utils.escape_html((link_to t('buttons.edit'), edit_admin_newsletter_path(newsletter), class: 'btn')) %>
+<%= ::Temple::Utils.escape_html((link_to t('buttons.show'), admin_newsletter_path(newsletter), class: 'btn')) %>
+<%= ::Temple::Utils.escape_html((link_to t('buttons.preview'), preview_admin_newsletter_path(newsletter), class: 'btn')) %>
+<% end %><%= ::Temple::Utils.escape_html((link_to t('buttons.new_newsletter'), new_admin_newsletter_path, class: 'btn blue')) %>

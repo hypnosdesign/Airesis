@@ -1,0 +1,17 @@
+<p class="inpoints">
+<span class="littleText" id="valutazioni">
+<%= ::Temple::Utils.escape_html((t('pages.proposals.show.score'))) %>
+</span><span class="rightAlign">
+<%= ::Temple::Utils.escape_html((@proposal.valutations)) %>
+</span></p><p class="ranking">
+<span class="littleText" id="gradimento">
+<%= ::Temple::Utils.escape_html((t('pages.proposals.show.rank'))) %>
+</span><span class="rightAlign">
+<%= ::Temple::Utils.escape_html((@proposal.rank)) %>
+%
+</span></p><% mustache_proposal = proposal_for_mustache(@proposal)
+if mustache_proposal['voting_or_voted?']
+ %><%= ::Temple::Utils.escape_html((render 'proposals/new_vote_bar', mustache_proposal)) %>
+<% else
+ %><%= ::Temple::Utils.escape_html((render 'proposals/new_rank_bar', mustache_proposal)) %>
+<% end %>

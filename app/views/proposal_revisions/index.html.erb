@@ -1,0 +1,12 @@
+<div class="card">
+<h2>
+<%= ::Temple::Utils.escape_html((@page_title = t('pages.proposal_histories.index.title', title: @proposal.title))) %>
+</h2><%= ::Temple::Utils.escape_html((render partial: 'panel_content')) %>
+<div class="clearboth">
+
+</div></div><% content_for :left_panel do
+ %><%= ::Temple::Utils.escape_html((link_to t('pages.proposal_histories.index.back_to_proposal'),
+@group ? group_proposal_url(@group, @proposal) : proposal_url(@proposal), class: 'btn blue')) %>
+<div class="mybox">
+<%= ::Temple::Utils.escape_html((render partial: 'panel_menu')) %>
+</div><% end %>

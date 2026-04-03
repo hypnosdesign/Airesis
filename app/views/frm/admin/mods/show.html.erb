@@ -1,0 +1,18 @@
+<ul class="breadcrumbs">
+<li>
+<%= ::Temple::Utils.escape_html((link_to t('pages.groups.administration_panel.forum'), group_frm_admin_root_url(@group))) %>
+</li><li>
+<%= ::Temple::Utils.escape_html((link_to t('frm.admin.group.index'), group_frm_admin_mods_url(@group))) %>
+</li><li class="current">
+<%= ::Temple::Utils.escape_html((@frm_mod.name)) %>
+</li></ul><div class="card">
+<div class="row add-member-form">
+<%= ::Temple::Utils.escape_html((render 'frm/admin/mods/add_form')) %>
+</div></div><div class="card">
+<div id="group_members_container">
+<%= ::Temple::Utils.escape_html((render 'group_members')) %>
+</div></div><script type="text/javascript">
+ ModsShow.autocompleteUrl = '<%= ::Temple::Utils.escape_html((j group_user_autocomplete_url(@group))) %>'; 
+</script><% _slim_controls1 = content_for :left_panel do %><% _slim_controls2 = ''.dup; 
+; _slim_controls2 << ((::Temple::Utils.escape_html((render 'groups/administration_panel'))).to_s); 
+; _slim_controls2 %><% end %><%= ::Temple::Utils.escape_html((_slim_controls1)) %>

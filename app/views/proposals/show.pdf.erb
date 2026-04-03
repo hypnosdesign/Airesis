@@ -1,0 +1,153 @@
+<html>
+<head>
+<meta content="text/html; charset=utf-8" http-equiv="content-type" />
+<%= ::Temple::Utils.escape_html((wicked_pdf_stylesheet_link_tag 'application')) %>
+<%= ::Temple::Utils.escape_html((wicked_pdf_stylesheet_link_tag 'pdf/proposal')) %>
+</head><body>
+<div class="dates">
+<span class="title_grey">
+<%= ::Temple::Utils.escape_html((raw t('pages.proposals.show.created_at'))) %>
+</span><br />
+<%= ::Temple::Utils.escape_html((l @proposal.created_at)) %>
+<br />
+<% if @proposal.updated_at != @proposal.created_at
+ %><span class="title_grey">
+<%= ::Temple::Utils.escape_html((t('pages.proposals.show.updated_at'))) %>
+</span><br />
+<%= ::Temple::Utils.escape_html((l @proposal.updated_at)) %>
+<% end %></div><div id="header">
+<div>
+<%= ::Temple::Utils.escape_html((params[:debug].present? ? image_tag('logo_head.png', class: 'logo-image') : wicked_pdf_image_tag('logo_head.png', class: 'logo-image'))) %>
+<div class="headerTitle">
+<%= ::Temple::Utils.escape_html((t('home.intro.title'))) %>
+</div></div></div><div id="content">
+<h1>
+<%= ::Temple::Utils.escape_html((@proposal.title)) %>
+</h1><div id="wicked_proposal_info">
+<% unless @proposal.is_polling?
+ %><div class="rankleftpanel" id="rankleftpanel">
+
+</div><div class="points-ranking">
+
+</div><p class="points">
+<span class="littleText" id="valutazioni">
+<%= ::Temple::Utils.escape_html((t('pages.proposals.show.score'))) %>
+</span><span class="rightAlign">
+<%= ::Temple::Utils.escape_html((@proposal.valutations)) %>
+</span></p><p class="ranking">
+<span class="littleText" id="gradimento">
+<%= ::Temple::Utils.escape_html((t('pages.proposals.show.rank'))) %>
+</span><span class="rightAlign">
+<%= ::Temple::Utils.escape_html((@proposal.rank)) %>
+%
+</span></p><div class="clear">
+</div><% end %></div></div><div class="properties-table">
+<div class="authors-cell">
+<h3>
+<%= ::Temple::Utils.escape_html((t('pages.proposals.show.editors_title'))) %>
+</h3><div class="authors_list">
+<% @proposal.users.each do |user|
+ %><%= ::Temple::Utils.escape_html((user.fullname)) %>
+<% end %><div class="clear">
+</div></div></div><div class="groups-cell">
+<% if ::Configuration.proposal_support
+ %><div id="support_left_panel_container">
+<h3>
+<%= ::Temple::Utils.escape_html((t('pages.proposals.show.supporting_group'))) %>
+</h3><% @proposal.supporting_groups.each do |group|
+ %><div class="pcontainer">
+
+</div><div class="MoImg24">
+<%= ::Temple::Utils.escape_html((group.group_image_tag 24)) %>
+</div><div class="Mo">
+<%= ::Temple::Utils.escape_html((link_to group.name[0..20], group_path(group))) %>
+</div><div style="clear: both;">
+</div><% end %></div><% end %><%= ::Temple::Utils.escape_html((t('pages.proposals.show.no_supporting_group') if @proposal.supporting_groups.empty?)) %>
+</div></div><div class="tags-cell">
+<% unless @proposal.tags.empty? || !::Configuration.folksonomy
+ %><h3>
+<%= ::Temple::Utils.escape_html((t('pages.proposals.show.tags_title'))) %>
+</h3><% @proposal.tags.each do |tag|
+ %><div class="tag">
+<%= ::Temple::Utils.escape_html((tag.text)) %>
+ x 
+<%= ::Temple::Utils.escape_html((tag.try(:proposals_count))) %>
+</div><% end; end %></div><div class="interest-borders-cell">
+<% unless @proposal.interest_borders.empty?
+ %><h3>
+<%= ::Temple::Utils.escape_html((t('pages.proposals.show.geographic_boundaries_title'))) %>
+</h3><% @proposal.interest_borders.each do |ib|
+ %><div class="label">
+<%= ::Temple::Utils.escape_html((ib.description)) %>
+</div><% end; end %></div><div class="clear">
+<div class="category-cell">
+<% if ::Configuration.proposal_categories
+ %><h3>
+<%= ::Temple::Utils.escape_html((t('pages.proposals.show.category_title'))) %>
+</h3><table>
+<tr>
+<td style="vertical-align: middle;">
+<%= ::Temple::Utils.escape_html((params[:debug].present? ? image_tag("proposal_categories/"+@proposal.category.name + "_s.png", align: 'middle', style: "width:22px;padding-right:2px;") : wicked_pdf_image_tag("proposal_categories/"+@proposal.category.name + "-22.png", align: 'middle', style: "width:22px;padding-right:2px;"))) %>
+</td><td>
+<%= ::Temple::Utils.escape_html((@proposal.category.description)) %>
+</td></tr></table><% end %></div><div class="clear">
+</div></div><div id="wicked_center_panel" style="margin-left: 4px;">
+<h2 class="section_title">
+Properties
+</h2><div class="proposal-main-container proposal_main shadow-box">
+<span class="title_grey">
+<%= ::Temple::Utils.escape_html((raw t('activerecord.attributes.proposal.debate_starts_at'))) %>
+</span><div class="time-property">
+<%= ::Temple::Utils.escape_html((l @proposal.quorum.started_at)) %>
+</div><br />
+<span class="title_grey">
+<%= ::Temple::Utils.escape_html((raw t('activerecord.attributes.proposal.debate_ends_at'))) %>
+</span><div class="time-property">
+<%= ::Temple::Utils.escape_html((l @proposal.quorum.ends_at)) %>
+</div><br />
+</div><% if @proposal.vote_starts_at
+ %><div class="proposal-main-container proposal_main shadow-box vote-properties">
+<span class="title_grey">
+<%= ::Temple::Utils.escape_html((raw t('activerecord.attributes.proposal.vote_starts_at'))) %>
+</span></div><div class="time-property">
+<%= ::Temple::Utils.escape_html((l @proposal.vote_starts_at)) %>
+</div><br />
+<span class="title_grey">
+<%= ::Temple::Utils.escape_html((raw t('activerecord.attributes.proposal.vote_ends_at'))) %>
+</span><div class="time-property">
+<%= ::Temple::Utils.escape_html((l @proposal.vote_ends_at)) %>
+</div><% end %></div><% if @proposal.vote.present?
+ %><h2 class="section_title vote-results-title">
+Vote results
+</h2><div class="proposal-main-container proposal_main shadow-box">
+
+</div><div class="proposal_content vote-results">
+<% if @proposal.voted?
+ %><%= ::Temple::Utils.escape_html((render(partial: @proposal.is_schulze? ? 'schulze_vote_results' : 'vote_results', formats: [:html]))) %>
+<% else
+ %><h3>
+<%= ::Temple::Utils.escape_html(('This proposal has not been voted yet')) %>
+</h3><% end %></div><% end; @proposal.sections.each do |section|
+unless section.paragraph.empty?
+ %><h2 class="section_title">
+<%= ::Temple::Utils.escape_html((section.title)) %>
+</h2><div class="proposal-main-container proposal_main shadow-box">
+
+</div><div class="proposal_content">
+<%= ::Temple::Utils.escape_html((sanitize(section.paragraph.content))) %>
+</div><% end; end; @proposal.solutions.includes(:sections).each do |solution|
+ %><h2 class="section_title solution_title">
+<%= ::Temple::Utils.escape_html((solution.title_with_seq.html_safe)) %>
+</h2><% solution.sections.each do |section|
+unless section.paragraph.empty?
+ %><h2 class="section_title">
+<%= ::Temple::Utils.escape_html((section.title)) %>
+</h2> <div id="proposal
+<%= ::Temple::Utils.escape_html((@proposal.id)) %>
+" class="proposal-main-container proposal_main shadow-box"> 
+<div class="proposal_content">
+<%= ::Temple::Utils.escape_html((sanitize(section.paragraph.content))) %>
+</div><% end; end; end %><div id="proposal_histories_container">
+
+</div><div id="proposalCommentsContainer">
+</div></body></html>

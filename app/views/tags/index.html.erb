@@ -1,0 +1,11 @@
+<% @extend = true
+ %><div class="card">
+<h1><%= ::Temple::Utils.escape_html((@page_title)) %>
+</h1><div data-tag-cloud="">
+<p>
+<% @tags.each do |tag|
+ %><%= ::Temple::Utils.escape_html((link_to tag.text, tag_path(tag.text), rel: tag.groups_count, class: 'round label',
+title: t('.tag_title', {proposals: tag.proposals_count,
+blog_posts: tag.blog_posts_count,
+groups: tag.groups_count}))) %>
+<% end %></p></div></div>

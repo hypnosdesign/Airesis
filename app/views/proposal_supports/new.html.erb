@@ -1,0 +1,6 @@
+<div class="card">
+<%= ::Temple::Utils.escape_html((render 'proposal_supports/panel')) %>
+
+</div><% content_for :left_panel do
+ %><%= ::Temple::Utils.escape_html((render 'proposals/left_panel')) %>
+<% end %>

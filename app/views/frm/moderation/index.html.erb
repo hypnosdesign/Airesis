@@ -1,0 +1,14 @@
+<h2>
+<%= ::Temple::Utils.escape_html((t('.title', forum: forum))) %>
+</h2><h3>
+<%= ::Temple::Utils.escape_html((t('posts_count', count: @posts.count, scope: 'frm.general'))) %>
+</h3><% _slim_controls1 = form_tag group_frm_forum_moderate_posts_url(@group,forum), method: :put do %><% _slim_controls2 = ''.dup; 
+; _slim_controls2 << ("<div".freeze); _slim_controls2 << (" id=\"".freeze); _slim_controls2 << ("posts".freeze); _slim_controls2 << ("\"".freeze); _slim_controls2 << (">".freeze); 
+; @posts.limit(25).group_by(&:topic).each do |topic, posts|
+; _slim_controls2 << ("<h4".freeze); _slim_controls2 << (">".freeze); 
+; _slim_controls2 << ((::Temple::Utils.escape_html((topic.forum.title))).to_s); 
+; _slim_controls2 << (" » ".freeze); 
+; _slim_controls2 << ((::Temple::Utils.escape_html((topic.subject))).to_s); 
+; _slim_controls2 << ("</h4>".freeze); _slim_controls2 << ((::Temple::Utils.escape_html((render posts, mass_moderation: true))).to_s); 
+; end; _slim_controls2 << ("</div>".freeze); _slim_controls2 << ((::Temple::Utils.escape_html((submit_tag t('frm.posts.moderation.moderate'), class: "btn btn-primary"))).to_s); 
+; _slim_controls2 %><% end %><%= ::Temple::Utils.escape_html((_slim_controls1)) %>

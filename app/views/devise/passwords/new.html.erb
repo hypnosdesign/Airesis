@@ -1,0 +1,9 @@
+<% @page_title = t("pages.password.title")
+
+ %><div class="card">
+<h2><%= ::Temple::Utils.escape_html((@page_title)) %>
+</h2><% _slim_controls1 = simple_form_for(@user, url: user_password_path, html: { method: :post }) do |f| %><% _slim_controls2 = ''.dup; 
+; _slim_controls2 << ((::Temple::Utils.escape_html((f.input :email, required: true, label: t('activerecord.attributes.user.email')))).to_s); 
+; _slim_controls2 << ((::Temple::Utils.escape_html((f.button :button, t("pages.password.submit"), class: 'btn blue'))).to_s); 
+; _slim_controls2 %><% end %><%= ::Temple::Utils.escape_html((_slim_controls1)) %><%= ::Temple::Utils.escape_html((render partial: 'devise/shared/links')) %>
+</div>
