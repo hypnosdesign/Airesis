@@ -1,6 +1,0 @@
-<% if proposals.any?
-proposals.each do |proposal|
- %><%= ::Temple::Utils.escape_html((render 'proposals/proposal_list_element', proposal_list_element_for_mustache(proposal))) %>
-<% end; else
- %><%= ::Temple::Utils.escape_html((t('pages.proposals.list.no_proposals'))) %>
-<% end %>

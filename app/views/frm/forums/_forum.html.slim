@@ -1,0 +1,27 @@
+- if can?(:read, forum)
+  |  <tr class="forum 
+  = cycle("odd", "even")
+  | "> 
+  td.forum-description
+    = link_to forum.title, group_forum_url(@group,forum), class: "title"
+  .description
+    = forem_format(forum.description)
+  td.topics-count
+    = topics_count(forum)
+  td.posts-count
+    = posts_count(forum)
+  td.views-count
+    = forum.views_count
+  td.last-post
+    span.last_post
+      - if last_post = forum.last_post_for(current_user)
+        = link_to(last_post.topic.subject, group_forum_topic_url(@group,forum, last_post.topic))
+        = t('by')
+        = last_post.user
+        br
+        |  <time datetime="
+        = last_post.created_at.to_s(:db)
+        | ">
+        = "#{time_ago_in_words(last_post.created_at)}"
+      - else
+        = t('frm.forums.index.none')

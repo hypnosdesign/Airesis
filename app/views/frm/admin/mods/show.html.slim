@@ -1,0 +1,17 @@
+ul.breadcrumbs
+  li
+    = link_to t('pages.groups.administration_panel.forum'), group_frm_admin_root_url(@group)
+  li
+    = link_to t('frm.admin.group.index'), group_frm_admin_mods_url(@group)
+  li.current
+    = @frm_mod.name
+.card
+  .row.add-member-form
+    = render 'frm/admin/mods/add_form'
+.card
+  #group_members_container
+    = render 'group_members'
+script[type="text/javascript"]
+  |  ModsShow.autocompleteUrl = '#{j group_user_autocomplete_url(@group)}'; 
+= content_for :left_panel do
+  = render 'groups/administration_panel'

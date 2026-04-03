@@ -1,0 +1,46 @@
+.right_panel
+  #whatis.quorum_section
+    = t('models.quorum.help_content.description_html')
+  - @quorums.each do |quorum|
+    |  <div id="quorum_
+    = quorum.id
+    | " class="quorum_section"> 
+    ul.pricing-table
+      li.title
+        = quorum.name
+      li.description
+        = quorum.description
+      li.description
+        = quorum.explanation
+      li.bullet-item
+        span.gray
+          = t('models.quorum.help_content.time_discussion')
+    b
+      = quorum.time(true)
+    li.bullet-item
+      span.gray
+        = t('models.quorum.help_content.participants')
+    b
+      = quorum.percentage ?  quorum.min_participants : t('models.quorum.help_content.not_specified')
+    li.bullet-item
+      span.gray
+        = t('models.quorum.help_content.good_score')
+    b
+      = quorum.good_score
+      | %
+    li.bullet-item
+      span.gray
+        = t('models.quorum.help_content.time_vote')
+    b
+      = quorum.vote_time
+    li.bullet-item
+      span.gray
+        = t('models.quorum.help_content.participants_vote')
+    b
+      = quorum.vote_percentage ?  quorum.min_vote_participants : t('models.quorum.help_content.not_specified')
+    li.bullet-item
+      span.gray
+        = t('models.quorum.help_content.vote_good_score')
+    b
+      = quorum.vote_good_score
+      | %

@@ -1,0 +1,36 @@
+h4
+  = @group.admin_title || t('pages.groups.default_admin_title')
+- @admins = @group.portavoce
+- @admins.includes(:image).limit(5).each do |user|
+  = user_tag(user, nil, true, false)
+- if @admins.size > 5
+  = link_to group_group_participations_url(@group, 'search_participant[role_id]' => ParticipationRole.admin.id), class: "btn disable" do
+    i.fa-solid.fa-user
+    = t('pages.groups.show.show_all_admins', count: @admins.size)
+h4
+  = t('pages.groups.show.participants_list')
+- @participation_request = current_user.has_asked_for_participation?(@group.id) if user_signed_in?
+- unless @participation_request
+  - unless @group.disable_participation_requests
+    = link_to ask_for_participation_group_url(@group), method: :post, class: "btn blue" do
+      i.fa-solid.fa-pencil
+      = t('pages.groups.show.ask_participate_button')
+- if @group.group_participations.size > 1
+  - @group_participations = @group.group_participations.includes(:participation_role, user: [:image])
+  - @group_participations.limit(5).each do |participant|
+    - next if participant.as_admin?
+    = user_tag participant.user, nil, true, false, title: participant.participation_role.name
+  - if @group_participations.size > 5
+    = link_to group_group_participations_url(@group), class: "btn disable" do
+      i.fa-solid.fa-user
+      = t('pages.groups.show.show_all_participants', count: @group.group_participations.count)
+- else
+  p
+
+  b
+    = t('pages.groups.show.no_participants')
+- if can? :accept_requests, @group
+  = link_to new_group_group_invitation_path(@group), remote: true, class: "btn disable" do
+    i.fa-solid.fa-envelope
+    = t('pages.groups.show.invite_button')
+  #new_invitation_container

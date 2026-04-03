@@ -1,8 +1,0 @@
-<% @page_title = 'Contributi alla proposta ' + @proposal.title
- %><h1>
-<%= ::Temple::Utils.escape_html((@page_title)) %>
-</h1><%= ::Temple::Utils.escape_html((render 'proposals/comments')) %>
-<% content_for :left_panel do
- %><div class="mybox">
-<%= ::Temple::Utils.escape_html((link_to t('pages.proposal_histories.index.back_to_proposal'), @proposal, class: 'btn blue')) %>
-</div><% end %>

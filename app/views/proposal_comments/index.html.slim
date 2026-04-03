@@ -1,0 +1,7 @@
+h1
+  = "List of comments on #{@proposal.title}"
+= link_to t('pages.proposal_histories.index.back_to_proposal'), @group ? group_proposal_url(@group, @proposal) : proposal_url(@proposal), class: 'btn blue'
+#proposalComments.blogComments
+  = render partial: 'proposals/comments'
+- content_for :left_panel do
+  = render 'proposals/left_panel'

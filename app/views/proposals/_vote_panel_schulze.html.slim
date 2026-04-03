@@ -1,0 +1,29 @@
+- range = @proposal.solutions.count
+p
+  = raw t('pages.proposals.vote_panel.schulze_title')
+h5
+  = @proposal.secret_vote ? t('pages.proposals.vote_panel.secret_vote') : t('pages.proposals.vote_panel.clear_vote')
+#solutions_table
+  .vote-items-external
+    span.label.primary
+      | 1
+    .vote-items
+      - @proposal.solutions.each_with_index do |solution, j|
+        |  <div class="list-group-item vote-item" data-id="
+        = solution.id
+        | "> 
+        i.fa-solid.fa-arrows-up-down-left-right
+        a.vote_solution_title[href="#"]
+          = raw t("pages.proposals.edit.new_solution_title.#{@proposal.proposal_type.name.downcase}", num: j+1)
+          = "#{solution.title}"
+= form_for 'data', url: { action: "vote_schulze", controller: "votations", proposal_id: @proposal.id },
+-              method: :put, remote: true do |f|
+= f.hidden_field 'votes'
+- if current_user.rotp_enabled && ::Configuration.rotp
+  = f.label t('pages.proposals.show.security_token')
+  = f.text_field 'token', maxlength: 6
+= f.button remote: true,
+-                  data: { confirm: t('pages.votations.show.confirm_schulze', name: @proposal.title) },
+-                  id: 'schulze-submit', class: 'btn blue' do
+i.fa-solid.fa-check
+= t('pages.proposals.show.vote_button')

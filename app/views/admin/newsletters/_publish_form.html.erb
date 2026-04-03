@@ -1,4 +1,0 @@
-<% _slim_controls1 = form_for newsletter, url: publish_admin_newsletter_path(newsletter) do |f| %><% _slim_controls2 = ''.dup; 
-; _slim_controls2 << ((::Temple::Utils.escape_html((f.select :receiver, {admin: 'admin', tutti: 'all', 'account non confermato' => 'not_confirmed', test: 'test'}))).to_s); 
-; _slim_controls2 << ((::Temple::Utils.escape_html((f.submit t('buttons.send'), class: 'btn'))).to_s); 
-; _slim_controls2 %><% end %><%= ::Temple::Utils.escape_html((_slim_controls1)) %>

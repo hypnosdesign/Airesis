@@ -1,0 +1,11 @@
+.left_panel
+  ul
+    li
+      a[href="#" onclick="showSection('whatis');return false;"]
+        = t('pages.quorums.index.how_read')
+    - @quorums.each do |quorum|
+      li
+        | <a href="#" onclick="showSection('quorum_'+
+        =quorum.id
+        | );return false;">
+        =quorum.name

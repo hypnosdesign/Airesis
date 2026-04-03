@@ -1,0 +1,12 @@
+.proposal_main
+  h3
+    .tit1
+      .tit2
+        = "#{t('pages.proposal_histories.sections.added')}: " if section_history.added
+        = "#{t('pages.proposal_histories.sections.removed')}: " if section_history.removed
+        = section_history.title
+  |  <div class="proposal_content 
+  = section_history.removed ? 'ice-del' : ''
+  = section_history.added ? 'ice-ins' : ''
+  | "> 
+  = sanitize(section_history.paragraphs.first.parsed_content(section_history.proposal.is_anonima?))

@@ -1,0 +1,16 @@
+h3
+  | E' stata inviata una segnalazione per il contributo:
+div
+  = @report.proposal_comment.content
+br
+br
+h3
+  | La segnalazione di tipo
+div
+  = @report.proposal_comment_report_type.description
+h3
+  | è avvenuta da parte dell'utente
+div
+  =link_to @report.user.fullname, user_url(@report.user)
+h3
+  = link_to 'Vai alla pagina della proposta per visualizzarlo', proposal_url(@report.proposal_comment.proposal)

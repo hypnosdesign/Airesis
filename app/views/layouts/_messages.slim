@@ -1,0 +1,17 @@
+- if Rails.env.test?
+  | toastr.options = {tapToDismiss: false, extendedTimeOut: 0, timeOut: 0};
+
+- flash.each do |key, value|
+  - case key
+  - when 'info'
+    | toastr.info('#{j raw value}');
+  - when 'notice'
+    | toastr.success('#{j raw value}');
+  - when 'warn'
+    | toastr.warning('#{j raw value}');
+  - else
+    | toastr.error('#{j raw value}');
+
+- Announcement.current(cookies.signed[:hidden_announcement_ids]).each do |announcement|
+  | toastr.options = {tapToDismiss: false, extendedTimeOut: 0, timeOut: 0};
+  | toastr.info('<div id="announcement#{announcement.id}">#{j raw announcement.message}#{link_to "OK", hide_announcement_path(announcement), class: "btn", style: "color: #444", remote: true, method: :post}</div>');

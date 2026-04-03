@@ -1,7 +1,0 @@
-<% if user_signed_in? && @step
-if @step.is_html?
- %><%= ::Temple::Utils.escape_html((render partial: "steps/#{@step.fragment}", formats: :html, layout: "layouts/tutorial")) %>
-<% else
- %><script>
-<%= ::Temple::Utils.escape_html((render partial: "steps/#{@step.fragment}", formats: :js, layout: "layouts/tutorial")) %></script>
-<% end; end %>

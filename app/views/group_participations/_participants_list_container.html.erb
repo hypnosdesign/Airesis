@@ -1,4 +1,0 @@
-<% @group_participations.each do |participant|
-next if @group.portavoce.include? participant.user
- %><%= ::Temple::Utils.escape_html((user_tag participant.user, nil, true, false, title: participant.participation_role.name)) %>
-<% end %>

@@ -1,0 +1,12 @@
+.group-item
+  div[style="float:left;"]
+    = group.group_image_tag(60) rescue nil
+  .p1
+    = link_to group.name, group_url(group)
+  .p2
+    = link_to t('pages.header.groups.proposals'), group_proposals_url(group)
+    |  - 
+    = link_to t('pages.header.groups.events'), group_events_url(group)
+    |  - 
+    = link_to t('pages.header.groups.forum'), group_forums_url(group)
+  .clearboth

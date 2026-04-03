@@ -1,0 +1,24 @@
+table.row
+  tbody
+    tr
+      td.wrapper.last
+        table.twelve.columns
+          tbody
+            tr
+              td
+                h1
+                  = t('mailer.user_message.hi_user', user: @user.fullname)
+                p.lead
+                  = raw t('mailer.user_message.user_sent_message', user: link_to(@from.fullname, url_for(@from)).html_safe)
+table.row.callout
+  tbody
+    tr
+      td.wrapper.last
+        table.twelve.columns
+          tbody
+            tr
+              td.panel
+                p
+                  = @body
+p
+  = t('mailer.user_message.reply_to_user', user: @from.name)

@@ -1,4 +1,0 @@
-<div class="eventComments" id="eventComments">
-<% @event_comments.each do |comment|
- %><%= ::Temple::Utils.escape_html((render partial: 'events/comment', locals: {comment: comment})) %>
-<% end %></div>

@@ -1,8 +1,0 @@
-<% if (params[:view] == SearchProposal::ORDER_BY_END)
- %><span class="order_option sel">
-<%= ::Temple::Utils.escape_html((link_to t('pages.proposals.tabs.most_urgent'), current_url(action: :tab_list, view: SearchProposal::ORDER_BY_END, order: params[:order] == 'a' ? nil : 'a'), title: "Ordina le proposte per data di termine dibattito", remote: true, data: { disable_with: t('loading') })) %>
-<%= ::Temple::Utils.escape_html((order_arrow)) %>
-</span><% else
- %><span class="order_option">
-<%= ::Temple::Utils.escape_html((link_to t('pages.proposals.tabs.most_urgent'), current_url(action: :tab_list, view: SearchProposal::ORDER_BY_END), title: "Ordina le proposte per data di termine dibattito", remote: true, data: { disable_with: t('loading') })) %>
-</span><% end %>

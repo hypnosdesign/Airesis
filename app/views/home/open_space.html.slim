@@ -1,0 +1,13 @@
+- @extend = true
+.homecont
+  ul.small-block-grid-1.medium-block-grid-2.large-block-grid-2.xlarge-block-grid-3.xxlarge-block-grid-4
+    li
+      = render partial: "home/portlets/last_proposals", layout: "layouts/portlet"
+    li
+      = render partial: "home/portlets/from_blogs", layout: "layouts/portlet"
+    li
+      = render partial: "home/portlets/most_active_groups", layout: "layouts/portlet"
+    li
+      = render partial: "home/portlets/next_events", layout: "layouts/portlet"
+    li
+      = render partial: "home/portlets/tags", layout: "layouts/portlet"

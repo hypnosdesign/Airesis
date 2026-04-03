@@ -1,0 +1,8 @@
+- if !@topic.subscriber?(current_user.id)
+  = link_to subscribe_group_forum_topic_url(@group, @forum, @topic), remote: true, class: "btn" do
+    i.fa-solid.fa-bell
+    = t("frm.topics.show.subscribe")
+- else
+  = link_to unsubscribe_group_forum_topic_url(@group, @forum, @topic), remote: true, class: "btn" do
+    i.fa-solid.fa-bell-slash
+    = t("frm.topics.show.unsubscribe")

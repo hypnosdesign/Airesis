@@ -1,0 +1,19 @@
+p
+  b
+    | Topic:
+  =h @reply.topic
+p
+  b
+    | User:
+  =h @reply.user
+p
+  b
+    | Subject:
+  =h @reply.subject
+p
+  b
+    | Body:
+  =h @reply.body
+= link_to 'Edit', edit_reply_path(@reply)
+|  | 
+= link_to 'Back', replies_path

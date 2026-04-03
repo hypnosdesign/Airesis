@@ -1,7 +1,0 @@
-<% _slim_controls1 = form_tag add_group_frm_admin_mod_members_url(@group, @frm_mod), remote: true do %><% _slim_controls2 = ''.dup; 
-; _slim_controls2 << ("<div".freeze); _slim_controls2 << (" class=\"".freeze); _slim_controls2 << ("inputs".freeze); _slim_controls2 << ("\"".freeze); _slim_controls2 << (">".freeze); 
-; _slim_controls2 << ("<label".freeze); _slim_controls2 << (">".freeze); _slim_controls2 << ((::Temple::Utils.escape_html((t('frm.admin.mods.show.add_a_new_member')))).to_s); 
-; _slim_controls2 << ("</label>".freeze); _slim_controls2 << ((::Temple::Utils.escape_html((select_tag 'frm_user_id'))).to_s); 
-; _slim_controls2 << ("</div>".freeze); _slim_controls2 << ("<p".freeze); _slim_controls2 << (" class=\"".freeze); _slim_controls2 << ("span1".freeze); _slim_controls2 << ("\"".freeze); _slim_controls2 << (">".freeze); 
-; _slim_controls2 << ((::Temple::Utils.escape_html((submit_tag t('frm.admin.mods.show.add_member'), class: 'btn blue', data: {disable_with: t('loading')}))).to_s); 
-; _slim_controls2 << ("</p>".freeze); _slim_controls2 %><% end %><%= ::Temple::Utils.escape_html((_slim_controls1)) %>

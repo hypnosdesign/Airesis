@@ -1,0 +1,29 @@
+- if @frm_mods.empty?
+  h4
+    = t('pages.forum_groups.index.create_first')
+- else
+  table#groups.index.table.table-striped[cellspacing="0"]
+    thead
+      tr
+        th
+          = t('name', scope: 'frm.admin.mods')
+        th
+          = t('edit', scope: 'frm.admin.mods')
+        th
+          = t('delete', scope: 'frm.admin.mods')
+    tbody
+      - @frm_mods.each do |group|
+        tr
+          td
+            = link_to group.name, group_frm_admin_mod_url(@group, group)
+            br
+            - group.members.each do |member|
+              = avatar(member, size: 20)
+          td
+            = link_to group_frm_admin_mod_url(@group, group), class: 'btn' do
+              i.fa-solid.fa-pencil
+              = t('edit', scope: 'frm.admin.mods')
+          td
+            = link_to group_frm_admin_mod_url(@group, group), method: :delete, data: {confirm: t('confirm_delete')}, class: 'btn' do
+              i.fa-regular.fa-trash-can
+              = t('delete', scope: 'frm.admin.mods')

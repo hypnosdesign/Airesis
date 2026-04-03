@@ -1,7 +1,0 @@
-<% if !@group || (can? :create_date, @group)
- %> $('#choose_votation').html('
-<%= ::Temple::Utils.escape_html((j render '/quorums/dates')) %>
-'); 
-<% else
- %> $('#choose_votation').html(''); 
-<% end %>

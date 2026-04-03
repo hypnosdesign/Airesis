@@ -1,9 +1,0 @@
-<p>
-<%= ::Temple::Utils.escape_html((t('mailer.blocked.hi_user', {user: "#{@user.blocked_name} #{@user.blocked_surname}"}))) %>
-<%= ::Temple::Utils.escape_html(()) %>
-,
-<br />
-<%= ::Temple::Utils.escape_html((t('mailer.blocked.deleted_correctly'))) %>
-</p><p>
-<%= ::Temple::Utils.escape_html((raw t('mailer.blocked.greetings'))) %>
-</p>

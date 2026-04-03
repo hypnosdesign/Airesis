@@ -1,9 +1,0 @@
-<% @group.participants.includes(:image).order('users.surname asc').each do |participant|
- %> <div class="members" id="mem
-<%= ::Temple::Utils.escape_html((participant.id)) %>
-"> 
-<%= ::Temple::Utils.escape_html((avatar(participant, size: 40))) %>
-<b>
-<%= ::Temple::Utils.escape_html((link_to participant.fullname, participant)) %>
-</b><% end %><div style="clear:both;">
-</div>
