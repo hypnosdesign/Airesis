@@ -1,0 +1,15 @@
+- @nomargin = true
+- @extend = true
+- content_for :menu do
+  .topmenu class=('noleft' unless content_for? :left_panel)
+    span.tit = @page_title
+
+    .submenu
+      = link_to(edemocracy_path, class: ((['whatis', 'intro'].include? params[:action]) ? 'sel' : '')) do
+        span.hidden.lg:inline = t('pages.home.index.whatis')
+      
+      span &ensp;⋅&ensp;
+      = link_to(press_path, class: (params[:action] == 'press' ? 'sel' : '')) do
+        span.hidden.lg:inline PRESS
+
+= render 'layouts/general'

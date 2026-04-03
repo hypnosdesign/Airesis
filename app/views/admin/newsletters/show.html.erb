@@ -1,8 +1,0 @@
-<div class="card">
-<%= ::Temple::Utils.escape_html((@newsletter.subject)) %>
-</div><div class="card">
-<%= ::Temple::Utils.escape_html((@newsletter.body.html_safe)) %>
-</div><%= ::Temple::Utils.escape_html((link_to t('buttons.edit'), edit_admin_newsletter_path, class: 'btn blue')) %>
-<div class="card">
-<%= ::Temple::Utils.escape_html((render 'publish_form', newsletter: @newsletter)) %>
-</div>

@@ -1,7 +1,0 @@
-<%= ::Temple::Utils.escape_html((render partial: 'frm/forums/head', locals: {forum: @topic.forum})) %>
-<h2>
-<%= ::Temple::Utils.escape_html((t('frm.post.edit'))) %>
-</h2><% _slim_controls1 = simple_form_for @post, url: group_forum_topic_post_url(@group, @topic.forum, @topic, @post) do |f| %><% _slim_controls2 = ''.dup; 
-; _slim_controls2 << ((::Temple::Utils.escape_html((render partial: 'form', locals: {f: f}))).to_s); 
-; _slim_controls2 << ((::Temple::Utils.escape_html((f.submit t("frm.post.buttons.edit"), class: 'btn blue'))).to_s); 
-; _slim_controls2 %><% end %><%= ::Temple::Utils.escape_html((_slim_controls1)) %>

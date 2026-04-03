@@ -1,6 +1,0 @@
-<span class="think">
-<%= ::Temple::Utils.escape_html((t('pages.proposals.contribution_valuation'))) %>
-</span><%= ::Temple::Utils.escape_html((image_tag "spinner.gif", style: 'display: none;', class: 'loading')) %>
-<%= ::Temple::Utils.escape_html((link_to_rankup(@proposal, comment))) %>
-<%= ::Temple::Utils.escape_html((link_to_ranknil(@proposal, comment))) %>
-<%= ::Temple::Utils.escape_html((link_to_rankdown(@proposal, comment))) %>

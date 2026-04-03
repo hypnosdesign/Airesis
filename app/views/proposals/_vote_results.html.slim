@@ -1,0 +1,74 @@
+div[style="float:left"]
+  b
+    = t('pages.proposals.results.total', count: @proposal.vote.number)
+  table
+    thead
+      tr
+        th
+        th
+          = t('pages.proposals.results.vote_column')
+        th
+          = t('pages.proposals.results.number_column')
+        th
+          = t('pages.proposals.results.percentage_column')
+    tbody
+      tr
+        td
+          .color_legend.positive
+        td
+          = t('pages.proposals.results.positive')
+        td
+          = @proposal.vote.positive
+        td
+          = @proposal.vote.positive_perc
+          | %
+      tr
+        td
+          .color_legend.negative
+        td
+          = t('pages.proposals.results.negative')
+        td
+          = @proposal.vote.negative
+        td
+          = @proposal.vote.negative_perc
+          | %
+      tr
+        td
+          .color_legend.neutral
+        td
+          = t('pages.proposals.results.neutral')
+        td
+          = @proposal.vote.neutral
+        td
+          = @proposal.vote.neutral_perc
+          | %
+|  <div style="height: 200px; width: 200px; float:left;" data-plot id="vote-results-chart" data-positive="
+= @proposal.vote.positive
+| " data-negative="
+= @proposal.vote.negative
+| " data-neutral="
+= @proposal.vote.neutral
+| "> 
+div[style="clear: both;"]
+hr
+table#votes_table
+  thead
+    tr
+      th
+        = t('pages.proposals.results.name_surname_column')
+      th
+        = t('pages.proposals.results.date_time_column')
+      - unless @proposal.secret_vote
+        th
+          = t('pages.proposals.results.vote_column')
+  - @proposal.user_votes.each do |user_vote|
+    tr
+      td
+        = user_vote.user.fullname
+      td
+        = l user_vote.created_at
+      - unless @proposal.secret_vote
+        td
+          = user_vote.vote_type.description
+script[type="text/javascript"]
+  |  ProposalsVoteResults.positive = '#{j t('pages.proposals.results.positive')}'; ProposalsVoteResults.neutral = '#{j t('pages.proposals.results.neutral')}'; ProposalsVoteResults.negative = '#{j t('pages.proposals.results.negative')}'; 

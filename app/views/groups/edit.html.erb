@@ -1,7 +1,0 @@
-<div class="card">
-<h1><%= ::Temple::Utils.escape_html((t('pages.groups.edit.modify_group'))) %>
-</h1><%= ::Temple::Utils.escape_html((render partial: @group, locals: {button_name: t('buttons.update')})) %>
-
-</div><% _slim_controls1 = content_for :left_panel do %><% _slim_controls2 = ''.dup; 
-; _slim_controls2 << ((::Temple::Utils.escape_html((render partial: 'groups/administration_panel'))).to_s); 
-; _slim_controls2 %><% end %><%= ::Temple::Utils.escape_html((_slim_controls1)) %>

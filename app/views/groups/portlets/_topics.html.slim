@@ -1,0 +1,7 @@
+.title
+  = t('pages.groups.show.last_topics')
+- if @last_topics.size > 0
+  .scrollable
+
+  .mini_topics
+    = render partial: 'frm/topics/mini_topic', collection: @last_topics, as: 'topic'

@@ -1,7 +1,0 @@
-<% content_for :left_panel do
- %><div class="mybox">
-<%= ::Temple::Utils.escape_html((link_to 'Pannello amministratore', admin_panel_url, class: 'btn blue')) %>
-<%= ::Temple::Utils.escape_html((link_to 'Rails Admin', admin_rails_admin_path, target: :_blank, class: 'btn blue')) %>
-<%= ::Temple::Utils.escape_html((link_to 'Newsletter', admin_newsletters_path, class: 'btn blue')) %>
-<%= ::Temple::Utils.escape_html((link_to 'Pannello Sidekiq', admin_sidekiq_web_path, class: 'btn blue')) %>
-</div><% end %>

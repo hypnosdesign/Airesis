@@ -1,0 +1,19 @@
+- if @group
+  = link_to '#', class: "historyButton btn", data: { 'reveal-id' => "regenerate_container" } do
+    i.fa-solid.fa-rotate-left
+    = t('proposals.regenerate_button')
+  - else
+    = link_to '#', class: "historyButton btn", data: { 'reveal-id' => "regenerate_container" } do
+      i.fa-solid.fa-rotate-left
+      = t('proposals.regenerate_button')
+  #regenerate_container.reveal-modal[data-reveal]
+
+  h2
+    = t('pages.proposals.show.new_quorum_title')
+  = simple_form_for @proposal, url: (@group ? regenerate_group_proposal_path(@group, @proposal) : regenerate_proposal_path(@proposal)), remote: true do |f|
+    = render partial: '/proposal_types/quorum_choice', locals: { f: f }
+    a.btn[href="#" onclick="$('#regenerate_container').foundation('reveal','close');"]
+      = t('buttons.cancel')
+    = f.submit t('pages.proposals.show.back_debate_button'), class: 'btn blue', data: { disable_with: t('loading') }
+  a.close-reveal-modal
+    | ×

@@ -1,5 +1,0 @@
-var container_ = $('
-<div class="reveal-modal small" data-reveal="" id="participation_role_container">
-</div>'); container_.html("
-<%= ::Temple::Utils.escape_html((j render(partial: 'participation_roles/form', locals: {button_name: t('buttons.create')}))) %>
-"); $('body').append(container_); airesis_reveal(container_); new AiresisFormValidation(container_.find('form')); 

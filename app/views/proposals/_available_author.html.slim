@@ -1,0 +1,8 @@
+- unless @proposal.users.include? current_user
+  .mycont
+    - if @proposal.available_user_authors.include? current_user
+      = t('pages.proposals.show.offered_as_editor_message')
+    - else
+      - if (can? :participate, @proposal) || (!current_user && !@proposal.private)
+        span#voglioredigere
+          =link_to t('pages.proposals.show.offer_as_editor_button'), available_author_proposal_path(@proposal, group_id: params[:group_id]), remote: true, method: :post, class: 'btn', data: {confirm: t('pages.proposals.show.confirm_editors_button'), disable_with: t('loading')}

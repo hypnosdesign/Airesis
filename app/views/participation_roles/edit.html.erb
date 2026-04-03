@@ -1,9 +1,0 @@
-<ul class="breadcrumbs">
-<li>
-<%= ::Temple::Utils.escape_html((link_to t('pages.groups.administration_panel.permissions'), group_participation_roles_path(@group))) %>
-</li><li class="current">
-<%= ::Temple::Utils.escape_html((@participation_role.name)) %>
-</li></ul><%= ::Temple::Utils.escape_html((render(partial: 'participation_roles/form', locals: {button_name: t('buttons.update')}))) %>
-<% _slim_controls1 = content_for :left_panel do %><% _slim_controls2 = ''.dup; 
-; _slim_controls2 << ((::Temple::Utils.escape_html((render partial: 'groups/administration_panel'))).to_s); 
-; _slim_controls2 %><% end %><%= ::Temple::Utils.escape_html((_slim_controls1)) %>

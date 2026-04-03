@@ -1,7 +1,0 @@
-<div<% _slim_codeattributes1 = ENV['FACEBOOK_APP_ID']; if _slim_codeattributes1; if _slim_codeattributes1 == true %> data-app-id=""<% else %> data-app-id="<%= ::Temple::Utils.escape_html((_slim_codeattributes1)) %>"<% end; end; _slim_codeattributes2 = I18n.locale.to_s.gsub('-','_'); if _slim_codeattributes2; if _slim_codeattributes2 == true %> data-locale=""<% else %> data-locale="<%= ::Temple::Utils.escape_html((_slim_codeattributes2)) %>"<% end; end; _slim_codeattributes3 = user_likes_url; if _slim_codeattributes3; if _slim_codeattributes3 == true %> data-user-like-url=""<% else %> data-user-like-url="<%= ::Temple::Utils.escape_html((_slim_codeattributes3)) %>"<% end; end %> id="fb-root">
-
-</div><%= ::Temple::Utils.escape_html((render '/layouts/top_menu')) %>
-
-<% if user_signed_in? && !Rails.env.test?
- %><%= ::Temple::Utils.escape_html((subscribe_to "/notifications/#{current_user.id}")) %>
-<% end %>

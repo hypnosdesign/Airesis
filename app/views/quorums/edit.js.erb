@@ -1,5 +1,0 @@
-var container_ = $('
-<div class="reveal-modal medium" data-reveal="" id="quorum_container">
-</div>'); $('body').append(container_); container_.html("
-<%= ::Temple::Utils.escape_html((j (render(partial: 'quorums/form', locals: {button_name: t('buttons.update')})))) %>
-"); airesis_reveal(container_); new AiresisFormValidation(container_.find('form')); 

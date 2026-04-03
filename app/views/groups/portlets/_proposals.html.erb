@@ -1,7 +1,0 @@
-<div class="title">
-<%= ::Temple::Utils.escape_html((t('pages.groups.show.last_proposals'))) %>
-</div><% @c = Proposal.group_portlet(@group,current_user)
-unless @c.empty?
- %><div class="scrollable">
-<%= ::Temple::Utils.escape_html((render partial: 'proposals/mini_proposal', collection: @c, as: 'proposal')) %>
-</div><% end %>

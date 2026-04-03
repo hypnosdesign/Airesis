@@ -1,5 +1,0 @@
-var container_ = $('
-<div class="reveal-modal small" data-reveal="" id="invitation_container">
-</div>'); container_.html("
-<%= ::Temple::Utils.escape_html((j render 'group_invitations/form')) %>
-"); $('body').append(container_); airesis_reveal(container_); 

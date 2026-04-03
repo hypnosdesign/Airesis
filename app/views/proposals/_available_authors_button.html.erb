@@ -1,6 +1,0 @@
-<% if @proposal.users.include? current_user
-if @proposal.available_authors.any?
-_slim_controls1 = link_to available_authors_list_proposal_path(@proposal, group_id: params[:group_id]), remote: true, data: {disable_with: t('loading')}, class: 'btn' do %><% _slim_controls2 = ''.dup; 
-; _slim_controls2 << ("<i".freeze); _slim_controls2 << (" class=\"".freeze); _slim_controls2 << ("fa-solid".freeze); _slim_controls2 << (" ".freeze); _slim_controls2 << ("fa-user".freeze); _slim_controls2 << ("\"".freeze); _slim_controls2 << (">".freeze); 
-; _slim_controls2 << ("</i>".freeze); _slim_controls2 << ((::Temple::Utils.escape_html((t('pages.proposals.show.available_editors_button', count: @proposal.available_authors.count)))).to_s); 
-; _slim_controls2 %><% end %><%= ::Temple::Utils.escape_html((_slim_controls1)) %><% end; end %>

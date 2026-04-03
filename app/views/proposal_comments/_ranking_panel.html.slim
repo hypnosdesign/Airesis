@@ -1,0 +1,47 @@
+- if can? :participate, @proposal
+  - my_rank = current_user.comment_rank(comment)
+  - can_rank_again = current_user.can_rank_again_comment?(comment)
+  - if my_rank
+    - if can_rank_again
+      span.think
+        = t('pages.proposals.contribution_valuation_again')
+    = image_tag "spinner.gif", style: 'display: none;', class: 'loading'
+    span.ranking-count
+      = comment.rankings.positives.count
+    - if my_rank == 1
+      |  <i class="icon-smile-full" style="margin-right:10px" title="
+      = t('pages.proposals.show.voteup')
+      | ">
+    - elsif can_rank_again
+      = link_to_rankup(@proposal, comment)
+    - else
+      |  <i class="icon-smile" title="
+      = t('pages.proposals.show.voteup')
+      | ">
+    span.ranking-count[style="margin-right:3px"]
+      = comment.rankings.neutrals.count
+    - if my_rank == 2
+      |  <i class="icon-baffled-full" style="margin-right:10px" title="
+      = t('pages.proposals.show.votenil')
+      | ">
+    - elsif can_rank_again
+      = link_to_ranknil(@proposal, comment)
+    - else
+      |  <i class="icon-baffled" title="
+      = t('pages.proposals.show.votenil')
+      | ">
+    span.ranking-count
+      = comment.rankings.negatives.count
+    - if my_rank == 3
+      |  <i class="icon-sad-full" title="
+      = t('pages.proposals.show.votedown')
+      | ">
+    - elsif can_rank_again
+      = link_to_rankdown(@proposal, comment)
+    - else
+      |  <i class="icon-sad" title="
+      = t('pages.proposals.show.votedown')
+      | ">
+  - else
+    = render 'ranking_panel_others', { comment: comment }
+- else
