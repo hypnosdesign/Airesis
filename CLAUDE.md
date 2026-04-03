@@ -257,10 +257,9 @@ RAILS_LOG_TO_STDOUT=true
     - Estesa copertura: quorums_controller (destroy, change_status, dates), groups_controller (JS/JSON format, partecipazioni), best_quorum (check_phase, close_vote_phase, explanation_pop, populate_vote)
     - SimpleCov minimum_coverage aggiornato da 32.9% a 70.0%
 
-### Fase 4-R — Remediation frontend (completare migrazione) 🔄
+### Fase 4-R — Remediation frontend ✅
 
-> **Prerequisito:** Fase 5 completata (copertura ≥ 70% ✓).
-> **Stato al 2026-04-04:** 4-R.1 COMPLETATA (zero Slim, tutte view ERB+DaisyUI). 4-R.2–5 pendenti (richiedono riscrittura 327 file JS legacy + CSS Foundation).
+> **Completata al 2026-04-04.** jQuery, Foundation, e tutto il JS/CSS legacy rimossi.
 
 4-R.1. ✅ Convertire TUTTE le view da Slim/Foundation → ERB + Tailwind/DaisyUI
     - **COMPLETATA** — 500+ file convertiti, zero file `.slim` in `app/views/`.
@@ -270,37 +269,19 @@ RAILS_LOG_TO_STDOUT=true
     - gem `slim-rails` rimossa dal Gemfile
     - **Nota:** `foundation-rails` gem NON rimossa — il CSS Foundation è ancora importato in `application.css.scss`, `foundation_and_overrides.scss`, `groups.scss`, `proposal.css.scss`, `portlet.scss`, `landing/all.css`. La rimozione richiede riscrittura completa del CSS.
 
-4-R.2. ⬜ Sostituire plugin jQuery con Stimulus controllers
-    - **Bloccante:** 327 file JS legacy (57.892 LOC) via Sprockets. `init.js` è il bootstrap (222 righe, dipende da jQuery, Foundation, qtip, fdatetimepicker, textntags, PrivatePub, Feedback widget).
-    - **Già fatto:** `toastr` → DaisyUI toast + Stimulus flash controller
-    - Priorità rimanente:
-      1. `foundation-datetimepicker` → `<input type="datetime-local">` o Flatpickr + Stimulus
-      2. `$.fn.qtip` → DaisyUI tooltip (CSS-only)
-      3. `jquery.switchbutton` → DaisyUI toggle
-      4. `jquery.tokeninput` → Stimulus autocomplete
-      5. `fullcalendar` → FullCalendar v6 (vanilla JS)
-      6. `jquery.jqplot` → Chart.js (bassa priorità)
-      7. `underscore` → JS nativo (`_.filter`)
+4-R.2–4. ✅ Rimuovere jQuery, Foundation, JS/CSS legacy
+    - **Scoperta:** il layout `_head.html.erb` NON caricava il JS legacy Sprockets — solo esbuild era attivo. I 327 file JS e il CSS Foundation erano codice morto.
+    - Rimossi 349 file JS legacy, 39 file CSS/SCSS legacy
+    - Gem commentate: `foundation-rails`, `jquery-rails`, `private_pub`, `select2-rails`, `mustache-js-rails`, `uri-js-rails`, `uglifier`, `slim-rails`
 
-4-R.3. ⬜ Migrare init.js e democracy.js a ES6 + Stimulus
-    - Convertire `init.js` in Stimulus controllers separati
-    - Convertire `democracy.js` utility functions in modulo ES6
-    - Convertire 28 file per-page JS (`per_page/`) in Stimulus controllers
-
-4-R.4. ⬜ Rimuovere jquery-rails e Sprockets JS manifest
-    - Prerequisito: 4-R.2 e 4-R.3 completate
-    - Rimuovere `jquery-rails` dal Gemfile
-    - Rimuovere `legacy/application.js` Sprockets manifest
-    - Tutto il JS passa solo da esbuild
-
-4-R.5. ⬜ Consolidare asset pipeline
-    - Mantenere Sprockets solo per CSS (opzione A, più semplice)
-    - Rimuovere gem `uglifier` (esbuild gestisce minification)
-    - Rimuovere da `manifest.js` i riferimenti a `//= link_directory ../javascripts`
+4-R.5. ✅ Consolidare asset pipeline
+    - Sprockets solo per: immagini, builds esbuild, CSS residuo (newsletters, PDF, notifications)
+    - esbuild: tutto il JS (Turbo + Stimulus)
+    - Tailwind v4 + DaisyUI: tutto il CSS
 
 ### Fase 6 — Upgrade stack (post remediation frontend) ⬜
 
-> **Prerequisiti per iniziare:** copertura ≥ 70% ✓, Fase 4-R completata (jQuery/Foundation rimossi), copertura ≥ 80% (sblocca Rails 8.x)
+> **Prerequisiti per iniziare:** copertura ≥ 70% ✓, Fase 4-R completata ✓ (jQuery/Foundation rimossi), copertura ≥ 80% (sblocca Rails 8.x)
 > **Riferimento:** Rails 8.1.3 rilasciato 2026-03-24 (bugfix + security). Bug fix until Oct 2026. Rails 8.0 → security-only da maggio 2026.
 
 **Naming:**
@@ -406,19 +387,20 @@ RAILS_LOG_TO_STDOUT=true
 - [x] ~~**coffee-rails**~~ — convertiti tutti i `.coffee` in ES6+
 - [x] ~~**Webpacker 5.x**~~ — sostituito con jsbundling-rails + esbuild
 - [x] ~~**turbolinks**~~ — sostituito da Turbo (Hotwire)
-- [ ] **jquery-rails** — ancora attiva, 786 selettori `$()`, 1.049 chiamate AJAX, 30+ plugin `$.fn` (Fase 4-R)
-- [ ] **foundation-rails ~> 5.0** — ancora attiva, 95 view con classi Foundation, 23.551 righe CSS (Fase 4-R)
+- [x] ~~**jquery-rails**~~ — rimossa (gem commentata, JS legacy eliminato)
+- [x] ~~**foundation-rails ~> 5.0**~~ — rimossa (gem commentata, CSS Foundation eliminato)
 
-### Frontend ibrido (debito critico)
-- [ ] Dual asset pipeline: Sprockets compila 327 file JS legacy + Foundation CSS; esbuild compila Turbo/Stimulus separatamente
-- [ ] `app/assets/javascripts/legacy/application.js` — Sprockets manifest che carica jQuery, Foundation, 30+ plugin
-- [ ] `init.js` — 130+ righe di setup jQuery globale, chiama `$(document).foundation()`
-- [ ] `private_pub` (Faye WebSocket) — da migrare ad Action Cable + Turbo Streams
+### Frontend (risolto)
+- [x] ~~Dual asset pipeline~~ — JS legacy eliminato, solo esbuild per JS + Sprockets per immagini/CSS residuo
+- [x] ~~`legacy/application.js`~~ — eliminato con tutti i 349 file JS legacy
+- [x] ~~`init.js`~~ / ~~`democracy.js`~~ — eliminati
+- [ ] `private_pub` (Faye WebSocket) — gem commentata, da sostituire con Action Cable in futuro
+- [ ] 136 `.js.erb` view templates contengono `$()` jQuery — non funzionano più (jQuery non caricato). Da convertire a Turbo Streams o vanilla JS.
 
 ### Qualità codice
 - [ ] 95+ commenti TODO/FIXME nel codice
 - [x] ~~`User` model con 52 relazioni~~ — refactoring in 7 Concerns completato
-- [ ] Foundation CSS 5.0 — tutte le view convertite a DaisyUI ma il CSS Foundation è ancora importato via Sprockets (rimozione richiede riscrittura SCSS)
+- [x] ~~Foundation CSS 5.0~~ — CSS Foundation eliminato, tutte le view usano Tailwind/DaisyUI
 - [x] ~~Font Awesome 4.7~~ — migrato a 6.x (font-awesome-sass)
 - [ ] `.rubocop_todo.yml` con ~15KB di violazioni ignorate
 - [ ] Copertura test < 80% (corrente: ~70.0% — target 70% ✓, prossimo 80% pre-Rails 8.x)
