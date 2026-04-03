@@ -53,7 +53,7 @@ gem 'sitemap_generator'
 gem 'sprockets', '~> 4.0'
 gem 'timezone', git: 'https://github.com/coorasse/timezone'
 
-gem 'uglifier'
+# gem 'uglifier' # removed: esbuild handles JS minification
 gem 'uri-js-rails'
 gem 'matrix' # required by vote-schulze; removed from Ruby stdlib in 3.1
 gem 'vote-schulze', git: 'https://github.com/coorasse/schulze-vote', ref: '0f47cbb'
