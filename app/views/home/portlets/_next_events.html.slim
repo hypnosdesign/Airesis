@@ -1,0 +1,7 @@
+.title.clearfix
+  span.left
+    = t('pages.home.index.next_events')
+  = link_to t('pages.home.index.show_events'), events_path, class: 'btn right'
+.scrollable
+  - if @events.any?
+    = render partial: 'events/mini_event', collection: @events, as: 'event'

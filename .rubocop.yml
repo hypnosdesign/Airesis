@@ -1,0 +1,56 @@
+inherit_from: .rubocop_todo.yml
+
+require:
+  - rubocop-performance
+  - rubocop-rails
+  - rubocop-rspec
+
+Style/Documentation:
+  Enabled: false
+
+Layout/MultilineOperationIndentation:
+    EnforcedStyle: indented
+
+Style/NonNilCheck:
+  IncludeSemanticChanges: true
+
+Layout/DotPosition:
+  EnforcedStyle: trailing
+
+Style/FrozenStringLiteralComment:
+  Enabled: false
+
+Rails/ActiveRecordOverride:
+  Enabled: false
+
+RSpec/DescribeClass:
+  Enabled: false
+
+RSpec/LetSetup:
+  Enabled: false
+
+# TODO: re-enable
+RSpec/ExpectInHook:
+  Enabled: false
+
+Capybara/CurrentPathExpectation:
+  Enabled: false
+
+Layout/LineLength:
+#  Max: 120
+  Exclude:
+    - config/locales/plurals.rb
+
+AllCops:
+  NewCops: enable
+  Exclude:
+    - 'node_modules/**/*'
+    - 'uploads/**/*'
+    - 'bin/**/*'
+    - 'script/**/*'
+    - 'log/**/*'
+    - 'public/**/*'
+    - 'tmp/**/*'
+    - 'db/**/*'
+    - 'vendor/**/*'
+    - 'node_modules/**/*'

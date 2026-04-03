@@ -1,0 +1,5 @@
+| var container_ = $('
+#permissions_list_container.reveal-modal.medium[data-reveal]
+| '); $('body').append(container_); container_.html("
+= j render 'permissions_list_panel'
+| "); airesis_reveal(container_); container_.find('a.cancel').click(function() { container_.foundation('reveal', 'close'); return false; }); 

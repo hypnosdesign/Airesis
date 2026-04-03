@@ -1,0 +1,13 @@
+| <div class="topic 
+= cycle('odd', 'even')
+= topic.locked? ? 'locked' : 'unlocked'
+| "> <div class="
+= icon_classes(topic)
+| "> 
+.byline.topic-title
+  = new_since_last_view_text(topic)
+  .subject
+    = link_to topic.subject, group_forum_topic_url(topic.forum.group, topic.forum, topic)
+  .started-by
+    = t('started_by')
+    = relevant_posts(topic).first.user

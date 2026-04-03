@@ -1,0 +1,58 @@
+#language.reveal-modal.bg-white.rounded-lg.shadow-2xl.p-6 data-reveal=true
+  dl.tabs.flex.border-b.border-gray-200.mb-4 data-tab=true
+    dd.active.mr-4
+      a.inline-block.py-2.px-4.text-blue-600.border-b-2.border-blue-600.font-medium href="#panel1" title="Europe" Europe
+    dd.mr-4
+      a.inline-block.py-2.px-4.text-gray-500.hover:text-blue-600.font-medium href="#panel2" title="America" America
+    dd.mr-4
+      a.inline-block.py-2.px-4.text-gray-500.hover:text-blue-600.font-medium href="#panel3" title="Asia" Asia
+    dd.mr-4
+      a.inline-block.py-2.px-4.text-gray-500.hover:text-blue-600.font-medium href="#panel4" title="Africa" Africa
+    dd
+      a.inline-block.py-2.px-4.text-gray-500.hover:text-blue-600.font-medium href="#panel5" title="Oceania" Oceania
+  
+  dl.accordion data-accordion=true
+    .tabs-content
+      #panel1.content.active.p-4
+        ul.grid.grid-cols-1.md:grid-cols-2.lg:grid-cols-3.gap-4
+          li = flag_for('Europe', 'en-EU')
+          li = flag_for('France', 'fr-FR')
+          li = flag_for('Hungary', 'hu-HU')
+          li = flag_for('Italy', 'it-IT')
+          li = flag_for('Deutschland', 'de-DE')
+          li = flag_for('România', 'ro-RO')
+          li = flag_for('España', 'es-ES')
+          li = flag_for('Portugal', 'pt-PT')
+          li = flag_for('Greece', 'el-GR')
+          li = flag_for('United Kingdom', 'en-GB')
+          li = flag_for('Ireland', 'en-IE')
+          li = flag_for('Serbia (Cyrillic)', 'sr-SP')
+          li = flag_for('Serbia (Latin)', 'sr-CS')
+          li = flag_for('Serbo-Croatian', 'sh-HR')
+          li = flag_for('Bosnian', 'bs-BA')
+          li = flag_for('Montenegrin (Latin)', 'me-ME')
+          li = flag_for('Russia','ru-RU')
+      
+      #panel2.content.hidden.p-4
+        ul.grid.grid-cols-1.md:grid-cols-2.lg:grid-cols-3.gap-4
+          li = flag_for('USA','en-US')
+          li = flag_for('Brasil','pt-BR')
+          li = flag_for('Ecuador','es-EC')
+          li = flag_for('Chile','es-CL')
+          li = flag_for('Argentina','es-AR')
+      
+      #panel3.content.hidden.p-4
+        ul.grid.grid-cols-1.md:grid-cols-2.lg:grid-cols-3.gap-4
+          li = flag_for('Indonesia', 'id-ID')
+          li = flag_for('中国','zh-TW')
+      
+      #panel4.content.hidden.p-4
+        ul.grid.grid-cols-1.md:grid-cols-2.lg:grid-cols-3.gap-4
+          li = flag_for('South Africa','en-ZA')
+      
+      #panel5.content.hidden.p-4
+        ul.grid.grid-cols-1.md:grid-cols-2.lg:grid-cols-3.gap-4
+          li = flag_for('Australia','en-AU')
+          li = flag_for('New Zealand','en-NZ')
+
+  a.close-reveal-modal.absolute.top-4.right-4.text-3xl.text-gray-400.hover:text-gray-600.no-underline href="#" &#215;

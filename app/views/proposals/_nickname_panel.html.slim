@@ -1,0 +1,16 @@
+- if signed_in? && @my_nickname && @proposal.is_anonima?
+  .mybox
+    h4
+  i.fa-solid.fa-circle-info.nickname-panel
+  = t('pages.proposals.show.your_nickname_is')
+  .mycont.clearfix
+    = user_tag(current_user, @proposal)
+  .regenerate_nickname
+    - if can? :update, @my_nickname
+      = link_to t('pages.proposals.show.regenerate_nickname'), proposal_nickname_path(@my_nickname), method: :put, class: 'btn', style: 'display: inline-block'
+      div
+        = '(puoi farlo ancora per '
+      .change_nick
+      = ')'
+  script[type="text/javascript"]
+    |  var endsDate = new Date(#{(@my_nickname.created_at + 10.minutes).utc.to_i * 1000}); $('.change_nick').countdown($.extend({ until: endsDate, compact: true, onExpiry: removeButton }, $.countdown.regionalOptions['it'])); function removeButton() { $('.regenerate_nickname').fadeOut(); } 

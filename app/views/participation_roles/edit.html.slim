@@ -1,0 +1,8 @@
+ul.breadcrumbs
+  li
+    = link_to t('pages.groups.administration_panel.permissions'), group_participation_roles_path(@group)
+  li.current
+    = @participation_role.name
+= render(partial: 'participation_roles/form', locals: {button_name: t('buttons.update')})
+= content_for :left_panel do
+  = render partial: 'groups/administration_panel'

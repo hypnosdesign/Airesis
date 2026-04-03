@@ -1,0 +1,64 @@
+.fixed.top-0.left-0.right-0.z-50
+  nav.top-bar.bg-blue-900.flex.items-center.justify-between.px-4.py-2 data-topbar=true
+    section.top-bar-section.flex.w-full.items-center
+      .logo-wrapper.hidden.md:block.mr-4
+        .logo
+          = link_to root_path, tabindex: 1 do
+            = image_tag 'logo_completo_white_medium.png', class: "h-10 w-auto"
+      
+      ul.left.flex.items-center.space-x-4
+        li
+          a#logo-but.button.bg-blue-700.hover:bg-blue-600.text-white.px-3.py-2.rounded.flex.items-center.space-x-2 href="#" data-dropdown="hover1" data-options="is_hover:false"
+            i.fa-solid.fa-users.text-lg
+            span.hidden.lg:inline = t('pages.header.groups_title')
+        
+        - if current_user
+          li.has-form
+            = simple_form_for Search.new, html: { class: 'm-0' }, data: { remote: true, disable_form_validator: '' } do |f|
+              .row.collapse
+                .large-12.small-10.columns
+                  = f.text_field :q, placeholder: t('placeholder.find'), class: 'rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6'
+            #search_box.card.hidden
+
+      ul.right.flex.items-center.ml-auto.space-x-4
+        li
+          = link_to open_space_path, class: 'cur globe text-white hover:text-blue-200', title: t('open_space') do
+            i.fa-solid.fa-earth-americas.text-xl
+
+        - if current_user
+          li
+            = link_to '#', class: 'button account hidden lg:flex items-center space-x-2 text-white', data: { dropdown: "personal_menu_large", options: "is_hover:false" } do
+              = avatar(current_user, size: 34, cert: false)
+              span = current_user.fullname
+            = link_to '#', class: 'small account lg:hidden', data: { dropdown: "personal_menu_small", options: "is_hover:false" } do
+              = avatar(current_user, size: 34, cert: false)
+          li
+          li
+            = link_to "#", onclick: "return false;", id: "alerts_link", class: 'text-white hover:text-blue-200', data: { dropdown: "alert_cont", options: "is_hover:false" } do
+              i.fa-solid.fa-bell.text-xl title="ALERTS"
+        - else
+          li.flex.space-x-2
+            = link_to t('pages.header.login'), '#', data: { reveal_id: "login-panel" }, class: "button bg-white text-blue-900 px-4 py-2 rounded hover:bg-blue-100 hidden md:inline-block"
+            = link_to t('pages.header.login'), '/users/sign_in', class: "button bg-white text-blue-900 px-4 py-2 rounded hover:bg-blue-100 md:hidden"
+            = link_to t('pages.header.menu.registration_button'), new_registration_path(resource_name), class: 'button bg-green-600 text-white px-4 py-2 rounded hover:bg-green-500'
+
+  = render 'layouts/personal_menu' if user_signed_in?
+
+#hover1.f-dropdown.medium.bg-white.shadow-lg.rounded-md.mt-2 data-dropdown-content=true
+  - if user_signed_in?
+    - if current_user.groups.empty?
+      .group-item.p-4
+        h4.text-gray-600 = t('pages.header.no_groups_yet')
+    - else
+      = render partial: 'groups/group_menu_item', collection: current_user.groups, as: :group
+    = render 'groups/open_space_menu_item'
+  
+  .group-item.p-4.border-t.border-gray-100.flex.flex-col.space-y-2
+    = link_to new_group_url, class: 'bg-blue-600 text-white px-4 py-2 rounded text-center hover:bg-blue-500' do
+      i.fa-solid.fa-plus.mr-2
+      = t('pages.header.open_group')
+    = link_to groups_url, class: 'bg-gray-600 text-white px-4 py-2 rounded text-center hover:bg-gray-500' do
+      i.fa-solid.fa-magnifying-glass.mr-2
+      = t('pages.header.new_group')
+
+= render 'layouts/login_panel' unless signed_in?

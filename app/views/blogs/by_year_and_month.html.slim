@@ -1,0 +1,17 @@
+- javascript 'endless_page'
+=render layout: "layouts/page_title", locals: {title: @page_title} do
+
+- if @blog_posts.size == 0 && !params[:page]
+  .blogPost
+
+  h1
+    =t('pages.blogs.show.no_posts')
+- else
+  #blogPostContainer
+    = render collection: @blog_posts, partial: 'blog_posts/blog_post'
+#loading_results
+  span
+    = t('pages.blogs.show.previous_posts')
+- content_for :left_panel do
+  =render 'blog_posts/admin_links'
+  =render 'blogs/left_panel'

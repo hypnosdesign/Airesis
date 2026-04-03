@@ -1,0 +1,15 @@
+- if can? :participate, @proposal
+  .handscontainer
+    - if @my_vote
+      - if @my_vote.to_sym == :positive
+        = render partial: '/proposals/valutations/votedup'
+      - elsif @can_vote_again
+        = render partial: '/proposals/valutations/voteup'
+      - if @my_vote.to_sym == :negative
+        = render partial: '/proposals/valutations/voteddown'
+      - elsif @can_vote_again
+        = render partial: '/proposals/valutations/votedown'
+    - elsif @can_vote_again
+      = render partial: '/proposals/valutations/voteup'
+      = render partial: '/proposals/valutations/votedown'
+  div[style="clear: both;"]

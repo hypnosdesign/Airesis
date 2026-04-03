@@ -1,0 +1,7 @@
+#proposalComments.blogComments
+  - if @proposal_comment_search.proposal_comments.any?
+    = render partial: 'proposals/comment', collection: @proposal_comment_search.proposal_comments, as: :comment
+  - else
+    .no-contributes-yet.panel.callout
+      p
+        = t('pages.proposals.show.no_contributes_yet')

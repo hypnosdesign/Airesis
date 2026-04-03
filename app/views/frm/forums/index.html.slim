@@ -1,0 +1,13 @@
+- @page_title = "#{t('.title')} #{@group.name}"
+- @extend=true
+#forums_container
+  h1#forums_title
+    = t('.title')
+  = render @categories
+- if is_group_admin? @group
+  - content_for :left_panel do
+    .mybox
+      h4
+        = t('frm.admin.area')
+      = link_to t("area", scope: "frm.admin"), group_frm_admin_root_url(@group), class: 'btn'
+= render partial: '/frm/application/forem_footer'

@@ -1,0 +1,2 @@
+class UserTracing < ApplicationRecord
+end

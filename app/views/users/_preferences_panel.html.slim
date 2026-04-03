@@ -1,0 +1,23 @@
+.mybox[data-ijs="settings-menu"]
+  h4
+    = t('pages.users.left_panel.title')
+  .menu-voice.general_info
+    = link_to user_url(current_user) do
+      i.fa-solid.fa-gears
+      = t('pages.users.left_panel.general_info')
+  .menu-voice.alarm_and_notifications
+    = link_to alarm_preferences_users_url do
+      i.fa-solid.fa-bell
+      = t('pages.users.left_panel.alarm_and_notifications')
+  .menu-voice.geographic_borders
+    = link_to border_preferences_users_url do
+      i.fa-solid.fa-image
+      = t('pages.users.left_panel.geographic_borders')
+  .menu-voice.account_and_policy
+    = link_to privacy_preferences_users_url do
+      i.fa-solid.fa-key
+      = t('pages.users.left_panel.account_and_privacy')
+  .menu-voice.statistics
+    = link_to statistics_users_url do
+      i.fa-solid.fa-chart-bar
+      = t('pages.users.left_panel.statistics')

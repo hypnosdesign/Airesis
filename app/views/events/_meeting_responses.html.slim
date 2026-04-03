@@ -1,0 +1,19 @@
+.mybox
+  h4
+    = @event.past? ? t('pages.events.show.participants') : t('pages.events.show.will_partecipate')
+  .mybox_button
+  .mycont
+    = render partial: 'events/participants', locals: {participants: @event.meeting.yes_participations}
+    - if @event.meeting.yes_participations.empty?
+      - if @event.past?
+        h4
+          = t('pages.events.show.no_participants')
+      - else
+        h4
+          = t('pages.events.show.no_participants_yet')
+.mybox
+  h4
+    = @event.past? ? t('pages.events.show.non_participants') : t('pages.events.show.will_non_participants')
+  .mybox_button.close[data-menu2show="0"]
+  .mycont[style="display:none"]
+    = render partial: 'events/participants', locals: {participants: @event.meeting.no_participations}

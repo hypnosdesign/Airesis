@@ -1,0 +1,10 @@
+ul.breadcrumbs
+  li
+    = link_to t('pages.groups.administration_panel.proposals'), group_quorums_url(@group)
+  li.current
+    = @quorum.name
+br
+.card
+  = render(partial: 'quorums/form', locals: {button_name: t('buttons.update')})
+= content_for :left_panel do
+  = render 'groups/administration_panel'

@@ -1,0 +1,85 @@
+- content_for :left_panel do
+  - if can? :view_data, @group
+    - if ::Configuration::socialnetwork_active
+      .mybox
+        |  <a href="https://twitter.com/share" class="twitter-share-button" data-lang="en" data-count="vertical" data-width="50" data-text="
+        = "Look at this group on ##{APP_SHORT_NAME}"
+        | ">Tweet
+        |  <div class="fb-like" data-send="false" data-width="50" data-layout="box_count" data-action="like" data-show-faces="false" data-share="false" data-likeable_type="
+        = @group.class.class_name
+        | " data-likeable_id="
+        = @group.id
+        | ">
+      h4
+        = t('pages.groups.show.short_url').upcase
+      .mycont
+        = link_to group_url(@group).gsub('/groups', ''), group_url(@group).gsub('/groups', '')
+  .mybox
+    a.btn[href="#" data-reveal-id="rules_modal"]
+
+  i.fa-solid.fa-book
+  = t('pages.groups.show.rules_button')
+  - if can? :view_data, @group
+    - if user_signed_in? && current_user.blog
+      - if can? :post_to, @group
+        = link_to new_group_blog_post_url(@group), class: 'btn green', style: "margin-top:4px;" do
+          i.fa-solid.fa-plus
+          = t('pages.groups.show.post_button')
+        br
+    - else
+      = link_to new_blog_path, class: 'btn green', style: "margin-top:4px;" do
+        i.fa-solid.fa-plus
+        = t('pages.groups.show.blog_button')
+      br
+  - if can? :view_data, @group
+    .mybox.participants_container
+      = render partial: 'groups/participants_panel'
+    - unless @group.disable_participation_requests
+      .participation_requests_container
+        = render partial: 'groups/participation_requests_panel'
+    - voting = @group.participation_requests.voting
+    -            if voting.size > 0
+    .mybox
+      p
+
+      h4
+        = 'Elenco delle richieste di partecipazione in corso di votazione'
+      - voting.each do |request|
+        p
+          = link_to_user request.user, full_name: true
+          a
+            | Vota SI
+          |  - 
+          a
+            | Vota NO
+  br
+  - @myparticipation = @group.group_participations.where(user_id: current_user.id).first if current_user
+  - if @myparticipation
+    .mybox
+      h4
+        = t('pages.groups.show.permissions_title')
+      |  <div id="permissions_list_container" title="
+      = t('pages.groups.show.list_permissions.title')
+      | ">
+    = link_to permissions_list_group_path(@group), data: { remote: true, disable_with: t('loading') }, class: 'btn' do
+      i.fa-solid.fa-circle-info
+      = t('pages.groups.show.list_permissions.button')
+    = link_to group_group_participation_path(@group, @myparticipation), method: :delete, data: { disable_with: t('loading'), confirm: t('pages.users.show.get_out_of_group_confermation') }, class: 'btn' do
+      i.fa-solid.fa-right-from-bracket
+      = t('pages.users.show.get_out_of_group_button')
+    .mybox
+      h4
+        = 'Archives'
+    .mycont
+      - if @archives.length > 0
+        - @archives.each do |rec|
+          .blog_comment
+            = link_to "#{t('calendar.monthNames')[rec.month.to_i - 1]} #{rec.year.to_i} (#{rec.posts})", posts_by_year_and_month_group_path(@group, month: rec.month.to_i, year: rec.year.to_i)
+      - else
+        = 'Nothing has ever been published in this group'
+  - else
+    .mybox
+      p
+        = link_to ask_for_participation_group_url(@group), method: :post, class: "btn blue" do
+          i.fa-solid.fa-pencil
+          = t('pages.groups.show.ask_participate_button')

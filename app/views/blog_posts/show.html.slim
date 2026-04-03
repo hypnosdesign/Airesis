@@ -1,0 +1,98 @@
+- if current_user && !Rails.env.test?
+  = subscribe_to blog_blog_post_path(@blog_post.blog, @blog_post)
+- content_for :html_options do
+  |  itemscope itemtype="http://schema.org/Blog" 
+= content_for :head do
+  |  <meta property="og:url" content="
+  = current_url
+  | "/> <meta property="og:title" content="
+  = @blog_post.title
+  | "/> 
+  meta[property="og:type" content="article"]
+  |  <meta property="og:image" content="
+  = asset_url('logo120.png')
+  | "/> <meta property="og:site_name" content="
+  = ENV['APP_LONG_NAME']
+  | "/> <meta property="fb:app_id" content="
+  = ENV['FACEBOOK_APP_ID']
+  | "/> <meta property="article:published_time" content="
+  = @blog_post.created_at.strftime('%Y/%m/%d')
+  | "> <meta property="article:tag" content="
+  = @blog_post.tags_list
+  | "> 
+- javascript 'endless_page'
+.blogPost
+  script[type="text/javascript"]
+    |  var pageURL = "#{@blog_url}"; 
+  .card
+    h1
+      = blog_post_label @blog_post
+      = @page_title
+    .blogPostBody[itemprop="description"]
+      = sanitize @blog_post.body
+      .clearboth
+    .blogPostFooter
+      .blogPostPostedAt
+        - - name = link_to((avatar(@blog_post.user, size: 15, cert: false) + @blog_post.user.fullname), @blog_post.user)
+        = raw t('pages.blog_posts.list_elements.inserted', name: name, date: (l @blog_post.created_at))
+        |  | 
+        span.blogComments
+          = link_to t('pages.blog_posts.view.comments', count: @blog_post.blog_comments.count), '#blogPostCommentsContainer'
+      - if ::Configuration::socialnetwork_active
+        .post_buttons
+          |  <a href="https://twitter.com/share" class="twitter-share-button" data-lang="en" data-text="
+          = t('twitter.share.blog_post', app: APP_SHORT_NAME, tags: @blog_post.tags.for_twitter)
+          | " data-url="
+          = blog_blog_post_url(@blog_post.blog, @blog_post)
+          | ">Tweet
+          |  | <div class="fb-like" data-href="
+          = @blog_url
+          | " data-width="450" data-layout="button_count" data-show-faces="true" data-send="true">
+    - unless @blog_post.tags.blank?
+      .blogPostTags
+        span.tag_label
+          | Tags: 
+        span.tags_list
+          = raw @blog_post.tags_with_links
+#blogNewComment.blogNewComment
+  = render partial: 'blog_comments/new_blog_comment', locals: {blog_comment: @blog_comment}
+#blogPostCommentsContainer
+  = render partial: 'blog_posts/comments'
+#loading_results
+  span
+    = t('pages.blog_posts.show.previous_comments')
+= content_for :left_panel do
+  - if can? :update, @blog_post
+    .mybox
+      = link_to edit_blog_blog_post_path(@blog_post.blog, @blog_post), class: 'btn' do
+        i.fa-solid.fa-pencil
+        = t('pages.blog_posts.show.edit_button')
+      = link_to @blog_url, method: :delete, data: {confirm: t('pages.blog_posts.show.delete_button_confirm')}, class: 'btn' do
+        i.fa-regular.fa-trash-can
+        = t('pages.blog_posts.show.delete_button')
+  - if ::Configuration.socialnetwork_active
+    .mybox
+      |  <a href="https://twitter.com/share" class="twitter-share-button" data-lang="en" data-count="vertical" data-text="
+      = t('twitter.share.blog_post', app: APP_SHORT_NAME, tags: @blog_post.tags.for_twitter)
+      | ">Tweet
+      = raw facebook_like
+      br
+  - if @blog_post.groups.count > 0
+    .mybox
+      h4
+        = 'Published on the following groups'
+    .mycont
+      - @blog_post.groups.each do |group|
+        .panel
+
+        .groupcontainer
+
+        .groupImg24
+          = group.group_image_tag(24) rescue nil
+        .group
+          = link_to group.name, group_url(group)
+    .clearboth
+- if @blog
+  = render 'blogs/left_panel'
+script[type="text/javascript"]
+  |  $(function () { disegnaCountdown(); }); 
