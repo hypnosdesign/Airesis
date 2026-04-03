@@ -1,0 +1,13 @@
+<div class="group-item">
+<div style="float:left;">
+<%= ::Temple::Utils.escape_html((group.group_image_tag(60) rescue nil)) %>
+</div><div class="p1">
+<%= ::Temple::Utils.escape_html((link_to group.name, group_url(group))) %>
+</div><div class="p2">
+<%= ::Temple::Utils.escape_html((link_to t('pages.header.groups.proposals'), group_proposals_url(group))) %>
+ - 
+<%= ::Temple::Utils.escape_html((link_to t('pages.header.groups.events'), group_events_url(group))) %>
+ - 
+<%= ::Temple::Utils.escape_html((link_to t('pages.header.groups.forum'), group_forums_url(group))) %>
+</div><div class="clearboth">
+</div></div>

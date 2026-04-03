@@ -1,0 +1,20 @@
+<div class="mybox">
+<h4>
+<%= ::Temple::Utils.escape_html((@event.past? ? t('pages.events.show.participants') : t('pages.events.show.will_partecipate'))) %>
+</h4><div class="mybox_button">
+</div><div class="mycont">
+<%= ::Temple::Utils.escape_html((render partial: 'events/participants', locals: {participants: @event.meeting.yes_participations})) %>
+<% if @event.meeting.yes_participations.empty?
+if @event.past?
+ %><h4>
+<%= ::Temple::Utils.escape_html((t('pages.events.show.no_participants'))) %>
+</h4><% else
+ %><h4>
+<%= ::Temple::Utils.escape_html((t('pages.events.show.no_participants_yet'))) %>
+</h4><% end; end %></div></div><div class="mybox">
+<h4>
+<%= ::Temple::Utils.escape_html((@event.past? ? t('pages.events.show.non_participants') : t('pages.events.show.will_non_participants'))) %>
+</h4><div class="mybox_button close" data-menu2show="0">
+</div><div class="mycont" style="display:none">
+<%= ::Temple::Utils.escape_html((render partial: 'events/participants', locals: {participants: @event.meeting.no_participations})) %>
+</div></div>

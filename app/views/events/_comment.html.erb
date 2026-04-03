@@ -1,0 +1,23 @@
+<div id="comment
+<%= ::Temple::Utils.escape_html((comment.id)) %>
+" class="blogComment card" 
+<% if (comment.collapsed)
+ %> data-collapsed 
+<% end %>> 
+<div class="blog-comment-image">
+<%= ::Temple::Utils.escape_html((avatar(comment.user, size: 20))) %>
+<span class="blogPoster">
+<%= ::Temple::Utils.escape_html((link_to_user comment.user)) %>
+</span></div><div class="blog-comment-content">
+<%= ::Temple::Utils.escape_html((raw auto_link((h(comment.body)).gsub(/\n/, '<br/>'), html: {target: '_blank'}, sanitize: false) { |text| truncate(text, length: 15) })) %>
+</div><div class="blog-comment-footer">
+<% if comment.likers.include? current_user
+ %><%= ::Temple::Utils.escape_html((link_to 'Unlike', like_event_event_comment_path(@event, comment), method: :post, remote: true, data: {other: 'Like'}, onclick: 'switchText($(this))')) %>
+<% else
+ %><%= ::Temple::Utils.escape_html((link_to 'Like', like_event_event_comment_path(@event, comment), method: :post, remote: true, data: {other: 'Unlike'}, onclick: 'switchText($(this))')) %>
+<% end %> · 
+<%= ::Temple::Utils.escape_html((time_in_words(comment.created_at))) %>
+<% if current_user and (current_user.id == comment.user_id)
+ %><%= ::Temple::Utils.escape_html((link_to t('pages.blog_posts.comment.delete_button'), [@event,comment], method: :delete,  data: {remote: true, confirm: t('pages.blog_posts.comment.confirm_delete')}, class: "deleteCommentLink", style:'float:right')) %>
+<% end %></div><div style="clear:both;">
+</div>

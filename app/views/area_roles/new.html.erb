@@ -1,0 +1,11 @@
+<ul class="breadcrumbs">
+<li>
+<%= ::Temple::Utils.escape_html((link_to 'All working areas', group_group_areas_url(@group))) %>
+</li><li>
+<%= ::Temple::Utils.escape_html((link_to @group_area.name, edit_group_group_area_url(@group,@group_area))) %>
+</li><li class="current">
+<%= ::Temple::Utils.escape_html((t('pages.groups.edit_permissions.new_role_title'))) %>
+</li></ul><%= ::Temple::Utils.escape_html((render(partial: 'area_roles/form', locals: {button_name: t('buttons.create'), remote: false}))) %>
+<% _slim_controls1 = content_for :left_panel do %><% _slim_controls2 = ''.dup; 
+; _slim_controls2 << ((::Temple::Utils.escape_html((render partial: 'groups/administration_panel'))).to_s); 
+; _slim_controls2 %><% end %><%= ::Temple::Utils.escape_html((_slim_controls1)) %>

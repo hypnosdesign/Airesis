@@ -1,0 +1,28 @@
+<div class="proposal-alert-box info radius clearfix" data-alert="">
+<% if can? :set_votation_date, @proposal
+if @proposal.users.exclude? current_user
+ %><p>
+<%= ::Temple::Utils.escape_html((t('pages.proposals.show.you_can_choose_vote_dates', count: OTHERS_CHOOSE_VOTE_DATE_DAYS))) %>
+</p><% end; if @group
+collection = @group.events.not_visible.vote_period.collect { |p| ["da #{l p.starttime} a #{l p.endtime}", p.id, { 'data-start' => (l p.starttime), 'data-end' => (l p.endtime), 'data-title' => p.title }] }
+else
+collection = Event.visible.vote_period.collect { |p| ["da #{l p.starttime} a #{l p.endtime}", p.id, { 'data-start' => (l p.starttime), 'data-end' => (l p.endtime), 'data-title' => p.title }] }
+end; if collection.size > 0
+_slim_controls1 = form_for @group ? [:set_votation_date, @group, @proposal] : [:set_votation_date, @proposal] do |f| %><% _slim_controls2 = ''.dup; 
+; _slim_controls2 << ("<p".freeze); _slim_controls2 << (">".freeze); 
+; _slim_controls2 << ((::Temple::Utils.escape_html((t('pages.proposals.show.choose_votation_period')))).to_s); 
+; _slim_controls2 << ((::Temple::Utils.escape_html((f.select :vote_period_id, options_for_select(collection), { style: 'width:400px' }))).to_s); 
+; _slim_controls2 << ((::Temple::Utils.escape_html((f.submit t('pages.proposals.show.choose_votation_period_button'), data: { confirm: t('pages.proposals.show.choose_votation_period_alert') }, class: 'btn blue'))).to_s); 
+; _slim_controls2 << ("</p>".freeze); _slim_controls2 %><% end %><%= ::Temple::Utils.escape_html((_slim_controls1)) %><% else
+ %><p>
+<%= ::Temple::Utils.escape_html((t('pages.proposals.show.create_votation_period'))) %>
+</p><% end %><%= ::Temple::Utils.escape_html((link_to @group ?)) %>
+<% new_group_event_url(@group, event_type_id: EventType::VOTATION, proposal_id: @proposal.id) :
+new_event_url(event_type_id: EventType::VOTATION, proposal_id: @proposal.id), remote: true, class: 'btn disable' do
+end %><i class="fa-solid fa-plus">
+</i><%= ::Temple::Utils.escape_html((t('pages.proposals.show.choose_new_votation_period_button'))) %>
+<% else
+ %><%= ::Temple::Utils.escape_html((t('pages.proposals.show.no_periods_contact_group'))) %>
+<% end %><a class="close" href="#">
+×
+</a></div>

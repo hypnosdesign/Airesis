@@ -1,0 +1,8 @@
+<% @page_title = t('pages.groups.new.title')
+ %><div class="card">
+<h1><%= ::Temple::Utils.escape_html((t('pages.groups.new.new_group'))) %>
+</h1><%= ::Temple::Utils.escape_html((render partial: @group, locals: { button_name: t('pages.groups.new.create_button')})) %>
+
+</div><% _slim_controls1 = content_for :left_panel do %><% _slim_controls2 = ''.dup; 
+; _slim_controls2 << ((::Temple::Utils.escape_html((render 'users/user_groups_panel'))).to_s); 
+; _slim_controls2 %><% end %><%= ::Temple::Utils.escape_html((_slim_controls1)) %>

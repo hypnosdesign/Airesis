@@ -1,0 +1,45 @@
+<div class="baloon-triangle contribute">
+
+</div><div>
+<div class="baloon_header">
+ <a href="#" class="right report_contribute hidden_link" data-dropdown="commentdropdown
+<%= ::Temple::Utils.escape_html((comment.id)) %>
+">
+ <ul class="f-dropdown" id="commentdropdown
+<%= ::Temple::Utils.escape_html((comment.id)) %>
+" data-dropdown-content> 
+<% if can? :update, comment
+ %><li>
+<%= ::Temple::Utils.escape_html((link_to t('pages.proposals.update_comment'), edit_proposal_proposal_comment_path(@proposal, comment),
+-                           class: "editCommentLink menu_item", data: {edit_contribute: comment.id})) %>
+</li><% end; if comment.versions.length > 0
+ %><li>
+<%= ::Temple::Utils.escape_html((link_to t('pages.proposals.history_comment'), history_proposal_proposal_comment_path(@proposal, comment),
+-                           class: "historyCommentLink menu_item", data: {history_contribute: comment.id})) %>
+</li><% end %><li>
+<a href="#" data-report-contribute="
+<%= ::Temple::Utils.escape_html((comment.id)) %>
+"> 
+<%= ::Temple::Utils.escape_html((t('buttons.report'))) %>
+</li><% if can? :destroy, comment
+ %><li>
+<%= ::Temple::Utils.escape_html((link_to t('pages.proposals.delete_comment'), [@proposal, comment], method: :delete, data: {remote: true, confirm: t('pages.proposals.show.delete_contribute_confirmation')},
+-                           class: "deleteCommentLink menu_item")) %>
+</li><% end %></div><div class="baloon-content">
+<%= ::Temple::Utils.escape_html((parsed_content(comment, @proposal.is_anonima?))) %>
+</div><div class="baloon-footer" title="<%= ::Temple::Utils.escape_html((l(comment.updated_at || comment.created_at))) %>">
+<% who = (proposal_nickname && @proposal.is_anonima? && !(comment.user == current_user)) ?
+proposal_nickname.nickname :
+(link_to_user comment.user, content_text: comment.user.fullname + ((proposal_nickname && @proposal.is_anonima?) ?
+(' (' + proposal_nickname.nickname + ')') :
+''))
+if comment.created_at == comment.updated_at
+ %><%= ::Temple::Utils.escape_html((raw t('pages.proposals.show.comment_inserted_by', when: time_in_words(comment.created_at), who: who))) %>
+<% else
+ %><%= ::Temple::Utils.escape_html((raw t('pages.proposals.show.comment_updated_by', when: time_in_words(comment.updated_at), who: who))) %>
+<% end %></div> <div id="rankingpanelcontainer
+<%= ::Temple::Utils.escape_html((comment.id)) %>
+" class="rankingpanelcontainer"> 
+<%= ::Temple::Utils.escape_html((render partial: 'proposal_comments/ranking_panel', locals: {comment: comment})) %>
+</div><div style="clear:both;">
+</div>

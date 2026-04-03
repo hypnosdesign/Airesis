@@ -1,0 +1,9 @@
+<ul class="breadcrumbs">
+<li>
+<%= ::Temple::Utils.escape_html((link_to 'All working areas', group_group_areas_url(@group))) %>
+</li><li class="current">
+<%= ::Temple::Utils.escape_html((@group_area.name)) %>
+</li></ul><%= ::Temple::Utils.escape_html((render 'group_areas/edit')) %>
+<% _slim_controls1 = content_for :left_panel do %><% _slim_controls2 = ''.dup; 
+; _slim_controls2 << ((::Temple::Utils.escape_html((render partial: 'groups/administration_panel'))).to_s); 
+; _slim_controls2 %><% end %><%= ::Temple::Utils.escape_html((_slim_controls1)) %>

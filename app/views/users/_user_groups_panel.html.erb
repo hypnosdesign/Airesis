@@ -1,0 +1,19 @@
+<% if user_signed_in?
+ %><div class="mybox">
+<h4>
+<%= ::Temple::Utils.escape_html((t('pages.groups.index.groups_list'))) %>
+</h4></div><div class="mycont">
+<% @groups = current_user.groups
+if @groups.empty?
+ %><%= ::Temple::Utils.escape_html((raw t('pages.groups.index.no_groups_yet', {name: (link_to t('group'), groups_path)}))) %>
+<% end; @groups.each do |group|
+ %><div class="panel">
+
+</div><div class="groupcontainer">
+
+</div><div class="groupImg24">
+<%= ::Temple::Utils.escape_html((group.group_image_tag(24) rescue nil)) %>
+</div><div class="group">
+<%= ::Temple::Utils.escape_html((link_to group.name, group_url(group))) %>
+</div><% end %></div><div class="clearboth">
+</div><% end %>

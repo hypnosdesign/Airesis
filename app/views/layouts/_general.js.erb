@@ -1,0 +1,10 @@
+(function () { 
+<%= ::Temple::Utils.escape_html((render partial: 'layouts/messages', locals: {flash: flash})) %>
+<%= ::Temple::Utils.escape_html((yield :layout)) %>
+<% unless @disable_per_page
+ %> execute_page_js('
+<%= ::Temple::Utils.escape_html((body_page_name)) %>
+'); 
+<% end %><%= ::Temple::Utils.escape_html((yield :after_page_js)) %>
+ })(); 
+<%= ::Temple::Utils.escape_html((yield :no_closure)) %>

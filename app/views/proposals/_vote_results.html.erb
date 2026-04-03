@@ -1,0 +1,75 @@
+<div style="float:left">
+<b>
+<%= ::Temple::Utils.escape_html((t('pages.proposals.results.total', count: @proposal.vote.number))) %>
+</b><table>
+<thead>
+<tr>
+<th>
+</th><th>
+<%= ::Temple::Utils.escape_html((t('pages.proposals.results.vote_column'))) %>
+</th><th>
+<%= ::Temple::Utils.escape_html((t('pages.proposals.results.number_column'))) %>
+</th><th>
+<%= ::Temple::Utils.escape_html((t('pages.proposals.results.percentage_column'))) %>
+</th></tr></thead><tbody>
+<tr>
+<td>
+<div class="color_legend positive">
+</div></td><td>
+<%= ::Temple::Utils.escape_html((t('pages.proposals.results.positive'))) %>
+</td><td>
+<%= ::Temple::Utils.escape_html((@proposal.vote.positive)) %>
+</td><td>
+<%= ::Temple::Utils.escape_html((@proposal.vote.positive_perc)) %>
+%
+</td></tr><tr>
+<td>
+<div class="color_legend negative">
+</div></td><td>
+<%= ::Temple::Utils.escape_html((t('pages.proposals.results.negative'))) %>
+</td><td>
+<%= ::Temple::Utils.escape_html((@proposal.vote.negative)) %>
+</td><td>
+<%= ::Temple::Utils.escape_html((@proposal.vote.negative_perc)) %>
+%
+</td></tr><tr>
+<td>
+<div class="color_legend neutral">
+</div></td><td>
+<%= ::Temple::Utils.escape_html((t('pages.proposals.results.neutral'))) %>
+</td><td>
+<%= ::Temple::Utils.escape_html((@proposal.vote.neutral)) %>
+</td><td>
+<%= ::Temple::Utils.escape_html((@proposal.vote.neutral_perc)) %>
+%
+</td></tr></tbody></table></div> <div style="height: 200px; width: 200px; float:left;" data-plot id="vote-results-chart" data-positive="
+<%= ::Temple::Utils.escape_html((@proposal.vote.positive)) %>
+" data-negative="
+<%= ::Temple::Utils.escape_html((@proposal.vote.negative)) %>
+" data-neutral="
+<%= ::Temple::Utils.escape_html((@proposal.vote.neutral)) %>
+"> 
+<div style="clear: both;">
+</div><hr />
+<table id="votes_table">
+<thead>
+<tr>
+<th>
+<%= ::Temple::Utils.escape_html((t('pages.proposals.results.name_surname_column'))) %>
+</th><th>
+<%= ::Temple::Utils.escape_html((t('pages.proposals.results.date_time_column'))) %>
+</th><% unless @proposal.secret_vote
+ %><th>
+<%= ::Temple::Utils.escape_html((t('pages.proposals.results.vote_column'))) %>
+</th><% end %></tr></thead><% @proposal.user_votes.each do |user_vote|
+ %><tr>
+<td>
+<%= ::Temple::Utils.escape_html((user_vote.user.fullname)) %>
+</td><td>
+<%= ::Temple::Utils.escape_html((l user_vote.created_at)) %>
+</td><% unless @proposal.secret_vote
+ %><td>
+<%= ::Temple::Utils.escape_html((user_vote.vote_type.description)) %>
+</td><% end %></tr><% end %></table><script type="text/javascript">
+ ProposalsVoteResults.positive = '<%= ::Temple::Utils.escape_html((j t('pages.proposals.results.positive'))) %>'; ProposalsVoteResults.neutral = '<%= ::Temple::Utils.escape_html((j t('pages.proposals.results.neutral'))) %>'; ProposalsVoteResults.negative = '<%= ::Temple::Utils.escape_html((j t('pages.proposals.results.negative'))) %>'; 
+</script>

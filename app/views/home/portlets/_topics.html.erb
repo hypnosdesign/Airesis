@@ -1,0 +1,8 @@
+<div class="title">
+<%= ::Temple::Utils.escape_html((t('home.portlets.topics.title'))) %>
+</div><% topics = @user.viewed_topics.order('created_at desc').limit(10)
+unless topics.empty?
+ %><div class="scrollable">
+<div class="mini_topics">
+<%= ::Temple::Utils.escape_html((render partial: 'frm/topics/mini_topic', collection: topics, as: 'topic')) %>
+</div></div><% end %>

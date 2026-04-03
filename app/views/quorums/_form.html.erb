@@ -1,0 +1,143 @@
+<h2>
+<%= ::Temple::Utils.escape_html((@page_title)) %>
+</h2><% if ['edit', 'update'].include? params[:action]
+ %><div class="panel callout">
+<p>
+<%= ::Temple::Utils.escape_html((t('pages.groups.edit_quorums.edit_quorum_warning'))) %>
+</p></div><% end; _slim_controls1 = simple_form_for [@group, @quorum], validate: true, remote: request.xhr? do |e| %><% _slim_controls2 = ''.dup; 
+; _slim_controls2 << ("<div".freeze); _slim_controls2 << (" class=\"".freeze); _slim_controls2 << ("row".freeze); _slim_controls2 << ("\"".freeze); _slim_controls2 << (">".freeze); 
+; 
+; _slim_controls2 << ("</div>".freeze); _slim_controls2 << ("<div".freeze); _slim_controls2 << (" class=\"".freeze); _slim_controls2 << ("columns".freeze); _slim_controls2 << (" ".freeze); _slim_controls2 << ("small-12".freeze); _slim_controls2 << ("\"".freeze); _slim_controls2 << (">".freeze); 
+; _slim_controls2 << ((::Temple::Utils.escape_html((e.input :name))).to_s); 
+; _slim_controls2 << ("</div>".freeze); _slim_controls2 << ("<div".freeze); _slim_controls2 << (" class=\"".freeze); _slim_controls2 << ("columns".freeze); _slim_controls2 << (" ".freeze); _slim_controls2 << ("small-12".freeze); _slim_controls2 << ("\"".freeze); _slim_controls2 << (">".freeze); 
+; _slim_controls2 << ((::Temple::Utils.escape_html((e.input :description, as: :text, input_html: { rows: 2, class: 'elastic' }))).to_s); 
+; _slim_controls2 << ("</div>".freeze); _slim_controls2 << ("<div".freeze); _slim_controls2 << (" class=\"".freeze); _slim_controls2 << ("row".freeze); _slim_controls2 << ("\"".freeze); _slim_controls2 << (">".freeze); 
+; 
+; _slim_controls2 << ("</div>".freeze); _slim_controls2 << ("<div".freeze); _slim_controls2 << (" class=\"".freeze); _slim_controls2 << ("columns".freeze); _slim_controls2 << (" ".freeze); _slim_controls2 << ("large-6".freeze); _slim_controls2 << ("\"".freeze); _slim_controls2 << (">".freeze); 
+; _slim_controls2 << ("<fieldset".freeze); _slim_controls2 << (">".freeze); 
+; _slim_controls2 << ("<legend".freeze); _slim_controls2 << (">".freeze); 
+; _slim_controls2 << ((::Temple::Utils.escape_html(('Debate'))).to_s); 
+; _slim_controls2 << ("</legend>".freeze); _slim_controls2 << ((::Temple::Utils.escape_html((e.label :minutes))).to_s); 
+; _slim_controls2 << ("</fieldset>".freeze); _slim_controls2 << ("</div>".freeze); _slim_controls2 << ("<div".freeze); _slim_controls2 << (" class=\"".freeze); _slim_controls2 << ("row".freeze); _slim_controls2 << (" ".freeze); _slim_controls2 << ("collapse".freeze); _slim_controls2 << ("\"".freeze); _slim_controls2 << (">".freeze); 
+; 
+; _slim_controls2 << ("</div>".freeze); _slim_controls2 << ("<div".freeze); _slim_controls2 << (" class=\"".freeze); _slim_controls2 << ("small-4".freeze); _slim_controls2 << (" ".freeze); _slim_controls2 << ("columns".freeze); _slim_controls2 << ("\"".freeze); _slim_controls2 << (">".freeze); 
+; 
+; _slim_controls2 << ("</div>".freeze); _slim_controls2 << ("<div".freeze); _slim_controls2 << (" class=\"".freeze); _slim_controls2 << ("row".freeze); _slim_controls2 << (" ".freeze); _slim_controls2 << ("collapse".freeze); _slim_controls2 << (" ".freeze); _slim_controls2 << ("postfix-radius".freeze); _slim_controls2 << ("\"".freeze); _slim_controls2 << (">".freeze); 
+; 
+; _slim_controls2 << ("</div>".freeze); _slim_controls2 << ("<div".freeze); _slim_controls2 << (" class=\"".freeze); _slim_controls2 << ("small-6".freeze); _slim_controls2 << (" ".freeze); _slim_controls2 << ("columns".freeze); _slim_controls2 << ("\"".freeze); _slim_controls2 << (">".freeze); 
+; _slim_controls2 << ((::Temple::Utils.escape_html((e.number_field :days_m, class: "days", min: 0, data: { fv_excluded: true }))).to_s); 
+; _slim_controls2 << ("</div>".freeze); _slim_controls2 << ("<div".freeze); _slim_controls2 << (" class=\"".freeze); _slim_controls2 << ("small-6".freeze); _slim_controls2 << (" ".freeze); _slim_controls2 << ("columns".freeze); _slim_controls2 << ("\"".freeze); _slim_controls2 << (">".freeze); 
+; _slim_controls2 << ("<span".freeze); _slim_controls2 << (" class=\"".freeze); _slim_controls2 << ("postfix".freeze); _slim_controls2 << ("\"".freeze); _slim_controls2 << (">".freeze); 
+; _slim_controls2 << ((::Temple::Utils.escape_html(((t 'activerecord.attributes.quorum.days_m')))).to_s); 
+; _slim_controls2 << ("</span>".freeze); _slim_controls2 << ("</div>".freeze); _slim_controls2 << ("<div".freeze); _slim_controls2 << (" class=\"".freeze); _slim_controls2 << ("small-4".freeze); _slim_controls2 << (" ".freeze); _slim_controls2 << ("columns".freeze); _slim_controls2 << ("\"".freeze); _slim_controls2 << (">".freeze); 
+; 
+; _slim_controls2 << ("</div>".freeze); _slim_controls2 << ("<div".freeze); _slim_controls2 << (" class=\"".freeze); _slim_controls2 << ("row".freeze); _slim_controls2 << (" ".freeze); _slim_controls2 << ("collapse".freeze); _slim_controls2 << (" ".freeze); _slim_controls2 << ("postfix-radius".freeze); _slim_controls2 << ("\"".freeze); _slim_controls2 << (">".freeze); 
+; 
+; _slim_controls2 << ("</div>".freeze); _slim_controls2 << ("<div".freeze); _slim_controls2 << (" class=\"".freeze); _slim_controls2 << ("small-6".freeze); _slim_controls2 << (" ".freeze); _slim_controls2 << ("columns".freeze); _slim_controls2 << ("\"".freeze); _slim_controls2 << (">".freeze); 
+; _slim_controls2 << ((::Temple::Utils.escape_html((e.number_field :hours_m, class: "hours", min: 0, max: 23, data: { fv_excluded: true }))).to_s); 
+; _slim_controls2 << ("</div>".freeze); _slim_controls2 << ("<div".freeze); _slim_controls2 << (" class=\"".freeze); _slim_controls2 << ("small-6".freeze); _slim_controls2 << (" ".freeze); _slim_controls2 << ("columns".freeze); _slim_controls2 << ("\"".freeze); _slim_controls2 << (">".freeze); 
+; _slim_controls2 << ("<span".freeze); _slim_controls2 << (" class=\"".freeze); _slim_controls2 << ("postfix".freeze); _slim_controls2 << ("\"".freeze); _slim_controls2 << (">".freeze); 
+; _slim_controls2 << ((::Temple::Utils.escape_html(((t 'activerecord.attributes.quorum.hours_m')))).to_s); 
+; _slim_controls2 << ("</span>".freeze); _slim_controls2 << ("</div>".freeze); _slim_controls2 << ("<div".freeze); _slim_controls2 << (" class=\"".freeze); _slim_controls2 << ("small-4".freeze); _slim_controls2 << (" ".freeze); _slim_controls2 << ("columns".freeze); _slim_controls2 << ("\"".freeze); _slim_controls2 << (">".freeze); 
+; 
+; _slim_controls2 << ("</div>".freeze); _slim_controls2 << ("<div".freeze); _slim_controls2 << (" class=\"".freeze); _slim_controls2 << ("row".freeze); _slim_controls2 << (" ".freeze); _slim_controls2 << ("collapse".freeze); _slim_controls2 << (" ".freeze); _slim_controls2 << ("postfix-radius".freeze); _slim_controls2 << ("\"".freeze); _slim_controls2 << (">".freeze); 
+; 
+; _slim_controls2 << ("</div>".freeze); _slim_controls2 << ("<div".freeze); _slim_controls2 << (" class=\"".freeze); _slim_controls2 << ("small-6".freeze); _slim_controls2 << (" ".freeze); _slim_controls2 << ("columns".freeze); _slim_controls2 << ("\"".freeze); _slim_controls2 << (">".freeze); 
+; _slim_controls2 << ((::Temple::Utils.escape_html((e.number_field :minutes_m, class: "minutes", min: 0, max: 55, step: 5, data: { fv_excluded: true }))).to_s); 
+; _slim_controls2 << ("</div>".freeze); _slim_controls2 << ("<div".freeze); _slim_controls2 << (" class=\"".freeze); _slim_controls2 << ("small-6".freeze); _slim_controls2 << (" ".freeze); _slim_controls2 << ("columns".freeze); _slim_controls2 << ("\"".freeze); _slim_controls2 << (">".freeze); 
+; _slim_controls2 << ("<span".freeze); _slim_controls2 << (" class=\"".freeze); _slim_controls2 << ("postfix".freeze); _slim_controls2 << ("\"".freeze); _slim_controls2 << (">".freeze); 
+; _slim_controls2 << ((::Temple::Utils.escape_html(((t 'activerecord.attributes.quorum.minutes_m')))).to_s); 
+; _slim_controls2 << ("</span>".freeze); _slim_controls2 << ("</div>".freeze); _slim_controls2 << ((::Temple::Utils.escape_html((e.label :percentage))).to_s); 
+; _slim_controls2 << ("<div".freeze); _slim_controls2 << (" class=\"".freeze); _slim_controls2 << ("row".freeze); _slim_controls2 << ("\"".freeze); _slim_controls2 << (">".freeze); 
+; 
+; _slim_controls2 << ("</div>".freeze); _slim_controls2 << ("<div".freeze); _slim_controls2 << (" class=\"".freeze); _slim_controls2 << ("small-12".freeze); _slim_controls2 << (" ".freeze); _slim_controls2 << ("columns".freeze); _slim_controls2 << ("\"".freeze); _slim_controls2 << (">".freeze); 
+; 
+; _slim_controls2 << ("</div>".freeze); _slim_controls2 << ("<div".freeze); _slim_controls2 << (" class=\"".freeze); _slim_controls2 << ("row".freeze); _slim_controls2 << (" ".freeze); _slim_controls2 << ("collapse".freeze); _slim_controls2 << (" ".freeze); _slim_controls2 << ("postfix-radius".freeze); _slim_controls2 << ("\"".freeze); _slim_controls2 << (">".freeze); 
+; 
+; _slim_controls2 << ("</div>".freeze); _slim_controls2 << ("<div".freeze); _slim_controls2 << (" class=\"".freeze); _slim_controls2 << ("small-9".freeze); _slim_controls2 << (" ".freeze); _slim_controls2 << ("columns".freeze); _slim_controls2 << ("\"".freeze); _slim_controls2 << (">".freeze); 
+; _slim_controls2 << ((::Temple::Utils.escape_html((e.input :percentage, as: :string, label: false, input_html: { class: "percentage participants", title: t('activerecord.attributes.quorum.percentage_title'), min: 0, max: 100 }))).to_s); 
+; _slim_controls2 << ("</div>".freeze); _slim_controls2 << ("<div".freeze); _slim_controls2 << (" class=\"".freeze); _slim_controls2 << ("small-3".freeze); _slim_controls2 << (" ".freeze); _slim_controls2 << ("columns".freeze); _slim_controls2 << ("\"".freeze); _slim_controls2 << (">".freeze); 
+; _slim_controls2 << ("<span".freeze); _slim_controls2 << (" class=\"".freeze); _slim_controls2 << ("postfix".freeze); _slim_controls2 << ("\"".freeze); _slim_controls2 << (">".freeze); 
+; _slim_controls2 << (" % + 1 ".freeze); 
+; _slim_controls2 << ("</span>".freeze); _slim_controls2 << ("</div>".freeze); _slim_controls2 << ("<div".freeze); _slim_controls2 << (" class=\"".freeze); _slim_controls2 << ("row".freeze); _slim_controls2 << ("\"".freeze); _slim_controls2 << (">".freeze); 
+; 
+; _slim_controls2 << ("</div>".freeze); _slim_controls2 << ("<div".freeze); _slim_controls2 << (" class=\"".freeze); _slim_controls2 << ("columns".freeze); _slim_controls2 << (" ".freeze); _slim_controls2 << ("small-12".freeze); _slim_controls2 << ("\"".freeze); _slim_controls2 << (">".freeze); 
+; _slim_controls2 << ((::Temple::Utils.escape_html((raw t('pages.groups.edit_quorums.new_quorum.advanced_participation_description', current_number: "<span id=\"participants_number\">1</span>", total_number: @group_participations_count, average: (@group.statistic.valutations*100 / @group.scoped_participants(:participate_proposals).count).round(2))))).to_s); 
+; _slim_controls2 << ("</div>".freeze); _slim_controls2 << ((::Temple::Utils.escape_html((e.label :good_score))).to_s); 
+; _slim_controls2 << ("<div".freeze); _slim_controls2 << (" class=\"".freeze); _slim_controls2 << ("row".freeze); _slim_controls2 << ("\"".freeze); _slim_controls2 << (">".freeze); 
+; 
+; _slim_controls2 << ("</div>".freeze); _slim_controls2 << ("<div".freeze); _slim_controls2 << (" class=\"".freeze); _slim_controls2 << ("small-12".freeze); _slim_controls2 << (" ".freeze); _slim_controls2 << ("columns".freeze); _slim_controls2 << ("\"".freeze); _slim_controls2 << (">".freeze); 
+; 
+; _slim_controls2 << ("</div>".freeze); _slim_controls2 << ("<div".freeze); _slim_controls2 << (" class=\"".freeze); _slim_controls2 << ("row".freeze); _slim_controls2 << (" ".freeze); _slim_controls2 << ("collapse".freeze); _slim_controls2 << (" ".freeze); _slim_controls2 << ("postfix-radius".freeze); _slim_controls2 << ("\"".freeze); _slim_controls2 << (">".freeze); 
+; 
+; _slim_controls2 << ("</div>".freeze); _slim_controls2 << ("<div".freeze); _slim_controls2 << (" class=\"".freeze); _slim_controls2 << ("small-9".freeze); _slim_controls2 << (" ".freeze); _slim_controls2 << ("columns".freeze); _slim_controls2 << ("\"".freeze); _slim_controls2 << (">".freeze); 
+; _slim_controls2 << ((::Temple::Utils.escape_html((e.input :good_score, as: :string, label: false, input_html: { type: :number,
+-                                             class: "percentage", title: t('activerecord.attributes.quorum.good_score_title'), min: 1, max: 100 }))).to_s); 
+; _slim_controls2 << ("</div>".freeze); _slim_controls2 << ("<div".freeze); _slim_controls2 << (" class=\"".freeze); _slim_controls2 << ("small-3".freeze); _slim_controls2 << (" ".freeze); _slim_controls2 << ("columns".freeze); _slim_controls2 << ("\"".freeze); _slim_controls2 << (">".freeze); 
+; _slim_controls2 << ("<span".freeze); _slim_controls2 << (" class=\"".freeze); _slim_controls2 << ("postfix".freeze); _slim_controls2 << ("\"".freeze); _slim_controls2 << (">".freeze); 
+; _slim_controls2 << (" % ".freeze); 
+; _slim_controls2 << ("</span>".freeze); _slim_controls2 << ("</div>".freeze); _slim_controls2 << ("<div".freeze); _slim_controls2 << (" class=\"".freeze); _slim_controls2 << ("row".freeze); _slim_controls2 << ("\"".freeze); _slim_controls2 << (">".freeze); 
+; 
+; _slim_controls2 << ("</div>".freeze); _slim_controls2 << ("<div".freeze); _slim_controls2 << (" class=\"".freeze); _slim_controls2 << ("columns".freeze); _slim_controls2 << (" ".freeze); _slim_controls2 << ("small-12".freeze); _slim_controls2 << ("\"".freeze); _slim_controls2 << (">".freeze); 
+; 
+; _slim_controls2 << ("</div>".freeze); _slim_controls2 << ("<b".freeze); _slim_controls2 << (">".freeze); 
+; _slim_controls2 << ((::Temple::Utils.escape_html(("(average value: #{@group.statistic.good_score.round(2)}%)"))).to_s); 
+; _slim_controls2 << ("</b>".freeze); _slim_controls2 << ((::Temple::Utils.escape_html((e.hidden_field :t_percentage, value: 's'))).to_s); 
+; _slim_controls2 << ((::Temple::Utils.escape_html((e.hidden_field :t_minutes, value: 's'))).to_s); 
+; _slim_controls2 << ((::Temple::Utils.escape_html((e.hidden_field :t_good_score, value: 's'))).to_s); 
+; _slim_controls2 << ("<div".freeze); _slim_controls2 << (" class=\"".freeze); _slim_controls2 << ("columns".freeze); _slim_controls2 << (" ".freeze); _slim_controls2 << ("large-6".freeze); _slim_controls2 << ("\"".freeze); _slim_controls2 << (">".freeze); 
+; _slim_controls2 << ("<fieldset".freeze); _slim_controls2 << (">".freeze); 
+; _slim_controls2 << ("<legend".freeze); _slim_controls2 << (">".freeze); 
+; _slim_controls2 << ((::Temple::Utils.escape_html(('Votation'))).to_s); 
+; _slim_controls2 << ("</legend>".freeze); _slim_controls2 << ("<p".freeze); _slim_controls2 << (" style=\"".freeze); _slim_controls2 << ("display:none".freeze); _slim_controls2 << ("\"".freeze); _slim_controls2 << (">".freeze); 
+; _slim_controls2 << ((::Temple::Utils.escape_html((e.label :vote_minutes))).to_s); 
+; #= e.text_field(:vote_days_m, class: "days", readonly: true)+(t 'activerecord.attributes.quorum.days_m')
+#= e.text_field(:vote_hours_m, class: "hours", readonly: true)+(t 'activerecord.attributes.quorum.hours_m')
+#= e.text_field(:vote_minutes_m, class: "minutes", readonly: true)+(t 'activerecord.attributes.quorum.minutes_m')
+; _slim_controls2 << ((::Temple::Utils.escape_html(('free'))).to_s); 
+; _slim_controls2 << ("</p>".freeze); _slim_controls2 << ((::Temple::Utils.escape_html((e.label :vote_percentage))).to_s); 
+; _slim_controls2 << ("</fieldset>".freeze); _slim_controls2 << ("</div>".freeze); _slim_controls2 << ("<div".freeze); _slim_controls2 << (" class=\"".freeze); _slim_controls2 << ("row".freeze); _slim_controls2 << ("\"".freeze); _slim_controls2 << (">".freeze); 
+; 
+; _slim_controls2 << ("</div>".freeze); _slim_controls2 << ("<div".freeze); _slim_controls2 << (" class=\"".freeze); _slim_controls2 << ("small-12".freeze); _slim_controls2 << (" ".freeze); _slim_controls2 << ("columns".freeze); _slim_controls2 << ("\"".freeze); _slim_controls2 << (">".freeze); 
+; 
+; _slim_controls2 << ("</div>".freeze); _slim_controls2 << ("<div".freeze); _slim_controls2 << (" class=\"".freeze); _slim_controls2 << ("row".freeze); _slim_controls2 << (" ".freeze); _slim_controls2 << ("collapse".freeze); _slim_controls2 << (" ".freeze); _slim_controls2 << ("postfix-radius".freeze); _slim_controls2 << ("\"".freeze); _slim_controls2 << (">".freeze); 
+; 
+; _slim_controls2 << ("</div>".freeze); _slim_controls2 << ("<div".freeze); _slim_controls2 << (" class=\"".freeze); _slim_controls2 << ("small-9".freeze); _slim_controls2 << (" ".freeze); _slim_controls2 << ("columns".freeze); _slim_controls2 << ("\"".freeze); _slim_controls2 << (">".freeze); 
+; _slim_controls2 << ((::Temple::Utils.escape_html((e.input :vote_percentage, as: :string, label: false, input_html: { type: :number,
+-                                       class: "percentage vote_participants", title: t('activerecord.attributes.quorum.percentage_title'), min: 0, max: 100 }))).to_s); 
+; _slim_controls2 << ("</div>".freeze); _slim_controls2 << ("<div".freeze); _slim_controls2 << (" class=\"".freeze); _slim_controls2 << ("small-3".freeze); _slim_controls2 << (" ".freeze); _slim_controls2 << ("columns".freeze); _slim_controls2 << ("\"".freeze); _slim_controls2 << (">".freeze); 
+; _slim_controls2 << ("<span".freeze); _slim_controls2 << (" class=\"".freeze); _slim_controls2 << ("postfix".freeze); _slim_controls2 << ("\"".freeze); _slim_controls2 << (">".freeze); 
+; _slim_controls2 << (" % + 1 ".freeze); 
+; _slim_controls2 << ("</span>".freeze); _slim_controls2 << ("</div>".freeze); _slim_controls2 << ("<div".freeze); _slim_controls2 << (" class=\"".freeze); _slim_controls2 << ("row".freeze); _slim_controls2 << ("\"".freeze); _slim_controls2 << (">".freeze); 
+; 
+; _slim_controls2 << ("</div>".freeze); _slim_controls2 << ("<div".freeze); _slim_controls2 << (" class=\"".freeze); _slim_controls2 << ("columns".freeze); _slim_controls2 << (" ".freeze); _slim_controls2 << ("small-12".freeze); _slim_controls2 << ("\"".freeze); _slim_controls2 << (">".freeze); 
+; _slim_controls2 << ((::Temple::Utils.escape_html((raw t('pages.groups.edit_quorums.new_quorum.advanced_participation_description', current_number: "<span id=\"vote_participants_number\">1</span>", total_number: @vote_participants_count, average: (@group.statistic.vote_valutations*100 / @group.scoped_participants(:vote_proposals).count).round(2))))).to_s); 
+; _slim_controls2 << ("</div>".freeze); _slim_controls2 << ((::Temple::Utils.escape_html((e.label :vote_good_score))).to_s); 
+; _slim_controls2 << ("<div".freeze); _slim_controls2 << (" class=\"".freeze); _slim_controls2 << ("row".freeze); _slim_controls2 << ("\"".freeze); _slim_controls2 << (">".freeze); 
+; 
+; _slim_controls2 << ("</div>".freeze); _slim_controls2 << ("<div".freeze); _slim_controls2 << (" class=\"".freeze); _slim_controls2 << ("small-12".freeze); _slim_controls2 << (" ".freeze); _slim_controls2 << ("columns".freeze); _slim_controls2 << ("\"".freeze); _slim_controls2 << (">".freeze); 
+; 
+; _slim_controls2 << ("</div>".freeze); _slim_controls2 << ("<div".freeze); _slim_controls2 << (" class=\"".freeze); _slim_controls2 << ("row".freeze); _slim_controls2 << (" ".freeze); _slim_controls2 << ("collapse".freeze); _slim_controls2 << (" ".freeze); _slim_controls2 << ("postfix-radius".freeze); _slim_controls2 << ("\"".freeze); _slim_controls2 << (">".freeze); 
+; 
+; _slim_controls2 << ("</div>".freeze); _slim_controls2 << ("<div".freeze); _slim_controls2 << (" class=\"".freeze); _slim_controls2 << ("small-9".freeze); _slim_controls2 << (" ".freeze); _slim_controls2 << ("columns".freeze); _slim_controls2 << ("\"".freeze); _slim_controls2 << (">".freeze); 
+; _slim_controls2 << ((::Temple::Utils.escape_html((e.input :vote_good_score, as: :string, label: false, input_html: {))).to_s); 
+; class: "percentage", title: t('activerecord.attributes.quorum.good_score_title'), min: 0, max: 100 }
+; _slim_controls2 << ("</div>".freeze); _slim_controls2 << ("<div".freeze); _slim_controls2 << (" class=\"".freeze); _slim_controls2 << ("small-3".freeze); _slim_controls2 << (" ".freeze); _slim_controls2 << ("columns".freeze); _slim_controls2 << ("\"".freeze); _slim_controls2 << (">".freeze); 
+; _slim_controls2 << ("<span".freeze); _slim_controls2 << (" class=\"".freeze); _slim_controls2 << ("postfix".freeze); _slim_controls2 << ("\"".freeze); _slim_controls2 << (">".freeze); 
+; _slim_controls2 << (" % ".freeze); 
+; _slim_controls2 << ("</span>".freeze); _slim_controls2 << ("</div>".freeze); _slim_controls2 << ((::Temple::Utils.escape_html((e.hidden_field :t_vote_percentage, value: 's'))).to_s); 
+; _slim_controls2 << ((::Temple::Utils.escape_html((e.hidden_field :t_vote_minutes, value: 'f'))).to_s); 
+; _slim_controls2 << ((::Temple::Utils.escape_html((e.hidden_field :t_vote_good_score, value: 's'))).to_s); 
+; _slim_controls2 << ("<div".freeze); _slim_controls2 << (" class=\"".freeze); _slim_controls2 << ("row".freeze); _slim_controls2 << ("\"".freeze); _slim_controls2 << (">".freeze); 
+; 
+; _slim_controls2 << ("</div>".freeze); _slim_controls2 << ("<div".freeze); _slim_controls2 << (" class=\"".freeze); _slim_controls2 << ("columns".freeze); _slim_controls2 << (" ".freeze); _slim_controls2 << ("large-12".freeze); _slim_controls2 << ("\"".freeze); _slim_controls2 << (">".freeze); 
+; _slim_controls2 << ((::Temple::Utils.escape_html((link_to t('buttons.cancel'), '#', class: 'btn', data: { 'reveal-close' => '' }))).to_s); 
+; _slim_controls2 << ((::Temple::Utils.escape_html((link_to t('buttons.go_back'), :back, class: 'btn', data: { back: '' }))).to_s); 
+; _slim_controls3 = e.button :button, class: 'btn blue' do; _slim_controls4 = ''.dup; 
+; _slim_controls4 << ("<i".freeze); _slim_controls4 << (" class=\"".freeze); _slim_controls4 << ("fa-solid".freeze); _slim_controls4 << (" ".freeze); _slim_controls4 << ("fa-floppy-disk".freeze); _slim_controls4 << ("\"".freeze); _slim_controls4 << (">".freeze); 
+; _slim_controls4 << ("</i>".freeze); _slim_controls4 << ((::Temple::Utils.escape_html((button_name))).to_s); 
+; _slim_controls4; end; _slim_controls2 << ((::Temple::Utils.escape_html((_slim_controls3))).to_s); _slim_controls2 << ("</div>".freeze); _slim_controls2 %><% end %><%= ::Temple::Utils.escape_html((_slim_controls1)) %><a class="close-reveal-modal">
+×
+</a><script type="text/javascript">
+ function update_participants(value) { var calculated = Math.min(Math.floor(parseFloat(value) * 0.01 * parseFloat(<%= ::Temple::Utils.escape_html((@group_participations_count)) %>)) + 1, <%= ::Temple::Utils.escape_html((@group_participations_count)) %>); $('#participants_number').html(calculated); } update_participants(<%= ::Temple::Utils.escape_html((@quorum.percentage)) %>); $(".participants").on('input', function (e) { var num = $(this).val(); update_participants(num); }); function update_vote_participants(value) { var calculated = Math.min(Math.floor(parseFloat(value) * 0.01 * parseFloat(<%= ::Temple::Utils.escape_html((@vote_participants_count)) %>)) + 1, <%= ::Temple::Utils.escape_html((@vote_participants_count)) %>); $('#vote_participants_number').html(calculated); } $(".vote_participants").on('input', function (e) { var num = $(this).val(); update_vote_participants(num); }); update_vote_participants(<%= ::Temple::Utils.escape_html((@quorum.vote_percentage)) %>); function closeMe() { $('#quorum_container').foundation('reveal', 'close'); } $(function () { $('.advanced').hide(); $(".elastic").elastic(); }); 
+</script>

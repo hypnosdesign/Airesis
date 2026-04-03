@@ -1,0 +1,11 @@
+$('body').append('
+<%= ::Temple::Utils.escape_html((j render 'promote')) %>
+'); $('#promote_container').foundation().foundation('reveal', 'open'); $('.legend').hide(); $("#promote_form").quickWizard({ prevButton: '
+<button class="btn" id="form-wizard-prev" type="button">
+<i class="fa-solid fa-arrow-left">
+</i><%= ::Temple::Utils.escape_html((j t('buttons.go_back'))) %>
+</button>', nextButton: '
+<button class="btn blue" id="form-wizard-next" type="button">
+<i class="fa-solid fa-arrow-right">
+</i><%= ::Temple::Utils.escape_html((j t('buttons.next'))) %>
+</button>', clickableBreadCrumbs: true, breadCrumbListClass: 'bread-crumb', nextCallback: function() {}, prevCallback: function() {}, submit: '.wizard[type = "submit"]' }); $('#promote_proposal').click(function (e) { $('#promote_container').foundation('reveal', 'open'); e.preventDefault(); return false; }); try{ FB.XFBML.parse(); }catch(ex){} twttr.widgets.load(); 

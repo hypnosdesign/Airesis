@@ -1,0 +1,8 @@
+<div class="title">
+<%= ::Temple::Utils.escape_html((t('pages.groups.show.last_topics'))) %>
+</div><% if @last_topics.size > 0
+ %><div class="scrollable">
+
+</div><div class="mini_topics">
+<%= ::Temple::Utils.escape_html((render partial: 'frm/topics/mini_topic', collection: @last_topics, as: 'topic')) %>
+</div><% end %>

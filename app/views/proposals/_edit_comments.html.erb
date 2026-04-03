@@ -1,0 +1,4 @@
+<div class="blogComments" id="proposalComments">
+<% @proposal_comment_search.proposal_comments.each do |comment|
+ %><%= ::Temple::Utils.escape_html((render partial: 'proposals/edit_comment', locals: {comment: comment})) %>
+<% end %></div>

@@ -1,0 +1,29 @@
+<% range = @proposal.solutions.count
+ %><p>
+<%= ::Temple::Utils.escape_html((raw t('pages.proposals.vote_panel.schulze_title'))) %>
+</p><h5>
+<%= ::Temple::Utils.escape_html((@proposal.secret_vote ? t('pages.proposals.vote_panel.secret_vote') : t('pages.proposals.vote_panel.clear_vote'))) %>
+</h5><div id="solutions_table">
+<div class="vote-items-external">
+<span class="label primary">
+1
+</span><div class="vote-items">
+<% @proposal.solutions.each_with_index do |solution, j|
+ %> <div class="list-group-item vote-item" data-id="
+<%= ::Temple::Utils.escape_html((solution.id)) %>
+"> 
+<i class="fa-solid fa-arrows-up-down-left-right">
+</i><a class="vote_solution_title" href="#">
+<%= ::Temple::Utils.escape_html((raw t("pages.proposals.edit.new_solution_title.#{@proposal.proposal_type.name.downcase}", num: j+1))) %>
+<%= ::Temple::Utils.escape_html(("#{solution.title}")) %>
+</a><% end %></div></div></div><% _slim_controls1 = form_for 'data', url: { action: "vote_schulze", controller: "votations", proposal_id: @proposal.id },
+-              method: :put, remote: true do |f| %><% _slim_controls2 = ''.dup; 
+; _slim_controls2 %><% end %><%= ::Temple::Utils.escape_html((_slim_controls1)) %><%= ::Temple::Utils.escape_html((f.hidden_field 'votes')) %>
+<% if current_user.rotp_enabled && ::Configuration.rotp
+ %><%= ::Temple::Utils.escape_html((f.label t('pages.proposals.show.security_token'))) %>
+<%= ::Temple::Utils.escape_html((f.text_field 'token', maxlength: 6)) %>
+<% end; _slim_controls3 = f.button remote: true,
+-                  data: { confirm: t('pages.votations.show.confirm_schulze', name: @proposal.title) },
+-                  id: 'schulze-submit', class: 'btn blue' do %><% _slim_controls4 = ''.dup; 
+; _slim_controls4 %><% end %><%= ::Temple::Utils.escape_html((_slim_controls3)) %><i class="fa-solid fa-check">
+</i><%= ::Temple::Utils.escape_html((t('pages.proposals.show.vote_button'))) %>

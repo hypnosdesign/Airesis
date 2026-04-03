@@ -1,0 +1,22 @@
+<h2>
+<%= ::Temple::Utils.escape_html((t('pages.proposals.show.editors_list_title'))) %>
+</h2><% if @available_authors.count > 0
+ %><div class="panel alert">
+<p>
+<%= ::Temple::Utils.escape_html((t('pages.available_authors.index.explain_html'))) %>
+</p></div><% _slim_controls1 = form_for 'authors', url: {controller: "proposals", action: "add_authors", group_id: params[:group_id]}, remote: true, method: :put do |f| %><% _slim_controls2 = ''.dup; 
+; @available_authors.each do |user|
+; _slim_controls2 << ("<div".freeze); _slim_controls2 << (">".freeze); 
+; _slim_controls2 << (" <input type=\"checkbox\" name=\"user_ids[]\" value=\"".freeze); 
+; _slim_controls2 << ((::Temple::Utils.escape_html((user.id))).to_s); 
+; _slim_controls2 << ("\"> ".freeze); 
+; _slim_controls2 << ((::Temple::Utils.escape_html((user.fullname))).to_s); 
+; _slim_controls2 << ((::Temple::Utils.escape_html((avatar(user, size: 24)))).to_s); 
+; _slim_controls2 << ("</div>".freeze); end; _slim_controls2 << ((::Temple::Utils.escape_html((link_to t('buttons.cancel'), '#', class: 'btn', data: {'reveal-close' => ''}))).to_s); 
+; _slim_controls2 << ((::Temple::Utils.escape_html((link_to t('buttons.go_back'), :back, class: 'btn', data: {back: ''}))).to_s); 
+; _slim_controls2 << ((::Temple::Utils.escape_html((f.submit t('buttons.save'), class: 'btn blue', data: {disable_with: t('loading')}))).to_s); 
+; _slim_controls2 %><% end %><%= ::Temple::Utils.escape_html((_slim_controls1)) %><% else
+ %><div class="panel alert">
+<p>
+Nessuno si è reso disponibile per redigere la sistesi al momento
+</p></div><% end %>

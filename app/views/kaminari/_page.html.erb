@@ -1,0 +1,5 @@
+<li<% _temple_html_attributeremover1 = (::Temple::Utils.escape_html(('current' if page.current?))).to_s %><% if !_temple_html_attributeremover1.empty? %> class="<%= _temple_html_attributeremover1 %>"<% end %>>
+<%= ::Temple::Utils.escape_html((link_to(page, page.current? ? '#' : url,
+{ :remote => remote,
+:rel => page.next? ? 'next' : page.prev? ? 'prev' : nil }))) %>
+</li>

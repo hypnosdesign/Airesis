@@ -1,0 +1,14 @@
+<i class="fa-solid fa-xmark close-right-section" data-close-section-id="
+<%= ::Temple::Utils.escape_html((section.id)) %>
+">
+<h2>
+<%= ::Temple::Utils.escape_html((t('pages.proposals.show.contributes_list', section: section.title))) %>
+</h2><% _slim_controls1 = form_for [@proposal, ProposalComment.new(section_id: section.id)], remote: true do |f| %><% _slim_controls2 = ''.dup; 
+; _slim_controls2 << ("<div".freeze); _slim_controls2 << (" class=\"".freeze); _slim_controls2 << ("comment-form-comment".freeze); _slim_controls2 << ("\"".freeze); _slim_controls2 << (">".freeze); 
+; _slim_controls2 << ((::Temple::Utils.escape_html((f.text_area :content, class: 'blogNewCommentField', rows: 5, cols: 70))).to_s); 
+; _slim_controls2 << ((::Temple::Utils.escape_html((f.hidden_field :section_id))).to_s); 
+; _slim_controls2 << ((::Temple::Utils.escape_html((hidden_field 'right', true))).to_s); 
+; _slim_controls2 << ("</div>".freeze); _slim_controls2 << ((::Temple::Utils.escape_html((f.submit t('pages.proposals.show.send_contribute_button'), class: 'btn green', data: {disable_with: t('sending')}, style: "width: 100px;height:35px;"))).to_s); 
+; _slim_controls2 %><% end %><%= ::Temple::Utils.escape_html((_slim_controls1)) %><script type="text/javascript">
+ $(function () { $('.blogNewCommentField').each(function () { if ($(this).attr('data-initialized') != 1) { $(this).textntags({ triggers: {'@': {uniqueTags: false}}, onDataRequest: function (mode, query, triggerChar, callback) { var data = ProposalsShow.nicknames; query = query.toLowerCase(); var found = _.filter(data, function (item) { return item.name.toLowerCase().indexOf(query) > -1; }); callback.call(this, found); } }); $(this).focus(function () { $(this).parent().parent().toggleClass("active"); }).focusout(function () { $(this).parent().parent().toggleClass("active"); }); $(this).attr('data-initialized', 1); $(this).charCount({ allowed: <%= ::Temple::Utils.escape_html((CONTRIBUTE_MAX_LENGTH)) %>, warning: 100, counterText: '<%= ::Temple::Utils.escape_html((t('pages.proposals.show.characters_left'))) %> ' }); } }); }); $(document).ajaxError(function (e, XHR, options) { if (XHR.status == 401) { window.location.replace("<%= ::Temple::Utils.escape_html((new_user_session_path)) %>"); } }); 
+</script>

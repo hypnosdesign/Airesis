@@ -1,0 +1,5 @@
+var container_ = $('
+<div class="reveal-modal medium" data-reveal="" id="new_message_container">
+</div>'); $('body').append(container_); container_.html("
+<%= ::Temple::Utils.escape_html((j render 'users/message')) %>
+"); airesis_reveal(container_); 

@@ -1,5 +1,0 @@
-| var container_ = $('
-#quorum_container.reveal-modal.medium[data-reveal]
-| '); container_.html("
-= j (render(partial: 'quorums/form', locals: {button_name: t('buttons.create')}))
-| "); $('body').append(container_); airesis_reveal(container_); container_.find('a.cancel').click(function() { container_.foundation('reveal', 'close'); return false; }); new AiresisFormValidation(container_.find('form')); 

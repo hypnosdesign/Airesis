@@ -1,0 +1,6 @@
+<% @proposal.proposal_lives.each do |life|
+ %><%= ::Temple::Utils.escape_html((l life.created_at, format: :until_long_date_time)) %>
+<% life.users.each do |user|
+ %><%= ::Temple::Utils.escape_html((user_tag(user))) %>
+<% end; end %><div style="clear: both;">
+</div>

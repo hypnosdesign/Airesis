@@ -1,0 +1,6 @@
+<div class="title">
+<%= ::Temple::Utils.escape_html((t('pages.groups.show.next_events'))) %>
+</div><% unless @next_events.empty?
+ %><div class="scrollable">
+<%= ::Temple::Utils.escape_html((render partial: 'events/mini_event', collection: @next_events, as: 'event')) %>
+</div><% end %>

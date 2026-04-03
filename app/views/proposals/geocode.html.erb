@@ -1,0 +1,5 @@
+<% content_for :head do
+ %> <script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?key=
+<%= ::Temple::Utils.escape_html((ENV['MAPS_API_KEY'])) %>
+&sensor=false&libraries=drawing"> 
+<% end %><%= ::Temple::Utils.escape_html((render partial: 'geocode', locals: {remote: false})) %>

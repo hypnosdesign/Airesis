@@ -1,0 +1,17 @@
+<% _slim_controls1 = render layout: "layouts/page_title", locals: {title: @page_title} do %><% _slim_controls2 = ''.dup; 
+; 
+; _slim_controls2 %><% end %><%= ::Temple::Utils.escape_html((_slim_controls1)) %><% if @blog_posts.size == 0 && !params[:page]
+ %><div class="blogPost">
+
+</div><h1>
+<%= ::Temple::Utils.escape_html((t('pages.blogs.show.no_posts'))) %>
+</h1><p>
+<%= ::Temple::Utils.escape_html((t('pages.blogs.show.no_unpublished_posts'))) %>
+</p><% else
+ %><%= ::Temple::Utils.escape_html((render collection: @blog_posts, partial: 'blog_post')) %>
+<% end %><div class="blogPages">
+<%= ::Temple::Utils.escape_html((paginate @blog_posts)) %>
+</div><% content_for :left_panel do
+ %><%= ::Temple::Utils.escape_html((render 'blog_posts/admin_links')) %>
+<%= ::Temple::Utils.escape_html((render 'blogs/left_panel')) %>
+<% end %>

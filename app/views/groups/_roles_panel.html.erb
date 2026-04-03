@@ -1,0 +1,36 @@
+<dl class="accordion" data-accordion="" id="roles_accordion">
+<% @participation_roles.each_with_index do |role, idx|
+ %><dd class="accordion-navigation">
+ <a href="#role_
+<%= ::Temple::Utils.escape_html((role.id)) %>
+">
+<%= ::Temple::Utils.escape_html((role.name)) %>
+<% if role.id == @group.participation_role_id
+ %> (default) 
+<% end %> <div id="role_
+<%= ::Temple::Utils.escape_html((role.id)) %>
+" class="content 
+<%= ::Temple::Utils.escape_html(('active' if idx==0)) %>
+"> 
+<% _slim_controls1 = link_to group_participation_role_url(@group, role), method: :delete, class: 'btn', style: 'float:right', data: { remote: true, confirm: t('pages.groups.edit_permissions.confirm_role_deletion'), disable_with: t('loading') } do %><% _slim_controls2 = ''.dup; 
+; _slim_controls2 << ("<i".freeze); _slim_controls2 << (" class=\"".freeze); _slim_controls2 << ("fa-regular".freeze); _slim_controls2 << (" ".freeze); _slim_controls2 << ("fa-trash-can".freeze); _slim_controls2 << ("\"".freeze); _slim_controls2 << (">".freeze); 
+; _slim_controls2 << ("</i>".freeze); _slim_controls2 << ((::Temple::Utils.escape_html((t('buttons.delete')))).to_s); 
+; _slim_controls3 = link_to edit_group_participation_role_url(@group, role), class: 'btn', style: 'float:right', data: { remote: true, disable_with: t('loading') } do; _slim_controls4 = ''.dup; 
+; _slim_controls4 << ("<i".freeze); _slim_controls4 << (" class=\"".freeze); _slim_controls4 << ("fa-solid".freeze); _slim_controls4 << (" ".freeze); _slim_controls4 << ("fa-pencil".freeze); _slim_controls4 << ("\"".freeze); _slim_controls4 << (">".freeze); 
+; _slim_controls4 << ("</i>".freeze); _slim_controls4 << ((::Temple::Utils.escape_html((t('buttons.edit')))).to_s); 
+; _slim_controls4; end; _slim_controls2 << ((::Temple::Utils.escape_html((_slim_controls3))).to_s); _slim_controls2 << ("<h4".freeze); _slim_controls2 << (">".freeze); 
+; _slim_controls2 << ((::Temple::Utils.escape_html((role.description))).to_s); 
+; _slim_controls2 << ("</h4>".freeze); _slim_controls5 = simple_form_for [@group, role], remote: true do |f|; _slim_controls6 = ''.dup; 
+; _slim_controls6 << ("<input".freeze); _slim_controls6 << (" name=\"".freeze); _slim_controls6 << ("no_refresh".freeze); _slim_controls6 << ("\"".freeze); _slim_controls6 << (" type=\"".freeze); _slim_controls6 << ("hidden".freeze); _slim_controls6 << ("\"".freeze); _slim_controls6 << (" value=\"".freeze); _slim_controls6 << ("1".freeze); _slim_controls6 << ("\"".freeze); _slim_controls6 << (" />".freeze); 
+; _slim_controls6 << ((::Temple::Utils.escape_html((f.input :view_proposals, label: I18n.t("db.group_actions.view_proposals.description"), input_html: { data: { action_abilitation: '' } }))).to_s); 
+; _slim_controls6 << ((::Temple::Utils.escape_html((f.input :participate_proposals, label: I18n.t("db.group_actions.participate_proposals.description"), input_html: { data: { action_abilitation: '' } }))).to_s); 
+; _slim_controls6 << ((::Temple::Utils.escape_html((f.input :vote_proposals, label: I18n.t("db.group_actions.vote_proposals.description"), input_html: { data: { action_abilitation: '' } }))).to_s); 
+; _slim_controls6 << ((::Temple::Utils.escape_html((f.input :insert_proposals, label: I18n.t("db.group_actions.insert_proposals.description"), input_html: { data: { action_abilitation: '' } }))).to_s); 
+; _slim_controls6 << ((::Temple::Utils.escape_html((f.input :support_proposals, label: I18n.t("db.group_actions.support_proposals.description"), input_html: { data: { action_abilitation: '' } }))).to_s); 
+; _slim_controls6 << ((::Temple::Utils.escape_html((f.input :view_documents, label: I18n.t("db.group_actions.view_documents.description"), input_html: { data: { action_abilitation: '' } }))).to_s); 
+; _slim_controls6 << ((::Temple::Utils.escape_html((f.input :manage_documents, label: I18n.t("db.group_actions.manage_documents.description"), input_html: { data: { action_abilitation: '' } }))).to_s); 
+; _slim_controls6 << ((::Temple::Utils.escape_html((f.input :create_events, label: I18n.t("db.group_actions.create_events.description"), input_html: { data: { action_abilitation: '' } }))).to_s); 
+; _slim_controls6 << ((::Temple::Utils.escape_html((f.input :choose_date_proposals, label: I18n.t("db.group_actions.choose_date_proposals.description"), input_html: { data: { action_abilitation: '' } }))).to_s); 
+; _slim_controls6 << ((::Temple::Utils.escape_html((f.input :write_to_wall, label: I18n.t("db.group_actions.write_to_wall.description"), input_html: { data: { action_abilitation: '' } }))).to_s); 
+; _slim_controls6 << ((::Temple::Utils.escape_html((f.input :accept_participation_requests, label: I18n.t("db.group_actions.accept_participation_requests.description"), input_html: { data: { action_abilitation: '' } }))).to_s); 
+; _slim_controls6; end; _slim_controls2 << ((::Temple::Utils.escape_html((_slim_controls5))).to_s); _slim_controls2 %><% end %><%= ::Temple::Utils.escape_html((_slim_controls1)) %></dd><% end %></dl>

@@ -1,0 +1,302 @@
+<meta content="text/html; charset=utf-8" http-equiv="Content-Type" />
+<meta<% _slim_codeattributes1 = @meta_description; if _slim_codeattributes1; if _slim_codeattributes1 == true %> content=""<% else %> content="<%= ::Temple::Utils.escape_html((_slim_codeattributes1)) %>"<% end; end %> name="description" />
+<meta content="width=device-width, initial-scale=1.0" name="viewport" />
+<meta content="Decidiamoci" name="author" />
+<meta<% _slim_codeattributes2 = @meta_description; if _slim_codeattributes2; if _slim_codeattributes2 == true %> content=""<% else %> content="<%= ::Temple::Utils.escape_html((_slim_codeattributes2)) %>"<% end; end %> property="og:description" />
+
+<script src="https://cdn.jsdelivr.net/npm/js-cookie@2/src/js.cookie.min.js">
+
+</script><%= ::Temple::Utils.escape_html((stylesheet_link_tag "tailwind", "data-turbo-track": "reload")) %>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet" />
+<%= ::Temple::Utils.escape_html((javascript_include_tag "application", "data-turbo-track": "reload", defer: true)) %>
+
+<%= ::Temple::Utils.escape_html((turbo_include_tags)) %>
+
+<%= ::Temple::Utils.escape_html((stylesheet_link_tag 'elfinder.min')) %>
+<%= ::Temple::Utils.escape_html((javascript_include_tag 'elfinder.full', 'elFinderSupportVer1')) %>
+<%= ::Temple::Utils.escape_html((javascript_include_tag "i18n/elfinder.#{I18n.locale}")) %>
+<%= ::Temple::Utils.escape_html((javascript_include_tag "vendor/modernizr")) %>
+<%= ::Temple::Utils.escape_html((javascript_include_tag Ckeditor.cdn_url)) %>
+<%= ::Temple::Utils.escape_html((csrf_meta_tag)) %>
+
+<%= ::Temple::Utils.escape_html((render 'layouts/favicons')) %>
+
+<link href="//cdnjs.cloudflare.com/ajax/libs/select2/4.0.0/css/select2.min.css" rel="stylesheet" />
+<script src="//cdnjs.cloudflare.com/ajax/libs/select2/4.0.0/js/select2.full.min.js">
+
+</script><script>
+window.Airesis = window.Airesis || {};
+
+Airesis.id = <%= ::Temple::Utils.escape_html((current_user ? current_user.id : -1)) %>;
+
+Airesis.fullName = '<%= ::Temple::Utils.escape_html((j current_user ? current_user.fullname : '')) %>';
+
+Airesis.email = '<%= ::Temple::Utils.escape_html((j (current_user && current_user.email) ? current_user.email : '')) %>';
+
+Airesis.signed_in = <%= ::Temple::Utils.escape_html((signed_in?)) %>;
+
+Airesis.groupId = <%= ::Temple::Utils.escape_html((@group.try(:id) || 'null')) %>;
+</script>
+<% cache("head_variables_#{I18n.locale}_#{params[:l]}") do
+ %><script>
+Airesis.environment = '<%= ::Temple::Utils.escape_html((Rails.env)) %>';
+
+Airesis.googleAnalyticsId = '<%= ::Temple::Utils.escape_html((ENV['GOOGLE_ANALYTICS_ID'])) %>';
+
+Airesis.new_user_session_path = '<%= ::Temple::Utils.escape_html((j new_user_session_path)) %>';
+
+Airesis.loadingImageTag = '<%= ::Temple::Utils.escape_html((j image_tag 'ajax-loader.gif')) %>';
+
+Airesis.debateVoteDifference = <%= ::Temple::Utils.escape_html((DEBATE_VOTE_DIFFERENCE.to_i / 60)) %>;
+
+Airesis.assets = {
+
+  group_participants: '<%= ::Temple::Utils.escape_html((j asset_path 'group_participants.png')) %>',
+
+  group_proposals: '<%= ::Temple::Utils.escape_html((j asset_path 'group_proposals.png')) %>',
+
+  ckeditor: {
+
+    config: '<%= ::Temple::Utils.escape_html((j asset_path 'ckeditor/config.js')) %>',
+
+    config_lite: '<%= ::Temple::Utils.escape_html((j asset_path 'ckeditor/config_lite.js')) %>'
+
+  }
+
+};
+
+Airesis.paths = {
+
+  interest_borders: {
+
+    index: '<%= ::Temple::Utils.escape_html((interest_borders_path(format: :json))) %>'
+
+  },
+
+  tags: {
+
+    index: '<%= ::Temple::Utils.escape_html((tags_path(format: :json))) %>'
+
+  },
+
+  quorums: {
+
+    dates: '<%= ::Temple::Utils.escape_html((dates_quorums_path)) %>'
+
+  }
+
+};
+
+Airesis.i18n = {
+
+  alerts_sign_has_read: '<%= ::Temple::Utils.escape_html((j raw t('pages.header.menu.sign_has_read'))) %>',
+
+  alert_read: '<%= ::Temple::Utils.escape_html((j raw t('pages.header.read'))) %>',
+
+  alarm_settings: '<%= ::Temple::Utils.escape_html((j raw t('pages.groups.header.alarm_settings'))) %>',
+
+  no_alerts: '<%= ::Temple::Utils.escape_html((j raw t('pages.header.no_alerts'))) %>',
+
+  type_for_town: '<%= ::Temple::Utils.escape_html((j raw t('pages.events.new.type_for_town'))) %>',
+
+  locale: '<%= ::Temple::Utils.escape_html((I18n.locale)) %>',
+
+  l: '<%= ::Temple::Utils.escape_html((params[:l])) %>',
+
+  rankdown_reason: '<%= ::Temple::Utils.escape_html((I18n.t('rankdown_reason'))) %>',
+
+  feedback: {
+
+    h2cPath: '<%= ::Temple::Utils.escape_html((javascript_path 'html2canvas')) %>',
+
+    label: '<%= ::Temple::Utils.escape_html((j t('pages.feedback.send_feedback'))) %>',
+
+    header: '<%= ::Temple::Utils.escape_html((j t('pages.feedback.send_feedback'))) %>',
+
+    nextLabel: '<%= ::Temple::Utils.escape_html((j t('pages.feedback.add_details'))) %>',
+
+    reviewLabel: '<%= ::Temple::Utils.escape_html((j t('pages.feedback.view_preview'))) %>',
+
+    sendLabel: '<%= ::Temple::Utils.escape_html((j t('buttons.send'))) %>',
+
+    closeLabel: '<%= ::Temple::Utils.escape_html((j t('buttons.close'))) %>',
+
+    messageSuccess: '<%= ::Temple::Utils.escape_html((j t('pages.feedback.send_succes'))) %>',
+
+    messageError: '<%= ::Temple::Utils.escape_html((j raw t('pages.feedback.send_error'))) %>',
+
+    describeProblem: "<%= ::Temple::Utils.escape_html((I18n.t('pages.feedback.describe_problem'))) %>",
+
+    blackoutButtonMessage: "<%= ::Temple::Utils.escape_html((j t('pages.feedback.blackout'))) %>",
+
+    highlightButtonMessage: "<%= ::Temple::Utils.escape_html((j t('pages.feedback.highlight'))) %>",
+
+    highlightOrBlackout: "<%= ::Temple::Utils.escape_html((j t('pages.feedback.highlight_or_blackout'))) %>"
+
+  },
+
+  interestBorders: {
+
+    hintText: '<%= ::Temple::Utils.escape_html((j t('interest_borders.hint'))) %>',
+
+    noResultsText: '<%= ::Temple::Utils.escape_html((j t('interest_borders.no_place_found'))) %>',
+
+    searchingText: '<%= ::Temple::Utils.escape_html((j t('interest_borders.searching'))) %>'
+
+  },
+
+  tags: {
+
+    hintText: '<%= ::Temple::Utils.escape_html((j t('digit_tags'))) %>',
+
+    searchingText: '<%= ::Temple::Utils.escape_html((j t('digit_tags'))) %>'
+
+  },
+
+  proposals: {
+
+    closeContributes: '<%= ::Temple::Utils.escape_html((j t('pages.proposals.show.close_contribute'))) %>',
+
+    showGiveContributes: '<%= ::Temple::Utils.escape_html((j t('pages.proposals.show.give_contribute'))) %>',
+
+    charactersLeft: '<%= ::Temple::Utils.escape_html((j t('pages.proposals.show.characters_left'))) %>',
+
+    loadingContributes: '<%= ::Temple::Utils.escape_html((j t('pages.proposals.show.loading_contributions'))) %>',
+
+    errorLoadingParagraph: '<%= ::Temple::Utils.escape_html((j t('pages.proposals.show.error_loading_paragraph'))) %>',
+
+    edit: {
+
+      updateConfirm: '<%= ::Temple::Utils.escape_html((j t('pages.proposals.edit.update_confirm'))) %>',
+
+      paragraph: '<%= ::Temple::Utils.escape_html((j t('pages.proposals.edit.paragraph'))) %>',
+
+      removeSection: '<%= ::Temple::Utils.escape_html((j t('pages.proposals.edit.remove_section'))) %>',
+
+      removeSectionConfirm: '<%= ::Temple::Utils.escape_html((j t('pages.proposals.edit.confirm_paragraph_deletion'))) %>',
+
+      removeSolutionConfirm: '<%= ::Temple::Utils.escape_html((j t('pages.proposals.edit.confirm_solution_deletion'))) %>',
+
+      removeSolution: '<%= ::Temple::Utils.escape_html((j t('pages.proposals.edit.remove_solution'))) %>',
+
+      addParagraph: '<%= ::Temple::Utils.escape_html((j t('pages.proposals.edit.add_paragraph_to_solution'))) %>'
+
+    },
+
+    debate: {
+
+      end: '<%= ::Temple::Utils.escape_html((j t('pages.quorums.index.debate_end'))) %>'
+
+    }
+
+  },
+
+  buttons: {
+
+    goBack: '<%= ::Temple::Utils.escape_html((j t('buttons.go_back'))) %>',
+
+    next: '<%= ::Temple::Utils.escape_html((j t('buttons.next'))) %>',
+
+    eventsFinish: '<%= ::Temple::Utils.escape_html((j I18n.t('pages.events.new.submit'))) %>'
+
+  },
+
+  groups: {
+
+    exactBorder: '<%= ::Temple::Utils.escape_html((j t('pages.groups.index.switchButton.exact_border'))) %>',
+
+    areaBorder: '<%= ::Temple::Utils.escape_html((j t('pages.groups.index.switchButton.area_border'))) %>',
+
+    queryOrPlace: '<%= ::Temple::Utils.escape_html((j t('pages.groups.index.insert_query_or_place'))) %>',
+
+    allWords: '<%= ::Temple::Utils.escape_html((j t('pages.groups.index.switchButton.all_words'))) %>',
+
+    oneWord: '<%= ::Temple::Utils.escape_html((j t('pages.groups.index.switchButton.one_word'))) %>'
+
+  },
+
+  datepicker: {
+
+    datetimeformat: '<%= ::Temple::Utils.escape_html((j to_momentjs(t('time.formats.datetimepicker')))) %>',
+
+    dateformat: '<%= ::Temple::Utils.escape_html((j to_momentjs(t('time.formats.datepicker')))) %>',
+
+    days: <%= ::Temple::Utils.escape_html(((Array(I18n.t('calendar.dayNames')) rescue []).to_json.html_safe)) %>,
+
+    daysShort: <%= ::Temple::Utils.escape_html(((Array(I18n.t('calendar.dayNamesShort')) rescue []).to_json.html_safe)) %>,
+
+    months: <%= ::Temple::Utils.escape_html(((Array(I18n.t('calendar.monthNames')) rescue []).to_json.html_safe)) %>,
+
+    monthsShort: <%= ::Temple::Utils.escape_html(((Array(I18n.t('calendar.monthNamesShort')) rescue []).to_json.html_safe)) %>,
+
+    today: '<%= ::Temple::Utils.escape_html((j (I18n.t('calendar.today').to_s rescue "").capitalize)) %>',
+
+    firstDay: <%= ::Temple::Utils.escape_html(((I18n.t('calendar.firstDay').to_i rescue 0))) %>,
+
+    changed: '<%= ::Temple::Utils.escape_html((j (I18n.t('calendar.changed').to_s rescue ""))) %>'
+
+  }
+
+};
+
+
+
+if ($.fn.fdatetimepicker) {
+
+  $.fn.fdatetimepicker.dates[Airesis.i18n.locale] = {
+
+    language: Airesis.i18n.locale,
+
+    days: Airesis.i18n.datepicker.days,
+
+    daysShort: Airesis.i18n.datepicker.daysShort,
+
+    months: Airesis.i18n.datepicker.months,
+
+    monthsShort: Airesis.i18n.datepicker.monthsShort,
+
+    today: Airesis.i18n.datepicker.today,
+
+    suffix: [],
+
+    meridiem: [],
+
+    weekStart: Airesis.i18n.datepicker.firstDay,
+
+    format: Airesis.i18n.datepicker.datetimeformat,
+
+    dateFormat: Airesis.i18n.datepicker.dateformat,
+
+    autoclose: true
+
+  };
+
+  $.fn.fdatetimepicker.defaults = $.fn.fdatetimepicker.dates[Airesis.i18n.locale];
+
+}
+
+
+
+if ($.countdown) {
+
+  $.countdown.regionalOptions[Airesis.i18n.locale] = {
+
+    digits: ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9'],
+
+    timeSeparator: ':', isRTL: false
+
+  };
+
+  $.countdown.setDefaults($.countdown.regionalOptions[Airesis.i18n.locale]);
+
+}
+</script>
+<% end %><script src="//maps.googleapis.com/maps/api/js?key=<%= ::Temple::Utils.escape_html((ENV['MAPS_API_KEY'])) %>" type="text/javascript">
+
+</script><% if defined?(Sentry)
+ %><script>
+window.sentryConfig = {dsn: '<%= ::Temple::Utils.escape_html((ENV['SENTRY_DSN'])) %>', environment: '<%= ::Temple::Utils.escape_html((ENV['SENTRY_ENVIRONMENT'])) %>'};</script>
+<%= ::Temple::Utils.escape_html((javascript_include_tag 'https://cdn.renuo.ch/sentry-ignore.min.js', crossorigin: 'anonymous')) %>
+<%= ::Temple::Utils.escape_html((javascript_include_tag 'sentry_init', defer: true)) %>
+
+<% end %><%= ::Temple::Utils.escape_html((yield :head)) %>

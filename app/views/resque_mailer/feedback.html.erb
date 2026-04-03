@@ -1,0 +1,9 @@
+<h1>
+Nuovo feedback ricevuto
+</h1><%= ::Temple::Utils.escape_html((link_to 'Visualizza immagine', url_for(@feedback.image) if @feedback.image.attached?)) %>
+<h1>
+Messaggio:
+</h1><%= ::Temple::Utils.escape_html((@feedback.message)) %>
+<h1>
+Dati aggiuntivi:
+</h1><%= ::Temple::Utils.escape_html((@feedback.stack)) %>

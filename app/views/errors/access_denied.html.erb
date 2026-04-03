@@ -1,0 +1,10 @@
+<% @extend=true
+ %><div class="error_dialog card">
+<div style="text-align: center;">
+<h1>
+<%= ::Temple::Utils.escape_html((t('error.error_302.title'))) %>
+</h1><p>
+<%= ::Temple::Utils.escape_html((t('error.error_302.description'))) %>
+</p><%= ::Temple::Utils.escape_html((link_to t('buttons.go_back'), :back)) %>
+</div><div style="clear: both;">
+</div></div>

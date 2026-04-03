@@ -1,0 +1,7 @@
+<% if @frm_mod.members.any?
+ %><label><%= ::Temple::Utils.escape_html((t('frm.admin.mods.show.current_members'))) %>
+</label><div class="row">
+<ul id="members">
+<% @frm_mod.members.each do |member|
+ %><%= ::Temple::Utils.escape_html((user_tag member)) %>
+<% end %></ul></div><% end %>

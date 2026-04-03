@@ -1,0 +1,16 @@
+$('#proposalsListContainer
+<%= ::Temple::Utils.escape_html((params[:state] || params[:view])) %>
+').append("
+<%= ::Temple::Utils.escape_html((escape_javascript(render partial: 'proposals/list', locals: {proposals: @proposals}))) %>
+"); 
+<% if @search.results.last_page?
+ %> $('#loading_proposals
+<%= ::Temple::Utils.escape_html((params[:state] || params[:view])) %>
+').hide(); 
+<% else
+ %> $('#loading_proposals
+<%= ::Temple::Utils.escape_html((params[:state] || params[:view])) %>
+').show(); 
+<% end %> $('#loading_proposals
+<%= ::Temple::Utils.escape_html((params[:state] || params[:view])) %>
+').next().hide(); //show_cards(); disegnaProgressBar(); disegnaCountdown(); 

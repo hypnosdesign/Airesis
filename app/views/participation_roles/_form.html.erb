@@ -1,0 +1,9 @@
+<% _slim_controls1 = simple_form_for((@group.present? ? [@group, @participation_role] : @participation_role), remote: request.xhr?) do |f| %><% _slim_controls2 = ''.dup; 
+; _slim_controls2 << ((::Temple::Utils.escape_html((f.input :name))).to_s); 
+; _slim_controls2 << ((::Temple::Utils.escape_html((f.input :description, as: :text))).to_s); 
+; _slim_controls2 << ((::Temple::Utils.escape_html((link_to t('buttons.cancel'), '#', class: 'btn', data: { 'reveal-close' => '' }))).to_s); 
+; _slim_controls2 << ((::Temple::Utils.escape_html((link_to t('buttons.go_back'), :back, class: 'btn', data: { back: '' }))).to_s); 
+; _slim_controls3 = f.button :button, class: 'btn blue' do; _slim_controls4 = ''.dup; 
+; _slim_controls4 << ("<i".freeze); _slim_controls4 << (" class=\"".freeze); _slim_controls4 << ("fa-solid".freeze); _slim_controls4 << (" ".freeze); _slim_controls4 << ("fa-floppy-disk".freeze); _slim_controls4 << ("\"".freeze); _slim_controls4 << (">".freeze); 
+; _slim_controls4 << ("</i>".freeze); _slim_controls4 << ((::Temple::Utils.escape_html((button_name))).to_s); 
+; _slim_controls4; end; _slim_controls2 << ((::Temple::Utils.escape_html((_slim_controls3))).to_s); _slim_controls2 %><% end %><%= ::Temple::Utils.escape_html((_slim_controls1)) %>

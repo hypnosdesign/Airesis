@@ -1,0 +1,16 @@
+<h2><%= ::Temple::Utils.escape_html((t('pages.proposal_supports.new.panel_title'))) %>
+</h2><% @available_groups = current_user.scoped_groups(:support_proposals, @proposal.groups)
+if @available_groups.empty?
+ %><%= ::Temple::Utils.escape_html((t('pages.proposal_supports.new.no_available_groups'))) %>
+<% else
+_slim_controls1 = form_for [@proposal, @proposal_support], remote: request.xhr? do |f| %><% _slim_controls2 = ''.dup; 
+; @available_groups.each do |group|
+_slim_controls3 = f.label group.name do; _slim_controls4 = ''.dup; 
+; _slim_controls4 << ((::Temple::Utils.escape_html((check_box_tag "proposal[supporting_group_ids][]", group.id,
+ProposalSupport.where(group_id: group.id, proposal_id: @proposal.id).exists?))).to_s); 
+; _slim_controls4 << ((::Temple::Utils.escape_html((group.name))).to_s); 
+; _slim_controls4 << ((::Temple::Utils.escape_html((group.group_image_tag 20))).to_s); 
+; _slim_controls4; end; _slim_controls2 << ((::Temple::Utils.escape_html((_slim_controls3))).to_s); _slim_controls2 << ("<br".freeze); _slim_controls2 << (" />".freeze); 
+; end; _slim_controls2 << ((::Temple::Utils.escape_html((link_to t('buttons.cancel'), '#', class: 'btn', data: { reveal_close: '' }))).to_s); 
+; _slim_controls2 << ((::Temple::Utils.escape_html((f.submit t('pages.proposal_supports.confirm_button'), class: 'btn blue', data: { disable_with: t('loading') }))).to_s); 
+; _slim_controls2 %><% end %><%= ::Temple::Utils.escape_html((_slim_controls1)) %><% end %><a class="close-reveal-modal">&#215;</a>

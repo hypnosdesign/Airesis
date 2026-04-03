@@ -1,0 +1,5 @@
+var container_ = $('
+<div class="reveal-modal" data-reveal="" id="vote_results_container">
+</div>'); container_.html("
+<%= ::Temple::Utils.escape_html((j render(partial: @proposal.is_schulze? ? 'schulze_vote_results' : 'vote_results'))) %>
+"); $('body').append(container_); airesis_reveal(container_, false); $('.results-button').click(function (e) { container_.foundation().foundation('reveal', 'open'); e.preventDefault(); return false; }); 

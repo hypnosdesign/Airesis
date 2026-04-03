@@ -1,0 +1,7 @@
+<div class="title">
+<%= ::Temple::Utils.escape_html((t('pages.home.show.your_proposals'))) %>
+</div><% @proposals_p = Proposal.home_portlet(current_user)
+unless @proposals_p.empty?
+ %><div class="scrollable">
+<%= ::Temple::Utils.escape_html((render partial: 'proposals/mini_proposal', collection: @proposals_p, as: 'proposal')) %>
+</div><% end %>
