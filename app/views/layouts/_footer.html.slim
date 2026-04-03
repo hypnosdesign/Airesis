@@ -1,7 +1,9 @@
 footer.row.full-width
   .large-6.medium-5.columns
-    a href="https://github.com/airesis/airesis" target="_blank" = t('pages.footer.for_edemocracy_html')
+    = ENV['APP_SHORT_NAME']
     | &nbsp;v.#{AIRESIS_VERSION}
+    | &nbsp;|&nbsp;
+    a href="https://github.com/airesis/airesis" target="_blank" fork di Airesis
 
   .large-6.medium-7.columns.text-right-medium-up
     a href="#" data-reveal-id="language"

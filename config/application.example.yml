@@ -73,8 +73,8 @@ NOREPLY_EMAIL: "No Reply <noreply@example.com>"
 #####################
 #application parameters
 #####################
-APP_SHORT_NAME: "Airesis"
-APP_LONG_NAME: "Airesis - The Social Network for E-Democracy"
+APP_SHORT_NAME: "Decidiamoci"
+APP_LONG_NAME: "Decidiamoci - Piattaforma di E-Democracy"
 
 # default reference email address for the website. is used in the app to tell the user which email address he
 # has to contact for information. it is also shown in the footer of the emails as main contact address.
