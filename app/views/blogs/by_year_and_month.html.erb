@@ -1,0 +1,21 @@
+<% javascript 'endless_page' %>
+
+<%= render layout: "layouts/page_title", locals: { title: @page_title } do %>
+  <% if @blog_posts.size == 0 && !params[:page] %>
+    <div class="blogPost card bg-base-200 p-4">
+      <h1 class="text-xl font-bold"><%= t('pages.blogs.show.no_posts') %></h1>
+    </div>
+  <% else %>
+    <div id="blogPostContainer">
+      <%= render collection: @blog_posts, partial: 'blog_posts/blog_post' %>
+    </div>
+  <% end %>
+  <div id="loading_results">
+    <span><%= t('pages.blogs.show.previous_posts') %></span>
+  </div>
+<% end %>
+
+<% content_for :left_panel do %>
+  <%= render 'blog_posts/admin_links' %>
+  <%= render 'blogs/left_panel' %>
+<% end %>

@@ -1,0 +1,148 @@
+<h2><%= @page_title %></h2>
+
+<% if ['edit', 'update'].include? params[:action] %>
+  <div class="alert alert-info mb-4">
+    <p><%= t('pages.groups.edit_quorums.edit_quorum_warning') %></p>
+  </div>
+<% end %>
+
+<%= simple_form_for [@group, @quorum], validate: true, remote: request.xhr? do |e| %>
+  <div class="flex flex-wrap">
+    <div class="w-full">
+      <%= e.input :name %>
+    </div>
+    <div class="w-full">
+      <%= e.input :description, as: :text, input_html: { rows: 2, class: 'elastic' } %>
+    </div>
+  </div>
+
+  <div class="flex flex-wrap">
+    <div class="w-full lg:w-1/2">
+      <fieldset class="border border-base-300 p-4 mb-4">
+        <legend class="font-bold">Debate</legend>
+        <%= e.label :minutes %>
+
+        <div class="flex items-center gap-2 mb-2">
+          <div class="w-24">
+            <%= e.number_field :days_m, class: "input input-bordered input-sm w-full days", min: 0, data: { fv_excluded: true } %>
+          </div>
+          <span class="text-sm"><%= t('activerecord.attributes.quorum.days_m') %></span>
+        </div>
+
+        <div class="flex items-center gap-2 mb-2">
+          <div class="w-24">
+            <%= e.number_field :hours_m, class: "input input-bordered input-sm w-full hours", min: 0, max: 23, data: { fv_excluded: true } %>
+          </div>
+          <span class="text-sm"><%= t('activerecord.attributes.quorum.hours_m') %></span>
+        </div>
+
+        <div class="flex items-center gap-2 mb-2">
+          <div class="w-24">
+            <%= e.number_field :minutes_m, class: "input input-bordered input-sm w-full minutes", min: 0, max: 55, step: 5, data: { fv_excluded: true } %>
+          </div>
+          <span class="text-sm"><%= t('activerecord.attributes.quorum.minutes_m') %></span>
+        </div>
+
+        <%= e.label :percentage %>
+        <div class="flex items-center gap-2 mb-2">
+          <div class="flex-1">
+            <%= e.input :percentage, as: :string, label: false, input_html: { class: "percentage participants", title: t('activerecord.attributes.quorum.percentage_title'), min: 0, max: 100 } %>
+          </div>
+          <span class="text-sm"> % + 1 </span>
+        </div>
+
+        <div class="w-full mb-2">
+          <%= raw t('pages.groups.edit_quorums.new_quorum.advanced_participation_description', current_number: "<span id=\"participants_number\">1</span>", total_number: @group_participations_count, average: (@group.statistic.valutations*100 / @group.scoped_participants(:participate_proposals).count).round(2)) %>
+        </div>
+
+        <%= e.label :good_score %>
+        <div class="flex items-center gap-2 mb-2">
+          <div class="flex-1">
+            <%= e.input :good_score, as: :string, label: false, input_html: { type: :number, class: "percentage", title: t('activerecord.attributes.quorum.good_score_title'), min: 1, max: 100 } %>
+          </div>
+          <span class="text-sm"> % </span>
+        </div>
+
+        <div class="w-full mb-2">
+          <b><%= "(average value: #{@group.statistic.good_score.round(2)}%)" %></b>
+        </div>
+
+        <%= e.hidden_field :t_percentage, value: 's' %>
+        <%= e.hidden_field :t_minutes, value: 's' %>
+        <%= e.hidden_field :t_good_score, value: 's' %>
+      </fieldset>
+    </div>
+
+    <div class="w-full lg:w-1/2">
+      <fieldset class="border border-base-300 p-4 mb-4">
+        <legend class="font-bold">Votation</legend>
+        <p style="display:none">
+          <%= e.label :vote_minutes %>
+          free
+        </p>
+        <%= e.label :vote_percentage %>
+        <div class="flex items-center gap-2 mb-2">
+          <div class="flex-1">
+            <%= e.input :vote_percentage, as: :string, label: false, input_html: { type: :number, class: "percentage vote_participants", title: t('activerecord.attributes.quorum.percentage_title'), min: 0, max: 100 } %>
+          </div>
+          <span class="text-sm"> % + 1 </span>
+        </div>
+
+        <div class="w-full mb-2">
+          <%= raw t('pages.groups.edit_quorums.new_quorum.advanced_participation_description', current_number: "<span id=\"vote_participants_number\">1</span>", total_number: @vote_participants_count, average: (@group.statistic.vote_valutations*100 / @group.scoped_participants(:vote_proposals).count).round(2)) %>
+        </div>
+
+        <%= e.label :vote_good_score %>
+        <div class="flex items-center gap-2 mb-2">
+          <div class="flex-1">
+            <%= e.input :vote_good_score, as: :string, label: false, input_html: { class: "percentage", title: t('activerecord.attributes.quorum.good_score_title'), min: 0, max: 100 } %>
+          </div>
+          <span class="text-sm"> % </span>
+        </div>
+
+        <%= e.hidden_field :t_vote_percentage, value: 's' %>
+        <%= e.hidden_field :t_vote_minutes, value: 'f' %>
+        <%= e.hidden_field :t_vote_good_score, value: 's' %>
+      </fieldset>
+    </div>
+  </div>
+
+  <div class="w-full flex gap-2 mt-4">
+    <%= link_to t('buttons.cancel'), '#', class: 'btn', data: { 'reveal-close' => '' } %>
+    <%= link_to t('buttons.go_back'), :back, class: 'btn', data: { back: '' } %>
+    <%= e.button :button, class: 'btn btn-primary' do %>
+      <i class="fa-solid fa-floppy-disk"></i>
+      <%= button_name %>
+    <% end %>
+  </div>
+<% end %>
+
+<a class="close-reveal-modal">&times;</a>
+
+<script type="text/javascript">
+  function update_participants(value) {
+    var calculated = Math.min(Math.floor(parseFloat(value) * 0.01 * parseFloat(<%= @group_participations_count %>)) + 1, <%= @group_participations_count %>);
+    $('#participants_number').html(calculated);
+  }
+  update_participants(<%= @quorum.percentage %>);
+  $(".participants").on('input', function (e) {
+    var num = $(this).val();
+    update_participants(num);
+  });
+  function update_vote_participants(value) {
+    var calculated = Math.min(Math.floor(parseFloat(value) * 0.01 * parseFloat(<%= @vote_participants_count %>)) + 1, <%= @vote_participants_count %>);
+    $('#vote_participants_number').html(calculated);
+  }
+  $(".vote_participants").on('input', function (e) {
+    var num = $(this).val();
+    update_vote_participants(num);
+  });
+  update_vote_participants(<%= @quorum.vote_percentage %>);
+  function closeMe() {
+    $('#quorum_container').foundation('reveal', 'close');
+  }
+  $(function () {
+    $('.advanced').hide();
+    $(".elastic").elastic();
+  });
+</script>

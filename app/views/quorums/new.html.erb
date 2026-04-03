@@ -1,0 +1,7 @@
+<div class="card bg-base-200 p-4">
+  <%= render(partial: 'quorums/form', locals: { button_name: t('buttons.create') }) %>
+</div>
+
+<% content_for :left_panel do %>
+  <%= render 'groups/administration_panel' %>
+<% end %>

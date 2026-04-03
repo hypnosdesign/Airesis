@@ -1,0 +1,12 @@
+<div class="card bg-base-200 p-4 mb-4">
+  <div class="image-container text-center mb-4">
+    <%= avatar(@user, size: 120) %>
+    <% if @user == current_user %>
+      <div class="caption mt-2">
+        <a class="link"><%= t('pages.users.show.edit_image') %></a>
+      </div>
+    <% end %>
+  </div>
+</div>
+
+<%= render 'users/message' %>

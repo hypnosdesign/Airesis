@@ -1,0 +1,18 @@
+<%= render layout: "layouts/page_title", locals: { title: @page_title } do %>
+  <% if @blog_posts.size == 0 && !params[:page] %>
+    <div class="blogPost card bg-base-200 p-4">
+      <h1 class="text-xl font-bold"><%= t('pages.blogs.show.no_posts') %></h1>
+      <p><%= t('pages.blogs.show.no_unpublished_posts') %></p>
+    </div>
+  <% else %>
+    <%= render collection: @blog_posts, partial: 'blog_post' %>
+  <% end %>
+  <div class="blogPages mt-4">
+    <%= paginate @blog_posts %>
+  </div>
+<% end %>
+
+<% content_for :left_panel do %>
+  <%= render 'blog_posts/admin_links' %>
+  <%= render 'blogs/left_panel' %>
+<% end %>

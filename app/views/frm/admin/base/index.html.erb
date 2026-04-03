@@ -1,0 +1,20 @@
+<% @page_title = "#{@group.name} - #{t('frm.admin.area')}" %>
+<div class="card bg-base-200 p-4">
+  <h1 class="text-2xl font-bold mb-4"><%= t('frm.admin.area') %></h1>
+  <div class="flex flex-wrap gap-2 mb-4">
+    <%= link_to t('frm.admin.category.index'), group_frm_admin_categories_url(@group), class: 'btn btn-primary btn-sm' %>
+    <%= link_to t('frm.admin.forum.index'), group_frm_admin_forums_url(@group), class: 'btn btn-primary btn-sm' %>
+    <%= link_to t('frm.admin.mod.index'), group_frm_admin_mods_url(@group), class: 'btn btn-primary btn-sm' %>
+  </div>
+  <hr class="mb-4">
+  <div id="admin_link">
+    <%= link_to group_forums_url(@group), class: 'btn btn-sm' do %>
+      <%= t('back_to_forums') %>
+      <i class="fa-solid fa-arrow-right"></i>
+    <% end %>
+  </div>
+</div>
+
+<% content_for :left_panel do %>
+  <%= render 'groups/administration_panel' %>
+<% end %>

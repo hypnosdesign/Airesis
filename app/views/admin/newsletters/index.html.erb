@@ -1,0 +1,18 @@
+<% @newsletters.each do |newsletter| %>
+  <div class="card bg-base-200 p-4 mb-4">
+    <div class="mb-2">
+      <strong><%= newsletter.subject %></strong>
+      <p><%= sanitize truncate_html(newsletter.body, length: 100, omission: '...') %></p>
+    </div>
+    <div class="mb-2">
+      <%= render 'publish_form', newsletter: newsletter %>
+    </div>
+    <div class="flex gap-2">
+      <%= link_to t('buttons.edit'), edit_admin_newsletter_path(newsletter), class: 'btn btn-sm' %>
+      <%= link_to t('buttons.show'), admin_newsletter_path(newsletter), class: 'btn btn-sm' %>
+      <%= link_to t('buttons.preview'), preview_admin_newsletter_path(newsletter), class: 'btn btn-sm' %>
+    </div>
+  </div>
+<% end %>
+
+<%= link_to t('buttons.new_newsletter'), new_admin_newsletter_path, class: 'btn btn-primary' %>

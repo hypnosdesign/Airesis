@@ -1,0 +1,21 @@
+<% if user_signed_in? %>
+  <div class="card bg-base-200 p-4">
+    <h4 class="font-bold mb-2"><%= t('pages.groups.index.groups_list') %></h4>
+    <div>
+      <% @groups = current_user.groups %>
+      <% if @groups.empty? %>
+        <%= raw t('pages.groups.index.no_groups_yet', { name: (link_to t('group'), groups_path) }) %>
+      <% end %>
+      <% @groups.each do |group| %>
+        <div class="flex items-center gap-2 mb-2 p-2 bg-base-300 rounded">
+          <div class="w-6">
+            <%= group.group_image_tag(24) rescue nil %>
+          </div>
+          <div>
+            <%= link_to group.name, group_url(group) %>
+          </div>
+        </div>
+      <% end %>
+    </div>
+  </div>
+<% end %>
