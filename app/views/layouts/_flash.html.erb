@@ -1,0 +1,28 @@
+<div id="flash-container" class="toast toast-top toast-end z-50 mt-16">
+  <% flash.each do |key, value| %>
+    <% alert_class = case key
+                     when 'info' then 'alert-info'
+                     when 'notice' then 'alert-success'
+                     when 'warn' then 'alert-warning'
+                     else 'alert-error'
+                     end %>
+    <div class="alert <%= alert_class %> shadow-brutal cursor-pointer"
+         data-controller="flash"
+         data-flash-type-value="<%= key %>"
+         data-flash-auto-dismiss-value="5000"
+         data-action="click->flash#dismiss">
+      <span><%= raw value %></span>
+    </div>
+  <% end %>
+
+  <% Announcement.current(cookies.signed[:hidden_announcement_ids]).each do |announcement| %>
+    <div class="alert alert-info shadow-brutal"
+         data-controller="flash"
+         data-flash-auto-dismiss-value="0">
+      <div id="announcement<%= announcement.id %>">
+        <%= raw announcement.message %>
+        <%= link_to "OK", hide_announcement_path(announcement), class: "btn btn-sm", remote: true, method: :post %>
+      </div>
+    </div>
+  <% end %>
+</div>
