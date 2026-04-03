@@ -1,0 +1,33 @@
+- content_for :menu do
+  .topimage
+    = image_tag 'logo120.png', width: 40, alt: ENV['APP_LONG_NAME']
+  .topmenu
+    span.tit = ENV['APP_LONG_NAME']
+
+    .submenu
+      = link_to(proposals_path, class: ((['proposals', 'proposal_revisions'].include? controller_name) ? 'sel' : '')) do
+        span.show-for-large-up = t('pages.open_space.layout.proposals_button')
+        .icon-file.small.hide-for-large-up title=t('pages.open_space.layout.proposals_button')
+
+      span &ensp;⋅&ensp;
+      = link_to(blogs_path, class: ((['blogs'].include? controller_name) ? 'sel' : '')) do
+        span.show-for-large-up = t('pages.open_space.layout.blogs_button')
+        .icon-bubble.small.hide-for-large-up title=t('pages.open_space.layout.blogs_button')
+
+      span &ensp;⋅&ensp;
+      = link_to(groups_path, class: ((['groups'].include? controller_name) ? 'sel' : '')) do
+        span.show-for-large-up = t('pages.open_space.layout.groups_button')
+        .icon-users.small.hide-for-large-up title=t('pages.open_space.layout.groups_button')
+
+      span &ensp;⋅&ensp;
+      = link_to events_path, class: (controller_name == 'events' ? 'sel' : '') do
+        span.show-for-large-up = t('pages.open_space.layout.calendar_button')
+        .icon-calendar.small.hide-for-large-up title=t('pages.open_space.layout.calendar_button')
+
+      span &ensp;⋅&ensp;
+      = link_to(tags_path, class: (controller_name == 'tags' ? 'sel' : '')) do
+        span.show-for-large-up = t('pages.open_space.layout.tags_button')
+        .icon-tags.small.hide-for-large-up title=t('pages.open_space.layout.tags_button')
+
+- @noleft = true
+= render 'layouts/general'

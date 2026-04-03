@@ -1,0 +1,89 @@
+- @page_title = t('pages.user.privacy')
+= render layout: "layouts/page_title", locals: { title: t('pages.user.privacy') } do
+
+.card
+  h2
+    = t('pages.users.privacy_preferences.options')
+  .tooltips
+    = check_box :user, :show_tooltips, value: current_user.show_tooltips, onclick: "return change_show_tooltips(this);"
+    = t('pages.users.privacy_preferences.tooltips')
+  - if ::Configuration::socialnetwork_active
+    .show_urls
+      = check_box :user, :show_urls, value: current_user.show_urls, onclick: "return change_show_urls(this);"
+      = t('pages.users.privacy_preferences.show_urls')
+  - if ::Configuration::user_messages
+    .messages
+      = check_box :user, :receive_messages, value: current_user.receive_messages, onclick: "return change_receive_messages(this);"
+      = t('pages.users.privacy_preferences.private_messages')
+  - if ::Configuration.rotp
+    h2
+      = t('pages.users.privacy_preferences.rotp_title')
+    .rotp
+      = check_box :user, :rotp_enabled, value: current_user.rotp_enabled, onclick: "return change_rotp_enabled(this);"
+      = t('pages.users.privacy_preferences.rotp')
+    #rotp_container
+      = render 'users/rotp_code'
+.card
+  h2
+    = t('pages.users.privacy_preferences.mail_language')
+  .email_locale
+    = select_tag 'locale', options_for_select(SysLocale.all.collect { |p| [I18n.t("db.sys_locales.#{p.key}.description"), p.id] }, selected: current_user.sys_locale_id)
+  h2
+    = t('pages.users.privacy_preferences.time_zone')
+  .time_zone
+    = select_tag 'time_zone', options_for_select(ActiveSupport::TimeZone.all.collect { |p| [p, p.name] }, selected: current_user.time_zone)
+.card
+  - if ::Configuration::socialnetwork_active
+    h2
+      = t('pages.users.privacy_preferences.join_accounts')
+    h5
+      = raw t('pages.users.privacy_preferences.join_accounts_description', app_short_name: APP_SHORT_NAME)
+    - authentications = current_user.authentications
+    -       alreadyproviders = current_user.authentications.pluck(:provider)
+    - if alreadyproviders.size == 3
+      = t('pages.users.privacy_preferences.joined_all')
+    .providers
+      - unless alreadyproviders.include? Authentication::FACEBOOK
+        = link_to omniauth_authorize_path(:user, :facebook) do
+          i.fa-brands.fa-facebook.fa-social
+          = t('pages.users.privacy_preferences.join_facebook')
+        br
+      - unless alreadyproviders.include? Authentication::GOOGLE
+        = link_to omniauth_authorize_path(:user, :google_oauth2) do
+          i.fa-brands.fa-google.fa-social
+          = t('pages.users.privacy_preferences.join_google')
+        br
+      - unless alreadyproviders.include? Authentication::TWITTER
+        = link_to omniauth_authorize_path(:user, :twitter) do
+          i.fa-brands.fa-twitter.fa-social
+          = t('pages.users.privacy_preferences.join_twitter')
+        br
+    - if alreadyproviders.size > 0
+      h2
+        = t('pages.users.privacy_preferences.providers_list')
+        | :
+      - authentications.each do |authentication|
+        - if authentication.provider == Authentication::FACEBOOK
+          i.fa-brands.fa-facebook.fa-social
+          |  Facebook 
+        - elsif authentication.provider == Authentication::GOOGLE
+          i.fa-brands.fa-google.fa-social
+          |  Google 
+        - elsif authentication.provider == Authentication::TWITTER
+          i.fa-brands.fa-twitter.fa-social
+          |  Twitter 
+        - if @user.email
+          = link_to t('buttons.detach'), [@user, authentication], method: :delete, data: { confirm: t('confirm_detach') }
+          br
+        - else
+          = link_to t('buttons.detach'), '#', data: { detach_disabled: true }
+          br
+- if can?(:change_rotp_enabled, current_user)
+  - _rotp_js = "var confirm_msg = el.checked ? \"#{j t('pages.users.privacy_preferences.rotp_confirm_enable')}\" : '#{j t('pages.users.privacy_preferences.rotp_confirm_disable')}'; if (!confirm(confirm_msg)) { return false; } var active = (el.checked) ? \"true\" : \"false\"; $.ajax({ data: { active: active }, url: \"/users/change_rotp_enabled\", dataType: 'script', type: 'post' }); "
+- else
+  - _rotp_js = "alert('Per abilitare il Token di sicurezza devi inserire un\\'indirizzo email valido'); return false; "
+script[type="text/javascript"]
+  |  $('a[data-detach-disabled]').click(function () { alert('#{j raw t('alert_detach')}'); return false; }); function change_show_tooltips(el) { var active = (el.checked) ? "true" : "false"; $.ajax({ data: { active: active }, url: "/users/change_show_tooltips", dataType: 'script', type: 'post' }); } function change_show_urls(el) { var active = (el.checked) ? "true" : "false"; $.ajax({ data: { active: active }, url: "/users/change_show_urls", dataType: 'script', type: 'post' }); } function change_receive_messages(el) { var active = (el.checked) ? "true" : "false"; $.ajax({ data: { active: active }, url: "/users/change_receive_messages", dataType: 'script', type: 'post' }); } function change_rotp_enabled(el) { #{_rotp_js} }$('#locale').bind("change", function () { var currentValue = $(this).val(); var currentLabel = $('option:selected', $(this)).text(); $.ajax({ data: { locale: currentValue }, url: "/users/change_locale", dataType: 'script', type: 'post' }); return true; }); $('#time_zone').bind("change", function () { var currentValue = $(this).val(); var currentLabel = $('option:selected', $(this)).text(); $.ajax({ data: { time_zone: currentValue }, url: "/users/change_time_zone", dataType: 'script', type: 'post' }); return true; }); 
+- content_for :left_panel do
+  - if current_user
+    = render partial: 'users/preferences_panel'

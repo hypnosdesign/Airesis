@@ -1,0 +1,16 @@
+- @page_title = "#{@group.name} - #{t('frm.admin.area')}"
+.card
+  h1
+    = t('frm.admin.area')
+  br
+  = link_to t('frm.admin.category.index'), group_frm_admin_categories_url(@group), class: 'btn blue'
+  = link_to t('frm.admin.forum.index'), group_frm_admin_forums_url(@group), class: 'btn blue'
+  = link_to t('frm.admin.mod.index'), group_frm_admin_mods_url(@group), class: 'btn blue'
+  br
+  hr
+  #admin_link
+    = link_to group_forums_url(@group), class: 'btn' do
+      = t('back_to_forums')
+      i.fa-solid.fa-arrow-right
+= content_for :left_panel do
+  = render 'groups/administration_panel'

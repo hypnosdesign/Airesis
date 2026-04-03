@@ -1,0 +1,2 @@
+class BannedEmail < ApplicationRecord
+end

@@ -1,0 +1,5 @@
+h2
+  = t('frm.admin.category.edit', title: @category.name)
+= render partial: 'edit', locals: {remote:false}
+= content_for :left_panel do
+  = render partial: 'groups/administration_panel'

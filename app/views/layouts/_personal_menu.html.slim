@@ -1,0 +1,57 @@
+#personal_menu_large.f-dropdown.large.bg-white.shadow-xl.rounded-lg.p-6 data-dropdown-content=true
+  .row data-equalizer=true
+    .columns.large-6.gray.hidden.lg:block data-equalizer-watch=true
+      - @groups = current_user.groups
+      - if @groups.any?
+        - @groups.each do |group|
+          = render 'groups/group_menu_item', group: group
+      = render 'groups/open_space_menu_item'
+    
+    .columns.large-6.text-right data-equalizer-watch=true
+      h2.text-2xl.font-bold.mb-4 = link_to current_user.fullname, home_url, class: 'text-gray-900 hover:text-blue-600'
+
+      .sep.border-t.border-gray-100.my-2
+      ul.list-none.p-0.m-0.space-y-2
+        li = link_to t('pages.header.menu.my_page'), home_url, class: 'text-gray-700 hover:text-blue-600'
+        li
+          - if current_user.blog
+            = link_to t('pages.header.menu.my_blog'), current_user.blog, class: 'text-gray-700 hover:text-blue-600'
+          - else
+            = link_to t('pages.header.menu.create_blog'), new_blog_path, class: 'text-gray-700 hover:text-blue-600'
+        li = link_to t('pages.header.menu.preferences'), user_url(current_user), class: 'text-gray-700 hover:text-blue-600'
+        
+        .sep.border-t.border-gray-100.my-2
+        li = link_to t('pages.header.menu.logout'), destroy_user_session_path, method: 'delete', class: 'text-red-600 hover:text-red-800'
+        
+        - if is_moderator?
+          li = link_to t('pages.header.menu.moderator'), moderator_panel_path, class: 'text-blue-600 hover:text-blue-800 font-semibold'
+        
+        - if is_admin?
+          li = link_to t('pages.header.menu.administration'), admin_panel_path, class: 'text-purple-600 hover:text-purple-800 font-semibold'
+
+#personal_menu_small.f-dropdown.gray.medium.bg-white.shadow-xl.rounded-lg.p-4 data-dropdown-content=true
+  .row
+    .columns.text-right
+      h2.text-xl.font-bold.mb-3 = current_user.fullname
+
+      .sep.border-t.border-gray-100.my-2
+      ul.list-none.p-0.m-0.space-y-2
+        li = link_to t('pages.header.menu.my_page'), home_url, class: 'text-gray-700 hover:text-blue-600'
+        li
+          - if current_user.blog
+            = link_to t('pages.header.menu.my_blog'), current_user.blog, class: 'text-gray-700 hover:text-blue-600'
+          - else
+            = link_to t('pages.header.menu.create_blog'), new_blog_path, class: 'text-gray-700 hover:text-blue-600'
+        li = link_to t('pages.header.menu.preferences'), user_url(current_user), class: 'text-gray-700 hover:text-blue-600'
+        
+        .sep.border-t.border-gray-100.my-2
+        li = link_to t('pages.header.menu.logout'), destroy_user_session_path, method: 'delete', class: 'text-red-600 hover:text-red-800'
+        
+        - if is_moderator?
+          li = link_to t('pages.header.menu.moderator'), moderator_panel_path, class: 'text-blue-600 hover:text-blue-800'
+        
+        - if is_admin?
+          li = link_to t('pages.header.menu.administration'), admin_panel_path, class: 'text-purple-600 hover:text-purple-800'
+
+#alert_cont.cont-mess.f-dropdown.gray.medium.bg-white.shadow-xl.rounded-lg.p-4 data-dropdown-content=true
+  | loading

@@ -1,0 +1,11 @@
+- @page_tile = 'Internal Error'
+.error_dialog.card
+  div
+    =image_tag 'allbroken128.png', style:"margin: auto;display: block;"
+  div[style="text-align: center;"]
+    h1
+      = t('error.error_500.title')
+    p
+      = t('error.error_500.description')
+    = link_to t('buttons.go_back'), :back
+  div[style="clear: both;"]

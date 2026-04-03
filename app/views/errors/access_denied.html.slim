@@ -1,0 +1,9 @@
+- @extend=true
+.error_dialog.card
+  div[style="text-align: center;"]
+    h1
+      = t('error.error_302.title')
+    p
+      = t('error.error_302.description')
+    =link_to t('buttons.go_back'), :back
+  div[style="clear: both;"]

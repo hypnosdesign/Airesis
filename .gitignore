@@ -1,0 +1,47 @@
+coverage
+rdoc
+doc
+.yardoc
+.bundle
+pkg
+.git
+.idea
+.DS_Store
+tmp
+log
+config/application.yml
+config/paypal.yml
+public/assets
+public/system
+public/ckeditor_assets
+private
+*.orig
+config/secrets.yml
+.ruby-gemset
+*.pid
+/public/packs
+/public/packs-test
+/node_modules
+/yarn-error.log
+yarn-debug.log*
+.yarn-integrity
+
+/app/assets/builds/*
+!/app/assets/builds/.keep
+
+# Active Storage
+/storage/*
+!/storage/.keep
+
+# Credentials (mai committare)
+config/master.key
+config/credentials/*.key
+
+# esbuild output
+/app/javascript/builds/*
+
+# Misc
+.env
+.env.local
+*.swp
+*.swo

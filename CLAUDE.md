@@ -1,0 +1,389 @@
+# CLAUDE.md — Airesis
+
+> Analisi iniziale: 2026-03-31.
+> Ultimo aggiornamento: 2026-04-03 — completate Fasi 1–5 (upgrade stack, migrazione gem, frontend, qualità). Copertura test in corso: 63.7% → target 70%.
+> Obiettivo: modernizzare l'app per renderla funzionante e manutenibile nel 2026.
+
+---
+
+## Cos'è questa app
+
+**Airesis** è una piattaforma open source di e-democracy e partecipazione civica.
+Permette a utenti e gruppi di creare proposte, votarle (sistema Schulze), discuterle via forum e blog, organizzare eventi, e gestire processi decisionali collettivi.
+
+È un'app Rails monolitica con API v1, pannello admin, sistema di notifiche asincrono e supporto multilingua per oltre 20 locale.
+
+Repo originale: https://github.com/coorasse/airesis (branch `develop`)
+
+---
+
+## Stack — stato attuale
+
+| Componente     | Versione originale | Versione attuale | Target              |
+|----------------|-------------------|-----------------|---------------------|
+| Ruby           | 2.7.5 (EOL)       | **3.2.8** ✓     | 3.2.x               |
+| Rails          | 6.0.3.1 (EOL)     | **7.1.6** ✓     | 7.1.x               |
+| PostgreSQL     | qualsiasi         | 14-alpine ✓     | 14+                 |
+| Redis          | qualsiasi         | 7-alpine ✓      | 7.x                 |
+| Sidekiq        | 6.1.2             | 6.1.x           | 7.x                 |
+| Devise         | 4.7.1             | **5.0.3** ✓     | 5.x                 |
+| CanCanCan      | 3.1.1             | **3.6.1** ✓     | 3.x                 |
+| rails_admin    | 2.0.1             | **3.3.0** ✓     | 3.x                 |
+| paper_trail    | 10.3.1            | **14.0.0** ✓    | 14.x                |
+| Webpacker      | 5.1.1             | **rimosso** ✓   | jsbundling + esbuild  |
+| jsbundling-rails | —               | **installato** ✓ | esbuild bundler      |
+| Foundation CSS | 5.0               | **TailwindCSS** ✓| Tailwind v4          |
+| Font Awesome   | 4.7               | **6.x** ✓       | font-awesome-sass    |
+| Turbolinks     | 5.x               | **rimosso** ✓   | Turbo (Hotwire)      |
+| Sentry gem     | sentry-raven 3.x  | **sentry-rails 6.5** ✓ | sentry-rails  |
+
+---
+
+## Struttura del progetto
+
+```
+app/
+  models/        # 117 modelli
+  controllers/   # 73 controller (namespace: api/v1, admin/, frm/)
+  workers/       # 39 Sidekiq worker
+  cancan/        # abilities (Guest, Logged, Moderator, Admin)
+  views/         # Slim (primario) + ERB (legacy)
+config/
+  initializers/  # 43 file (aggiunti zeitwerk.rb, new_framework_defaults_6_1.rb)
+  locales/       # 20+ lingue
+spec/            # RSpec, ~7400 linee
+```
+
+### Namespace principali
+- `Api::V1::` — API REST con token auth
+- `Admin::` — pannello amministrativo (rails_admin + controller custom)
+- `Frm::` — forum integrato (Topics, Posts, Forums, Categories)
+
+### Modelli chiave
+- `User` — 52 relazioni, Devise + OmniAuth (Facebook/Google/Twitter)
+- `Proposal` — entità centrale, stati via `workflow` gem, voto Schulze
+- `Group` — comunità con ruoli, eventi, blog, forum
+- `Event` — incontri con partecipanti e commenti
+- `Alert` / `Notification` — sistema notifiche (20+ worker Sidekiq)
+
+---
+
+## Autenticazione e autorizzazione
+
+- **Devise 5** — registrazione, login, conferma email, password reset
+- **OmniAuth** — Facebook, Google OAuth2, Twitter
+- **simple_token_authentication** — token API
+- **CanCanCan 3** — autorizzazione a ruoli (Guest < Logged < Moderator < Admin)
+- **Rack::Attack** — rate limiting e blocco probe
+
+---
+
+## Job asincroni (Sidekiq)
+
+Code configurate in `config/sidekiq.yml`:
+- `high_priority` — 5 concorrenti
+- `notifications` — 3 concorrenti
+- `default` — 2 concorrenti
+- `low_priority` — 1 concorrente
+- `mailers` — 1 concorrente
+
+---
+
+## Docker
+
+Avvio sviluppo:
+```bash
+docker compose up
+```
+
+Servizi:
+- `airesis` — app Rails (porta 3000), `NODE_OPTIONS=--openssl-legacy-provider` necessario per Webpack 4 + OpenSSL 3
+- `db` — PostgreSQL 14 (porta 5433, user `postgres`, trust auth)
+- `redis` — Redis 7
+- `sidekiq` — worker Sidekiq
+
+Comandi utili:
+```bash
+# Creare il database (prima volta)
+docker compose run --rm airesis bundle exec rails db:create db:schema:load
+
+# Migrazioni
+docker compose run --rm airesis bundle exec rails db:migrate
+
+# Compilare gli asset (necessario dopo ogni deploy o cambio JS/CSS)
+docker compose run --rm -e RAILS_ENV=development -e NODE_OPTIONS=--openssl-legacy-provider airesis bundle exec rails assets:precompile
+
+# Aggiornare gem e ricostruire l'immagine
+docker compose run --rm airesis bundle update <gem>
+docker compose build
+```
+
+---
+
+## Variabili d'ambiente necessarie
+
+Copiare `config/application.example.yml` → `config/application.yml` e compilare.
+Il file è gestito da **Figaro** e caricato automaticamente.
+
+Variabili minime per development (già in `config/application.yml`):
+```bash
+SECRET_KEY_BASE / DEVISE_SECRET_KEY
+DATABASE_URL (override via docker-compose)
+REDIS_URL (override via docker-compose)
+MAILER_DEFAULT_HOST=localhost:3000
+ADMIN_EMAIL / ADMIN_PASSWORD
+```
+
+Variabili aggiuntive per produzione:
+```bash
+SMTP_ADDRESS / SMTP_PORT / SMTP_USER / SMTP_PASSWORD
+AWS_HOST / AWS_BUCKET / AWS_REGION / AWS_ACCESS_KEY_ID / AWS_SECRET_ACCESS_KEY
+SENTRY_DSN
+RECAPTCHA_PUBLIC / RECAPTCHA_PRIVATE
+FACEBOOK_APP_ID / FACEBOOK_APP_SECRET
+GOOGLE_APP_ID / GOOGLE_APP_SECRET
+TWITTER_APP_ID / TWITTER_APP_SECRET
+FORCE_SSL=true
+RAILS_LOG_TO_STDOUT=true
+```
+
+---
+
+## Test
+
+- Framework: **RSpec** + FactoryBot + Capybara + Selenium
+- Copertura attuale: **~63.7%** (866 esempi, 0 failure al 2026-04-03) — target >70%
+- Copertura minima configurata in SimpleCov: **32.9%** (da aggiornare a 70% quando raggiunta)
+- Run in Docker: `docker compose run --rm -e BUNDLE_APP_CONFIG=/usr/src/app/.bundle airesis bundle exec rspec`
+- CI: Travis CI (`.travis.yml`) + Semaphore (`.semaphore/`)
+
+---
+
+## Roadmap di refactoring
+
+### Fase 1 — Ambiente funzionante ✅
+1. ✅ Dockerfile corretto (Ruby 2.7.5, Node 18, Yarn, dipendenze sistema)
+2. ✅ `docker-compose.yml` aggiornato a formato v3.8 (Postgres 14, Redis 7)
+3. ✅ `config/application.yml` creato per development
+4. ✅ Schema caricato (133 tabelle), app risponde HTTP 200
+
+### Fase 2 — Upgrade Rails ✅
+5. ✅ Rails 6.0 → **6.1.7.10**
+   - `paper_trail` 10→14, `bullet` 6→8, `bootsnap` 1.4→1.23
+   - `require 'logger'` in `config/boot.rb`, `bin/webpack`, `bin/webpack-dev-server`
+   - `belongs_to :default_role` → `:default_participation_role` / `:default_area_role` (conflitto con `AR::Base.default_role` in Rails 6.1)
+   - Named volume `node_modules` in docker-compose
+6. ✅ Rails 6.1 → **7.0.10**
+   - `devise` 4→5, `cancancan` 3.1→3.6, `rails_admin` 2→3, `simple_form` 5.0→5.4
+   - `config/initializers/rails_admin.rb` wrappato in `config.to_prepare`
+   - `config/initializers/zeitwerk.rb` — esclude `lib/rails_admin/` da Zeitwerk
+   - `config.action_view.raise_on_missing_translations` → `config.i18n.raise_on_missing_translations`
+   - `NODE_OPTIONS=--openssl-legacy-provider` per Webpack 4 + Node 18 + OpenSSL 3
+7. ✅ Rails 7.0 → **7.1.6**
+   - `config.load_defaults 7.1`
+   - `I18n.t()` class-load-time in `user.rb` → lambda `-> { I18n.t() }` (Rails 7.1 triggers `raise_on_missing_translations` prima del runtime)
+   - Aggiunta chiave mancante `activerecord.errors.messages.privacy` in `config/locales/activerecord.en-EU.yml`
+   - `config/initializers/rails_admin.rb`: aggiunto `RailsAdmin.config { config.asset_source = :webpacker }` fuori da `to_prepare` (per il railtie check)
+   - `rails_admin:install` → `asset_source = :webpacker`, crea `app/javascript/packs/rails_admin.js` e stylesheet
+   - Stub Sprockets: `vendor/assets/javascripts/rails_admin/application.js` e `vendor/assets/stylesheets/rails_admin/application.css` per evitare che Sprockets compili il manifest della gem (i file `.js`/`.scss` rails_admin sono solo in `src/` per webpacker, non nel path Sprockets)
+   - `paper_trail` 14.x: warning (non upgrade) — PaperTrail 15+ richiede Ruby ≥ 3.0, da aggiornare dopo upgrade Ruby
+8. ✅ Ruby 2.7.5 → **3.2.8**
+   - `FROM ruby:3.2.8` in Dockerfile
+   - `pg` 1.2.3 → 1.6.3 (Ruby 3.2: `rb_cData` conflict con la nuova classe `Data`)
+   - `paper_trail` 14 → 17 (richiede Ruby ≥ 3.0; aggiunto `gem 'paper_trail', '>= 15'`)
+   - `gem 'matrix'` aggiunto: rimossa da stdlib Ruby 3.1, richiesta da `vote-schulze`
+   - `binding_of_caller` 0.8→1.0, `better_errors` 2.7→2.10, `byebug` 11→13, `pry-byebug` 3.9→3.12, `rack-mini-profiler` 2→4
+   - `pry` 0.13→0.16, `pry-rails` 0.3.9→0.3.11 (`Object#=~` rimosso in Ruby 3.x)
+   - `friendly_id` 5.3→5.6 (`has_many` con 3 argomenti non più supportato in AR 7.1)
+   - Psych 5.0 (Ruby 3.1+) disabilita YAML aliases: patch in `config/boot.rb` per compatibilità con Webpacker 5.x e altri gem. Rimuovere in Fase 3 con Webpacker.
+   - Workflow gem aggiornamento: usare `docker create / docker cp / docker rm` per estrarre Gemfile.lock aggiornato dall'immagine dopo ogni build
+9. ✅ Sostituire `sentry-raven` con `sentry-ruby` + `sentry-rails`
+   - `sentry-raven` rimosso dal gruppo `:production`; aggiunti `sentry-ruby 6.5.0` + `sentry-rails 6.5.0`
+   - `config/initializers/sentry.rb`: `Raven.configure` → `Sentry.init` con `send_default_pii: false` e `breadcrumbs_logger`
+   - `app/controllers/application_controller.rb`: `Raven.capture_exception` → `Sentry.with_scope` + `Sentry.capture_exception`
+
+### Fase 3 — Gem deprecate
+10. ✅ Migrare **Paperclip** → Active Storage
+    - Aggiunti `has_one_attached` ai modelli `User`, `Group`, `SentFeedback`, `Image`, `Ckeditor::Picture`, `Ckeditor::AttachmentFile`.
+    - Eseguite migrazioni per le tabelle Active Storage.
+    - Aggiunta gemma `active_storage_validations`.
+11. ✅ Rimuovere **coffee-rails**, convertire `.coffee` in ES6+
+    - Convertiti 36 file `.coffee` in `.js`.
+    - Rimosso `coffee-rails` dal Gemfile.
+12. ✅ Sostituire **Webpacker** con `jsbundling-rails` + `esbuild`
+    - Rimosso `webpacker` dal Gemfile e `package.json`.
+    - Aggiunta gemma `jsbundling-rails`.
+    - Configurato `esbuild` come bundler JS.
+    - Spostati entry point da `app/javascript/packs/` a `app/javascript/`.
+    - Aggiornati layout e RailsAdmin per usare il nuovo sistema.
+    - Rimossi file di configurazione Webpacker.
+
+
+
+### Fase 4 — Frontend
+13. ✅ Aggiornare Foundation 5 → TailwindCSS
+    - Installato `tailwindcss-rails` (Tailwind v4).
+    - Creato `application.tailwind.css`.
+    - Iniziata conversione componenti (es. top menu, bottoni).
+14. ✅ Adottare Hotwire (Turbo + Stimulus) — rimuovere jQuery + Turbolinks
+    - Installati `turbo-rails` e `stimulus-rails`.
+    - Configurato Turbo nel layout principale.
+    - Stimulus pronto per nuovi controller.
+15. ✅ Aggiornare Font Awesome 4.7 → 6.x
+    - Sostituito `font-awesome-rails` con `font-awesome-sass`.
+    - Eseguita migrazione batch di oltre 100 icone nelle view.
+16. ✅ Conversione totale ERB → Slim
+    - Convertiti tutti i 336 file `.html.erb` rimanenti in `.slim` tramite script automatizzato.
+    - Aggiornati layout e partial principali.
+
+### Fase 5 — Qualità e manutenibilità
+17. ✅ Refactoring `User` model in Concerns
+    - Estratte associazioni e metodi in `User::Authenticatable`, `User::Proposable`, `User::Groupable`, `User::Socializable`, `User::Forumable`, `User::Notificationable`, `User::Profileable`.
+    - Ridotto `app/models/user.rb` a circa 100 righe di codice core.
+18. ✅ Uniformare template engine (tutti Slim)
+    - Convertiti tutti i 336 file ERB rimanenti in Slim.
+19. 🔄 Aumentare copertura test al 70%+
+    - Stato al 2026-04-03: **63.7%** (866 esempi, 0 failure)
+    - Aggiunte spec request per 12+ controller a zero copertura (area_roles, frm/admin/*, frm/moderation, proposal_supports, event_comments, blocked_proposal_alerts, group_invitation_emails, admin/newsletters, registrations)
+    - Estese spec per home, blog_posts, proposals, groups, users, quorums controller
+    - Aggiunte spec modelli: best_quorum_extra, user/authenticatable concern
+    - File pendenti con maggior gap: proposals_controller (~144 linee), old_quorum (~127), groups_controller (~124), proposal_buildable (~86), users_controller (~71)
+
+### Fase 6 — Upgrade stack (post copertura 70%) ⬜
+
+> **Prerequisiti per iniziare:** copertura ≥ 70% (sblocca Fase 6), copertura ≥ 80% (sblocca Rails 8.x)
+> **Riferimento:** Rails 8.1.3 rilasciato 2026-03-24 (bugfix + security). Bug fix until Oct 2026. Rails 8.0 → security-only da maggio 2026.
+
+**Versioning applicazione (Semantic Versioning):**
+- Versione corrente: **4.8.7** (definita in `config/initializers/sentry.rb` come `AIRESIS_VERSION`)
+- Fasi 1–5 completate (Rails 6→7.1, Ruby 2.7→3.2, Webpacker→esbuild, Foundation→Tailwind, Turbolinks→Hotwire, Paperclip→ActiveStorage, ERB→Slim) → bump a **5.0.0** al termine della copertura 80%
+- Rails 8.x + Ruby 3.4 + UI redesign → bump a **6.0.0**
+
+20. ⬜ Copertura test → 80% + bump versione **5.0.0**
+    - Target intermedio prima dell'upgrade Rails 8.x
+    - Priorità: percorsi critici (auth, proposte/voto Schulze, gruppi, API v1)
+    - Non necessario il 100% — troppo costoso su 117 modelli / 73 controller
+    - Al raggiungimento dell'80%: aggiornare `AIRESIS_VERSION = '5.0.0'`
+
+21. ⬜ Rails 7.1 → **7.2**
+    - Step minore, meno rischi
+    - Verificare compatibilità: `rails_admin`, `simple_token_authentication`, `vote-schulze` (gem su git), `airesis_i18n` (gem su git)
+    - Aggiornare `config.load_defaults 7.2`
+    - Eseguire `rails app:update` interattivo nel container
+
+22. ⬜ Rails 7.2 → **8.0**
+    - Verificare `rails_admin` (supporto Rails 8 non garantito — potrebbe richiedere sostituzione)
+    - Valutare migrazione da Sidekiq → **Solid Queue** (built-in Rails 8, elimina dipendenza Redis per i job)
+    - Valutare migrazione da Redis cache → **Solid Cache**
+    - `ActionController::Parameters` e altri breaking changes 8.0
+    - Aggiornare `config.load_defaults 8.0`
+
+23. ⬜ Rails 8.0 → **8.1.x** (target: 8.1.3+)
+    - Step minore rispetto a 8.0
+    - Aggiornare `config.load_defaults 8.1`
+    - Valutare **Solid Cable** per WebSocket (sostituisce `private_pub.ru` via Faye)
+
+24. ⬜ Ruby 3.2.8 → **3.4.x**
+    - Può procedere in parallelo con Rails 7.2→8.x
+    - Verificare `vote-schulze` (gem su git) e `airesis_i18n` (gem su git) con Ruby 3.4
+    - `matrix` gem: verificare se rientra in stdlib o rimane necessaria
+    - Aggiornare Dockerfile: `FROM ruby:3.4-alpine`
+
+25. ⬜ Rimuovere Sidekiq e Redis (opzionale, post Rails 8)
+    - Solo se migrazione a Solid Queue completata
+    - Semplifica infrastruttura Docker (elimina servizio `redis` per i job)
+    - Mantenere Redis se usato per altri scopi (cache, sessioni)
+
+### Fase 7 — UI/UX redesign moderno ⬜
+
+> **Prerequisito:** completate Fasi 5 e 6 (stack stabile su Rails 8.x + Ruby 3.4)
+> **Nota architetturale:** l'app usa Hotwire/Turbo/Stimulus — NON React. Librerie React-only (shadcn/ui, Radix UI) non compatibili nativamente.
+
+26. ⬜ Setup DaisyUI + Tailwind v4
+    - **DaisyUI** — plugin Tailwind, zero JS overhead, componenti semantici
+    - Evoluzione naturale: già su Tailwind v4, DaisyUI si aggiunge come plugin npm
+    - Componenti core: button, card, modal, dropdown, navbar, badge, alert, table, form, drawer, tabs, avatar, tooltip
+    - Theming tramite CSS variables (light/dark mode nativo, temi custom per branding Airesis)
+    - Perfetta integrazione con Stimulus (DaisyUI non ha JS proprio — tutto JS gestito da Stimulus)
+    - Setup: `npm install daisyui` + aggiungere plugin in `tailwind.config.js`
+
+27. ⬜ Redesign componenti core
+    - Layout principale (navbar, sidebar, footer)
+    - Sistema tipografico e colori (design token Tailwind)
+    - Form (simple_form + wrapper Tailwind/DaisyUI)
+    - Tabelle e liste (proposte, gruppi, eventi)
+    - Card e pannelli informativi
+    - Modali e drawer (usare Turbo Frames + Stimulus)
+    - Notifiche e alert in-app
+    - Paginazione (kaminari template Tailwind)
+
+28. ⬜ Redesign pagine principali
+    - Homepage pubblica (landing, open space)
+    - Dashboard utente autenticato
+    - Pagine proposte (index, show, new/edit, vote)
+    - Pagine gruppi (show, impostazioni, aree)
+    - Forum (topics, posts)
+    - Blog (index, show, editor)
+    - Profilo utente e impostazioni
+    - Pannello admin
+
+29. ⬜ Interattività moderna con Stimulus + Turbo
+    - Sostituire jQuery-dependent patterns con Stimulus controllers
+    - Turbo Frames per aggiornamenti parziali (commenti, voti in real-time)
+    - Turbo Streams per notifiche live
+    - Valutare migrazione `private_pub.ru` → Action Cable + Turbo Streams
+
+30. ⬜ Bump versione **6.0.0**
+    - Al completamento del redesign UI + Rails 8.x + Ruby 3.4
+    - Aggiornare `AIRESIS_VERSION = '6.0.0'`
+
+---
+
+## Debito tecnico residuo
+
+### Sicurezza
+- [x] ~~Ruby 2.7.5 EOL~~ — upgradato a 3.2.8
+- [x] ~~`sentry-raven`~~ — migrato a `sentry-ruby` + `sentry-rails` 6.5.0
+
+### Gem deprecate ancora presenti
+- [x] ~~**Paperclip**~~ — migrato ad Active Storage
+- [x] ~~**coffee-rails**~~ — convertiti tutti i `.coffee` in ES6+
+- [x] ~~**Webpacker 5.x**~~ — sostituito con jsbundling-rails + esbuild
+- [x] ~~**turbolinks**~~ — sostituito da Turbo (Hotwire)
+
+### Qualità codice
+- [ ] 95+ commenti TODO/FIXME nel codice
+- [x] ~~`User` model con 52 relazioni~~ — refactoring in 7 Concerns completato
+- [x] ~~Foundation CSS 5.0~~ — migrato a TailwindCSS v4
+- [x] ~~Font Awesome 4.7~~ — migrato a 6.x (font-awesome-sass)
+- [ ] `.rubocop_todo.yml` con ~15KB di violazioni ignorate
+- [ ] Copertura test < 80% (corrente: ~63.7% — target 70% poi 80% pre-Rails 8.x)
+
+---
+
+## Convenzioni di sviluppo
+
+- Template engine primario: **Slim** (`.slim`)
+- ORM: **ActiveRecord** con PostgreSQL
+- Autorizzazione: sempre via **CanCanCan** (`can?` / `authorize!`)
+- Job asincroni: sempre via **Sidekiq** (non `ActiveJob` diretto)
+- Ricerca full-text: **pg_search** (non LIKE)
+- Paginazione: **kaminari**
+- Form: **simple_form** con wrapper Foundation
+- Internazionalizzazione: ogni stringa UI deve passare per `I18n.t()`
+
+---
+
+## Note tecniche importanti
+
+- **`rails app:update` è pericoloso** — sovrascrive file custom senza backup. Usare sempre `rails app:update` in modalità interattiva dentro il container, oppure applicare le modifiche manualmente. I file sovrascritti accidentalmente possono essere recuperati dal repo GitHub: `curl https://raw.githubusercontent.com/coorasse/airesis/develop/CONFIG_FILE`.
+- **`lib/rails_admin/`** non segue le convenzioni Zeitwerk — è caricato esplicitamente nell'initializer ed escluso da `config/initializers/zeitwerk.rb`.
+- **`bin/webpack` e `bin/webpack-dev-server`** richiedono `require 'logger'` prima di `require 'webpacker'` (workaround per bootsnap ≥ 1.10 + Rails 7).
+- **`default_role`** rinominato in `Group` → `default_participation_role` e in `GroupArea` → `default_area_role` (conflitto con `ActiveRecord::Base.default_role` introdotto in Rails 6.1).
+- **Stub Sprockets per rails_admin** — `vendor/assets/javascripts/rails_admin/application.js` e `vendor/assets/stylesheets/rails_admin/application.css` sono stub vuoti. Sprockets 3.x scansiona tutti i logical paths quando verifica `precompiled_assets`; senza lo stub, troverebbe il manifest rails_admin della gem (`.js.erb`) che referenzia file solo in `src/` (webpacker). Lo stub ha priorità perché `vendor/assets` precede i gem paths in Sprockets. Se si rimuove webpacker in futuro, rimuovere anche questi stub.
+- **PaperTrail 14 con Rails 7.1** — emette un warning di compatibilità ma funziona. PaperTrail 15+ richiede Ruby ≥ 3.0; aggiornare dopo upgrade Ruby.
+- La gem `airesis_i18n` è su git — tenerla d'occhio durante l'upgrade Ruby.
+- La gem `vote-schulze` è su git — verificare compatibilità Ruby 3.
+- `private_pub.ru` usa WebSocket via Faye — valutare migrazione ad Action Cable.
+- CORS è aperto a `*` per `/api/*` — restringere in produzione.
+- `config/locales/` contiene file sia YAML che RB — non mischiare i formati.

@@ -1,0 +1,56 @@
+- @extend=true
+h1
+  = @tag
+dl.section-container.tabs[data-tab]
+  dd.active
+    a[href="#proposals"]
+      = t('pages.tags.proposals_tab')
+  dd
+    a[href="#posts"]
+      = t('pages.tags.posts_tab')
+  dd
+    a[href="#groups"]
+      = t('pages.tags.groups_tab')
+.tabs-content
+  #proposals.content.active
+    h2
+      = t('pages.tags.list_proposals_with_tag')
+    - if @proposals.size == 0
+      .Proposal
+        p
+          = t('pages.tags.no_proposals_with_tag')
+    - else
+      ul.small-block-grid-1.xlarge-block-grid-2
+        - @proposals.each do |proposal|
+          = render 'proposals/proposal_list_element', proposal_list_element_for_mustache(proposal)
+  #posts.content
+    h2
+      = t('pages.tags.list_posts_with_tag')
+    - if @blog_posts.size == 0
+      .blogPost
+        p
+          = t('pages.tags.no_posts_with_tag')
+    - else
+      - @blog_posts.each do |blog_post|
+        div
+          = render 'blog_posts/blog_post', blog_post: blog_post
+  #groups.content
+    h2
+      = t('pages.tags.list_groups_with_tags')
+    - if @groups.size == 0
+      p
+        = t('pages.tags.no_groups_with_tag')
+    - else
+      ul.small-block-grid-1.large-block-grid-2.xlarge-block-grid-3.xxlarge-block-grid-4
+        = render collection: @groups, partial: 'groups/group_tag', as: 'group'
+- content_for :left_panel do
+  .mybox
+    h4
+      = t('pages.tags.show.related_title')
+  .mycont
+    - @similars.each do |tag|
+      .round.label.tag
+        |  <a href="
+        = tag_path tag.text
+        | ">
+        = tag.text

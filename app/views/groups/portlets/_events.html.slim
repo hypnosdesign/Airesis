@@ -1,0 +1,5 @@
+.title
+  = t('pages.groups.show.next_events')
+- unless @next_events.empty?
+  .scrollable
+    = render partial: 'events/mini_event', collection: @next_events, as: 'event'

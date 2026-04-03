@@ -1,0 +1,18 @@
+| <tr class="topic 
+= cycle('odd', 'even')
+= topic.locked? ? 'locked' : 'unlocked'
+| "> 
+td.<ruby.code="=.icon_classes(topic)"></ruby>
+
+td.byline.topic-title
+  .subject
+    = link_to topic.subject, group_forum_topic_url(@group, @forum, topic)
+  .started-by
+    = t "started_by"
+    = relevant_posts(topic).first.user
+td.posts-count.text-center
+  = relevant_posts(topic).count
+td.views-count.text-center
+  = topic.views_count
+td.latest-post
+  = link_to_latest_post(topic)

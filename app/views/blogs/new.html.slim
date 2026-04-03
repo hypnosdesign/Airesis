@@ -1,0 +1,11 @@
+.card
+  h1
+    = t('pages.blogs.new.title')
+  = simple_form_for @blog do |f|
+    = f.error_notification
+    = f.input :title, required: true
+    p
+      = link_to t('pages.blogs.new.cancel_button'), :back, class: 'btn'
+      = f.submit t('pages.blogs.new.create_button'), class: 'btn blue'
+= content_for :left_panel do
+  = render partial: 'users/user_groups_panel'

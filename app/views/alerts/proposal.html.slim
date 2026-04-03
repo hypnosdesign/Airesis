@@ -1,0 +1,14 @@
+.cont-mess.gray.scrollable
+  - @unread.each do |alert|
+    li
+      |  <a class="card mess new" href="
+      = calculate_alert_path(alert)
+      | " data-proposal-id="
+      = @proposal_id
+      | "> 
+    div
+      p.p2
+        = alert.message.html_safe
+    .p1
+      = l alert.created_at
+.clearboth

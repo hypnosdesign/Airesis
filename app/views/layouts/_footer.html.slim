@@ -1,0 +1,23 @@
+footer.row.full-width
+  .large-6.medium-5.columns
+    a href="https://github.com/airesis/airesis" target="_blank" = t('pages.footer.for_edemocracy_html')
+    | &nbsp;v.#{AIRESIS_VERSION}
+
+  .large-6.medium-7.columns.text-right-medium-up
+    a href="#" data-reveal-id="language"
+      = image_tag "flags/#{I18n.locale}.png", class: 'language footer', title: t('pages.home.index.change_language')
+    | &nbsp;|&nbsp;
+    = link_to t('terms_of_service'), terms_path, class: 'terms_link'
+    | &nbsp;|&nbsp;
+    = link_to t('privacy_policy'), privacy_path, class: 'privacy_link'
+    | &nbsp;|&nbsp;
+    = link_to t('cookie_policy'), cookie_law_path, class: 'privacy_link'
+    | &nbsp;|&nbsp;
+    = link_to t('pages.home.index.whatis'), edemocracy_path, class: 'privacy_link'
+
+    span.show-for-medium-up
+      | &nbsp;|&nbsp;
+      span.feedback_space
+
+= render 'layouts/languages'
+= render 'cookies_eu/consent_banner', link: cookie_law_path unless Rails.env.test?

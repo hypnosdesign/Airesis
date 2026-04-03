@@ -1,0 +1,5 @@
+/*
+ * rails_admin styles are served via webpacker (asset_source: :webpacker)
+ * This stub prevents Sprockets from trying to compile rails_admin's own manifest,
+ * which references Sass files only available in the webpacker source tree.
+ */
