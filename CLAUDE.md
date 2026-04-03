@@ -265,13 +265,18 @@ RAILS_LOG_TO_STDOUT=true
 > **Mapping Foundation → DaisyUI/Tailwind:**
 > `.row` → `flex flex-wrap` | `.columns.large-6` → `w-full lg:w-1/2` | `.panel` → `card bg-base-200 p-4` | `.reveal-modal` → `dialog.modal` (DaisyUI) | `.button` → `btn` | `.button.small` → `btn btn-sm` | `.button.alert` → `btn btn-error` | `.alert-box` → `alert` | `.tabs-content` → `tabs` | `.f-dropdown` → `dropdown` | `.label` → `badge` | `.side-nav` → `menu`
 
-4-R.1. ⬜ Convertire view da Foundation grid a Tailwind/DaisyUI
-    - **Batch 1** — Auth + Home (8 file): devise/sessions, devise/registrations, home/index, home/intro, _login_panel
-    - **Batch 2** — Proposals (15 file): proposals/index, edit, new, _show_proposal, _left_panel*, _comment*, _vote_panel*, proposal_comments/
-    - **Batch 3** — Groups + Events (15 file): groups/index, show, _group, _search_form, _administration_panel, events/show, _edit_form, _wizard, _calendar
-    - **Batch 4** — Forum, Blog, Users, Admin, Quorums (25 file): frm/, blogs/, blog_posts/, users/show, users/statistics, quorums/_form, admin/
-    - **Batch 5** — JS templates e mailer (30 file): `.js.slim` con reveal-modal, resque_mailer/, newsletter layouts
-    - **Cleanup:** rimuovere `foundation-rails` gem, `foundation_and_overrides.scss`, classi Foundation da `application.css.scss`
+4-R.1. 🔄 Convertire view da Foundation grid a Tailwind/DaisyUI (+ Slim → ERB)
+    - ✅ **Batch 1** — Auth + Home: devise/sessions/new, registrations/new+edit, shared/_links+_social_links, home/index+intro
+    - ✅ **Batch 2** — Proposals: index, show, new, edit, _show_proposal, _vote_panel, _comment, _comments, _report_contribute, _closest_proposals, _left_panel, _left_panel_index
+    - ✅ **Batch 3** — Groups + Events: groups/index+show+_left_panel, events/show, layouts/groups+open_space
+    - ✅ **Layout shell** — _general, _top_menu, _footer, _login_panel, application (tutti ERB + DaisyUI)
+    - ✅ **Fix DaisyUI build** — `@plugin "daisyui"` nel file corretto (`app/assets/tailwind/application.css`)
+    - ✅ **Stile neobrutalista** — `--radius-*: 0rem`, `--border: 2px`, ombre solide `.shadow-brutal`
+    - ✅ **Fix render_error** — `application_controller.rb` template path senza suffisso
+    - ⬜ **Batch 4** — Forum, Blog, Users, Admin, Quorums (~25 file)
+    - ⬜ **Batch 5** — JS templates e mailer (~30 file)
+    - ⬜ **Cleanup** — rimuovere `foundation-rails` gem quando tutte le view sono convertite
+    - **Nota:** `slimrb -e` non è utilizzabile per conversioni bulk (escapa gli helper Rails). Conversione manuale batch per batch. I file Slim non convertiti funzionano grazie al compatibility layer CSS.
 
 4-R.2. ⬜ Sostituire plugin jQuery con Stimulus controllers
     - Priorità (per accoppiamento):
