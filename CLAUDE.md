@@ -254,8 +254,15 @@ RAILS_LOG_TO_STDOUT=true
 > **Prerequisiti per iniziare:** copertura ≥ 70% (sblocca Fase 6), copertura ≥ 80% (sblocca Rails 8.x)
 > **Riferimento:** Rails 8.1.3 rilasciato 2026-03-24 (bugfix + security). Bug fix until Oct 2026. Rails 8.0 → security-only da maggio 2026.
 
+**Naming:**
+- Nome in codice: **Decidiamoci** (fork di Airesis, licenza AGPL v3)
+- `APP_SHORT_NAME` / `APP_LONG_NAME` in `config/application.yml` (gitignored) e `config/application.example.yml`
+- Footer: "Decidiamoci vX.X.X | fork di Airesis"
+- Il modulo Ruby interno rimane `Airesis` e `window.Airesis` JS — troppi riferimenti, non rinominare finché non necessario
+- Costante versione: `APP_VERSION` in `config/initializers/sentry.rb` (`AIRESIS_VERSION` mantenuto come alias)
+
 **Versioning applicazione (Semantic Versioning):**
-- Versione corrente: **4.8.7** (definita in `config/initializers/sentry.rb` come `AIRESIS_VERSION`)
+- Versione corrente: **4.8.7** (definita in `config/initializers/sentry.rb` come `APP_VERSION`)
 - Fasi 1–5 completate (Rails 6→7.1, Ruby 2.7→3.2, Webpacker→esbuild, Foundation→Tailwind, Turbolinks→Hotwire, Paperclip→ActiveStorage, ERB→Slim) → bump a **5.0.0** al termine della copertura 80%
 - Rails 8.x + Ruby 3.4 + UI redesign → bump a **6.0.0**
 
