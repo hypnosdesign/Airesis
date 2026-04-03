@@ -224,14 +224,17 @@ RAILS_LOG_TO_STDOUT=true
 ### Fase 4 — Frontend (parziale)
 13. 🔄 Foundation 5 → TailwindCSS + DaisyUI
     - Installato `tailwindcss-rails` (Tailwind v4) + DaisyUI 5.x come plugin.
-    - Creato `application.tailwind.css` con temi nord/night.
-    - Layout shell convertito: `_general`, `_top_menu`, `_footer`, `application` usano DaisyUI.
-    - ~108/517 view parzialmente convertite a Tailwind/DaisyUI.
-    - **Pendente:** 95 view con classi Foundation (`row`, `columns`, `panel`, `reveal-modal`). Gem `foundation-rails ~> 5.0` ancora attiva. `foundation_and_overrides.scss` ancora importato. CSS compilato: 23.551 righe Foundation vs 2 righe Tailwind.
+    - DaisyUI build: `@plugin "daisyui"` in `app/assets/tailwind/application.css` (file usato dalla gem).
+    - Stile neobrutalista: `--radius-*: 0rem`, `--border: 2px`, ombre solide `.shadow-brutal`.
+    - **Tutti i layout ERB** (34 file, 0 Slim): _general, _top_menu, _footer, _login_panel, _head, _header, _favicons, _languages (→ DaisyUI tabs+dialog), _personal_menu, _page_title, _portlet, _tutorials, application, open_space, groups, users, admin, landing, newsletter.
+    - **56 view ERB** con DaisyUI: Batch 1 (auth+home), Batch 2 (proposals), Batch 3 (groups+events).
+    - **460 view Slim** rimanenti: funzionano via compatibility layer CSS. Da convertire progressivamente.
+    - **Pendente:** gem `foundation-rails ~> 5.0` ancora attiva. `foundation_and_overrides.scss` ancora importato.
 14. 🔄 Adottare Hotwire (Turbo + Stimulus) — rimuovere jQuery + Turbolinks
     - Turbolinks rimosso, `turbo-rails` importato in `application.js` e funzionante.
-    - `stimulus-rails` installato, 1 controller attivo (theme toggle).
-    - **Pendente:** `jquery-rails` gem ancora attiva. 327 file JS legacy (57.892 LOC) in `app/assets/javascripts/` caricati via Sprockets. `init.js` chiama `$(document).foundation()`. 786 selettori jQuery, 1.049 chiamate AJAX, 30+ plugin `$.fn` (toastr, qtip, fdatetimepicker, switchbutton, tokeninput, fullcalendar, jqplot, steps, textntags, intro.js). `private_pub` (Faye WebSocket) ancora attivo.
+    - Stimulus controller attivi: `theme` (dark/light toggle), `flash` (DaisyUI toast, sostituisce toastr.js).
+    - **toastr.js sostituito** — flash messages ora DaisyUI toast + Stimulus, zero jQuery.
+    - **Pendente:** `jquery-rails` gem ancora attiva. 327 file JS legacy (57.892 LOC) via Sprockets. Plugin jQuery rimanenti: qtip, fdatetimepicker, switchbutton, tokeninput, fullcalendar, jqplot, steps, textntags, intro.js. `private_pub` (Faye) ancora attivo.
 15. ✅ Aggiornare Font Awesome 4.7 → 6.x
     - Sostituito `font-awesome-rails` con `font-awesome-sass`.
     - Eseguita migrazione batch di oltre 100 icone nelle view.
