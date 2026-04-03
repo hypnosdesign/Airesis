@@ -1,0 +1,12 @@
+<% @page_title = 'Internal Error' %>
+<div class="card bg-base-200 p-4">
+  <div>
+    <%= image_tag 'allbroken128.png', style: "margin: auto; display: block;" %>
+  </div>
+  <div class="text-center">
+    <h1><%= t('error.error_500.title') %></h1>
+    <p><%= t('error.error_500.description') %></p>
+    <%= link_to t('buttons.go_back'), :back, class: 'btn btn-primary' %>
+  </div>
+  <div class="clear-both"></div>
+</div>

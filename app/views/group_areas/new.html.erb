@@ -1,0 +1,10 @@
+<nav class="breadcrumbs text-sm">
+  <ul>
+    <li><%= link_to 'All working areas', group_group_areas_url(@group) %></li>
+    <li class="current">New group Area</li>
+  </ul>
+</nav>
+<%= render 'group_areas/form' %>
+<% content_for :left_panel do %>
+  <%= render partial: 'groups/administration_panel' %>
+<% end %>

@@ -1,0 +1,17 @@
+<% if @group %>
+  <% @quorum_collection = @group.quorums.active %>
+<% else %>
+  <% @quorum_collection = Quorum.visible.order('seq nulls last') %>
+<% end %>
+<%= f.input :quorum_id, as: :select, required: true,
+            collection: @quorum_collection.collect { |p| [p.name, p.id, { 'data-description' => p.description,
+                                                                          'data-explanation' => p.explanation,
+                                                                          'data-time_fixed' => p.time_fixed?,
+                                                                          'data-minutes' => p.minutes }] },
+            include_blank: t('pages.proposals.new.quorum_prompt'), input_html: { style: 'width: 100%' } %>
+<div id="available_quorums_container" title="<%= t('pages.quorums.index.title') %>"></div>
+<div class="clearboth"></div>
+<p id="quorum_explanation" class="alert alert-info" style="display:none;"></p>
+<div id="choose_votation" class="content">
+  <div></div>
+</div>
