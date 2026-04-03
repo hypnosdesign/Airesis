@@ -1,0 +1,185 @@
+<% @page_title = t('pages.proposals.edit.title', title: @proposal.title) %>
+<h1 class="text-2xl font-bold mb-6"><%= @page_title %></h1>
+
+<%= simple_form_for (@group.present?) ? [@group, @proposal] : @proposal, validate: true, remote: @remote do |f| %>
+  <% if can? :destroy, @proposal %>
+    <div class="card bg-info/10 border-2 border-info p-4 mb-4">
+      <p>
+        <% last = (EDIT_PROPOSAL_TIME_LIMIT - (Time.now - @proposal.created_at)) / 60 %>
+        <% if last < 2 %>
+          <%= t('pages.proposals.edit.hurry_up') %>
+        <% end %>
+        <% if last > 0 %>
+          <%= t('pages.proposals.edit.last_minutes', minutes: last.round(0)) %>
+        <% else %>
+          <%= t('pages.proposals.edit.no_participants') %>
+        <% end %>
+      </p>
+      <%= f.input :title, input_html: { data: { fv_remote_id: @proposal.id } } %>
+    </div>
+
+    <div class="mb-4">
+      <%= f.label :interest_borders_tkn %>
+      <%= f.text_field 'interest_borders_tkn', data: { pre: @proposal.interest_borders.to_json } %>
+    </div>
+
+    <% if ::Configuration::folksonomy %>
+      <div class="mb-4">
+        <%= f.label :tags_list %>
+        <%= f.text_field :tags_list %>
+      </div>
+    <% end %>
+
+    <% if @proposal.change_advanced_options %>
+      <fieldset class="card bg-base-200 p-4 mb-4">
+        <legend class="font-semibold"><%= t('pages.proposals.new.advanced_options') %></legend>
+        <label class="label cursor-pointer justify-start gap-2">
+          <%= f.check_box :anonima, class: 'checkbox' %>
+          <span><%= t('activerecord.attributes.proposal.anonima') %></span>
+        </label>
+        <label class="label cursor-pointer justify-start gap-2">
+          <%= f.check_box :visible_outside, class: 'checkbox' %>
+          <span><%= t('activerecord.attributes.proposal.visible_outside') %></span>
+        </label>
+        <label class="label cursor-pointer justify-start gap-2">
+          <%= f.check_box :secret_vote, class: 'checkbox' %>
+          <span><%= t('activerecord.attributes.proposal.secret_vote') %></span>
+        </label>
+      </fieldset>
+    <% end %>
+  <% end %>
+
+  <div class="mb-4">
+    <%= f.label :proposal_category_id %>
+    <%= f.select :proposal_category_id, options_for_select(ProposalCategory.all.collect { |p| [p.description, p.id, {'data-imagesrc' => image_path("proposal_categories/#{p.name}_s.png")}] }, @proposal.proposal_category_id), {}, { style: 'width:100%' } %>
+  </div>
+
+  <% if @proposal.vote_defined %>
+    <% if @proposal.vote_event_id %>
+      <%= f.label :event_id %>
+      <%= link_to @event, 'Votation event' %>
+    <% else %>
+      <% @event = Event.new(starttime: @proposal.vote_starts_at, endtime: @proposal.vote_ends_at) %>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+        <div>
+          <%= f.label :vote_starts_at %>
+          <%= f.text_field :vote_starts_at, value: (l @proposal.vote_starts_at, format: :textfield), disabled: true, class: 'input input-bordered w-full' %>
+        </div>
+        <div>
+          <%= f.label :vote_ends_at %>
+          <%= f.text_field :vote_ends_at, value: (l @proposal.vote_ends_at, format: :textfield), disabled: true, class: 'input input-bordered w-full' %>
+        </div>
+      </div>
+    <% end %>
+  <% end %>
+
+  <div style="clear:both"></div>
+
+  <div class="sections_column space-y-4">
+    <% @proposal.sections.includes(:paragraphs).each_with_index do |section, i| %>
+      <%= f.fields_for :sections, section do |s| %>
+        <%= render 'section', section_for_mustache(section, i) %>
+      <% end %>
+    <% end %>
+  </div>
+
+  <div class="new_section mt-4">
+    <a class="btn btn-outline w-full" href="#" data-add-section>
+      <%= t('pages.proposals.edit.add_paragraph') %>
+    </a>
+  </div>
+
+  <hr class="my-6">
+
+  <% @proposal.solutions.includes({sections: :paragraphs}).order('sections.seq, sections.id').each_with_index do |solution, i| %>
+    <%= f.fields_for :solutions, solution do |sol| %>
+      <%= render 'solution', solution_for_mustache(solution, i) %>
+    <% end %>
+  <% end %>
+
+  <% unless @proposal.is_petition? %>
+    <div data-hook="new-solution"></div>
+    <div class="new_section mt-4">
+      <a class="btn btn-outline w-full" href="#" data-add-solution>
+        <%= t("pages.proposals.edit.add_solution.#{@proposal.proposal_type.name.downcase}") %>
+      </a>
+      <br>
+      <a class="text-sm link link-hover" href="#" onclick="document.getElementById('you_know').showModal(); return false;">
+        <%= t('pages.proposals.edit.you_know_what_you_do') %>
+      </a>
+    </div>
+
+    <dialog id="you_know" class="modal">
+      <div class="modal-box">
+        <h2 class="text-xl font-bold mb-4"><%= t('pages.proposals.edit.schulze_title') %></h2>
+        <p><%= t('pages.proposals.edit.more_solutions_explained_html', app_short_name: APP_SHORT_NAME) %></p>
+        <div class="modal-action">
+          <form method="dialog"><button class="btn">×</button></form>
+        </div>
+      </div>
+    </dialog>
+  <% end %>
+
+  <div class="flex gap-4 mt-6">
+    <%= f.hidden_field :integrated_contributes_ids_list %>
+    <%= hidden_field_tag :subaction, 'save' %>
+    <%= f.submit t('buttons.save_and_exit'), class: 'btn btn-primary', data: { disable_with: t('updating'), type: 'save', clean_fields: true } %>
+    <%= f.submit t('buttons.save'), class: 'btn btn-outline', data: { disable_with: t('updating'), type: 'continue', clean_fields: true } %>
+  </div>
+<% end %>
+
+<% content_for :absolute do %>
+  <div class="suggestion_right editing">
+    <div class="suggestion-title card bg-base-200 p-3 font-semibold">
+      <%= t('pages.proposals.edit.inserted_contributes') %>
+    </div>
+    <i class="fa-solid fa-xmark close-right-section cursor-pointer" data-close-edit-right-section></i>
+    <div id="loading_contributes" style="margin:auto;text-align:center;">
+      <%= image_tag 'ajax-loader.gif' %><br>
+    </div>
+    <b><%= t('pages.proposals.show.loading_contributions') %></b>
+    <div id="proposalCommentsContainer"></div>
+    <div id="loading_results" style="display:none;">
+      <span><%= t('pages.proposals.show.previos_contributes') %></span>
+    </div>
+  </div>
+<% end %>
+
+<script id="section_template" type="text/html"><%= render "section" %></script>
+<script id="solution_section_template" type="text/html"><%= render "solution_section" %></script>
+<script id="solution_template" type="text/html"><%= render "solution" %></script>
+<script id="section_navigator_template" type="text/html"><%= render "section_navigator" %></script>
+<script id="solution_navigator_template" type="text/html"><%= render "solution_navigator" %></script>
+
+<% _solutions_sections_js = @proposal.solutions.each_with_index.map { |sol, i| "ProposalsEdit.numSolutionSections[#{i}] = #{sol.sections.count};" }.join(" ") %>
+<% _proposal_type_key = @proposal.proposal_type.name.downcase %>
+<% _title_placeholder = raw t("pages.proposals.edit.insert_title.#{_proposal_type_key}") %>
+<% _solution_title = raw t("pages.proposals.edit.new_solution_title.#{_proposal_type_key}", num: 0) %>
+
+<script>
+  ProposalsEdit.voteStartsAt = '<%= l DEBATE_VOTE_DIFFERENCE.since(@proposal.quorum.ends_at), format: :textfield %>';
+  ProposalsEdit.voteEndsAt = '<%= l (DEBATE_VOTE_DIFFERENCE + 2.days).since(@proposal.quorum.ends_at), format: :textfield %>';
+  ProposalsEdit.tags = <%= raw @proposal.tags.map{|t| {id: t.text, name: t.text}}.to_json.to_s %>;
+  ProposalsEdit.contributesUrl = '<%= edit_list_proposal_proposal_comments_url(@proposal) %>';
+  ProposalsEdit.contributesCount = <%= @proposal.contributes.listable.count %>;
+  ProposalsEdit.solutionsCount = <%= @proposal.solutions.count %>;
+  ProposalsEdit.fakeSolutionsCount = ProposalsEdit.solutionsCount;
+  ProposalsEdit.sectionsCount = <%= @proposal.sections.count %>;
+  ProposalsEdit.numSolutionSections = {};
+  <%= _solutions_sections_js %>
+  Airesis.i18n.proposals.edit.titlePlaceholder = '<%= _title_placeholder %>';
+  Airesis.i18n.proposals.edit.solutionTitle = '<%= _solution_title %>';
+  ProposalsEdit.mustacheSections = <%= raw @proposal.build_solution.sections.map.with_index{|section, j| solution_section_for_mustache(section, 0 , j)[:mustache]}.to_json %>;
+</script>
+
+<% content_for :left_panel do %>
+  <div class="edit_proposal_panel space-y-2">
+    <div class="card bg-base-200 p-3">
+      <%= link_to t('buttons.save_and_exit'), '#', data: { update_and_exit_proposal: '' }, class: 'btn btn-primary w-full mb-2' %>
+      <%= link_to t('buttons.save'), '#', data: { update_proposal: '' }, class: 'btn btn-outline w-full mb-2' %>
+      <%= link_to t('pages.proposals.edit.hide_contributes'), '#', data: { other: t('pages.proposals.edit.show_contributes'), close_edit_right_section: '' }, class: 'btn btn-outline w-full mb-2' %>
+      <%= link_to t('buttons.cancel'), @proposal.private ? group_proposal_url(@proposal.groups.first, @proposal) : proposal_url(@proposal), class: 'btn w-full' %>
+    </div>
+    <%= render 'navigator' %>
+  </div>
+<% end %>
