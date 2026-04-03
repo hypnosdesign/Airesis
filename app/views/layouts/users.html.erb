@@ -1,0 +1,51 @@
+<% content_for :head do %>
+  <% if @user && @user.google_page_url %>
+    <link href="<%= @user.google_page_url %>" rel="author">
+  <% end %>
+<% end %>
+
+<% content_for :left_panel do %>
+  <nav class="p-2">
+    <ul class="menu menu-lg w-full">
+      <% if @user %>
+        <% if current_user && (@user == current_user) %>
+          <li class="<%= 'bg-base-300' if params[:controller] == 'home' %>">
+            <%= link_to home_url do %>
+              <i class="fa-solid fa-house"></i> <%= t('pages.header.menu.my_page') %>
+            <% end %>
+          </li>
+          <li class="<%= 'bg-base-300' if ['blogs', 'blog_posts'].include?(params[:controller]) %>">
+            <% if @user.blog %>
+              <%= link_to @user.blog do %>
+                <i class="fa-solid fa-pencil"></i> <%= t('pages.header.menu.my_blog') %>
+              <% end %>
+            <% else %>
+              <%= link_to new_blog_path do %>
+                <i class="fa-solid fa-pencil"></i> <%= t('pages.header.menu.create_blog') %>
+              <% end %>
+            <% end %>
+          </li>
+          <li class="<%= 'bg-base-300' if ['users', 'alerts'].include?(params[:controller]) %>">
+            <%= link_to @user do %>
+              <i class="fa-solid fa-gear"></i> <%= t('pages.header.menu.preferences') %>
+            <% end %>
+          </li>
+        <% end %>
+        <% if @user != current_user %>
+          <% unless @user.new_record? %>
+            <li class="<%= 'bg-base-300' if ['home', 'users'].include?(params[:controller]) %>">
+              <%= link_to @user do %><%= t('pages.header.menu.profile') %><% end %>
+            </li>
+          <% end %>
+          <% if @user.blog %>
+            <li class="<%= 'bg-base-300' if ['blogs', 'blog_posts'].include?(params[:controller]) %>">
+              <%= link_to @user.blog do %>BLOG<% end %>
+            </li>
+          <% end %>
+        <% end %>
+      <% end %>
+    </ul>
+  </nav>
+<% end %>
+
+<%= render 'layouts/general' %>

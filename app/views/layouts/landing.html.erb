@@ -1,0 +1,21 @@
+<% @nomargin = true %>
+<% @extend = true %>
+
+<% content_for :left_panel do %>
+  <nav class="p-2">
+    <ul class="menu menu-lg w-full">
+      <li class="<%= 'bg-base-300' if ['whatis', 'intro'].include?(params[:action]) %>">
+        <%= link_to edemocracy_path do %>
+          <i class="fa-solid fa-circle-info"></i> <%= t('pages.home.index.whatis') %>
+        <% end %>
+      </li>
+      <li class="<%= 'bg-base-300' if params[:action] == 'press' %>">
+        <%= link_to press_path do %>
+          <i class="fa-solid fa-newspaper"></i> PRESS
+        <% end %>
+      </li>
+    </ul>
+  </nav>
+<% end %>
+
+<%= render 'layouts/general' %>
