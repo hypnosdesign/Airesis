@@ -1,13 +1,5 @@
 doctype html
-/[if lt IE 8 ]
-  | <html class="no-js ie ie7" lang="en">
-/[if IE 8 ]
-  | <html class="no-js ie ie8" lang="en">
-/[if IE 9 ]
-  | <html class="no-js ie ie9" lang="en">
-/! [if (gte IE 8)|!(IE)]<!--
-html.no-js lang="en"
-  /! <![endif]
+html.no-js lang="en" data-theme="nord"
   head
     meta charset="utf-8"
     title = t('home.tags.title')
@@ -20,229 +12,173 @@ html.no-js lang="en"
     meta property="og:description" content=t('home.tags.description')
     meta property="fb:app_id" content=ENV['FACEBOOK_APP_ID']
     meta name="author" content="Alessandro Rodi"
-
     meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"
 
-    = stylesheet_link_tag 'landing/all'
     = stylesheet_link_tag "tailwind", "data-turbo-track": "reload"
     link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet"
 
-    = javascript_include_tag 'jquery'
-    = javascript_include_tag 'vendor/modernizr'
-    = javascript_include_tag 'landing/all'
-
     = render 'layouts/favicons'
 
-    - if Rails.env.production? && ENV['GOOGLE_ANALYTICS'].present?
-      javascript:
-        (function (i, s, o, g, r, a, m) {
-          i['GoogleAnalyticsObject'] = r;
-          i[r] = i[r] || function () {
-            (i[r].q = i[r].q || []).push(arguments)
-          }, i[r].l = 1 * new Date();
-          a = s.createElement(o),
-          m = s.getElementsByTagName(o)[0];
-          a.async = 1;
-          a.src = g;
-          m.parentNode.insertBefore(a, m)
-        })(window, document, 'script', '//www.google-analytics.com/analytics.js', 'ga');
-        ga('create', '#{ENV['GOOGLE_ANALYTICS_ID']}', 'auto');
-        ga('send', 'pageview');
-
-  body data-page=body_page_name
-    = javascript_include_tag 'landing/main'
-
-    javascript:
-      $(function () {
-        window.___gcfg = { lang: 'it' };
-        (function () {
-          var po = document.createElement("script");
-          po.type = "text/javascript";
-          po.async = true;
-          po.src = "https://apis.google.com/js/plusone.js";
-          var s = document.getElementsByTagName("script")[0];
-          s.parentNode.insertBefore(po, s);
-        })();
-
-        (function (d, s, id) {
-          var js, fjs = d.getElementsByTagName(s)[0];
-          if (d.getElementById(id)) return;
-          js = d.createElement(s);
-          js.id = id;
-          js.src = "//connect.facebook.net/#{I18n.locale.to_s.gsub('-','_')}/all.js#xfbml=1&appId=#{ENV['FACEBOOK_APP_ID']}";
-          fjs.parentNode.insertBefore(js, fjs);
-        }(document, 'script', 'facebook-jssdk'));
-      });
-
-    #fb-root
-
-    #preloader
-      #status
-        = image_tag 'landing/preloader.gif', height: 64, width: 64
+  body.bg-base-100
 
     header.bg-gray-900.text-white.py-4
-      .row.max-w-7xl.mx-auto.px-4.flex.justify-between.items-center
+      .max-w-7xl.mx-auto.px-4.flex.justify-between.items-center
         .logo
-          a.smoothscroll href="#hero"
+          a href="#hero"
             = image_tag 'logo_completo_white_mini.png', class: "h-8"
 
-        nav#nav-wrap.hidden.md:block
-          ul#nav.flex.space-x-6.text-xs.font-bold.uppercase.tracking-widest
+        nav.hidden.md:block
+          ul.flex.space-x-6.text-xs.font-bold.uppercase.tracking-widest
             li = link_to t('pages.home.index.whatis'), edemocracy_path, class: "hover:text-blue-400 transition"
-            li = link_to t('pages.home.index.features'), '#features', class: 'smoothscroll hover:text-blue-400 transition'
+            li = link_to t('pages.home.index.features'), '#features', class: 'hover:text-blue-400 transition'
             li = link_to t('pages.home.index.register'), new_user_registration_path, class: "hover:text-blue-400 transition"
 
         .flex.items-center.space-x-4
           .language-button
-            a href="#" data-reveal-id="language"
+            a href="#" onclick="document.getElementById('language').showModal(); return false;"
               = image_tag "flags/#{I18n.locale}.png", class: 'h-4 shadow-sm hover:opacity-80 transition', title: t('pages.home.index.change_language')
 
-          ul.header-social.flex.space-x-4
+          ul.flex.space-x-4
             li: a href="https://www.facebook.com/airesisit" target="_blank" class="hover:text-blue-500 transition": i.fa-brands.fa-facebook.text-lg
             li: a href="https://twitter.com/democracyo" target="_blank" class="hover:text-blue-400 transition": i.fa-brands.fa-x-twitter.text-lg
 
     /! Homepage Hero
-    section#hero.bg-gray-50.py-16.md:py-24
-      .row.max-w-7xl.mx-auto.px-4
-        .columns
-          .hero-text.text-center.mb-12
-            = image_tag 'logo_completo_medium.png', alt: 'Airesis - The Social Network for E-Democracy', title: t('home.tags.title'), class: 'mx-auto max-w-xs md:max-w-md'
-            h1.responsive-headline.text-3xl.md:text-5xl.font-extrabold.mt-8.text-gray-900.leading-tight = t('home.intro.paragraph_1.title')
-          
-          .grid.grid-cols-1.md:grid-cols-2.gap-12.mt-16
-            .login-form.card.bg-white.p-8.shadow-2xl.rounded-2xl.border.border-gray-100
-              = form_for resource, as: resource_name, url: user_session_path do |f|
-                .space-y-6
-                  ul.social-network.grid.grid-cols-3.gap-4
+    section#hero.bg-base-200.py-16.md:py-24
+      .max-w-7xl.mx-auto.px-4
+        .hero-text.text-center.mb-12
+          = image_tag 'logo_completo_medium.png', alt: 'Airesis - The Social Network for E-Democracy', title: t('home.tags.title'), class: 'mx-auto max-w-xs md:max-w-md'
+          h1.text-3xl.md:text-5xl.font-extrabold.mt-8.text-base-content.leading-tight = t('home.intro.paragraph_1.title')
+
+        .grid.grid-cols-1.md:grid-cols-2.gap-12.mt-16
+          .card.bg-base-100.p-8.shadow-2xl.rounded-2xl.border.border-base-300
+            = form_for resource, as: resource_name, url: user_session_path do |f|
+              .space-y-6
+                - if ::Configuration.socialnetwork_active
+                  ul.grid.grid-cols-3.gap-4
                     li = link_to_ip t('pages.top_panel.facebook_login'), :facebook, 'facebook'
                     li = link_to_ip t('pages.top_panel.google_login'), :google_oauth2, 'google'
                     li = link_to_ip t('pages.top_panel.twitter_login'), :twitter, 'twitter'
-                  
-                  .relative
-                    .absolute.inset-0.flex.items-center aria-hidden="true"
-                      .w-full.border-t.border-gray-200
-                    .relative.flex.justify-center.text-sm
-                      span.bg-white.px-2.text-gray-500 = t('common.or') rescue 'or'
 
+                  .divider = t('common.or') rescue 'or'
 
-                  .space-y-4
-                    = f.email_field :email, placeholder: 'Email', class: 'block w-full rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 py-3'
-                    = f.password_field :password, placeholder: 'Password', class: 'block w-full rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 py-3'
-                  
-                  .flex.items-center.justify-between
-                    .flex.items-center
-                      = f.check_box :remember_me, checked: true, class: 'h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500'
-                      = f.label :remember_me, t('pages.home.index.keep_connected'), class: 'ml-2 block text-sm text-gray-600'
-                    
-                    .text-sm
-                      = link_to t('pages.home.index.forgot_password'), new_user_password_path, class: 'font-medium text-blue-600 hover:text-blue-500'
-                  
-                  div
-                    = f.submit t('pages.home.index.login'), class: 'w-full flex justify-center py-4 px-4 border border-transparent rounded-lg shadow-md text-base font-bold text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition'
+                .space-y-4
+                  = f.email_field :email, placeholder: 'Email', class: 'input input-bordered w-full'
+                  = f.password_field :password, placeholder: 'Password', class: 'input input-bordered w-full'
 
-            .card.bg-white.p-8.shadow-2xl.rounded-2xl.border.border-gray-100.flex.flex-col.justify-center
-              h2.text-2xl.font-bold.mb-6.text-gray-900 = t('pages.home.index.field_1.title') rescue "Benvenuto"
-              p.text-gray-600.text-lg.mb-10.leading-relaxed = t('pages.home.index.field_1.content')
-              .flex.flex-col.sm:flex-row.gap-4
-                = link_to t('pages.home.index.register'), new_user_registration_path, class: 'flex-1 flex justify-center py-4 px-4 border border-transparent rounded-lg shadow-md text-base font-bold text-white bg-red-600 hover:bg-red-700 transition'
-                = link_to t('pages.home.index.try_it'), open_space_path, class: 'flex-1 flex justify-center py-4 px-4 border border-gray-300 rounded-lg shadow-sm text-base font-bold text-gray-700 bg-gray-50 hover:bg-gray-100 transition'
+                .flex.items-center.justify-between
+                  .flex.items-center.gap-2
+                    = f.check_box :remember_me, checked: true, class: 'checkbox checkbox-primary checkbox-sm'
+                    = f.label :remember_me, t('pages.home.index.keep_connected'), class: 'text-sm'
 
-          .hero-image.mt-20.text-center
-            = image_tag 'landing/hero-airesis.png', class: 'mx-auto rounded-lg shadow-xl border border-gray-200'
+                  .text-sm
+                    = link_to t('pages.home.index.forgot_password'), new_user_password_path, class: 'link link-hover text-primary'
 
-    section#whatis.bg-blue-600.text-white.py-20
-      .row.max-w-5xl.mx-auto.px-4.flex.items-start.space-x-8
+                div
+                  = f.submit t('pages.home.index.login'), class: 'btn btn-primary w-full'
+
+          .card.bg-base-100.p-8.shadow-2xl.rounded-2xl.border.border-base-300.flex.flex-col.justify-center
+            h2.text-2xl.font-bold.mb-6.text-base-content = t('pages.home.index.field_1.title') rescue "Benvenuto"
+            p.text-base-content/70.text-lg.mb-10.leading-relaxed = t('pages.home.index.field_1.content')
+            .flex.flex-col.sm:flex-row.gap-4
+              = link_to t('pages.home.index.register'), new_user_registration_path, class: 'btn btn-error flex-1'
+              = link_to t('pages.home.index.try_it'), open_space_path, class: 'btn btn-outline flex-1'
+
+        .mt-20.text-center
+          = image_tag 'landing/hero-airesis.png', class: 'mx-auto rounded-lg shadow-xl border border-base-300'
+
+    section#whatis.bg-primary.text-primary-content.py-20
+      .max-w-5xl.mx-auto.px-4.flex.items-start.space-x-8
         span: i.fa-solid.fa-quote-left.text-5xl.opacity-30
         .text-container
           h2.text-3xl.md:text-4xl.font-bold.mb-8 = t('home.whatis.paragraph_1.title')
-          blockquote.border-l-4.border-white/20.pl-6
+          blockquote.border-l-4.border-primary-content/20.pl-6
             p.text-xl.md:text-2xl.leading-relaxed.italic = t('home.whatis.paragraph_1.content_html')
         span: i.fa-solid.fa-quote-right.text-5xl.opacity-30.self-end
 
-    section#features.py-24.bg-white.space-y-32
-      .row.max-w-7xl.mx-auto.px-4.flex.flex-col.md:flex-row.items-center.gap-16
+    section#features.py-24.bg-base-100.space-y-32
+      .max-w-7xl.mx-auto.px-4.flex.flex-col.md:flex-row.items-center.gap-16
         .md:w-1/2.relative
           .absolute.-inset-4.bg-blue-100.rounded-full.blur-3xl.opacity-30
-          = image_tag 'presentation/group.png', class: 'relative rounded-2xl shadow-2xl border border-gray-100 w-full'
+          = image_tag 'presentation/group.png', class: 'relative rounded-2xl shadow-2xl border border-base-300 w-full'
         .md:w-1/2
-          .card.p-10.bg-gray-50.rounded-3xl.border.border-gray-100
-            .inline-flex.items-center.justify-center.p-3.bg-blue-600.rounded-xl.shadow-lg.mb-6
-              i.fa-solid.fa-users.text-white.text-xl
-            h3.text-3xl.font-bold.mb-6.text-gray-900 = t('home.whatis.paragraph_2.title')
-            p.text-gray-600.text-lg.leading-relaxed = t('home.whatis.paragraph_2.content_html', groups: Group.count)
+          .card.p-10.bg-base-200.rounded-3xl.border.border-base-300
+            .inline-flex.items-center.justify-center.p-3.bg-primary.rounded-xl.shadow-lg.mb-6
+              i.fa-solid.fa-users.text-primary-content.text-xl
+            h3.text-3xl.font-bold.mb-6.text-base-content = t('home.whatis.paragraph_2.title')
+            p.text-base-content/70.text-lg.leading-relaxed = t('home.whatis.paragraph_2.content_html', groups: Group.count)
 
-      .row.max-w-7xl.mx-auto.px-4.flex.flex-col.md:flex-row-reverse.items-center.gap-16
+      .max-w-7xl.mx-auto.px-4.flex.flex-col.md:flex-row-reverse.items-center.gap-16
         .md:w-1/2.relative
           .absolute.-inset-4.bg-green-100.rounded-full.blur-3xl.opacity-30
-          = image_tag 'presentation/permissions.png', class: 'relative rounded-2xl shadow-2xl border border-gray-100 w-full'
+          = image_tag 'presentation/permissions.png', class: 'relative rounded-2xl shadow-2xl border border-base-300 w-full'
         .md:w-1/2
-          .card.p-10.bg-gray-50.rounded-3xl.border.border-gray-100
-            .inline-flex.items-center.justify-center.p-3.bg-green-600.rounded-xl.shadow-lg.mb-6
-              i.fa-solid.fa-shield-halved.text-white.text-xl
-            h3.text-3xl.font-bold.mb-6.text-gray-900 = t('home.whatis.paragraph_3.title')
-            p.text-gray-600.text-lg.leading-relaxed = t('home.whatis.paragraph_3.content_html')
+          .card.p-10.bg-base-200.rounded-3xl.border.border-base-300
+            .inline-flex.items-center.justify-center.p-3.bg-success.rounded-xl.shadow-lg.mb-6
+              i.fa-solid.fa-shield-halved.text-success-content.text-xl
+            h3.text-3xl.font-bold.mb-6.text-base-content = t('home.whatis.paragraph_3.title')
+            p.text-base-content/70.text-lg.leading-relaxed = t('home.whatis.paragraph_3.content_html')
 
-      .row.max-w-7xl.mx-auto.px-4.flex.flex-col.md:flex-row.items-center.gap-16
+      .max-w-7xl.mx-auto.px-4.flex.flex-col.md:flex-row.items-center.gap-16
         .md:w-1/2.relative
           .absolute.-inset-4.bg-purple-100.rounded-full.blur-3xl.opacity-30
-          = image_tag 'presentation/event.png', class: 'relative rounded-2xl shadow-2xl border border-gray-100 w-full'
+          = image_tag 'presentation/event.png', class: 'relative rounded-2xl shadow-2xl border border-base-300 w-full'
         .md:w-1/2
-          .card.p-10.bg-gray-50.rounded-3xl.border.border-gray-100
-            .inline-flex.items-center.justify-center.p-3.bg-purple-600.rounded-xl.shadow-lg.mb-6
-              i.fa-solid.fa-calendar-check.text-white.text-xl
-            h3.text-3xl.font-bold.mb-6.text-gray-900 = t('home.whatis.paragraph_5.title')
-            p.text-gray-600.text-lg.leading-relaxed = t('home.whatis.paragraph_5.content_html')
+          .card.p-10.bg-base-200.rounded-3xl.border.border-base-300
+            .inline-flex.items-center.justify-center.p-3.bg-secondary.rounded-xl.shadow-lg.mb-6
+              i.fa-solid.fa-calendar-check.text-secondary-content.text-xl
+            h3.text-3xl.font-bold.mb-6.text-base-content = t('home.whatis.paragraph_5.title')
+            p.text-base-content/70.text-lg.leading-relaxed = t('home.whatis.paragraph_5.content_html')
 
-      .row.max-w-7xl.mx-auto.px-4.flex.flex-col.md:flex-row-reverse.items-center.gap-16
+      .max-w-7xl.mx-auto.px-4.flex.flex-col.md:flex-row-reverse.items-center.gap-16
         .md:w-1/2.relative
           .absolute.-inset-4.bg-orange-100.rounded-full.blur-3xl.opacity-30
-          = image_tag 'presentation/proposal.png', class: 'relative rounded-2xl shadow-2xl border border-gray-100 w-full'
+          = image_tag 'presentation/proposal.png', class: 'relative rounded-2xl shadow-2xl border border-base-300 w-full'
         .md:w-1/2
-          .card.p-10.bg-gray-50.rounded-3xl.border.border-gray-100
-            .inline-flex.items-center.justify-center.p-3.bg-orange-600.rounded-xl.shadow-lg.mb-6
-              i.fa-solid.fa-lightbulb.text-white.text-xl
-            h3.text-3xl.font-bold.mb-6.text-gray-900 = t('home.whatis.paragraph_4.title')
-            p.text-gray-600.text-lg.leading-relaxed = t('home.whatis.paragraph_4.content_html', users: User.count, proposals: Proposal.count)
+          .card.p-10.bg-base-200.rounded-3xl.border.border-base-300
+            .inline-flex.items-center.justify-center.p-3.bg-warning.rounded-xl.shadow-lg.mb-6
+              i.fa-solid.fa-lightbulb.text-warning-content.text-xl
+            h3.text-3xl.font-bold.mb-6.text-base-content = t('home.whatis.paragraph_4.title')
+            p.text-base-content/70.text-lg.leading-relaxed = t('home.whatis.paragraph_4.content_html', users: User.count, proposals: Proposal.count)
 
-    section#testimonials.bg-gray-900.text-white.py-24
-      .row.max-w-5xl.mx-auto.px-4.text-center
+    section#testimonials.bg-neutral.text-neutral-content.py-24
+      .max-w-5xl.mx-auto.px-4.text-center
         h2.text-3xl.md:text-4xl.font-bold.mb-16 Citations
         .grid.grid-cols-1.md:grid-cols-3.gap-12
-          blockquote.bg-gray-800.p-8.rounded-2xl.border-b-4.border-blue-500
+          blockquote.bg-neutral-focus.p-8.rounded-2xl.border-b-4.border-primary
             p.text-lg.italic.mb-6 "Quae optima sunt, esse communia."
-            cite.block.font-bold.text-blue-400 — Lucio Anneo Seneca
-          
-          blockquote.bg-gray-800.p-8.rounded-2xl.border-b-4.border-green-500
-            p.text-lg.italic.mb-6 "The tragedy of modern democracies is that they have not yet succeeded in effecting democracy."
-            cite.block.font-bold.text-green-400 — Jacques Maritain
-          
-          blockquote.bg-gray-800.p-8.rounded-2xl.border-b-4.border-orange-500
-            p.text-lg.italic.mb-6 "Nothing is stronger than an idea whose time has come."
-            cite.block.font-bold.text-orange-400 — Victor Hugo
+            cite.block.font-bold.text-primary — Lucio Anneo Seneca
 
-    footer.bg-black.text-gray-400.py-16
-      .row.max-w-7xl.mx-auto.px-4.grid.grid-cols-1.md:grid-cols-3.gap-12
+          blockquote.bg-neutral-focus.p-8.rounded-2xl.border-b-4.border-success
+            p.text-lg.italic.mb-6 "The tragedy of modern democracies is that they have not yet succeeded in effecting democracy."
+            cite.block.font-bold.text-success — Jacques Maritain
+
+          blockquote.bg-neutral-focus.p-8.rounded-2xl.border-b-4.border-warning
+            p.text-lg.italic.mb-6 "Nothing is stronger than an idea whose time has come."
+            cite.block.font-bold.text-warning — Victor Hugo
+
+    footer.bg-neutral.text-neutral-content/60.py-16.border-t.border-neutral-content/10
+      .max-w-7xl.mx-auto.px-4.grid.grid-cols-1.md:grid-cols-3.gap-12
         .info.space-y-6
           .footer-logo
             = image_tag 'logo_completo_white_mini.png', class: "h-8"
           p.text-sm
             | Airesis is the open source platform for e-democracy.
             br
-            a.text-blue-400.hover:underline href="https://github.com/airesis/airesis" target="_blank" View on GitHub
+            a.link.link-hover.text-primary href="https://github.com/airesis/airesis" target="_blank" View on GitHub
             |  v.#{AIRESIS_VERSION}
 
         .social.text-center
-          h3.text-white.font-bold.uppercase.mb-6.text-sm.tracking-widest Socialize
+          h3.text-neutral-content.font-bold.uppercase.mb-6.text-sm.tracking-widest Socialize
           ul.flex.justify-center.space-x-6
-            li: a.hover:text-blue-500.transition href="https://www.facebook.com/airesisit/": i.fa-brands.fa-facebook.text-2xl
-            li: a.hover:text-blue-400.transition href="https://twitter.com/democracyo": i.fa-brands.fa-x-twitter.text-2xl
-        
-        .contact.text-right
-          h3.text-white.font-bold.uppercase.mb-6.text-sm.tracking-widest Contact Us
-          a.text-blue-400.hover:underline href="mailto:info@airesis.it" info@airesis.it
+            li: a.hover:text-primary.transition href="https://www.facebook.com/airesisit/": i.fa-brands.fa-facebook.text-2xl
+            li: a.hover:text-primary.transition href="https://twitter.com/democracyo": i.fa-brands.fa-x-twitter.text-2xl
 
-      #go-top.mt-16.text-center
-        a.smoothscroll.inline-flex.items-center.justify-center.bg-gray-800.w-12.h-12.rounded-full.hover:bg-gray-700.transition title="Back to Top" href="#hero"
+        .contact.text-right
+          h3.text-neutral-content.font-bold.uppercase.mb-6.text-sm.tracking-widest Contact Us
+          a.link.link-hover.text-primary href="mailto:info@airesis.it" info@airesis.it
+
+      .mt-16.text-center
+        a.btn.btn-circle.btn-ghost title="Back to Top" href="#hero"
           i.fa-solid.fa-chevron-up
 
     = render 'layouts/languages'
