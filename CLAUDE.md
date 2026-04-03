@@ -1,7 +1,7 @@
 # CLAUDE.md — Airesis
 
 > Analisi iniziale: 2026-03-31.
-> Ultimo aggiornamento: 2026-04-03 — completate Fasi 1–5 (upgrade stack, migrazione gem, frontend, qualità). Copertura test: 70.0% ✓ (target raggiunto).
+> Ultimo aggiornamento: 2026-04-03 — Fasi 1–3, 5 completate. Fase 4 (frontend) parziale: Tailwind/DaisyUI installati, layout convertito, ma jQuery+Foundation ancora attivi. Copertura test: 70.0% ✓.
 > Obiettivo: modernizzare l'app per renderla funzionante e manutenibile nel 2026.
 
 ---
@@ -32,9 +32,10 @@ Repo originale: https://github.com/coorasse/airesis (branch `develop`)
 | paper_trail    | 10.3.1            | **14.0.0** ✓    | 14.x                |
 | Webpacker      | 5.1.1             | **rimosso** ✓   | jsbundling + esbuild  |
 | jsbundling-rails | —               | **installato** ✓ | esbuild bundler      |
-| Foundation CSS | 5.0               | **TailwindCSS** ✓| Tailwind v4          |
+| Foundation CSS | 5.0               | **Foundation 5 + TailwindCSS** (ibrido) | solo Tailwind v4 + DaisyUI |
 | Font Awesome   | 4.7               | **6.x** ✓       | font-awesome-sass    |
 | Turbolinks     | 5.x               | **rimosso** ✓   | Turbo (Hotwire)      |
+| jQuery         | jquery-rails       | **ancora attivo** | da rimuovere (Fase 4-R) |
 | Sentry gem     | sentry-raven 3.x  | **sentry-rails 6.5** ✓ | sentry-rails  |
 
 ---
@@ -47,7 +48,7 @@ app/
   controllers/   # 73 controller (namespace: api/v1, admin/, frm/)
   workers/       # 39 Sidekiq worker
   cancan/        # abilities (Guest, Logged, Moderator, Admin)
-  views/         # Slim (primario) + ERB (legacy)
+  views/         # Slim (517 file). ~108 con Tailwind/DaisyUI, ~95 ancora con classi Foundation
 config/
   initializers/  # 43 file (aggiunti zeitwerk.rb, new_framework_defaults_6_1.rb)
   locales/       # 20+ lingue
@@ -97,7 +98,7 @@ docker compose up
 ```
 
 Servizi:
-- `airesis` — app Rails (porta 3000), `NODE_OPTIONS=--openssl-legacy-provider` necessario per Webpack 4 + OpenSSL 3
+- `airesis` — app Rails (porta 3000). Nota: `NODE_OPTIONS=--openssl-legacy-provider` ancora nel docker-compose (legacy Webpack, da rimuovere in Fase 4-R)
 - `db` — PostgreSQL 14 (porta 5433, user `postgres`, trust auth)
 - `redis` — Redis 7
 - `sidekiq` — worker Sidekiq
@@ -220,15 +221,17 @@ RAILS_LOG_TO_STDOUT=true
 
 
 
-### Fase 4 — Frontend
-13. ✅ Aggiornare Foundation 5 → TailwindCSS
-    - Installato `tailwindcss-rails` (Tailwind v4).
-    - Creato `application.tailwind.css`.
-    - Iniziata conversione componenti (es. top menu, bottoni).
-14. ✅ Adottare Hotwire (Turbo + Stimulus) — rimuovere jQuery + Turbolinks
-    - Installati `turbo-rails` e `stimulus-rails`.
-    - Configurato Turbo nel layout principale.
-    - Stimulus pronto per nuovi controller.
+### Fase 4 — Frontend (parziale)
+13. 🔄 Foundation 5 → TailwindCSS + DaisyUI
+    - Installato `tailwindcss-rails` (Tailwind v4) + DaisyUI 5.x come plugin.
+    - Creato `application.tailwind.css` con temi nord/night.
+    - Layout shell convertito: `_general`, `_top_menu`, `_footer`, `application` usano DaisyUI.
+    - ~108/517 view parzialmente convertite a Tailwind/DaisyUI.
+    - **Pendente:** 95 view con classi Foundation (`row`, `columns`, `panel`, `reveal-modal`). Gem `foundation-rails ~> 5.0` ancora attiva. `foundation_and_overrides.scss` ancora importato. CSS compilato: 23.551 righe Foundation vs 2 righe Tailwind.
+14. 🔄 Adottare Hotwire (Turbo + Stimulus) — rimuovere jQuery + Turbolinks
+    - Turbolinks rimosso, `turbo-rails` importato in `application.js` e funzionante.
+    - `stimulus-rails` installato, 1 controller attivo (theme toggle).
+    - **Pendente:** `jquery-rails` gem ancora attiva. 327 file JS legacy (57.892 LOC) in `app/assets/javascripts/` caricati via Sprockets. `init.js` chiama `$(document).foundation()`. 786 selettori jQuery, 1.049 chiamate AJAX, 30+ plugin `$.fn` (toastr, qtip, fdatetimepicker, switchbutton, tokeninput, fullcalendar, jqplot, steps, textntags, intro.js). `private_pub` (Faye WebSocket) ancora attivo.
 15. ✅ Aggiornare Font Awesome 4.7 → 6.x
     - Sostituito `font-awesome-rails` con `font-awesome-sass`.
     - Eseguita migrazione batch di oltre 100 icone nelle view.
@@ -252,9 +255,57 @@ RAILS_LOG_TO_STDOUT=true
     - Estesa copertura: quorums_controller (destroy, change_status, dates), groups_controller (JS/JSON format, partecipazioni), best_quorum (check_phase, close_vote_phase, explanation_pop, populate_vote)
     - SimpleCov minimum_coverage aggiornato da 32.9% a 70.0%
 
-### Fase 6 — Upgrade stack (post copertura 70%) ⬜
+### Fase 4-R — Remediation frontend (completare migrazione) ⬜
 
-> **Prerequisiti per iniziare:** copertura ≥ 70% (sblocca Fase 6), copertura ≥ 80% (sblocca Rails 8.x)
+> **Prerequisito:** Fase 5 completata (copertura ≥ 70% ✓).
+> **Motivazione:** La Fase 4 ha installato Tailwind/DaisyUI e Hotwire ma non ha rimosso jQuery/Foundation. L'app è in stato ibrido: entrambi i sistemi sono caricati. Questo blocca l'upgrade Rails (Sprockets conflict) e il redesign UI (DaisyUI su Foundation non funziona). Serve completare la migrazione prima di procedere.
+
+> **Approccio:** component-by-component, batch per batch. L'app resta funzionante durante la transizione perché entrambi i CSS sono caricati. Ogni batch è testabile indipendentemente.
+
+> **Mapping Foundation → DaisyUI/Tailwind:**
+> `.row` → `flex flex-wrap` | `.columns.large-6` → `w-full lg:w-1/2` | `.panel` → `card bg-base-200 p-4` | `.reveal-modal` → `dialog.modal` (DaisyUI) | `.button` → `btn` | `.button.small` → `btn btn-sm` | `.button.alert` → `btn btn-error` | `.alert-box` → `alert` | `.tabs-content` → `tabs` | `.f-dropdown` → `dropdown` | `.label` → `badge` | `.side-nav` → `menu`
+
+4-R.1. ⬜ Convertire view da Foundation grid a Tailwind/DaisyUI
+    - **Batch 1** — Auth + Home (8 file): devise/sessions, devise/registrations, home/index, home/intro, _login_panel
+    - **Batch 2** — Proposals (15 file): proposals/index, edit, new, _show_proposal, _left_panel*, _comment*, _vote_panel*, proposal_comments/
+    - **Batch 3** — Groups + Events (15 file): groups/index, show, _group, _search_form, _administration_panel, events/show, _edit_form, _wizard, _calendar
+    - **Batch 4** — Forum, Blog, Users, Admin, Quorums (25 file): frm/, blogs/, blog_posts/, users/show, users/statistics, quorums/_form, admin/
+    - **Batch 5** — JS templates e mailer (30 file): `.js.slim` con reveal-modal, resque_mailer/, newsletter layouts
+    - **Cleanup:** rimuovere `foundation-rails` gem, `foundation_and_overrides.scss`, classi Foundation da `application.css.scss`
+
+4-R.2. ⬜ Sostituire plugin jQuery con Stimulus controllers
+    - Priorità (per accoppiamento):
+      1. `toastr` → DaisyUI toast + Stimulus (flash messages, ogni pagina)
+      2. `foundation-datetimepicker` → `<input type="datetime-local">` o Flatpickr + Stimulus
+      3. `$.fn.qtip` → DaisyUI tooltip (CSS-only)
+      4. `jquery.switchbutton` → DaisyUI toggle
+      5. `jquery.steps` → Stimulus multi-step controller
+      6. `jquery.tokeninput` → Stimulus autocomplete (tag/interest borders)
+      7. `Feedback` widget → Stimulus controller
+      8. `fullcalendar` → FullCalendar v6 (vanilla JS, no jQuery)
+      9. `jquery.jqplot` → Chart.js o CSS semplice (bassa priorità, solo vote results)
+      10. `underscore` → JS nativo (usato solo `_.filter`)
+
+4-R.3. ⬜ Migrare init.js e democracy.js a ES6 + Stimulus
+    - Convertire `init.js` in Stimulus controllers separati (search, datepicker, reveal-modal, textntags, tag-cloud, page-dispatcher)
+    - Convertire `democracy.js` utility functions in modulo ES6
+    - Convertire 28 file per-page JS (`per_page/`) in Stimulus controllers
+
+4-R.4. ⬜ Rimuovere jquery-rails e Sprockets JS manifest
+    - Rimuovere `jquery-rails` dal Gemfile
+    - Rimuovere `legacy/application.js` Sprockets manifest
+    - Tutto il JS passa solo da esbuild
+    - Mantenere Sprockets solo per CSS
+
+4-R.5. ⬜ Consolidare asset pipeline
+    - Opzione A: mantenere Sprockets solo per CSS (più semplice)
+    - Opzione B: migrare a Propshaft (default Rails 8, ma Sprockets 4.x funziona ancora)
+    - Rimuovere gem `uglifier` (esbuild gestisce minification)
+    - Rimuovere da `manifest.js` i riferimenti a `//= link_directory ../javascripts`
+
+### Fase 6 — Upgrade stack (post remediation frontend) ⬜
+
+> **Prerequisiti per iniziare:** copertura ≥ 70% ✓, Fase 4-R completata (jQuery/Foundation rimossi), copertura ≥ 80% (sblocca Rails 8.x)
 > **Riferimento:** Rails 8.1.3 rilasciato 2026-03-24 (bugfix + security). Bug fix until Oct 2026. Rails 8.0 → security-only da maggio 2026.
 
 **Naming:**
@@ -360,11 +411,19 @@ RAILS_LOG_TO_STDOUT=true
 - [x] ~~**coffee-rails**~~ — convertiti tutti i `.coffee` in ES6+
 - [x] ~~**Webpacker 5.x**~~ — sostituito con jsbundling-rails + esbuild
 - [x] ~~**turbolinks**~~ — sostituito da Turbo (Hotwire)
+- [ ] **jquery-rails** — ancora attiva, 786 selettori `$()`, 1.049 chiamate AJAX, 30+ plugin `$.fn` (Fase 4-R)
+- [ ] **foundation-rails ~> 5.0** — ancora attiva, 95 view con classi Foundation, 23.551 righe CSS (Fase 4-R)
+
+### Frontend ibrido (debito critico)
+- [ ] Dual asset pipeline: Sprockets compila 327 file JS legacy + Foundation CSS; esbuild compila Turbo/Stimulus separatamente
+- [ ] `app/assets/javascripts/legacy/application.js` — Sprockets manifest che carica jQuery, Foundation, 30+ plugin
+- [ ] `init.js` — 130+ righe di setup jQuery globale, chiama `$(document).foundation()`
+- [ ] `private_pub` (Faye WebSocket) — da migrare ad Action Cable + Turbo Streams
 
 ### Qualità codice
 - [ ] 95+ commenti TODO/FIXME nel codice
 - [x] ~~`User` model con 52 relazioni~~ — refactoring in 7 Concerns completato
-- [x] ~~Foundation CSS 5.0~~ — migrato a TailwindCSS v4
+- [ ] Foundation CSS 5.0 — parzialmente migrato (layout shell → Tailwind/DaisyUI, 95 view ancora Foundation)
 - [x] ~~Font Awesome 4.7~~ — migrato a 6.x (font-awesome-sass)
 - [ ] `.rubocop_todo.yml` con ~15KB di violazioni ignorate
 - [ ] Copertura test < 80% (corrente: ~70.0% — target 70% ✓, prossimo 80% pre-Rails 8.x)
@@ -379,7 +438,7 @@ RAILS_LOG_TO_STDOUT=true
 - Job asincroni: sempre via **Sidekiq** (non `ActiveJob` diretto)
 - Ricerca full-text: **pg_search** (non LIKE)
 - Paginazione: **kaminari**
-- Form: **simple_form** con wrapper Foundation
+- Form: **simple_form** (wrapper ancora Foundation — da migrare a Tailwind/DaisyUI in Fase 4-R)
 - Internazionalizzazione: ogni stringa UI deve passare per `I18n.t()`
 
 ---
@@ -395,5 +454,7 @@ RAILS_LOG_TO_STDOUT=true
 - La gem `airesis_i18n` è su git — tenerla d'occhio durante l'upgrade Ruby.
 - La gem `vote-schulze` è su git — verificare compatibilità Ruby 3.
 - `private_pub.ru` usa WebSocket via Faye — valutare migrazione ad Action Cable.
+- **Dual asset pipeline (Sprockets + esbuild)** — entrambi attivi in parallelo. Sprockets compila `app/assets/javascripts/legacy/application.js` (327 file, jQuery+Foundation) + `application.css.scss` (Foundation CSS). esbuild compila `app/javascript/application.js` (Turbo+Stimulus). Il layout `_head.html.slim` carica entrambi. Rischio: handler eventi duplicati, CSS conflittuali, bloat. Da consolidare in Fase 4-R.
+- **`app/assets/javascripts/init.js`** è il punto di ingresso JS legacy — esegue `$(document).foundation()`, inizializza 15+ plugin jQuery, configura `window.Airesis`. Ogni pagina lo carica. Non può essere rimosso senza sostituire ogni plugin con Stimulus controller equivalente.
 - CORS è aperto a `*` per `/api/*` — restringere in produzione.
 - `config/locales/` contiene file sia YAML che RB — non mischiare i formati.
