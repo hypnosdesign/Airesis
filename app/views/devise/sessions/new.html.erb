@@ -1,0 +1,35 @@
+<% @page_title = t('pages.login.title') %>
+
+<div class="card bg-base-100 shadow-lg max-w-md mx-auto mt-8 p-8">
+  <h2 class="text-2xl font-bold mb-6"><%= t('pages.login.title') %></h2>
+
+  <% if ::Configuration.socialnetwork_active %>
+    <div class="flex flex-col gap-2 mb-6">
+      <%= link_to_ip t('pages.top_panel.facebook_login'), :facebook, 'facebook' %>
+      <%= link_to_ip t('pages.top_panel.google_login'), :google_oauth2, 'google' %>
+      <%= link_to_ip t('pages.top_panel.twitter_login'), :twitter, 'twitter' %>
+    </div>
+    <div class="divider"></div>
+  <% end %>
+
+  <%= simple_form_for @user, url: user_session_path, html: { class: 'flex flex-col gap-4' } do |f| %>
+    <%= f.input :email, required: true, input_html: { class: 'input input-bordered w-full' } %>
+    <%= f.input :password, required: true, input_html: { class: 'input input-bordered w-full' } %>
+
+    <div class="form-control">
+      <%= f.label :remember_me, class: 'label cursor-pointer justify-start gap-2' do %>
+        <%= f.check_box :remember_me, class: 'checkbox checkbox-primary' %>
+        <span class="label-text"><%= t('pages.sessions.new.remember_me_label') %></span>
+      <% end %>
+    </div>
+
+    <%= button_tag type: :submit, class: 'btn btn-primary w-full' do %>
+      <i class="fa-solid fa-key mr-2"></i>
+      <%= t('buttons.login') %>
+    <% end %>
+  <% end %>
+
+  <div class="divider mt-4"></div>
+
+  <%= render 'devise/shared/links' %>
+</div>
