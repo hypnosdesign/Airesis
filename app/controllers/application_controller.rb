@@ -169,7 +169,7 @@ class ApplicationController < ActionController::Base
         render template: 'layouts/error', status: 500, layout: 'application'
       end
       format.html do
-        render template: '/errors/500.html.erb', status: 500, layout: 'application'
+        render template: 'errors/500', status: 500, layout: 'application'
       end
     end
   end
