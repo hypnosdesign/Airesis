@@ -1,34 +1,44 @@
-h2
-  | Edit 
-  = resource_name.to_s.humanize
-= form_for(resource, as: resource_name, url: registration_path(resource_name), html: { method: :put }) do |f|
-  = devise_error_messages!
-  div
-    = f.label :email
-    br
-    = f.email_field :email
-  div
-    = f.label :password
-  i
-    | (leave blank if you don't want to change it)
-  br
-  = f.password_field :password
-  div
-    = f.label :password_confirmation
-    br
-    = f.password_field :password_confirmation
-  div
-    = f.label :current_password
-  i
-    | (we need your current password to confirm your changes)
-  br
-  = f.password_field :current_password
-  div
-    = f.submit "Update"
-h3
-  | Cancel my account
-p
-  | Unhappy? 
-  = link_to "Cancel my account", registration_path(resource_name), data: {confirm: "Are you sure?"}, method: :delete
-  | .
-= link_to "Back", :back
+- @page_title = t('pages.registration.edit_title') rescue "Edit #{resource_name.to_s.humanize}"
+
+.card.bg-base-100.shadow-lg.max-w-md.mx-auto.mt-8.p-8.rounded-2xl
+  h2.text-2xl.font-bold.mb-6
+    | Edit #{resource_name.to_s.humanize}
+
+  = form_for(resource, as: resource_name, url: registration_path(resource_name), html: { method: :put, class: 'flex flex-col gap-4' }) do |f|
+    = devise_error_messages!
+
+    .form-control
+      = f.label :email, class: 'label'
+        span.label-text Email
+      = f.email_field :email, class: 'input input-bordered w-full'
+
+    .form-control
+      = f.label :password, class: 'label'
+        span.label-text Password
+      p.text-xs.text-base-content/60.mb-1 (leave blank if you don't want to change it)
+      = f.password_field :password, class: 'input input-bordered w-full'
+
+    .form-control
+      = f.label :password_confirmation, class: 'label'
+        span.label-text Password confirmation
+      = f.password_field :password_confirmation, class: 'input input-bordered w-full'
+
+    .form-control
+      = f.label :current_password, class: 'label'
+        span.label-text Current password
+      p.text-xs.text-base-content/60.mb-1 (we need your current password to confirm your changes)
+      = f.password_field :current_password, class: 'input input-bordered w-full'
+
+    .mt-4
+      = f.submit "Update", class: 'btn btn-primary w-full'
+
+  .divider.mt-6
+
+  .text-center
+    h3.text-lg.font-semibold.mb-2 Cancel my account
+    p.text-sm.text-base-content/60.mb-4
+      | Unhappy?
+    = link_to "Cancel my account", registration_path(resource_name), data: { confirm: "Are you sure?" }, method: :delete, class: 'btn btn-error btn-outline btn-sm'
+
+  .mt-4.text-center
+    = link_to "Back", :back, class: 'link link-hover text-primary text-sm'

@@ -1,10 +1,7 @@
-ul
+.flex.flex-col.gap-2.text-sm.items-center
   - if controller_name != 'registrations'
-    li
-      = link_to t('pages.sessions.links.register'), new_registration_path(resource_name)
+    = link_to t('pages.sessions.links.register'), new_registration_path(resource_name), class: 'link link-hover text-primary'
   - if controller_name != 'passwords'
-    li
-      = link_to t('pages.sessions.links.forgot_password'), new_password_path(resource_name)
+    = link_to t('pages.sessions.links.forgot_password'), new_password_path(resource_name), class: 'link link-hover text-primary'
   - if controller_name != 'confirmations'
-    li
-      = link_to t('pages.sessions.links.havent_received_email'), new_confirmation_path(resource_name)
+    = link_to t('pages.sessions.links.havent_received_email'), new_confirmation_path(resource_name), class: 'link link-hover text-primary'
