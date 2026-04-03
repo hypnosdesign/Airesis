@@ -12,7 +12,7 @@ This project is a modernizing open-source e-democracy platform. It is a monolith
     *   **Cache/Jobs:** Redis 7, Sidekiq 6.1 (multi-queue setup)
     *   **Auth:** Devise 5 (with OmniAuth for Facebook, Google, Twitter) + CanCanCan 3 for authorization.
     *   **Frontend:** Slim (100% of templates), TailwindCSS v4, Hotwire (Turbo & Stimulus), FontAwesome 6 (CDN).
-    *   **Asset Pipeline:** Sprockets 4 + `jsbundling-rails` (esbuild).
+    *   **Asset Pipeline:** Sprockets 4 (for legacy) + `jsbundling-rails` (esbuild, for modern).
     *   **Other:** `active_storage` (uploads), `paper_trail` (auditing), `friendly_id` (slugs), `geocoder`, `ckeditor`.
 
 ## Building and Running
@@ -35,7 +35,7 @@ This project is a modernizing open-source e-democracy platform. It is a monolith
     ```bash
     docker compose run --rm airesis yarn build
     ```
-5.  **Tailwind Build:** (Required for CSS changes)
+5.  **Tailwind Build:** (Required for Tailwind CSS changes)
     ```bash
     docker compose run --rm airesis bundle exec rails tailwindcss:build
     ```
@@ -49,36 +49,20 @@ This project is a modernizing open-source e-democracy platform. It is a monolith
 *   **Authorization:** Always use **CanCanCan** (`can?`, `authorize!`).
 *   **Jobs:** Use **Sidekiq** directly for background tasks (configured in `config/sidekiq.yml`).
 *   **Views:** Use **Slim** (`.slim`) exclusively. All ERB files have been migrated.
-*   **Styling:** Use **TailwindCSS**. Foundation 5 is still present but deprecated.
-*   **JS:** Use **Stimulus** for new interactive features. Legacy jQuery logic is being phased out.
-*   **I18n:** UI strings must use `I18n.t()`. Note: Use `rescue` or check for existence when concatenating I18n arrays in layouts to avoid `TypeError`.
+*   **Styling:** Build all new features using **TailwindCSS/DaisyUI**. The legacy Foundation CSS code is completely deprecated and MUST be refactored out.
+*   **JS:** Use **Stimulus** for all interactivity (`app/javascript/controllers`). DO NOT write new jQuery code.
+*   **I18n:** UI strings must use `I18n.t()`. 
 
-## Project Structure Highlights
+## The "Real" Application State & Technical Debt (Current 2026 Status)
 
-*   `app/models/concerns/user/`: Modularized `User` logic (Authenticatable, Proposable, Groupable, etc.).
-*   `app/javascript/`: JS entry points for esbuild.
-*   `app/assets/builds/`: Compiled JS and CSS (Tailwind).
-*   `app/assets/config/manifest.js`: Sprockets 4 manifest linking builds and legacy JS.
-*   `app/workers/`: Sidekiq workers for async tasks.
+While Fases 1-5 have successfully upgraded the infrastructure (Ruby 3.2, Rails 7.1, Hotwire, esbuild, Tailwind CSS initialized, Slim refactored, Paperclip to ActiveStorage migrated), **the application suffers from a massive "hybrid state" in the frontend.**
 
-## Roadmap & Technical Debt (Current 2026 Status)
+### 🚨 Critical Frontend Architecture Debt:
+- **Stimulus is empty:** While configured, there are almost zero real Stimulus controllers active in `app/javascript/controllers`.
+- **Legacy Code Rules the Client:** The overwhelming majority of the application's interactivity and style is still dictated by monolithic legacy files sitting in `app/assets/javascripts` (e.g. `democracy.js`, `foundation-patch.js`) and `app/assets/stylesheets` (huge 70KB Foundation overrides, fullcalendar, jQuery-UI).
+- **The True Strategy:** The primary development focus MUST be purely executional: picking a view, removing Foundation classes, re-implementing it in TailwindCSS/DaisyUI, and moving any jQuery interactivity into well-scoped Stimulus Controllers.
 
-*   **Completed:** 
-    *   Upgraded stack: Ruby 3.2, Rails 7.1, Postgres 14, Redis 7, Sprockets 4.
-    *   Migrated **Paperclip** to **Active Storage**.
-    *   Removed **CoffeeScript** (converted to ES6+).
-    *   Replaced **Webpacker** with **esbuild**.
-    *   Implemented **TailwindCSS v4** and **Hotwire**.
-    *   Migrated **100% of views from ERB to Slim**.
-    *   Refactored **User model** into Concerns.
-*   **Next Steps:**
-    *   Increase test coverage (> 70%).
-    *   Systematic TailwindCSS application to all UI components (removing Foundation).
-    *   Migrate legacy jQuery logic to Stimulus controllers.
-
-## Important Technical Notes
-
-*   **Sprockets 4:** Uses `app/assets/config/manifest.js`. Note that `application.js` from `builds` conflicts with `javascripts/application.js`, so legacy main JS was moved to `javascripts/legacy/application.js`.
-*   **User Model:** Extracted into 7 Concerns to manage complexity.
-*   **FontAwesome 6:** Loaded via CDN in `_head.html.slim` for compatibility.
-*   **Tests:** Run via `bundle exec rspec`. Coverage is around 33%.
+### Active Roadmap:
+1.  **Increase Test Coverage (from ~63.7% to >70%):** Write robust RSpec and System Tests to guarantee that removing legacy views and javascript won't break features like Schulze voting.
+2.  **Frontend Bonification:** Page-by-page rewrite using exclusively DaisyUI / TailwindCSS and Stimulus. Absolute destruction of `app/assets/javascripts` and `foundation`.
+3.  **Future Upgrades (Post Refactor):** Upgrade to Rails 8.0/Ruby 3.4, and evaluate replacing Sidekiq/Redis with `Solid Queue` / `Solid Cache` to simplify the Docker infrastructure.

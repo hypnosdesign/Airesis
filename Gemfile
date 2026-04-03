@@ -12,7 +12,7 @@ gem 'daemons'
 gem 'devise'
 gem 'devise_traceable', git: 'https://github.com/coorasse/devise_traceable'
 gem 'el_finder'
-gem 'foundation-rails', '~> 5.0'
+# gem 'foundation-rails', '~> 5.0' # removed: all CSS migrated to Tailwind/DaisyUI
 gem 'friendly_id'
 gem 'gemoji'
 gem 'geocoder'
@@ -20,18 +20,18 @@ gem 'globalize'
 gem 'httparty'
 gem 'icalendar'
 gem 'jbuilder'
-gem 'jquery-rails'
+# gem 'jquery-rails' # removed: JS legacy not loaded, all views use Stimulus/Turbo
 gem 'kaminari'
 gem 'koala'
 gem 'mustache'
-gem 'mustache-js-rails'
+# gem 'mustache-js-rails' # removed: JS legacy not loaded
 gem 'nickname_generator'
 gem 'omniauth-facebook'
 gem 'omniauth-google-oauth2'
 gem 'omniauth-twitter'
 gem 'pg'
 gem 'premailer-rails', '>= 1.12.0'
-gem 'private_pub'
+# gem 'private_pub' # removed: not loaded in layout, to replace with Action Cable
 gem 'rack-cors', require: 'rack/cors'
 gem 'rails_admin'
 gem 'rails_autolink'
@@ -42,7 +42,7 @@ gem 'active_storage_validations'
 gem 'ostruct'
 gem 'sanitize', '>= 6.0'
 gem 'sass-rails'
-gem 'select2-rails'
+# gem 'select2-rails' # removed: Select2 loaded from CDN, not via Sprockets
 gem 'sidekiq'
 gem 'sidekiq-failures'
 gem 'simple_form'
@@ -54,7 +54,7 @@ gem 'sprockets', '~> 4.0'
 gem 'timezone', git: 'https://github.com/coorasse/timezone'
 
 # gem 'uglifier' # removed: esbuild handles JS minification
-gem 'uri-js-rails'
+# gem 'uri-js-rails' # removed: JS legacy not loaded
 gem 'matrix' # required by vote-schulze; removed from Ruby stdlib in 3.1
 gem 'vote-schulze', git: 'https://github.com/coorasse/schulze-vote', ref: '0f47cbb'
 gem 'jsbundling-rails'
