@@ -1,0 +1,49 @@
+<% @extend = true %>
+<% @page_title = t('pages.groups.index.title') %>
+
+<h1 class="text-2xl font-bold mb-6"><%= t('pages.groups.index.find_group_label') %></h1>
+
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+  <div id="group_search_form">
+    <div class="card bg-base-100 p-4">
+      <%= render 'groups/search_form' %>
+    </div>
+  </div>
+  <div class="hidden lg:block">
+    <div class="card bg-base-100 p-4" data-tag-cloud="">
+      <% @tags.each do |tag| %>
+        <%= link_to tag.text, groups_url(tag: tag.text), remote: true, rel: tag.groups_count, class: 'badge badge-outline m-1' %>
+      <% end %>
+    </div>
+  </div>
+</div>
+
+<% if @groups.any? %>
+  <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-4" id="groups_list">
+    <%= render partial: "group_tag", collection: @groups, as: :group %>
+  </div>
+<% else %>
+  <h2 class="text-xl opacity-60"><%= t('pages.groups.index.search_description') %></h2>
+<% end %>
+
+<div id="more_groups_container">
+  <%= render partial: 'more_groups' %>
+</div>
+
+<% content_for :left_panel do %>
+  <div class="card bg-base-200 p-3 mb-2">
+    <% if !current_user || (can? :create, Group) %>
+      <%= link_to new_group_path, class: "btn btn-primary w-full" do %>
+        <i class="fa-solid fa-plus"></i> <%= t('pages.groups.index.create_group_button') %>
+      <% end %>
+    <% else %>
+      <p class="text-sm opacity-60"><%= t('pages.groups.index.limit_reached') %></p>
+    <% end %>
+  </div>
+  <%= render partial: 'users/user_groups_panel' %>
+<% end %>
+
+<script>
+  GroupsIndex.areaParam = <%= params[:area] == 'on' %>;
+  GroupsIndex.andParam = <%= params[:and] == 'on' %>;
+</script>

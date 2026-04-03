@@ -1,0 +1,79 @@
+<% content_for :left_panel do %>
+  <% if can? :view_data, @group %>
+    <div class="card bg-base-200 p-3 mb-2">
+      <% if can? :view_data, @group %>
+        <% if user_signed_in? && current_user.blog %>
+          <% if can? :post_to, @group %>
+            <%= link_to new_group_blog_post_url(@group), class: 'btn btn-success btn-sm w-full mb-2' do %>
+              <i class="fa-solid fa-plus"></i> <%= t('pages.groups.show.post_button') %>
+            <% end %>
+          <% end %>
+        <% else %>
+          <%= link_to new_blog_path, class: 'btn btn-success btn-sm w-full mb-2' do %>
+            <i class="fa-solid fa-plus"></i> <%= t('pages.groups.show.blog_button') %>
+          <% end %>
+        <% end %>
+      <% end %>
+
+      <a class="btn btn-sm w-full mb-2" href="#" onclick="document.getElementById('rules_modal').showModal(); return false;">
+        <i class="fa-solid fa-book"></i> <%= t('pages.groups.show.rules_button') %>
+      </a>
+    </div>
+
+    <div class="card bg-base-200 p-3 mb-2">
+      <%= render partial: 'groups/participants_panel' %>
+    </div>
+
+    <% unless @group.disable_participation_requests %>
+      <div class="participation_requests_container mb-2">
+        <%= render partial: 'groups/participation_requests_panel' %>
+      </div>
+    <% end %>
+
+    <% voting = @group.participation_requests.voting %>
+    <% if voting.size > 0 %>
+      <div class="card bg-base-200 p-3 mb-2">
+        <h4 class="font-semibold mb-2">Elenco delle richieste di partecipazione in corso di votazione</h4>
+        <% voting.each do |request| %>
+          <p><%= link_to_user request.user, full_name: true %></p>
+        <% end %>
+      </div>
+    <% end %>
+  <% end %>
+
+  <%
+    @myparticipation = @group.group_participations.where(user_id: current_user.id).first if current_user
+  %>
+  <% if @myparticipation %>
+    <div class="card bg-base-200 p-3 mb-2">
+      <h4 class="font-semibold mb-2"><%= t('pages.groups.show.permissions_title') %></h4>
+      <div id="permissions_list_container" class="space-y-2">
+        <%= link_to permissions_list_group_path(@group), data: { remote: true, disable_with: t('loading') }, class: 'btn btn-sm w-full' do %>
+          <i class="fa-solid fa-circle-info"></i> <%= t('pages.groups.show.list_permissions.button') %>
+        <% end %>
+        <%= link_to group_group_participation_path(@group, @myparticipation), method: :delete, data: { disable_with: t('loading'), confirm: t('pages.users.show.get_out_of_group_confermation') }, class: 'btn btn-sm btn-outline w-full' do %>
+          <i class="fa-solid fa-right-from-bracket"></i> <%= t('pages.users.show.get_out_of_group_button') %>
+        <% end %>
+      </div>
+    </div>
+
+    <div class="card bg-base-200 p-3 mb-2">
+      <h4 class="font-semibold mb-2">Archives</h4>
+      <% if @archives.length > 0 %>
+        <ul class="menu menu-sm">
+          <% @archives.each do |rec| %>
+            <li><%= link_to "#{t('calendar.monthNames')[rec.month.to_i - 1]} #{rec.year.to_i} (#{rec.posts})", posts_by_year_and_month_group_path(@group, month: rec.month.to_i, year: rec.year.to_i) %></li>
+          <% end %>
+        </ul>
+      <% else %>
+        <p class="text-sm opacity-60">Nothing has ever been published in this group</p>
+      <% end %>
+    </div>
+  <% else %>
+    <div class="card bg-base-200 p-3 mb-2">
+      <%= link_to ask_for_participation_group_url(@group), method: :post, class: "btn btn-primary w-full" do %>
+        <i class="fa-solid fa-pencil"></i> <%= t('pages.groups.show.ask_participate_button') %>
+      <% end %>
+    </div>
+  <% end %>
+<% end %>
