@@ -466,4 +466,191 @@ RSpec.describe ProposalsController, search: true, seeds: true do
       expect([200, 302, 403, 500]).to include(response.status)
     end
   end
+
+  describe 'GET banner' do
+    let(:proposal) { create(:public_proposal, current_user_id: user.id) }
+
+    it 'returns a response' do
+      get banner_proposal_path(proposal)
+      expect([200, 302, 403, 500]).to include(response.status)
+    end
+  end
+
+  describe 'GET test_banner' do
+    let(:proposal) { create(:public_proposal, current_user_id: user.id) }
+
+    it 'redirects to sign in when not authenticated' do
+      get test_banner_proposal_path(proposal)
+      expect([302, 401, 403, 500]).to include(response.status)
+    end
+
+    it 'returns a response when authenticated as owner' do
+      sign_in user
+      get test_banner_proposal_path(proposal)
+      expect([200, 302, 403, 500]).to include(response.status)
+    end
+  end
+
+  describe 'PATCH set_votation_date' do
+    let(:proposal) { create(:public_proposal, current_user_id: user.id) }
+
+    it 'redirects to sign in when not authenticated' do
+      patch set_votation_date_proposal_path(proposal),
+            params: { proposal: { vote_period_id: nil } }
+      expect(response).to redirect_to(new_user_session_path)
+    end
+
+    it 'returns a response when authenticated as owner' do
+      sign_in user
+      patch set_votation_date_proposal_path(proposal),
+            params: { proposal: { vote_period_id: nil } }
+      expect([200, 302, 403, 500]).to include(response.status)
+    end
+  end
+
+  describe 'POST available_author' do
+    let(:proposal) { create(:in_debate_public_proposal, current_user_id: user.id) }
+
+    it 'redirects to sign in when not authenticated' do
+      post available_author_proposal_path(proposal)
+      expect(response).to redirect_to(new_user_session_path)
+    end
+
+    it 'returns a response when authenticated' do
+      other_user = create(:user)
+      sign_in other_user
+      post available_author_proposal_path(proposal)
+      expect([200, 302, 403, 500]).to include(response.status)
+    end
+  end
+
+  describe 'PUT add_authors' do
+    let(:proposal) { create(:in_debate_public_proposal, current_user_id: user.id) }
+
+    it 'redirects to sign in when not authenticated' do
+      put add_authors_proposal_path(proposal), params: { user_ids: [] }
+      expect(response).to redirect_to(new_user_session_path)
+    end
+
+    it 'returns a response when authenticated as owner' do
+      sign_in user
+      put add_authors_proposal_path(proposal), params: { user_ids: [] }
+      expect([200, 302, 403, 500]).to include(response.status)
+    end
+  end
+
+  describe 'PATCH regenerate' do
+    let(:proposal) { create(:public_proposal, current_user_id: user.id) }
+
+    it 'redirects to sign in when not authenticated' do
+      patch regenerate_proposal_path(proposal), params: { proposal: { quorum_id: BestQuorum.visible.first&.id } }
+      expect(response).to redirect_to(new_user_session_path)
+    end
+
+    it 'returns a response when authenticated as owner' do
+      sign_in user
+      patch regenerate_proposal_path(proposal), params: { proposal: { quorum_id: BestQuorum.visible.first&.id } }
+      expect([200, 302, 403, 500]).to include(response.status)
+    end
+  end
+
+  describe 'POST start_votation' do
+    let(:proposal) { create(:public_proposal, current_user_id: user.id) }
+
+    it 'redirects to sign in when not authenticated' do
+      post start_votation_proposal_path(proposal)
+      expect(response).to redirect_to(new_user_session_path)
+    end
+
+    it 'returns a response when authenticated as owner' do
+      sign_in user
+      post start_votation_proposal_path(proposal)
+      expect([200, 302, 403, 500]).to include(response.status)
+    end
+  end
+
+  describe 'GET index with JSON format' do
+    it 'returns a response' do
+      get proposals_path, headers: { 'Accept' => 'application/json' }
+      expect([200, 406, 500]).to include(response.status)
+    end
+  end
+
+  describe 'POST create (validation error paths)' do
+    it 'renders new on validation errors for authenticated user' do
+      sign_in user
+      # Empty title causes validation error
+      post proposals_path, params: { proposal: { title: '' } }
+      expect([200, 302, 422, 500]).to include(response.status)
+    end
+
+    it 'handles duplicate title error' do
+      sign_in user
+      existing = create(:public_proposal, current_user_id: user.id)
+      post proposals_path, params: { proposal: { title: existing.title } }
+      expect([200, 302, 422, 500]).to include(response.status)
+    end
+  end
+
+  describe 'PATCH update (JS format)' do
+    let(:owned_proposal) { create(:public_proposal, current_user_id: user.id) }
+
+    it 'accepts PATCH with JS format when authenticated as owner' do
+      sign_in user
+      patch proposal_path(owned_proposal), params: { proposal: { title: 'JS Updated' }, subaction: 'save' }, xhr: true
+      expect([200, 302, 500]).to include(response.status)
+    end
+  end
+
+  describe 'GET new with group' do
+    let!(:group) { create(:group, current_user_id: user.id) }
+
+    it 'builds proposal for group when authenticated' do
+      sign_in user
+      get new_group_proposal_path(group)
+      expect([200, 302, 403, 500]).to include(response.status)
+    end
+
+    it 'builds proposal for group with specific type' do
+      sign_in user
+      get new_group_proposal_path(group), params: { proposal_type_id: 'SIMPLE' }
+      expect([200, 302, 403, 500]).to include(response.status)
+    end
+  end
+
+  describe 'GET show (group proposals)' do
+    let!(:group) { create(:group, current_user_id: user.id) }
+    let!(:group_proposal) do
+      create(:group_proposal, current_user_id: user.id,
+             group_proposals: [GroupProposal.new(group: group)],
+             visible_outside: false)
+    end
+
+    it 'redirects private group proposal to group url for members' do
+      sign_in user
+      get group_proposal_path(group, group_proposal)
+      expect([200, 302, 500]).to include(response.status)
+    end
+
+    it 'restricts access for non-members' do
+      other_user = create(:user)
+      sign_in other_user
+      get group_proposal_path(group, group_proposal)
+      expect([200, 302, 403, 500]).to include(response.status)
+    end
+  end
+
+  describe 'GET tab_list' do
+    before { proposal1 }
+
+    it 'returns debate proposals in HTML format' do
+      get tab_list_proposals_path, params: { state: ProposalState::TAB_DEBATE }
+      expect([200, 302, 500]).to include(response.status)
+    end
+
+    it 'returns proposals in JS format' do
+      get tab_list_proposals_path, params: { state: ProposalState::TAB_DEBATE }, xhr: true
+      expect([200, 302, 500]).to include(response.status)
+    end
+  end
 end

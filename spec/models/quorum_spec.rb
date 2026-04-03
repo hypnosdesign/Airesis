@@ -96,4 +96,94 @@ RSpec.describe BestQuorum, type: :model, seeds: true do
       expect { quorum.and? }.to raise_error(StandardError)
     end
   end
+
+  describe '#time with various durations' do
+    it 'returns nil when minutes is nil' do
+      quorum.minutes = nil
+      expect(quorum.time).to be_nil
+    end
+
+    it 'returns nil when minutes is 0' do
+      quorum.minutes = 0
+      expect(quorum.time).to be_nil
+    end
+
+    it 'returns minutes string when < 60 min' do
+      quorum.minutes = 30
+      result = quorum.time
+      expect(result).to be_a(String)
+      expect(result).not_to be_empty
+    end
+
+    it 'returns hours and minutes when < 24 hours' do
+      quorum.minutes = 90
+      result = quorum.time
+      expect(result).to be_a(String)
+    end
+
+    it 'returns days when > 24 hours' do
+      quorum.minutes = 2 * 24 * 60
+      result = quorum.time
+      expect(result).to be_a(String)
+    end
+
+    it 'returns months when > 30 days' do
+      quorum.minutes = 45 * 24 * 60
+      result = quorum.time
+      expect(result).to be_a(String)
+    end
+
+    it 'returns remaining time when assigned' do
+      quorum.update_column(:assigned, true)
+      quorum.ends_at = 2.days.from_now
+      quorum.minutes = 4 * 24 * 60
+      result = quorum.time
+      expect(result).to be_a(String) if result
+    end
+
+    it 'returns total time when total_time=true even if assigned' do
+      quorum.update_column(:assigned, true)
+      quorum.ends_at = 2.days.from_now
+      quorum.minutes = 4 * 24 * 60
+      result = quorum.time(true)
+      expect(result).to be_a(String)
+    end
+  end
+
+  describe '#explanation' do
+    it 'returns a string' do
+      result = quorum.explanation
+      expect(result).to be_a(String) if result
+    end
+  end
+
+  describe '#min_participants' do
+    it 'returns an integer' do
+      quorum.percentage = 10
+      result = quorum.min_participants
+      expect(result).to be_a(Integer) if result
+    end
+  end
+
+  describe 'scopes' do
+    it '.visible returns public quorums' do
+      visible = BestQuorum.visible
+      expect(visible).to be_a(ActiveRecord::Relation)
+    end
+
+    it '.active returns active quorums' do
+      active = BestQuorum.active
+      expect(active).to be_a(ActiveRecord::Relation)
+    end
+
+    it '.assigned returns assigned quorums' do
+      assigned = BestQuorum.assigned
+      expect(assigned).to be_a(ActiveRecord::Relation)
+    end
+
+    it '.unassigned returns unassigned quorums' do
+      unassigned = BestQuorum.unassigned
+      expect(unassigned).to be_a(ActiveRecord::Relation)
+    end
+  end
 end

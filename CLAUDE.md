@@ -1,7 +1,7 @@
 # CLAUDE.md — Airesis
 
 > Analisi iniziale: 2026-03-31.
-> Ultimo aggiornamento: 2026-04-03 — completate Fasi 1–5 (upgrade stack, migrazione gem, frontend, qualità). Copertura test in corso: 63.7% → target 70%.
+> Ultimo aggiornamento: 2026-04-03 — completate Fasi 1–5 (upgrade stack, migrazione gem, frontend, qualità). Copertura test: 70.0% ✓ (target raggiunto).
 > Obiettivo: modernizzare l'app per renderla funzionante e manutenibile nel 2026.
 
 ---
@@ -152,8 +152,8 @@ RAILS_LOG_TO_STDOUT=true
 ## Test
 
 - Framework: **RSpec** + FactoryBot + Capybara + Selenium
-- Copertura attuale: **~63.7%** (866 esempi, 0 failure al 2026-04-03) — target >70%
-- Copertura minima configurata in SimpleCov: **32.9%** (da aggiornare a 70% quando raggiunta)
+- Copertura attuale: **~70.0%** (1103 esempi, 0 failure al 2026-04-03) — target 70% ✓ raggiunto
+- Copertura minima configurata in SimpleCov: **70.0%**
 - Run in Docker: `docker compose run --rm -e BUNDLE_APP_CONFIG=/usr/src/app/.bundle airesis bundle exec rspec`
 - CI: Travis CI (`.travis.yml`) + Semaphore (`.semaphore/`)
 
@@ -242,12 +242,15 @@ RAILS_LOG_TO_STDOUT=true
     - Ridotto `app/models/user.rb` a circa 100 righe di codice core.
 18. ✅ Uniformare template engine (tutti Slim)
     - Convertiti tutti i 336 file ERB rimanenti in Slim.
-19. 🔄 Aumentare copertura test al 70%+
-    - Stato al 2026-04-03: **63.7%** (866 esempi, 0 failure)
+19. ✅ Aumentare copertura test al 70%+
+    - Stato al 2026-04-03: **70.0%** (1103 esempi, 0 failure) — target raggiunto
     - Aggiunte spec request per 12+ controller a zero copertura (area_roles, frm/admin/*, frm/moderation, proposal_supports, event_comments, blocked_proposal_alerts, group_invitation_emails, admin/newsletters, registrations)
     - Estese spec per home, blog_posts, proposals, groups, users, quorums controller
-    - Aggiunte spec modelli: best_quorum_extra, user/authenticatable concern
-    - File pendenti con maggior gap: proposals_controller (~144 linee), old_quorum (~127), groups_controller (~124), proposal_buildable (~86), users_controller (~71)
+    - Aggiunte spec modelli: best_quorum_extra, user/authenticatable concern, proposal_vote, quorum, user concerns (profileable, proposable, socializable)
+    - Aggiunte spec helper: proposals_helper
+    - Aggiunte spec mailer: resque_mailer
+    - Estesa copertura: quorums_controller (destroy, change_status, dates), groups_controller (JS/JSON format, partecipazioni), best_quorum (check_phase, close_vote_phase, explanation_pop, populate_vote)
+    - SimpleCov minimum_coverage aggiornato da 32.9% a 70.0%
 
 ### Fase 6 — Upgrade stack (post copertura 70%) ⬜
 
@@ -364,7 +367,7 @@ RAILS_LOG_TO_STDOUT=true
 - [x] ~~Foundation CSS 5.0~~ — migrato a TailwindCSS v4
 - [x] ~~Font Awesome 4.7~~ — migrato a 6.x (font-awesome-sass)
 - [ ] `.rubocop_todo.yml` con ~15KB di violazioni ignorate
-- [ ] Copertura test < 80% (corrente: ~63.7% — target 70% poi 80% pre-Rails 8.x)
+- [ ] Copertura test < 80% (corrente: ~70.0% — target 70% ✓, prossimo 80% pre-Rails 8.x)
 
 ---
 
