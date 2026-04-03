@@ -1,8 +1,0 @@
-ul.breadcrumbs
-  li
-    = link_to 'All working areas', group_group_areas_url(@group)
-  li.current
-    = @group_area.name
-= render 'group_areas/edit'
-= content_for :left_panel do
-  = render partial: 'groups/administration_panel'

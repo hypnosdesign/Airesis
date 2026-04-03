@@ -1,9 +1,0 @@
-h1
-  | New reply
-- if @reply.errors.any?
-  ul
-    - @reply.errors.full_messages.each do |msg|
-      li
-        = msg
-= render partial: @reply, locals: { button_name: "Reply" }
-= link_to 'Back', replies_path

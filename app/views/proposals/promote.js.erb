@@ -1,0 +1,19 @@
+$('body').append('<%= j render 'promote' %>');
+$('#promote_container').foundation().foundation('reveal', 'open');
+$('.legend').hide();
+$("#promote_form").quickWizard({
+  prevButton: '<button id="form-wizard-prev" class="btn" type="button"><i class="fa-solid fa-arrow-left"></i><%= j t('buttons.go_back') %></button>',
+  nextButton: '<button id="form-wizard-next" class="btn btn-primary" type="button"><i class="fa-solid fa-arrow-right"></i><%= j t('buttons.next') %></button>',
+  clickableBreadCrumbs: true,
+  breadCrumbListClass: 'bread-crumb',
+  nextCallback: function() {},
+  prevCallback: function() {},
+  submit: '.wizard[type = "submit"]'
+});
+$('#promote_proposal').click(function (e) {
+  $('#promote_container').foundation('reveal', 'open');
+  e.preventDefault();
+  return false;
+});
+try { FB.XFBML.parse(); } catch(ex) {}
+twttr.widgets.load();

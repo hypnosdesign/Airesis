@@ -1,0 +1,48 @@
+<div class="flex flex-wrap">
+  <div class="w-full lg:w-8/12">
+    <div id="my_friends" class="friends_scroll">
+      <input class="search" placeholder="Search">
+      <ul class="list friends_list">
+        <% current_user.facebook.get_connections("me", "friends?fields=id,name,first_name, picture.type(square)").each do |friend| %>
+          <li class="fb_friend" data-id="<%= friend['id'] %>">
+            <div class="card bg-base-200 p-4">
+              <div class="flex flex-wrap">
+                <div class="w-full lg:w-2/12">
+                  <%= image_tag friend['picture']['data']['url'] %>
+                </div>
+                <div class="w-full lg:w-10/12">
+                  <%= form_for 'message', url: facebook_send_message_proposal_url(@proposal), remote: true do |f| %>
+                    <div class="flex flex-wrap name">
+                      <div class="w-full">
+                        <%= friend['name'] %>
+                      </div>
+                    </div>
+                    <div class="flex flex-wrap">
+                      <div class="w-full lg:w-9/12">
+                        <%= f.hidden_field :friend_id, value: friend['id'] %>
+                        <%= f.hidden_field :url, value: @proposal.private ? group_proposal_url(@group, @proposal) : proposal_url(@proposal) %>
+                        <%= f.text_area :body, value: "Hi #{friend['first_name']},\ntake a look at this proposal on Airesis. You may be interested in it!", class: 'fb_msg_area' %>
+                      </div>
+                      <div class="w-full lg:w-3/12">
+                        <%= f.button t('buttons.send'), class: 'btn' %>
+                      </div>
+                    </div>
+                  <% end %>
+                </div>
+              </div>
+            </div>
+          </li>
+        <% end %>
+      </ul>
+    </div>
+  </div>
+  <div class="w-full lg:w-4/12">
+    <div class="flex flex-wrap">
+      <p><%= 'Invitations will be sent via Facebook message along with a link to this proposal so your friends can participate.' %></p>
+    </div>
+    <div id="sent_friends" class="flex flex-wrap sent_friends" data-added="0"></div>
+  </div>
+</div>
+<script type="text/javascript">
+  var options = { valueNames: [ 'name' ] }; var friendsList = new List('my_friends', options);
+</script>

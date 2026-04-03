@@ -1,0 +1,92 @@
+<% if @group %>
+  <h2><%= "Evento del gruppo: #{@group.name}" %></h2>
+<% else %>
+  admin event
+<% end %>
+
+<%= simple_form_for @group.present? ? [@group, @event] : @event, validate: true do |f| %>
+  <%= f.hidden_field :organizer_id %>
+  <div class="flex flex-wrap">
+    <div class="w-full md:w-1/2 p-2">
+      <%= f.input :title %>
+      <%= f.input :description, rows: 4, cols: 30 %>
+      <% if @event.votation? %>
+        <%= f.hidden_field :private %>
+      <% else %>
+        <%= f.label :private do %>
+          <%= f.check_box :private, title: t('pages.events.new.private_tooltip') %>
+          <%= t('activerecord.attributes.event.private') %>
+        <% end %>
+      <% end %>
+    </div>
+  </div>
+
+  <div class="flex flex-wrap collapse">
+    <%= f.label :starttime %>
+  </div>
+  <div class="w-9/12">
+    <%= f.text_field :starttime, as: :string, value: (l @event.starttime, format: :datetimepicker) %>
+  </div>
+  <div class="w-3/12">
+    <span class="postfix">
+      <i class="fa-solid fa-calendar"></i>
+    </span>
+  </div>
+
+  <div class="flex flex-wrap collapse">
+    <%= f.label :endtime %>
+  </div>
+  <div class="w-9/12">
+    <%= f.text_field :endtime, as: :string, value: (l @event.endtime, format: :datetimepicker) %>
+  </div>
+  <div class="w-3/12">
+    <span class="postfix">
+      <i class="fa-solid fa-calendar"></i>
+    </span>
+  </div>
+
+  <%= f.label :all_day do %>
+    <%= f.check_box :all_day %>
+    <%= t('activerecord.attributes.event.all_day') %>
+  <% end %>
+  <%= f.hidden_field :commit_button, value: "" %>
+
+  <div class="w-full md:w-1/2 p-2">
+    <% if @event.meeting? %>
+      <%= f.simple_fields_for :meeting, @meeting do |m| %>
+        <%= m.simple_fields_for :place, @place do |p| %>
+          <div id="edit_luogo">
+            <%= p.input :municipality_id, input_html: {style: 'width:100%', 'data-pre' => {id: @event.place.municipality.id, text: @event.place.municipality.description}.to_json} %>
+            <%= p.input :address %>
+            <%= p.hidden_field :latitude_original %>
+            <%= p.hidden_field :longitude_original %>
+            <%= p.hidden_field :latitude_center %>
+            <%= p.hidden_field :longitude_center %>
+            <%= p.hidden_field :zoom %>
+          </div>
+          <div id="edit_map_canvas" style="width: 320px; height: 320px;"></div>
+        <% end %>
+      <% end %>
+    <% end %>
+  </div>
+
+  <div class="flex flex-wrap">
+    <div class="w-full">
+      <a class="btn" href="#" onclick="$('#event_edit').foundation('reveal','close');$('#event_edit').remove();">
+        <%= t('buttons.cancel') %>
+      </a>
+      <%= f.submit t('buttons.update'), class: 'btn btn-primary', data: {disable_with: t('updating')} %>
+    </div>
+  </div>
+<% end %>
+
+<a class="close-reveal-modal">&times;</a>
+
+<% if @event.place %>
+  <% _place_js = "EventsEdit.placeDefined = true; EventsEdit.latitudeOriginal = #{@event.place.latitude_original}; EventsEdit.longitudeOriginal = #{@event.place.longitude_original}; EventsEdit.latitudeCenter = #{@event.place.latitude_center}; EventsEdit.longitudeCenter = #{@event.place.longitude_center}; EventsEdit.zoom = #{@event.place.zoom}; " %>
+<% else %>
+  <% _place_js = "" %>
+<% end %>
+<script type="text/javascript">
+  EventsEdit.eventId = <%= @event.id %>; EventsEdit.votation = <%= @event.votation? %>; <%= _place_js %>
+</script>

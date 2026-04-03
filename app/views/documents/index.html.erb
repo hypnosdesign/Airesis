@@ -1,0 +1,18 @@
+<% @extend = true %>
+<% @page_title = t('pages.groups.documents.documents_archive') %>
+<%= render layout: "layouts/page_title", locals: {title: @page_title} do %>
+<% end %>
+
+<div class="flex flex-wrap w-full">
+  <div class="flex flex-wrap">
+    <div id="storage_size_container" class="w-full md:w-1/4 p-2">
+      <%= render partial: 'storage_size' %>
+    </div>
+    <div class="w-full md:w-3/4 p-2">
+      <div id="elfinder"></div>
+    </div>
+  </div>
+</div>
+<script type="text/javascript" charset="utf-8">
+  $(function () { var elf = $('#elfinder').elfinder({ url: '/elfinder?group_id=<%= @group.id %>', transport: new elFinderSupportVer1(), commands: [ 'open', 'up', 'back', 'forward', 'getfile', 'download', 'rm', 'rename', 'mkdir', 'mkfile', 'upload', 'copy', 'cut', 'paste', 'edit', 'info', 'view', 'help', 'sort' ], uiOptions: { toolbar: [ ['back', 'forward'], ['mkdir', 'upload'], ['open', 'download'], ['info'], ['copy', 'cut', 'paste'], ['rm'], ['duplicate', 'rename', 'edit', 'resize'], ['extract', 'archive'], ['search'], ['view', 'sort'], ['help'] ] }, lang: '<%= I18n.locale.to_s.gsub('-','_') %>', resizable: false }).elfinder('instance'); elf.bind('upload', function (event) { $.ajax({ url: "<%= reload_storage_size_group_url(@group) %>", dataType: 'script', type: 'get' }); }) .bind('remove', function (event) { $.ajax({ url: "<%= reload_storage_size_group_url(@group) %>", dataType: 'script', type: 'get' }); }); });
+</script>

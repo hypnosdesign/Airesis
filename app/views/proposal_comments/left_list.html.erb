@@ -1,0 +1,8 @@
+<% @page_title = 'Contributi alla proposta ' + @proposal.title %>
+<h1><%= @page_title %></h1>
+<%= render 'proposals/comments' %>
+<% content_for :left_panel do %>
+  <div class="card bg-base-200 p-4">
+    <%= link_to t('pages.proposal_histories.index.back_to_proposal'), @proposal, class: 'btn btn-primary' %>
+  </div>
+<% end %>

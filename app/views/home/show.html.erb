@@ -1,0 +1,21 @@
+<% @extend = true %>
+<div class="homecont">
+  <ul class="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-4">
+    <li>
+      <%= render partial: "home/portlets/proposals", layout: "layouts/portlet" %>
+    </li>
+    <li>
+      <%= render partial: "home/portlets/votation", layout: "layouts/portlet" %>
+    </li>
+    <li>
+      <%= render partial: "home/portlets/topics", layout: "layouts/portlet" %>
+    </li>
+    <li>
+      <%= render partial: "home/portlets/territory", layout: "layouts/portlet" %>
+    </li>
+  </ul>
+</div>
+
+<%= content_for :left_panel do %>
+  <%= render partial: 'users/user_groups_panel' %>
+<% end %>
