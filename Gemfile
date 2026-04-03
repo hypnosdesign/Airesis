@@ -49,7 +49,7 @@ gem 'simple_form'
 gem 'simple_token_authentication'
 gem 'sinatra', require: false
 gem 'sitemap_generator'
-gem 'slim-rails'
+# gem 'slim-rails' # removed: all views converted to ERB
 gem 'sprockets', '~> 4.0'
 gem 'timezone', git: 'https://github.com/coorasse/timezone'
 
@@ -83,8 +83,8 @@ group :development do
   gem 'better_errors'
   gem 'binding_of_caller'
   gem 'bullet'
-  gem 'erb2slim'
-  gem 'html2slim'
+  # gem 'erb2slim' # removed: no more Slim files
+  # gem 'html2slim' # removed: no more Slim files
   gem 'i18n-tasks'
 
 
