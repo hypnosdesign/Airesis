@@ -3,7 +3,7 @@ html.no-js lang="en" data-theme="nord"
   head
     meta charset="utf-8"
     title = t('home.tags.title')
-    meta name="apple-mobile-web-app-capable" content="yes"
+    meta name="mobile-web-app-capable" content="yes"
     meta name="description" content=t('home.tags.description')
     meta property="og:title" content=t('home.tags.title')
     meta property="og:type" content="website"
@@ -50,7 +50,7 @@ html.no-js lang="en" data-theme="nord"
           h1.text-3xl.md:text-5xl.font-extrabold.mt-8.text-base-content.leading-tight = t('home.intro.paragraph_1.title')
 
         .grid.grid-cols-1.md:grid-cols-2.gap-12.mt-16
-          .card.bg-base-100.p-8.shadow-2xl.rounded-2xl.border.border-base-300
+          .card.bg-base-100.p-8.shadow-brutal-lg.border.border-base-300
             = form_for resource, as: resource_name, url: user_session_path do |f|
               .space-y-6
                 - if ::Configuration.socialnetwork_active
@@ -76,7 +76,7 @@ html.no-js lang="en" data-theme="nord"
                 div
                   = f.submit t('pages.home.index.login'), class: 'btn btn-primary w-full'
 
-          .card.bg-base-100.p-8.shadow-2xl.rounded-2xl.border.border-base-300.flex.flex-col.justify-center
+          .card.bg-base-100.p-8.shadow-brutal-lg.border.border-base-300.flex.flex-col.justify-center
             h2.text-2xl.font-bold.mb-6.text-base-content = t('pages.home.index.field_1.title') rescue "Benvenuto"
             p.text-base-content/70.text-lg.mb-10.leading-relaxed = t('pages.home.index.field_1.content')
             .flex.flex-col.sm:flex-row.gap-4
@@ -84,7 +84,7 @@ html.no-js lang="en" data-theme="nord"
               = link_to t('pages.home.index.try_it'), open_space_path, class: 'btn btn-outline flex-1'
 
         .mt-20.text-center
-          = image_tag 'landing/hero-airesis.png', class: 'mx-auto rounded-lg shadow-xl border border-base-300'
+          = image_tag 'landing/hero-airesis.png', class: 'mx-auto shadow-brutal border border-base-300'
 
     section#whatis.bg-primary.text-primary-content.py-20
       .max-w-5xl.mx-auto.px-4.flex.items-start.space-x-8
@@ -99,10 +99,10 @@ html.no-js lang="en" data-theme="nord"
       .max-w-7xl.mx-auto.px-4.flex.flex-col.md:flex-row.items-center.gap-16
         .md:w-1/2.relative
           .absolute.-inset-4.bg-blue-100.rounded-full.blur-3xl.opacity-30
-          = image_tag 'presentation/group.png', class: 'relative rounded-2xl shadow-2xl border border-base-300 w-full'
+          = image_tag 'presentation/group.png', class: 'relative shadow-brutal-lg border border-base-300 w-full'
         .md:w-1/2
-          .card.p-10.bg-base-200.rounded-3xl.border.border-base-300
-            .inline-flex.items-center.justify-center.p-3.bg-primary.rounded-xl.shadow-lg.mb-6
+          .card.p-10.bg-base-200.border.border-base-300
+            .inline-flex.items-center.justify-center.p-3.bg-primary.shadow-brutal.mb-6
               i.fa-solid.fa-users.text-primary-content.text-xl
             h3.text-3xl.font-bold.mb-6.text-base-content = t('home.whatis.paragraph_2.title')
             p.text-base-content/70.text-lg.leading-relaxed = t('home.whatis.paragraph_2.content_html', groups: Group.count)
@@ -110,10 +110,10 @@ html.no-js lang="en" data-theme="nord"
       .max-w-7xl.mx-auto.px-4.flex.flex-col.md:flex-row-reverse.items-center.gap-16
         .md:w-1/2.relative
           .absolute.-inset-4.bg-green-100.rounded-full.blur-3xl.opacity-30
-          = image_tag 'presentation/permissions.png', class: 'relative rounded-2xl shadow-2xl border border-base-300 w-full'
+          = image_tag 'presentation/permissions.png', class: 'relative shadow-brutal-lg border border-base-300 w-full'
         .md:w-1/2
-          .card.p-10.bg-base-200.rounded-3xl.border.border-base-300
-            .inline-flex.items-center.justify-center.p-3.bg-success.rounded-xl.shadow-lg.mb-6
+          .card.p-10.bg-base-200.border.border-base-300
+            .inline-flex.items-center.justify-center.p-3.bg-success.shadow-brutal.mb-6
               i.fa-solid.fa-shield-halved.text-success-content.text-xl
             h3.text-3xl.font-bold.mb-6.text-base-content = t('home.whatis.paragraph_3.title')
             p.text-base-content/70.text-lg.leading-relaxed = t('home.whatis.paragraph_3.content_html')
@@ -121,10 +121,10 @@ html.no-js lang="en" data-theme="nord"
       .max-w-7xl.mx-auto.px-4.flex.flex-col.md:flex-row.items-center.gap-16
         .md:w-1/2.relative
           .absolute.-inset-4.bg-purple-100.rounded-full.blur-3xl.opacity-30
-          = image_tag 'presentation/event.png', class: 'relative rounded-2xl shadow-2xl border border-base-300 w-full'
+          = image_tag 'presentation/event.png', class: 'relative shadow-brutal-lg border border-base-300 w-full'
         .md:w-1/2
-          .card.p-10.bg-base-200.rounded-3xl.border.border-base-300
-            .inline-flex.items-center.justify-center.p-3.bg-secondary.rounded-xl.shadow-lg.mb-6
+          .card.p-10.bg-base-200.border.border-base-300
+            .inline-flex.items-center.justify-center.p-3.bg-secondary.shadow-brutal.mb-6
               i.fa-solid.fa-calendar-check.text-secondary-content.text-xl
             h3.text-3xl.font-bold.mb-6.text-base-content = t('home.whatis.paragraph_5.title')
             p.text-base-content/70.text-lg.leading-relaxed = t('home.whatis.paragraph_5.content_html')
@@ -132,10 +132,10 @@ html.no-js lang="en" data-theme="nord"
       .max-w-7xl.mx-auto.px-4.flex.flex-col.md:flex-row-reverse.items-center.gap-16
         .md:w-1/2.relative
           .absolute.-inset-4.bg-orange-100.rounded-full.blur-3xl.opacity-30
-          = image_tag 'presentation/proposal.png', class: 'relative rounded-2xl shadow-2xl border border-base-300 w-full'
+          = image_tag 'presentation/proposal.png', class: 'relative shadow-brutal-lg border border-base-300 w-full'
         .md:w-1/2
-          .card.p-10.bg-base-200.rounded-3xl.border.border-base-300
-            .inline-flex.items-center.justify-center.p-3.bg-warning.rounded-xl.shadow-lg.mb-6
+          .card.p-10.bg-base-200.border.border-base-300
+            .inline-flex.items-center.justify-center.p-3.bg-warning.shadow-brutal.mb-6
               i.fa-solid.fa-lightbulb.text-warning-content.text-xl
             h3.text-3xl.font-bold.mb-6.text-base-content = t('home.whatis.paragraph_4.title')
             p.text-base-content/70.text-lg.leading-relaxed = t('home.whatis.paragraph_4.content_html', users: User.count, proposals: Proposal.count)
@@ -144,15 +144,15 @@ html.no-js lang="en" data-theme="nord"
       .max-w-5xl.mx-auto.px-4.text-center
         h2.text-3xl.md:text-4xl.font-bold.mb-16 Citations
         .grid.grid-cols-1.md:grid-cols-3.gap-12
-          blockquote.bg-neutral-focus.p-8.rounded-2xl.border-b-4.border-primary
+          blockquote.bg-neutral-focus.p-8.border-b-4.border-primary
             p.text-lg.italic.mb-6 "Quae optima sunt, esse communia."
             cite.block.font-bold.text-primary — Lucio Anneo Seneca
 
-          blockquote.bg-neutral-focus.p-8.rounded-2xl.border-b-4.border-success
+          blockquote.bg-neutral-focus.p-8.border-b-4.border-success
             p.text-lg.italic.mb-6 "The tragedy of modern democracies is that they have not yet succeeded in effecting democracy."
             cite.block.font-bold.text-success — Jacques Maritain
 
-          blockquote.bg-neutral-focus.p-8.rounded-2xl.border-b-4.border-warning
+          blockquote.bg-neutral-focus.p-8.border-b-4.border-warning
             p.text-lg.italic.mb-6 "Nothing is stronger than an idea whose time has come."
             cite.block.font-bold.text-warning — Victor Hugo
 

@@ -1,0 +1,38 @@
+<% content_for :left_panel do %>
+  <nav class="p-2">
+    <ul class="menu menu-lg w-full">
+      <li class="<%= 'bg-base-300' if ['proposals', 'proposal_revisions'].include?(controller_name) %>">
+        <%= link_to proposals_path do %>
+          <i class="fa-solid fa-file-lines"></i>
+          <%= t('pages.open_space.layout.proposals_button') %>
+        <% end %>
+      </li>
+      <li class="<%= 'bg-base-300' if controller_name == 'blogs' %>">
+        <%= link_to blogs_path do %>
+          <i class="fa-solid fa-newspaper"></i>
+          <%= t('pages.open_space.layout.blogs_button') %>
+        <% end %>
+      </li>
+      <li class="<%= 'bg-base-300' if controller_name == 'groups' %>">
+        <%= link_to groups_path do %>
+          <i class="fa-solid fa-users"></i>
+          <%= t('pages.open_space.layout.groups_button') %>
+        <% end %>
+      </li>
+      <li class="<%= 'bg-base-300' if controller_name == 'events' %>">
+        <%= link_to events_path do %>
+          <i class="fa-solid fa-calendar-days"></i>
+          <%= t('pages.open_space.layout.calendar_button') %>
+        <% end %>
+      </li>
+      <li class="<%= 'bg-base-300' if controller_name == 'tags' %>">
+        <%= link_to tags_path do %>
+          <i class="fa-solid fa-tags"></i>
+          <%= t('pages.open_space.layout.tags_button') %>
+        <% end %>
+      </li>
+    </ul>
+  </nav>
+<% end %>
+
+<%= render 'layouts/general' %>

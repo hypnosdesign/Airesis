@@ -1,4 +1,62 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
 @import "tailwindcss";
+@plugin "daisyui" {
+  themes: nord --default, night;
+}
+
+@theme {
+  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+  --shadow-brutal: 4px 4px 0px oklch(0% 0 0 / 20%);
+  --shadow-brutal-lg: 6px 6px 0px oklch(0% 0 0 / 25%);
+}
+
+/*
+ * Neobrutalismo: angoli netti, bordi spessi, ombre solide.
+ * Sovrascrive i radius e border dei temi nord/night.
+ */
+:root, [data-theme] {
+  --radius-selector: 0rem;
+  --radius-field: 0rem;
+  --radius-box: 0rem;
+  --border: 2px;
+  --depth: 1;
+  --noise: 0;
+}
+
+/* Ombre solide neobrutaliste (no blur) */
+.shadow-brutal {
+  box-shadow: 4px 4px 0px oklch(0% 0 0 / 20%);
+}
+
+.shadow-brutal-lg {
+  box-shadow: 6px 6px 0px oklch(0% 0 0 / 25%);
+}
+
+[data-theme="night"] .shadow-brutal,
+[data-theme="night"] .shadow-brutal-lg {
+  box-shadow: 4px 4px 0px oklch(100% 0 0 / 10%);
+}
+
+/* Card e modal con bordo netto e ombra solida */
+.card {
+  border: 2px solid oklch(0% 0 0 / 10%);
+  box-shadow: 4px 4px 0px oklch(0% 0 0 / 15%);
+}
+
+[data-theme="night"] .card {
+  border-color: oklch(100% 0 0 / 10%);
+  box-shadow: 4px 4px 0px oklch(0% 0 0 / 40%);
+}
+
+.modal-box {
+  border: 2px solid oklch(0% 0 0 / 15%);
+  box-shadow: 8px 8px 0px oklch(0% 0 0 / 20%);
+}
+
+[data-theme="night"] .modal-box {
+  border-color: oklch(100% 0 0 / 15%);
+  box-shadow: 8px 8px 0px oklch(0% 0 0 / 50%);
+}
 
 /*
  * Foundation 5 → Tailwind compatibility layer.
