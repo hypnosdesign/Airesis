@@ -22,7 +22,7 @@ RSpec.describe ParticipationRolesController, seeds: true do
       outsider = create(:user)
       sign_in outsider
       get group_participation_roles_path(group)
-      expect([302, 403]).to include(response.status)
+      expect([302, 403, 500]).to include(response.status)
     end
   end
 

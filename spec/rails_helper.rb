@@ -2,7 +2,7 @@ require 'simplecov'
 
 unless ENV['NO_COVERAGE']
   SimpleCov.start 'rails'
-  SimpleCov.minimum_coverage 32.90
+  SimpleCov.minimum_coverage 70.00
   SimpleCov.maximum_coverage_drop 0
 end
 

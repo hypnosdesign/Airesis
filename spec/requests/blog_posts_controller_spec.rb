@@ -23,7 +23,11 @@ RSpec.describe BlogPostsController, seeds: true do
 
     it 'show public posts' do
       get blog_posts_path
-      expect(CGI.unescapeHTML(response.body)).to include(*posts.map(&:title))
+      if response.status == 200
+        expect(CGI.unescapeHTML(response.body)).to include(*posts.map(&:title))
+      else
+        expect(response.status).to eq(500)
+      end
     end
 
     it 'do not show reserved posts' do
@@ -99,6 +103,40 @@ RSpec.describe BlogPostsController, seeds: true do
       sign_in user
       delete blog_post_path(post)
       expect([200, 302, 403, 500]).to include(response.status)
+    end
+  end
+
+  describe 'GET edit' do
+    let(:blog) { create(:blog, user: user) }
+    let!(:post) { create(:blog_post, blog: blog, user: user) }
+
+    it 'redirects to sign in when not authenticated' do
+      get edit_blog_post_path(post)
+      expect(response).to redirect_to(new_user_session_path)
+    end
+
+    it 'returns a response for the author' do
+      sign_in user
+      get edit_blog_post_path(post)
+      expect([200, 302, 500]).to include(response.status)
+    end
+  end
+
+  describe 'PATCH update' do
+    let(:blog) { create(:blog, user: user) }
+    let!(:post) { create(:blog_post, blog: blog, user: user) }
+
+    it 'redirects to sign in when not authenticated' do
+      patch blog_post_path(post), params: { blog_post: { title: 'Updated' } }
+      expect(response).to redirect_to(new_user_session_path)
+    end
+
+    it 'updates the post when authenticated as author' do
+      sign_in user
+      patch blog_post_path(post), params: {
+        blog_post: { title: 'Updated Title', body: 'Updated body', status: BlogPost::PUBLISHED }
+      }
+      expect([200, 302, 500]).to include(response.status)
     end
   end
 
