@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-RSpec.describe 'users/show.html.slim' do
+RSpec.describe 'users/show.html.erb' do
   include Devise::Test::ControllerHelpers
 
   context 'with group participations' do
