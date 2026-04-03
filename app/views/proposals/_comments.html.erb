@@ -1,0 +1,9 @@
+<div id="proposalComments" class="blogComments">
+  <% if @proposal_comment_search.proposal_comments.any? %>
+    <%= render partial: 'proposals/comment', collection: @proposal_comment_search.proposal_comments, as: :comment %>
+  <% else %>
+    <div class="no-contributes-yet card bg-info/10 border-2 border-info p-4">
+      <p><%= t('pages.proposals.show.no_contributes_yet') %></p>
+    </div>
+  <% end %>
+</div>

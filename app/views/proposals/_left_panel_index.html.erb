@@ -1,0 +1,148 @@
+<div class="card bg-base-200 p-3 mb-2">
+  <%= render 'proposals/new_proposal' %>
+</div>
+
+<% if @group && @group.enable_areas && @group.group_areas.length > 0 && ::Configuration.group_areas %>
+  <div class="card bg-base-200 p-3 mb-2">
+    <h4 class="font-semibold mb-2"><%= t('pages.proposals.index.group_areas_title') %></h4>
+    <ul class="menu menu-sm">
+      <li>
+        <% if params[:group_area_id] %>
+          <%= link_to t('pages.proposals.index.no_group_areas'), current_url(group_area_id: nil) %>
+        <% else %>
+          <span class="font-semibold"><%= t('pages.proposals.index.all_areas') %></span>
+        <% end %>
+      </li>
+      <% @group.group_areas.each do |area| %>
+        <li>
+          <% if params[:group_area_id] == area.id.to_s %>
+            <span class="font-semibold"><%= area.name %></span>
+          <% else %>
+            <%= link_to area.name, current_url(group_area_id: area.id) %>
+          <% end %>
+        </li>
+      <% end %>
+    </ul>
+  </div>
+<% else %>
+  <div class="card bg-base-200 p-3 mb-2">
+    <h4 class="font-semibold mb-2"><%= t('pages.proposals.index.territory') %></h4>
+    <%= form_tag current_url, method: :get do %>
+      <% if @search.interest_border %>
+        <%= select_tag :interest_border, options_for_select([[@search.interest_border.text, @search.interest_border.key]], @search.interest_border.key), title: t('buttons.search'), class: 'select select-bordered select-sm w-full interest_borders' %>
+      <% else %>
+        <%= select_tag :interest_border, [], title: t('buttons.search'), class: 'select select-bordered select-sm w-full interest_borders' %>
+      <% end %>
+    <% end %>
+  </div>
+<% end %>
+
+<% if ::Configuration.proposal_categories %>
+  <div class="card bg-base-200 p-3 mb-2">
+    <h4 class="font-semibold mb-2 <%= 'text-primary' if params[:category] %>"><%= t('pages.proposals.index.categories_title') %></h4>
+    <ul class="menu menu-sm">
+      <li>
+        <% if params[:category] %>
+          <%= link_to t('pages.proposals.index.all_categories'), current_url(category: nil) %>
+        <% else %>
+          <span class="font-semibold"><%= t('pages.proposals.index.all_categories') %></span>
+        <% end %>
+      </li>
+      <% ProposalCategory.for_menu(@group).each do |category| %>
+        <li>
+          <div class="flex items-center gap-2">
+            <%= image_tag("proposal_categories/#{category.name}_s.png", alt: category.description, title: category.description, style: "width:18px") %>
+            <% if params[:category] == category.id.to_s %>
+              <span class="font-semibold"><%= category.description %></span>
+            <% else %>
+              <%= link_to category.description, current_url(category: category.id) %>
+            <% end %>
+          </div>
+        </li>
+      <% end %>
+    </ul>
+  </div>
+<% end %>
+
+<% if @group %>
+  <div class="card bg-base-200 p-3 mb-2">
+    <h4 class="font-semibold mb-2 <%= 'text-primary' if params[:type] %>"><%= t('pages.proposals.index.proposal_types_title') %></h4>
+    <ul class="menu menu-sm">
+      <li>
+        <% if params[:type] %>
+          <%= link_to t('pages.proposals.index.all_proposal_types'), current_url(type: nil) %>
+        <% else %>
+          <span class="font-semibold"><%= t('pages.proposals.index.all_proposal_types') %></span>
+        <% end %>
+      </li>
+      <% ProposalType.for_menu(@group).each do |type| %>
+        <li>
+          <div class="flex items-center gap-2">
+            <%= image_tag("proposal_types/#{type.name.downcase}_ico.png", alt: type.description, title: type.description, style: "width:18px") %>
+            <% if params[:type] == type.id.to_s %>
+              <span class="font-semibold"><%= type.description %></span>
+            <% else %>
+              <%= link_to type.description, current_url(type: type.id) %>
+            <% end %>
+          </div>
+        </li>
+      <% end %>
+    </ul>
+  </div>
+<% end %>
+
+<div class="card bg-base-200 p-3 mb-2">
+  <h4 class="font-semibold mb-2"><%= t('pages.proposals.left_panel.creation_date') %></h4>
+  <ul class="menu menu-sm">
+    <li><%= link_to t('pages.proposals.left_panel.any_date'), current_url(time: nil), class: 'menu_item', data: { type: 'w' } %></li>
+    <li><%= link_to t('pages.proposals.left_panel.last_hour'), current_url({time: {start: (Time.now - 1.hour).to_i * 1000, end: Time.now.to_i * 1000, type: '1h'}}), class: 'menu_item', data: { type: '1h' } %></li>
+    <li><%= link_to t('pages.proposals.left_panel.last_24_hour'), current_url({time: {start: (Time.now - 24.hours).to_i * 1000, end: Time.now.to_i * 1000, type: '24h'}}), class: 'menu_item', data: { type: '24h' } %></li>
+    <li><%= link_to t('pages.proposals.left_panel.last_week'), current_url({time: {start: (Time.now - 7.days).to_i * 1000, end: Time.now.to_i * 1000, type: '7d'}}), class: 'menu_item', data: { type: '7d' } %></li>
+    <li><%= link_to t('pages.proposals.left_panel.last_month'), current_url({time: {start: (Time.now - 1.month).to_i * 1000, end: Time.now.to_i * 1000, type: '1m'}}), class: 'menu_item', data: { type: '1m' } %></li>
+    <li><%= link_to t('pages.proposals.left_panel.last_year'), current_url({time: {start: (Time.now - 1.year).to_i * 1000, end: Time.now.to_i * 1000, type: '1y'}}), class: 'menu_item', data: { type: '1y' } %></li>
+    <li>
+      <a href="#" class="menu_item" onclick="document.getElementById('choose_dates').showModal(); return false;">
+        <%= t('pages.proposals.left_panel.date_range') %>
+      </a>
+    </li>
+  </ul>
+</div>
+
+<dialog id="choose_dates" class="modal">
+  <div class="modal-box">
+    <form method="dialog">
+      <button class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2">✕</button>
+    </form>
+    <h2 class="text-xl font-bold mb-4"><%= t('pages.proposals.left_panel.choose_creation_date') %></h2>
+    <%= form_for 'time', { url: @group ? group_proposals_url(@group) : proposals_url, method: :get } do |f| %>
+      <%= hidden_field_tag :type, params[:type] if params[:type] %>
+      <%= hidden_field_tag :category, params[:category] if params[:category] %>
+      <%= hidden_field_tag :l, params[:l] if params[:l] %>
+      <%= hidden_field_tag :group_area_id, params[:group_area_id] if params[:group_area_id] %>
+      <%= hidden_field_tag :search, params[:search] if params[:search] %>
+      <%= hidden_field_tag :or, params[:or] if params[:or] %>
+      <div class="form-control mb-4">
+        <%= f.label :start_w, t('label.from').capitalize, class: 'label' %>
+        <%= f.text_field :start_w, value: (params[:time][:start_w] if params[:time]), class: 'input input-bordered w-full datePicker', autocomplete: 'off', data: { start_view: 4, min_view: 2 } %>
+        <%= f.hidden_field :start, value: (params[:time][:start] if params[:time]) %>
+      </div>
+      <div class="form-control mb-4">
+        <%= f.label :end_w, t('label.to').capitalize, class: 'label' %>
+        <%= f.text_field :end_w, value: (params[:time][:end_w] if params[:time]), class: 'input input-bordered w-full datePicker', autocomplete: 'off', data: { start_view: 4, min_view: 2 } %>
+        <%= f.hidden_field :end, value: (params[:time][:end] if params[:time]) %>
+      </div>
+      <%= f.hidden_field :type, value: 'f' %>
+      <div class="flex gap-2">
+        <button type="button" class="btn btn-outline" onclick="document.getElementById('choose_dates').close()"><%= t('buttons.cancel') %></button>
+        <%= f.button t('buttons.search'), class: 'btn btn-primary', data: { disable_with: t('loading') } %>
+      </div>
+    <% end %>
+  </div>
+</dialog>
+
+<% if @group && (can? :view_proposal, @group) %>
+  <div class="card bg-base-200 p-3 mb-2">
+    <h4 class="font-semibold mb-2"><%= t('pages.proposals.index.search_title') %></h4>
+    <%= render partial: 'search_form' %>
+  </div>
+<% end %>
