@@ -4,7 +4,7 @@
   <% end %>
   <% @proposal_presentation = @proposal.proposal_presentations.where(user_id: current_user.id).first %>
   <% if can? :destroy, @proposal_presentation %>
-    <%= link_to t('.dont_want_to_be_an_author'), proposal_proposal_presentation_path(@proposal, @proposal_presentation), method: :delete, class: 'btn' %>
+    <%= link_to t('.dont_want_to_be_an_author'), proposal_proposal_presentation_path(@proposal, @proposal_presentation), data: { turbo_method: :delete }, class: 'btn' %>
   <% end %>
 <% else %>
   <% @proposal.users.each do |user| %>

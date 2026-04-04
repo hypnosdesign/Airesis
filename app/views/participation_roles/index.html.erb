@@ -4,7 +4,7 @@
   <%= render partial: 'groups/roles_panel' %>
 </div>
 <br>
-<%= link_to t('pages.groups.edit_permissions.new_role'), new_group_participation_role_url(@group), data: { remote: true, disable_with: t('loading') }, class: 'btn btn-primary' %>
+<%= link_to t('pages.groups.edit_permissions.new_role'), new_group_participation_role_url(@group), data: { disable_with: t('loading') }, class: 'btn btn-primary' %>
 <div id="edit_role" title="<%= t('pages.groups.edit_permissions.edit_role_title') %>" class="reveal-modal small" data-reveal>
 </div>
 <div id="new_role" class="reveal-modal small" data-reveal>

@@ -4,7 +4,7 @@
   </ul>
 </nav>
 <%= render layout: "layouts/page_title", locals: {title: t('pages.groups.edit_work_areas.manage_group_areas')} do %>
-  <%= link_to new_group_group_area_url(@group, manage: true), remote: true, class: "btn" do %>
+  <%= link_to new_group_group_area_url(@group, manage: true), class: "btn" do %>
     <i class="fa-solid fa-plus"></i>
     <%= t('pages.groups.edit_work_areas.manage.new_area') %>
   <% end %>

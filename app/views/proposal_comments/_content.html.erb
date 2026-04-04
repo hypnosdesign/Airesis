@@ -22,7 +22,7 @@
     </li>
     <% if can? :destroy, comment %>
       <li>
-        <%= link_to t('pages.proposals.delete_comment'), [@proposal, comment], method: :delete, data: {remote: true, confirm: t('pages.proposals.show.delete_contribute_confirmation')},
+        <%= link_to t('pages.proposals.delete_comment'), [@proposal, comment], data: { turbo_method: :delete , turbo_confirm: t('pages.proposals.show.delete_contribute_confirmation')},
                     class: "deleteCommentLink menu_item" %>
       </li>
     <% end %>

@@ -2,7 +2,7 @@
 <div class="card bg-base-200 p-4">
   <h2><%= @page_title %></h2>
 
-  <%= simple_form_for(@user, url: user_confirmation_path, html: { method: :post }) do |f| %>
+  <%= simple_form_for(@user, url: user_confirmation_path, html: { data: { turbo_method: :post } }) do |f| %>
     <%= render partial: 'fragments/error_messages', locals: { resource: @user } %>
     <%= f.input :email,
                 required: true,

@@ -8,14 +8,14 @@
   </div>
   <div class="blog-comment-footer text-sm text-base-content/60">
     <% if comment.likers.include? current_user %>
-      <%= link_to 'Unlike', like_event_event_comment_path(@event, comment), method: :post, remote: true, data: { other: 'Like' }, onclick: 'switchText(this)' %>
+      <%= link_to 'Unlike', like_event_event_comment_path(@event, comment), data: { turbo_method: :post, other: 'Like' }, onclick: 'switchText(this)' %>
     <% else %>
-      <%= link_to 'Like', like_event_event_comment_path(@event, comment), method: :post, remote: true, data: { other: 'Unlike' }, onclick: 'switchText(this)' %>
+      <%= link_to 'Like', like_event_event_comment_path(@event, comment), data: { turbo_method: :post, other: 'Unlike' }, onclick: 'switchText(this)' %>
     <% end %>
     &middot;
     <%= time_in_words(comment.created_at) %>
     <% if current_user and (current_user.id == comment.user_id) %>
-      <%= link_to t('pages.blog_posts.comment.delete_button'), [@event, comment], method: :delete, data: { remote: true, confirm: t('pages.blog_posts.comment.confirm_delete') }, class: "deleteCommentLink", style: 'float:right' %>
+      <%= link_to t('pages.blog_posts.comment.delete_button'), [@event, comment], data: { turbo_method: :delete, turbo_confirm: t('pages.blog_posts.comment.confirm_delete') }, class: "deleteCommentLink", style: 'float:right' %>
     <% end %>
   </div>
 </div>

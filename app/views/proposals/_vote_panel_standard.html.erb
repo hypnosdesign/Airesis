@@ -1,6 +1,6 @@
 <h4><%= t('pages.proposals.vote_panel.single_title') %></h4>
 <h4><%= @proposal.secret_vote ? t('pages.proposals.vote_panel.secret_vote') : t('pages.proposals.vote_panel.clear_vote') %></h4>
-<%= form_for 'data', url: votation_vote_path(proposal_id: @proposal.id), remote: true, method: :put do |f| %>
+<%= form_for 'data', url: votation_vote_path(proposal_id: @proposal.id), data: { turbo_method: :put } do |f| %>
   <%= f.hidden_field 'vote_type' %>
   <% if current_user.rotp_enabled && ::Configuration.rotp %>
     <%= f.label 'Token di sicurezza' %>

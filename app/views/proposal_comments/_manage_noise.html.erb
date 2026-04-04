@@ -32,7 +32,7 @@
     </div>
   </div>
 </div>
-<%= form_for 'comments', url: mark_noise_proposal_proposal_comments_path(@proposal.id), method: :post do |f| %>
+<%= form_for 'comments', url: mark_noise_proposal_proposal_comments_path(@proposal.id), data: { turbo_method: :post } do |f| %>
   <%= f.hidden_field 'active' %>
   <%= f.hidden_field 'inactive' %>
   <%= link_to t('buttons.cancel'), '#', class: 'btn', data: {'reveal-close' => ''} %>

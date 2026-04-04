@@ -6,7 +6,7 @@
           <span class="remove_area_button">
             <br>
             <% if can? :destroy, area %>
-              <%= link_to t('buttons.delete'), [@group, area], method: :delete, remote: true, confirm: t('pages.groups.edit_work_areas.manage.confirm_deletion') %>
+              <%= link_to t('buttons.delete'), [@group, area], data: { turbo_method: :delete }, turbo_confirm: t('pages.groups.edit_work_areas.manage.confirm_deletion') %>
             <% end %>
           </span>
         </div>

@@ -27,7 +27,7 @@
             <% end %>
           </td>
           <td>
-            <%= link_to group_frm_admin_mod_url(@group, group), method: :delete, data: { confirm: t('confirm_delete') }, class: 'btn btn-sm btn-error' do %>
+            <%= link_to group_frm_admin_mod_url(@group, group), data: { turbo_method: :delete, turbo_confirm: t('confirm_delete') }, class: 'btn btn-sm btn-error' do %>
               <i class="fa-regular fa-trash-can"></i>
               <%= t('delete', scope: 'frm.admin.mods') %>
             <% end %>

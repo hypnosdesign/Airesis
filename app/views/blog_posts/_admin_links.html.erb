@@ -17,7 +17,7 @@
         <i class="fa-solid fa-pencil"></i>
         <%= t('pages.blogs.show.edit_button') %>
       <% end %>
-      <%= link_to @blog, method: :delete, class: 'btn btn-error btn-sm', data: { confirm: t('blog.delete.confirm_message', count: @blog.blog_posts.count) } do %>
+      <%= link_to @blog, data: { turbo_method: :delete }, class: 'btn btn-error btn-sm', data: { turbo_confirm: t('blog.delete.confirm_message', count: @blog.blog_posts.count) } do %>
         <i class="fa-solid fa-trash"></i>
         <%= t('buttons.delete') %>
       <% end %>

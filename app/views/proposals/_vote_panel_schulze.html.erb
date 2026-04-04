@@ -17,13 +17,13 @@
     </div>
   </div>
 </div>
-<%= form_for 'data', url: { action: "vote_schulze", controller: "votations", proposal_id: @proposal.id }, method: :put, remote: true do |f| %>
+<%= form_for 'data', url: { action: "vote_schulze", controller: "votations", proposal_id: @proposal.id }, data: { turbo_method: :put } do |f| %>
   <%= f.hidden_field 'votes' %>
   <% if current_user.rotp_enabled && ::Configuration.rotp %>
     <%= f.label t('pages.proposals.show.security_token') %>
     <%= f.text_field 'token', maxlength: 6 %>
   <% end %>
-  <%= f.button remote: true, data: { confirm: t('pages.votations.show.confirm_schulze', name: @proposal.title) }, id: 'schulze-submit', class: 'btn btn-primary' do %>
+  <%= f.button data: { turbo_confirm: t('pages.votations.show.confirm_schulze', name: @proposal.title) }, id: 'schulze-submit', class: 'btn btn-primary' do %>
     <i class="fa-solid fa-check"></i>
     <%= t('pages.proposals.show.vote_button') %>
   <% end %>

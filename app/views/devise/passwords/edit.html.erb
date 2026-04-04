@@ -2,7 +2,7 @@
 <div class="card bg-base-200 p-4">
   <h2><%= @page_title %></h2>
 
-  <%= simple_form_for(@user, url: user_password_path, html: { method: :put }) do |f| %>
+  <%= simple_form_for(@user, url: user_password_path, html: { data: { turbo_method: :put } }) do |f| %>
     <%= render partial: 'fragments/error_messages', locals: { resource: resource } %>
 
     <%= f.hidden_field :reset_password_token %>

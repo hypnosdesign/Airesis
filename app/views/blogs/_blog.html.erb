@@ -14,7 +14,7 @@
           <%= link_to t('buttons.edit'), edit_blog_path(blog), class: 'btn btn-xs' %>
         <% end %>
         <% if can? :destroy, blog %>
-          <%= link_to t('buttons.delete'), blog, data: { confirm: 'Sei sicuro di voler eliminare questo blog?' }, method: :delete, class: 'btn btn-xs btn-error' %>
+          <%= link_to t('buttons.delete'), blog, data: { turbo_confirm: 'Sei sicuro di voler eliminare questo blog?', turbo_method: :delete }, class: 'btn btn-xs btn-error' %>
         <% end %>
       </div>
     </div>

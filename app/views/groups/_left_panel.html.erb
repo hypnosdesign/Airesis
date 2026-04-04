@@ -48,10 +48,10 @@
     <div class="card bg-base-200 p-3 mb-2">
       <h4 class="font-semibold mb-2"><%= t('pages.groups.show.permissions_title') %></h4>
       <div id="permissions_list_container" class="space-y-2">
-        <%= link_to permissions_list_group_path(@group), data: { remote: true, disable_with: t('loading') }, class: 'btn btn-sm w-full' do %>
+        <%= link_to permissions_list_group_path(@group), data: { disable_with: t('loading') }, class: 'btn btn-sm w-full' do %>
           <i class="fa-solid fa-circle-info"></i> <%= t('pages.groups.show.list_permissions.button') %>
         <% end %>
-        <%= link_to group_group_participation_path(@group, @myparticipation), method: :delete, data: { disable_with: t('loading'), confirm: t('pages.users.show.get_out_of_group_confermation') }, class: 'btn btn-sm btn-outline w-full' do %>
+        <%= link_to group_group_participation_path(@group, @myparticipation), data: { turbo_method: :delete, disable_with: t('loading'), turbo_confirm: t('pages.users.show.get_out_of_group_confermation') }, class: 'btn btn-sm btn-outline w-full' do %>
           <i class="fa-solid fa-right-from-bracket"></i> <%= t('pages.users.show.get_out_of_group_button') %>
         <% end %>
       </div>
@@ -71,7 +71,7 @@
     </div>
   <% else %>
     <div class="card bg-base-200 p-3 mb-2">
-      <%= link_to ask_for_participation_group_url(@group), method: :post, class: "btn btn-primary w-full" do %>
+      <%= link_to ask_for_participation_group_url(@group), data: { turbo_method: :post }, class: "btn btn-primary w-full" do %>
         <i class="fa-solid fa-pencil"></i> <%= t('pages.groups.show.ask_participate_button') %>
       <% end %>
     </div>

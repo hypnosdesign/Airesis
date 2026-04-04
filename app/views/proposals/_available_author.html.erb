@@ -5,7 +5,7 @@
     <% else %>
       <% if (can? :participate, @proposal) || (!current_user && !@proposal.private) %>
         <span id="voglioredigere">
-          <%= link_to t('pages.proposals.show.offer_as_editor_button'), available_author_proposal_path(@proposal, group_id: params[:group_id]), remote: true, method: :post, class: 'btn', data: { confirm: t('pages.proposals.show.confirm_editors_button'), disable_with: t('loading') } %>
+          <%= link_to t('pages.proposals.show.offer_as_editor_button'), available_author_proposal_path(@proposal, group_id: params[:group_id]), data: { turbo_method: :post }, class: 'btn', data: { turbo_confirm: t('pages.proposals.show.confirm_editors_button'), disable_with: t('loading') } %>
         </span>
       <% end %>
     <% end %>

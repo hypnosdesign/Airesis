@@ -1,7 +1,7 @@
 <% @page_title = t("pages.groups.edit_proposals.title") %>
 
 <%= render layout: "layouts/page_title", locals: { title: t('pages.groups.edit_proposals.title') } do %>
-  <%= link_to new_group_best_quorum_url(@group), data: { remote: true, disable_with: t('loading') }, class: "btn btn-primary btn-sm disable" do %>
+  <%= link_to new_group_best_quorum_url(@group), data: { disable_with: t('loading') }, class: "btn btn-primary btn-sm disable" do %>
     <i class="fa-solid fa-plus"></i>
     <%= t('pages.groups.edit_quorums.add_quorum') %>
   <% end %>

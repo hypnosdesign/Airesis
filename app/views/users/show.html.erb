@@ -38,7 +38,7 @@
 <% if current_user == @user %>
   <dialog id="name_modal" class="modal">
     <div class="modal-box">
-      <%= simple_form_for @user, remote: true do |f| %>
+      <%= simple_form_for @user do |f| %>
         <div class="w-full lg:w-1/2">
           <%= f.input :name, size: 20, required: true %>
           <div class="flex gap-2 mt-2">
@@ -53,7 +53,7 @@
 
   <dialog id="surname_modal" class="modal">
     <div class="modal-box">
-      <%= simple_form_for @user, remote: true do |f| %>
+      <%= simple_form_for @user do |f| %>
         <%= f.input :surname, size: 20, required: true %>
         <div class="flex gap-2 mt-2">
           <input type="button" value="<%= t('buttons.cancel') %>" onclick="document.getElementById('surname_modal').close();" class="btn"/>
@@ -66,7 +66,7 @@
 
   <dialog id="password_modal" class="modal">
     <div class="modal-box">
-      <%= simple_form_for @user, remote: true do |f| %>
+      <%= simple_form_for @user do |f| %>
         <%= f.input :password, required: true, type: :password, label: t('pages.password.edit.new_password'), size: 20 %>
         <%= f.input :password_confirmation, required: true, type: :password, size: 20, label: t('pages.registration.confirm_password'), input_html: { data: { fv_identical_field: 'user[password]', fv_identical: true } } %>
         <div class="flex gap-2 mt-2">
@@ -80,7 +80,7 @@
 
   <dialog id="email_modal" class="modal">
     <div class="modal-box">
-      <%= simple_form_for @user, remote: true do |f| %>
+      <%= simple_form_for @user do |f| %>
         <%= f.input :email, label: t('pages.users.show.email_label'), size: 25, required: true %>
         <div class="flex gap-2 mt-2">
           <input type="button" value="<%= t('buttons.cancel') %>" onclick="document.getElementById('email_modal').close();" class="btn"/>
