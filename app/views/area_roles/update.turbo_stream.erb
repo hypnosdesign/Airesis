@@ -1,0 +1,12 @@
+<% unless params[:no_refresh] %>
+  <%= turbo_stream.replace "roles_panel_container" do %>
+    <%= render "group_areas/roles_panel" %>
+  <% end %>
+  <%= turbo_stream.replace "roles_table_container" do %>
+    <%= render "group_areas/user_roles_panel" %>
+  <% end %>
+  <%= turbo_stream.replace "area_role_modal" do %>
+    <div id="area_role_modal"></div>
+  <% end %>
+<% end %>
+<%= render partial: "layouts/flash_stream" %>

@@ -1,0 +1,7 @@
+<%= turbo_stream.replace "support_left_panel_container" do %>
+  <%= render "support_left_panel" %>
+<% end %>
+<%= turbo_stream.replace "proposal_support_modal" do %>
+  <div id="proposal_support_modal"></div>
+<% end %>
+<%= render partial: "layouts/flash_stream" %>

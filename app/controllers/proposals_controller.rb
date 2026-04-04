@@ -62,7 +62,7 @@ class ProposalsController < ApplicationController
       format.html do
         render 'tab_list', layout: false
       end
-      format.js
+      format.turbo_stream
       format.json
     end
   end
@@ -71,7 +71,7 @@ class ProposalsController < ApplicationController
     authorize! :index, Proposal
     query_index
     respond_to do |format|
-      format.js
+      format.turbo_stream
     end
   end
 
@@ -79,7 +79,7 @@ class ProposalsController < ApplicationController
     @proposal = Proposal.find(params[:id])
     respond_to do |format|
       format.html { render 'banner', layout: false }
-      format.js
+      format.turbo_stream
     end
   end
 
@@ -131,7 +131,7 @@ class ProposalsController < ApplicationController
         @blocked_alerts = BlockedProposalAlert.find_by(user_id: current_user.id, proposal_id: @proposal.id) if current_user
         flash.now[:info] = I18n.t('info.proposal.voting') if @proposal.voting?
       end
-      format.js do
+      format.turbo_stream do
         head :ok
       end
       format.json
@@ -148,7 +148,7 @@ class ProposalsController < ApplicationController
       @elapsed = Time.zone.now - max
       if @elapsed < PROPOSALS_TIME_LIMIT
         respond_to do |format|
-          format.js { render 'error_new' }
+          format.turbo_stream { render 'error_new' }
         end
         return
       end
@@ -225,10 +225,10 @@ class ProposalsController < ApplicationController
     @proposal.regenerate(regenerate_proposal_params)
     flash[:notice] = t('info.proposal.back_in_debate')
     respond_to do |format|
+      format.turbo_stream
       format.html do
         redirect_to redirect_url(@proposal)
       end
-      format.js
     end
   end
 
@@ -297,7 +297,7 @@ class ProposalsController < ApplicationController
 
     respond_to do |format|
       format.html
-      format.js
+      format.turbo_stream
     end
   end
 
@@ -312,7 +312,7 @@ class ProposalsController < ApplicationController
   def available_authors_list
     @available_authors = @proposal.available_user_authors
     respond_to do |format|
-      format.js
+      format.turbo_stream
     end
   end
 
@@ -331,7 +331,10 @@ class ProposalsController < ApplicationController
     flash[:notice] = t('info.proposal.authors_added')
   rescue Exception => e
     flash[:error] = t('errors.proposal.authors_added')
-    render 'layouts/error'
+    respond_to do |format|
+      format.turbo_stream { render partial: 'layouts/flash_stream' }
+      format.html { redirect_back fallback_location: proposal_path(@proposal) }
+    end
   end
 
   def vote_results
@@ -384,7 +387,7 @@ class ProposalsController < ApplicationController
 
     flash[:notice] = I18n.t('info.proposal.rank_recorderd')
     respond_to do |format|
-      format.js { render 'rank' }
+      format.turbo_stream { render 'rank' }
       format.html { redirect_back(fallback_location: proposal_path(@proposal)) }
     end
   rescue Exception => e
@@ -392,7 +395,7 @@ class ProposalsController < ApplicationController
     flash[:error] = I18n.t('error.proposals.proposal_rank')
     respond_to do |format|
       format.html { redirect_back(fallback_location: proposal_path(@proposal)) }
-      format.js { render 'proposals/errors/rank' }
+      format.turbo_stream { render 'proposals/errors/rank' }
     end
   end
 
@@ -424,7 +427,7 @@ class ProposalsController < ApplicationController
     flash[:error] = I18n.t('error.proposals.proposal_not_valuating')
     respond_to do |format|
       format.html { redirect_back(fallback_location: proposal_path(@proposal)) }
-      format.js { render 'proposals/errors/rank', layout: false }
+      format.turbo_stream { render 'proposals/errors/rank', layout: false }
     end
   end
 

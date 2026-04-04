@@ -1,0 +1,7 @@
+<%= turbo_stream.replace "suggestions" do %>
+  <div id="suggestions">
+    <% if @proposals.present? %>
+      <%= render "similar" %>
+    <% end %>
+  </div>
+<% end %>

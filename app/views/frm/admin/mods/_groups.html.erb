@@ -1,7 +1,8 @@
+<div id="groups_table">
 <% if @frm_mods.empty? %>
   <h4 class="text-lg"><%= t('pages.forum_groups.index.create_first') %></h4>
 <% else %>
-  <table id="groups" class="table index table-striped" cellspacing="0">
+  <table class="table index table-striped" cellspacing="0">
     <thead>
       <tr>
         <th><%= t('name', scope: 'frm.admin.mods') %></th>
@@ -36,3 +37,4 @@
     </tbody>
   </table>
 <% end %>
+</div>

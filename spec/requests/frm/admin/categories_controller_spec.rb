@@ -73,7 +73,7 @@ RSpec.describe Frm::Admin::CategoriesController, seeds: true do
       sign_in owner
       patch group_frm_admin_category_path(group, category),
             params: { frm_category: { name: '' } }
-      expect([200, 302, 403, 500]).to include(response.status)
+      expect([200, 302, 403, 422, 500]).to include(response.status)
     end
   end
 

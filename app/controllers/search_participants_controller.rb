@@ -10,7 +10,7 @@ class SearchParticipantsController < ApplicationController
     flash[:notice] = t('info.groups.search_participants')
     respond_to do |format|
       format.html
-      format.js
+      format.turbo_stream
     end
   end
 

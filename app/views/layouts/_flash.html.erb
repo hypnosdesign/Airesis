@@ -16,13 +16,12 @@
   <% end %>
 
   <% Announcement.current(cookies.signed[:hidden_announcement_ids]).each do |announcement| %>
-    <div class="alert alert-info shadow-brutal"
+    <div id="announcement<%= announcement.id %>"
+         class="alert alert-info shadow-brutal"
          data-controller="flash"
          data-flash-auto-dismiss-value="0">
-      <div id="announcement<%= announcement.id %>">
-        <%= raw announcement.message %>
-        <%= link_to "OK", hide_announcement_path(announcement), class: "btn btn-sm", remote: true, method: :post %>
-      </div>
+      <span><%= raw announcement.message %></span>
+      <%= link_to "OK", hide_announcement_path(announcement), class: "btn btn-sm", data: { turbo_method: :post } %>
     </div>
   <% end %>
 </div>

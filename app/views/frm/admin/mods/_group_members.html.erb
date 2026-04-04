@@ -1,10 +1,12 @@
-<% if @frm_mod.members.any? %>
-  <label><%= t('frm.admin.mods.show.current_members') %></label>
-  <div class="flex flex-wrap gap-2">
-    <ul id="members">
-      <% @frm_mod.members.each do |member| %>
-        <%= user_tag member %>
-      <% end %>
-    </ul>
-  </div>
-<% end %>
+<div id="group_members_container">
+  <% if @frm_mod.members.any? %>
+    <label><%= t('frm.admin.mods.show.current_members') %></label>
+    <div class="flex flex-wrap gap-2">
+      <ul>
+        <% @frm_mod.members.each do |member| %>
+          <%= user_tag member %>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+</div>

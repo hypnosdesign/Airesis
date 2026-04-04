@@ -25,7 +25,7 @@ class BlogPostsController < ApplicationController
       @page_title = t('pages.blog_posts.index.title', app_short_name: APP_SHORT_NAME)
       respond_to do |format|
         format.html
-        format.js
+        format.turbo_stream
       end
     end
   end
@@ -48,7 +48,7 @@ class BlogPostsController < ApplicationController
     @blog_comments = @blog_post.blog_comments.includes(user: [:image]).order('created_at DESC').page(params[:page]).per(COMMENTS_PER_PAGE)
     respond_to do |format|
       format.html
-      format.js
+      format.turbo_stream
     end
   end
 

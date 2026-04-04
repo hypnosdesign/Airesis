@@ -2,6 +2,4 @@
 
 <%= render '/layouts/top_menu' %>
 
-<% if user_signed_in? && !Rails.env.test? %>
-  <%= subscribe_to "/notifications/#{current_user.id}" %>
-<% end %>
+<%# TODO: sostituire con Action Cable/Turbo Streams (PrivatePub rimosso) %>

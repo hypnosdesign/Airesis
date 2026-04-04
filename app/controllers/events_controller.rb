@@ -30,7 +30,7 @@ class EventsController < ApplicationController
       format.html do
         @proposals = @event.proposals.for_list(current_user.try(:id)) if @event.votation?
       end
-      format.js
+      format.turbo_stream
       format.ics do
         calendar = Icalendar::Calendar.new
         calendar.add_event(@event.to_ics)
@@ -103,12 +103,12 @@ class EventsController < ApplicationController
     end
 
     respond_to do |format|
+      format.turbo_stream
       format.html { redirect_to @group ? group_events_url(@group) : events_url }
-      format.js
     end
   rescue ActiveRecord::ActiveRecordError => e
     respond_to do |format|
-      format.js { render 'layouts/active_record_error', locals: { object: @event } }
+      format.turbo_stream { render partial: 'layouts/flash_stream', status: :unprocessable_entity }
     end
   end
 
@@ -128,13 +128,13 @@ class EventsController < ApplicationController
     if @event.update(event_params)
       flash[:notice] = t('info.events.event_updated')
       respond_to do |format|
+        format.turbo_stream
         format.html { redirect_to @group ? group_event_url(@group, @event) : event_url(@event) }
-        format.js
       end
     else
       respond_to do |format|
+        format.turbo_stream { render partial: 'layouts/flash_stream', status: :unprocessable_entity }
         format.html { render :edit }
-        format.js { render 'layouts/active_record_error', locals: { object: @event } }
       end
     end
   end

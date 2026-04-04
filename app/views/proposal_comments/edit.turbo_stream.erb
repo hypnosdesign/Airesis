@@ -1,0 +1,5 @@
+<%= turbo_stream.replace "comment_content_#{@proposal_comment.id}" do %>
+  <div id="comment_content_<%= @proposal_comment.id %>">
+    <%= render partial: "proposal_comments/edit_form", locals: { comment: @proposal_comment } %>
+  </div>
+<% end %>

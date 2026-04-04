@@ -1,0 +1,6 @@
+<%= turbo_stream.append "blogPostContainer" do %>
+  <%= render partial: "blog_posts/blog_post", collection: @blog_posts %>
+<% end %>
+<% unless @blog_posts.total_pages > @blog_posts.current_page %>
+  <%= turbo_stream.remove "loading_results" %>
+<% end %>

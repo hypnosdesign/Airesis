@@ -28,9 +28,19 @@ class HomeController < ApplicationController
 
   def municipality; end
 
-  def privacy; end
+  def privacy
+    respond_to do |format|
+      format.turbo_stream
+      format.html
+    end
+  end
 
-  def terms; end
+  def terms
+    respond_to do |format|
+      format.turbo_stream
+      format.html
+    end
+  end
 
   def cookie_law; end
 

@@ -88,30 +88,20 @@ class UsersController < ApplicationController
     current_user.show_tooltips = params[:active]
     current_user.save!
     flash[:notice] = params[:active] == 'true' ? t('info.user.tooltips_enabled') : t('info.user.tooltips_disabled')
-
-    respond_to do |format|
-      format.js { render partial: 'layouts/messages' }
-    end
+    respond_to_preference
   rescue Exception => e
-    respond_to do |format|
-      flash[:error] = t('error.setting_preferences')
-      format.js { render 'layouts/error' }
-    end
+    flash[:error] = t('error.setting_preferences')
+    respond_to_preference
   end
 
   def change_show_urls
     current_user.show_urls = params[:active]
     current_user.save!
     flash[:notice] = params[:active] == 'true' ? t('info.user.url_shown') : t('info.user.url_hidden')
-
-    respond_to do |format|
-      format.js { render partial: 'layouts/messages' }
-    end
+    respond_to_preference
   rescue Exception => e
-    respond_to do |format|
-      flash[:error] = t('error.setting_preferences')
-      format.js { render partial: 'layouts/messages' }
-    end
+    flash[:error] = t('error.setting_preferences')
+    respond_to_preference
   end
 
   def change_receive_messages
@@ -122,51 +112,32 @@ class UsersController < ApplicationController
                      else
                        t('info.private_messages_inactive')
                      end
-
-    respond_to do |format|
-      format.js { render partial: 'layouts/messages' }
-    end
+    respond_to_preference
   rescue Exception => e
-    respond_to do |format|
-      flash[:error] = t('error.setting_preferences')
-      format.js { render 'layouts/error' }
-    end
+    flash[:error] = t('error.setting_preferences')
+    respond_to_preference
   end
 
-  # change default user locale
   def change_locale
     current_user.locale = SysLocale.find(params[:locale])
     current_user.save!
-
     flash[:notice] = t('info.locale_changed')
-
-    respond_to do |format|
-      format.js { render partial: 'layouts/messages' }
-    end
+    respond_to_preference
   rescue Exception => e
-    respond_to do |format|
-      flash[:error] = t('error.setting_preferences')
-      format.js { render 'layouts/error' }
-    end
+    flash[:error] = t('error.setting_preferences')
+    respond_to_preference
   end
 
   def change_time_zone
     current_user.time_zone = params[:time_zone]
     current_user.save!
-
     flash[:notice] = t('info.user.time_zone_changed')
-
-    respond_to do |format|
-      format.js { render partial: 'layouts/messages' }
-    end
+    respond_to_preference
   rescue Exception => e
-    respond_to do |format|
-      flash[:error] = t('error.setting_preferences')
-      format.js { render 'layouts/error' }
-    end
+    flash[:error] = t('error.setting_preferences')
+    respond_to_preference
   end
 
-  # enable or disable rotp feature
   def change_rotp_enabled
     authorize! :change_rotp_enabled, current_user
     current_user.rotp_enabled = params[:active]
@@ -177,15 +148,13 @@ class UsersController < ApplicationController
       flash[:notice] = t('info.rotp_inactive')
     end
     current_user.save!
-
     respond_to do |format|
-      format.js
+      format.turbo_stream
+      format.html { redirect_back fallback_location: root_path }
     end
   rescue Exception => e
-    respond_to do |format|
-      flash[:error] = t('error.setting_preferences')
-      format.js { render 'layouts/error' }
-    end
+    flash[:error] = t('error.setting_preferences')
+    respond_to_preference
   end
 
   def update
@@ -193,7 +162,7 @@ class UsersController < ApplicationController
       if @user.update(user_params)
         flash[:notice] = t('info.user.info_updated')
         flash[:notice] += t('info.user.confirm_email') if params[:user][:email] && @user.email != params[:user][:email]
-        format.js
+        format.turbo_stream
         format.html do
           if params[:back] == 'home'
             redirect_to home_url
@@ -205,6 +174,7 @@ class UsersController < ApplicationController
         @user.errors.full_messages.each do |msg|
           flash[:error] = msg
         end
+        format.turbo_stream { render partial: 'layouts/flash_stream', status: :unprocessable_entity }
         format.html do
           if params[:back] == 'home'
             redirect_to home_url
@@ -212,24 +182,25 @@ class UsersController < ApplicationController
             redirect_back(fallback_location: root_path)
           end
         end
-        format.js { render 'layouts/error' }
       end
     end
   end
 
-  # mostra la form di invio messaggio all'utente
   def show_message
     authorize! :send_message, @user
+    respond_to do |format|
+      format.turbo_stream
+      format.html
+    end
   end
 
-  # invia un messaggio all'utente
   def send_message
     authorize! :send_message, @user
     ResqueMailer.user_message(params[:message][:subject], params[:message][:body], current_user.id, @user.id).deliver_later
     flash[:notice] = t('info.message_sent')
     respond_to do |format|
+      format.turbo_stream
       format.html { redirect_to @user }
-      format.js
     end
   end
 
@@ -243,6 +214,13 @@ class UsersController < ApplicationController
   end
 
   protected
+
+  def respond_to_preference
+    respond_to do |format|
+      format.turbo_stream { render partial: 'layouts/flash_stream' }
+      format.html { redirect_back fallback_location: root_path }
+    end
+  end
 
   def wrong_join_accounts_params?
     params[:user][:password].empty?

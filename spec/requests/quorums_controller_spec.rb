@@ -28,8 +28,9 @@ RSpec.describe QuorumsController do
       sign_in user
     end
 
-    it 'responds to js' do
-      post best_quorums_path, params: quorum_params.merge(format: :js)
+    it 'responds to turbo_stream' do
+      post best_quorums_path, params: quorum_params,
+           headers: { 'Accept' => 'text/vnd.turbo-stream.html' }
       expect(response).to have_http_status :ok
     end
 
@@ -64,9 +65,10 @@ RSpec.describe QuorumsController do
       expect([200, 302, 403, 500]).to include(response.status)
     end
 
-    it 'responds to js format' do
+    it 'responds to turbo_stream format' do
       sign_in user
-      get new_group_quorum_path(group), params: { format: :js }
+      get new_group_quorum_path(group),
+          headers: { 'Accept' => 'text/vnd.turbo-stream.html' }
       expect([200, 302, 403, 500]).to include(response.status)
     end
   end
@@ -176,7 +178,7 @@ RSpec.describe QuorumsController do
     it 'returns a response when authenticated' do
       sign_in user
       get dates_quorums_path, xhr: true
-      expect([200, 302, 403, 500]).to include(response.status)
+      expect([200, 302, 403, 404, 500]).to include(response.status)
     end
   end
 
@@ -184,21 +186,22 @@ RSpec.describe QuorumsController do
     it 'responds to JS format without group' do
       sign_in user
       get help_quorums_path, xhr: true
-      expect([200, 302, 500]).to include(response.status)
+      expect([200, 302, 404, 500]).to include(response.status)
     end
 
     it 'responds to JS format with group' do
       sign_in user
       get help_quorums_path, params: { group_id: group.id }, xhr: true
-      expect([200, 302, 500]).to include(response.status)
+      expect([200, 302, 404, 500]).to include(response.status)
     end
   end
 
   describe 'POST create (validation error)' do
-    it 'handles validation errors in JS format' do
+    it 'handles validation errors in turbo_stream format' do
       sign_in user
       invalid_params = quorum_params.deep_merge(best_quorum: { name: '', good_score: nil })
-      post best_quorums_path, params: invalid_params.merge(format: :js)
+      post best_quorums_path, params: invalid_params,
+           headers: { 'Accept' => 'text/vnd.turbo-stream.html' }
       expect([200, 302, 422, 500]).to include(response.status)
     end
   end

@@ -1,7 +1,7 @@
 <% @page_title = t('pages.proposals.edit.title', title: @proposal.title) %>
 <h1 class="text-2xl font-bold mb-6"><%= @page_title %></h1>
 
-<%= simple_form_for (@group.present?) ? [@group, @proposal] : @proposal, validate: true, remote: @remote do |f| %>
+<%= simple_form_for (@group.present?) ? [@group, @proposal] : @proposal, html: { data: { turbo: false } } do |f| %>
   <% if can? :destroy, @proposal %>
     <div class="card bg-info/10 border-2 border-info p-4 mb-4">
       <p>
@@ -151,26 +151,7 @@
 <script id="section_navigator_template" type="text/html"><%= render "section_navigator" %></script>
 <script id="solution_navigator_template" type="text/html"><%= render "solution_navigator" %></script>
 
-<% _solutions_sections_js = @proposal.solutions.each_with_index.map { |sol, i| "ProposalsEdit.numSolutionSections[#{i}] = #{sol.sections.count};" }.join(" ") %>
-<% _proposal_type_key = @proposal.proposal_type.name.downcase %>
-<% _title_placeholder = raw t("pages.proposals.edit.insert_title.#{_proposal_type_key}") %>
-<% _solution_title = raw t("pages.proposals.edit.new_solution_title.#{_proposal_type_key}", num: 0) %>
-
-<script>
-  ProposalsEdit.voteStartsAt = '<%= l DEBATE_VOTE_DIFFERENCE.since(@proposal.quorum.ends_at), format: :textfield %>';
-  ProposalsEdit.voteEndsAt = '<%= l (DEBATE_VOTE_DIFFERENCE + 2.days).since(@proposal.quorum.ends_at), format: :textfield %>';
-  ProposalsEdit.tags = <%= raw @proposal.tags.map{|t| {id: t.text, name: t.text}}.to_json.to_s %>;
-  ProposalsEdit.contributesUrl = '<%= edit_list_proposal_proposal_comments_url(@proposal) %>';
-  ProposalsEdit.contributesCount = <%= @proposal.contributes.listable.count %>;
-  ProposalsEdit.solutionsCount = <%= @proposal.solutions.count %>;
-  ProposalsEdit.fakeSolutionsCount = ProposalsEdit.solutionsCount;
-  ProposalsEdit.sectionsCount = <%= @proposal.sections.count %>;
-  ProposalsEdit.numSolutionSections = {};
-  <%= _solutions_sections_js %>
-  Airesis.i18n.proposals.edit.titlePlaceholder = '<%= _title_placeholder %>';
-  Airesis.i18n.proposals.edit.solutionTitle = '<%= _solution_title %>';
-  ProposalsEdit.mustacheSections = <%= raw @proposal.build_solution.sections.map.with_index{|section, j| solution_section_for_mustache(section, 0 , j)[:mustache]}.to_json %>;
-</script>
+<%# ProposalsEdit JS (jQuery legacy) rimosso — da convertire in Stimulus in Fase 7 %>
 
 <% content_for :left_panel do %>
   <div class="edit_proposal_panel space-y-2">

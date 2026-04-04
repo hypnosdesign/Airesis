@@ -7,11 +7,10 @@ class ProposalCommentsController < ApplicationController
 
   layout :choose_layout
 
-  # retrieve contributes list
   def index
     respond_to do |format|
       format.html { @proposal_comment_search = ProposalCommentSearch.new({ all: true, disable_limit: true }, @proposal) }
-      format.js { @proposal_comment_search = ProposalCommentSearch.new(params, @proposal, current_user) }
+      format.turbo_stream { @proposal_comment_search = ProposalCommentSearch.new(params, @proposal, current_user) }
     end
   end
 
@@ -29,19 +28,32 @@ class ProposalCommentsController < ApplicationController
 
   def show; end
 
-  def history; end
+  def history
+    respond_to do |format|
+      format.turbo_stream
+      format.html
+    end
+  end
 
-  # mostra tutti i commenti dati ad un contributo
   def show_all_replies
     @proposal_comment = ProposalComment.find_by(id: params[:id])
     @replies = ProposalComment.where('parent_proposal_comment_id=?', params[:id]).order('created_at ASC')[0..-(params[:showed].to_i + 1)]
+    respond_to do |format|
+      format.turbo_stream
+      format.html
+    end
   end
 
   def new
     @proposal_comment = @proposal.proposal_comments.build
   end
 
-  def edit; end
+  def edit
+    respond_to do |format|
+      format.turbo_stream
+      format.html
+    end
+  end
 
   def create
     parent_id = params[:proposal_comment][:parent_proposal_comment_id]
@@ -51,14 +63,14 @@ class ProposalCommentsController < ApplicationController
     respond_to do |format|
       @my_nickname = current_user.proposal_nicknames.find_by(proposal_id: @proposal.id)
       @proposal_comment.collapsed = true
+      format.turbo_stream
       format.html { redirect_to @proposal }
-      format.js
       format.json { head :ok }
     end
   rescue Exception => e
     respond_to do |format|
       flash[:error] = @proposal_comment.errors.messages.values.join(' e ')
-      format.js { render 'layouts/error' }
+      format.turbo_stream { render partial: 'layouts/flash_stream', status: :unprocessable_entity }
       format.json do
         render json: @proposal_comment.try(:errors) || { error: true }, status: :unprocessable_entity
       end
@@ -69,8 +81,8 @@ class ProposalCommentsController < ApplicationController
     respond_to do |format|
       if @proposal_comment.update(proposal_comment_update_params)
         flash[:notice] = t('info.proposal.updated_comment')
+        format.turbo_stream
         format.html { redirect_to(@proposal) }
-        format.js
       else
         format.html { render action: 'edit' }
       end
@@ -84,12 +96,11 @@ class ProposalCommentsController < ApplicationController
 
     respond_to do |format|
       flash[:notice] = t('info.proposal.comment_deleted')
+      format.turbo_stream
       format.html { redirect_to @proposal }
-      format.js
     end
   end
 
-  # allow a user to tell the proposal author that his contribute has not been integrated well
   def unintegrate
     authorize! :unintegrate, @proposal_comment
     @proposal_comment.unintegrate
@@ -115,19 +126,32 @@ class ProposalCommentsController < ApplicationController
       report = @proposal_comment.reports.create(user_id: current_user.id, proposal_comment_report_type_id: params[:reason])
     end
     flash[:notice] = t('info.proposal.contribute_reported')
-  rescue Exception => e
-    # log_error(e)
     respond_to do |format|
-      flash[:error] = t('error.proposals.contribute_report')
-      format.js { render 'layouts/error' }
+      format.turbo_stream
+      format.html { redirect_back fallback_location: proposal_path(@proposal) }
+    end
+  rescue Exception => e
+    flash[:error] = t('error.proposals.contribute_report')
+    respond_to do |format|
+      format.turbo_stream { render partial: 'layouts/flash_stream' }
+      format.html { redirect_back fallback_location: proposal_path(@proposal) }
     end
   end
 
-  def noise; end
+  def noise
+    respond_to do |format|
+      format.turbo_stream
+      format.html
+    end
+  end
 
-  def manage_noise; end
+  def manage_noise
+    respond_to do |format|
+      format.turbo_stream
+      format.html
+    end
+  end
 
-  # the editor marked some contributes as unuseful
   def mark_noise
     return unless current_user.is_my_proposal? @proposal
 
@@ -145,7 +169,7 @@ class ProposalCommentsController < ApplicationController
 
     respond_to do |format|
       format.html { redirect_to @proposal }
-      format.js { head :ok }
+      format.turbo_stream { head :ok }
     end
   end
 
@@ -182,23 +206,22 @@ class ProposalCommentsController < ApplicationController
       if @ranking.save
         @proposal_comment.reload
         flash[:notice] = t('info.proposal.rank_recorderd')
+        format.turbo_stream { render 'rank' }
         format.html { redirect_to @proposal }
-        format.js { render 'rank' }
       else
         flash[:notice] = t(:error_on_proposal_comment_rank)
+        format.turbo_stream { render partial: 'layouts/flash_stream' }
         format.html { redirect_to @proposal }
-        format.js { render 'layouts/error' }
       end
     end
   end
 
-  # check if the user can valutate again a contribute. that can happen only if the contribute received a suggestion after the previous valutation
   def already_ranked
     return true if current_user.can_rank_again_comment?(@proposal_comment)
 
     flash[:notice] = t('info.proposal.comment_already_ranked')
     respond_to do |format|
-      format.js { render 'layouts/error' }
+      format.turbo_stream { render partial: 'layouts/flash_stream' }
       format.html do
         redirect_to proposal_path(params[:proposal_id])
       end

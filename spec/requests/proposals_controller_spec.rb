@@ -97,78 +97,78 @@ RSpec.describe ProposalsController, search: true, seeds: true do
     end
 
     it 'does not retrieve any results if no tag matches' do
-      get similar_proposals_path, params: { tags: 'a,b,c' }, xhr: true
+      get similar_proposals_path, params: { tags: 'a,b,c' }, headers: { 'Accept' => 'text/vnd.turbo-stream.html' }
       expect(response.body).not_to include proposal1.title
     end
 
     it 'retrieve correct result matching title but not tags' do
-      get similar_proposals_path, params: { tags: 'a,b,c', title: 'bella giornata' }, xhr: true
+      get similar_proposals_path, params: { tags: 'a,b,c', title: 'bella giornata' }, headers: { 'Accept' => 'text/vnd.turbo-stream.html' }
       expect(response.body).to include proposal1.title
     end
 
     it 'retrieve correct result matching title' do
-      get similar_proposals_path, params: { title: 'bella giornata' }, xhr: true
+      get similar_proposals_path, params: { title: 'bella giornata' }, headers: { 'Accept' => 'text/vnd.turbo-stream.html' }
       expect(response.body).to include proposal1.title
     end
 
     it 'retrieve both proposals with correct tag' do
       proposal2 = create(:public_proposal, title: 'una giornata da inferno', current_user_id: user.id)
-      get similar_proposals_path, params: { tags: 'tag1' }, xhr: true
+      get similar_proposals_path, params: { tags: 'tag1' }, headers: { 'Accept' => 'text/vnd.turbo-stream.html' }
       expect(response.body).to include proposal1.title
       expect(response.body).to include proposal2.title
     end
 
     it 'retrieve both proposals matching title with tag' do
       proposal2 = create(:public_proposal, title: 'una giornata da inferno', current_user_id: user.id)
-      get similar_proposals_path, params: { tags: 'giornata' }, xhr: true
+      get similar_proposals_path, params: { tags: 'giornata' }, headers: { 'Accept' => 'text/vnd.turbo-stream.html' }
       expect(response.body).to include proposal1.title
       expect(response.body).to include proposal2.title
     end
 
     it 'retrieve only one if only one matches' do
       proposal2 = create(:public_proposal, title: 'una giornata da inferno', current_user_id: user.id)
-      get similar_proposals_path, params: { tags: 'inferno' }, xhr: true
+      get similar_proposals_path, params: { tags: 'inferno' }, headers: { 'Accept' => 'text/vnd.turbo-stream.html' }
       expect(response.body).to include proposal2.title
     end
 
     it 'retrieve both proposals matching title' do
       proposal2 = create(:public_proposal, title: 'una giornata da inferno', current_user_id: user.id)
-      get similar_proposals_path, params: { title: 'giornata', format: :js }, xhr: true
+      get similar_proposals_path, params: { title: 'giornata' }, headers: { 'Accept' => 'text/vnd.turbo-stream.html' }
       expect(response.body).to include proposal1.title
       expect(response.body).to include proposal2.title
     end
 
     it 'find first the most relevant' do
       proposal2 = create(:public_proposal, title: 'una giornata da inferno', current_user_id: user.id)
-      get similar_proposals_path, params: { title: 'inferno', tags: 'tag1', format: :js }, xhr: true
+      get similar_proposals_path, params: { title: 'inferno', tags: 'tag1' }, headers: { 'Accept' => 'text/vnd.turbo-stream.html' }
       expect(response.body).to include proposal2.title
       expect(response.body).to include proposal1.title
     end
 
     it 'find first the most relevant mixing title and tags' do
       proposal2 = create(:public_proposal, title: 'una giornata da inferno', current_user_id: user.id)
-      get similar_proposals_path, params: { title: 'inferno', tags: 'giornata', format: :js }, xhr: true
+      get similar_proposals_path, params: { title: 'inferno', tags: 'giornata' }, headers: { 'Accept' => 'text/vnd.turbo-stream.html' }
       expect(response.body).to include proposal2.title
       expect(response.body).to include proposal1.title
     end
 
     it 'find both also with some other words' do
       proposal2 = create(:public_proposal, title: 'una giornata da inferno', current_user_id: user.id)
-      get similar_proposals_path, params: { title: 'inferno', tags: 'giornata, tag1, parole, a, caso', format: :js }, xhr: true
+      get similar_proposals_path, params: { title: 'inferno', tags: 'giornata, tag1, parole, a, caso' }, headers: { 'Accept' => 'text/vnd.turbo-stream.html' }
       expect(response.body).to include proposal2.title
       expect(response.body).to include proposal1.title
     end
 
     it 'does not retrieve anything with a wrong title' do
       proposal2 = create(:public_proposal, title: 'una giornata da inferno', current_user_id: user.id)
-      get similar_proposals_path, params: { title: 'rappresentative', format: :js }, xhr: true
+      get similar_proposals_path, params: { title: 'rappresentative' }, headers: { 'Accept' => 'text/vnd.turbo-stream.html' }
       expect(response.body).not_to include proposal1.title
       expect(response.body).not_to include proposal2.title
     end
 
     it "can't retrieve private proposals not visible outside" do
       proposal2 = create(:public_proposal, title: 'una giornata da inferno', current_user_id: user.id)
-      get similar_proposals_path, params: { title: 'inferno', format: :js }, xhr: true
+      get similar_proposals_path, params: { title: 'inferno' }, headers: { 'Accept' => 'text/vnd.turbo-stream.html' }
       expect(response.body).not_to include proposal1.title
       expect(response.body).to include proposal2.title
     end
@@ -177,7 +177,7 @@ RSpec.describe ProposalsController, search: true, seeds: true do
       proposal2 = create(:public_proposal, title: 'una giornata da inferno', current_user_id: user.id)
       group = create(:group, current_user_id: user.id)
       proposal3 = create(:group_proposal, title: 'questo gruppo è un INFERNO! riorganizziamolo!!!!', current_user_id: user.id, group_proposals: [GroupProposal.new(group: group)], visible_outside: true)
-      get similar_proposals_path, params: { title: 'inferno', format: :js }, xhr: true
+      get similar_proposals_path, params: { title: 'inferno' }, headers: { 'Accept' => 'text/vnd.turbo-stream.html' }
       expect(response.body).not_to include proposal1.title
       expect(response.body).to include proposal3.title
       expect(response.body).to include proposal2.title
@@ -189,7 +189,7 @@ RSpec.describe ProposalsController, search: true, seeds: true do
       hell_group = create(:group_proposal, title: 'questo gruppo è un INFERNO! riorganizziamolo!!!!',
                                            current_user_id: user.id,
                                            groups: [group], visible_outside: false)
-      get similar_proposals_path, params: { title: 'inferno', group_id: group.id, format: :js }, xhr: true
+      get similar_proposals_path, params: { title: 'inferno', group_id: group.id }, headers: { 'Accept' => 'text/vnd.turbo-stream.html' }
       expect(response.body).not_to include proposal1.title
       expect(response.body).not_to include hell_day.title
       expect(response.body).not_to include hell_group.title
@@ -202,7 +202,7 @@ RSpec.describe ProposalsController, search: true, seeds: true do
       sign_in user
 
       # repeat same request
-      get similar_proposals_path, params: { title: 'inferno', group_id: group.id, format: :js }, xhr: true
+      get similar_proposals_path, params: { title: 'inferno', group_id: group.id }, headers: { 'Accept' => 'text/vnd.turbo-stream.html' }
       expect(response.body).to include proposal3.title
     end
 
@@ -217,7 +217,7 @@ RSpec.describe ProposalsController, search: true, seeds: true do
 
       sign_in user
 
-      get similar_proposals_path, params: { title: 'inferno', format: :js }, xhr: true
+      get similar_proposals_path, params: { title: 'inferno' }, headers: { 'Accept' => 'text/vnd.turbo-stream.html' }
       expect(response.body).not_to include proposal1.title
       expect(response.body).to include proposal3.title
       expect(response.body).to include proposal2.title
@@ -232,7 +232,7 @@ RSpec.describe ProposalsController, search: true, seeds: true do
       create_participation(user2, group)
       sign_in user2
 
-      get similar_proposals_path, params: { title: 'inferno', format: :js }, xhr: true
+      get similar_proposals_path, params: { title: 'inferno' }, headers: { 'Accept' => 'text/vnd.turbo-stream.html' }
       expect(response.body).not_to include proposal1.title
       expect(response.body).to include proposal3.title
       expect(response.body).to include proposal2.title
@@ -248,7 +248,7 @@ RSpec.describe ProposalsController, search: true, seeds: true do
 
       sign_in user2
 
-      get similar_proposals_path, params: { title: 'giornata', format: :js }, xhr: true
+      get similar_proposals_path, params: { title: 'giornata' }, headers: { 'Accept' => 'text/vnd.turbo-stream.html' }
       expect(response.body).to include proposal1.title
       expect(response.body).to include proposal3.title
     end

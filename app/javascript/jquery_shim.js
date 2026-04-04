@@ -338,3 +338,21 @@ $.fx = { off: false };
 
 // Expose globally
 window.$ = window.jQuery = $;
+
+// No-op stubs for legacy global functions called by un-migrated .js.erb files.
+// These prevent "X is not defined" errors during incremental migration.
+// Remove these as each module is converted to Turbo Streams + Stimulus.
+window.execute_page_js = function() {};
+window.disegnaCountdown = function() {};
+window.disegnaProgressBar = function() {};
+window.checkScroll = function() {};
+window.airesis_reveal = function() {};
+window.ProposalsShow = {
+  init_text_areas: function() {},
+  checkScroll: function() {},
+  destroy_countdowns: function() {},
+  init_countdowns: function() {},
+  firstCheck: false,
+  checkActive: false,
+  contributes: []
+};

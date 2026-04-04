@@ -16,6 +16,10 @@ module Frm
       def new
         @page_title = t('frm.admin.group.new')
         @frm_mod = @group.mods.build
+        respond_to do |format|
+          format.turbo_stream
+          format.html
+        end
       end
 
       def create
@@ -24,14 +28,12 @@ module Frm
         if @frm_mod.save
           flash[:notice] = t('frm.admin.group.created')
           respond_to do |format|
-            format.html do
-              redirect_to group_frm_admin_frm_mod_url(@group, @frm_mod)
-            end
-            format.js
+            format.turbo_stream
+            format.html { redirect_to group_frm_admin_frm_mod_url(@group, @frm_mod) }
           end
         else
           flash[:alert] = t('frm.admin.group.not_created')
-          render :new
+          render :new, status: :unprocessable_entity
         end
       end
 

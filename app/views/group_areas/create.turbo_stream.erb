@@ -1,0 +1,13 @@
+<% if params[:manage] == "true" %>
+  <%= turbo_stream.replace "group_areas_container" do %>
+    <%= render "group_areas/group_areas_list" %>
+  <% end %>
+<% else %>
+  <%= turbo_stream.replace "users_list_container" do %>
+    <%= render "group_areas/users_list" %>
+  <% end %>
+<% end %>
+<%= turbo_stream.replace "group_area_modal" do %>
+  <div id="group_area_modal"></div>
+<% end %>
+<%= render partial: "layouts/flash_stream" %>

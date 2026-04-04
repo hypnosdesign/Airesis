@@ -1,0 +1,7 @@
+<%= turbo_stream.replace "quorum_panel_container" do %>
+  <%= render "groups/quorums_panel" %>
+<% end %>
+<%= turbo_stream.replace "quorum_modal" do %>
+  <div id="quorum_modal"></div>
+<% end %>
+<%= render partial: "layouts/flash_stream" %>

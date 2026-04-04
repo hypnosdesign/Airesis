@@ -16,7 +16,7 @@ class GroupParticipationsController < ApplicationController
 
     respond_to do |format|
       format.html
-      format.js
+      format.turbo_stream
       format.json
       format.csv { send_data build_csv }
     end
@@ -41,7 +41,8 @@ class GroupParticipationsController < ApplicationController
     @group_participation.save!
     flash[:notice] = t('info.participation_roles.role_changed')
     respond_to do |format|
-      format.js { render partial: 'layouts/messages' }
+      format.turbo_stream { render partial: 'layouts/flash_stream' }
+      format.html { redirect_back fallback_location: group_path(@group) }
     end
   end
 
@@ -53,6 +54,10 @@ class GroupParticipationsController < ApplicationController
     body = params[:message][:body]
     ResqueMailer.massive_email(current_user.id, ids, @group.id, subject, body).deliver_later
     flash[:notice] = t('info.message_sent')
+    respond_to do |format|
+      format.turbo_stream { render partial: 'layouts/flash_stream' }
+      format.html { redirect_back fallback_location: group_path(@group) }
+    end
   end
 
   # destroy all selected participations
@@ -73,13 +78,11 @@ class GroupParticipationsController < ApplicationController
     end
     flash[:notice] = t('info.participations_destroyed')
   rescue Exception => e
-    flash[:notice] = t('error.participations_destroyed')
+    flash[:error] = t('error.participations_destroyed')
+  ensure
     respond_to do |format|
-      format.js do
-        render :update do |page|
-          page.replace_html 'flash_messages', partial: 'layouts/flash', locals: { flash: flash }
-        end
-      end
+      format.turbo_stream { render partial: 'layouts/flash_stream' }
+      format.html { redirect_back fallback_location: group_path(@group) }
     end
   end
 
