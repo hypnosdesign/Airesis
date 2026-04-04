@@ -2,6 +2,8 @@
   <% @unread = @proposal.contributes.listable.unread(current_user.id, @proposal.id) %>
 <% end %>
 
+<%= turbo_stream_from @proposal %>
+
 <h1 class="proposalTitle text-2xl font-bold mb-4">
   <%= image_tag("proposal_types/#{@proposal.proposal_type.name.downcase}_ico.png", alt: @proposal.proposal_type.description, title: @proposal.proposal_type.description, style: "width:40px;padding-right:2px;vertical-align:middle") %>
   <span itemprop="name"><%= h @proposal.title %></span>
