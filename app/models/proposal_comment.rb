@@ -1,7 +1,10 @@
 class ProposalComment < ApplicationRecord
   include ActionView::Helpers::TextHelper
+  include Turbo::Broadcastable
 
   has_paper_trail versions: { class_name: 'ProposalCommentVersion' }, only: [:content], on: %i[update destroy]
+
+  after_destroy_commit -> { broadcast_remove_to proposal, target: "comment_#{id}" }
 
   belongs_to :user, class_name: 'User', inverse_of: :proposal_comments, foreign_key: :user_id
   belongs_to :contribute, class_name: 'ProposalComment', inverse_of: :replies, foreign_key: :parent_proposal_comment_id, optional: true

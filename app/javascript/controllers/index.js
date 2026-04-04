@@ -4,6 +4,9 @@
 
 import { application } from "./application"
 
+import AutosubmitController from "./autosubmit_controller"
+application.register("autosubmit", AutosubmitController)
+
 import CountdownController from "./countdown_controller"
 application.register("countdown", CountdownController)
 
@@ -18,3 +21,6 @@ application.register("modal", ModalController)
 
 import ThemeController from "./theme_controller"
 application.register("theme", ThemeController)
+
+import ToggleController from "./toggle_controller"
+application.register("toggle", ToggleController)
