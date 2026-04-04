@@ -23,7 +23,7 @@ class User < ApplicationRecord
   validates :accept_conditions, acceptance: { message: -> { I18n.t('activerecord.errors.messages.TOS') } }
   validates :accept_privacy, acceptance: { message: -> { I18n.t('activerecord.errors.messages.privacy') } }
 
-  enum user_type_id: { administrator: 1, moderator: 2, authenticated: 3 }, _prefix: true
+  enum :user_type_id, { administrator: 1, moderator: 2, authenticated: 3 }, prefix: true
 
   # Attachments
   has_one_attached :avatar

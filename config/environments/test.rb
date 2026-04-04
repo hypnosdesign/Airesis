@@ -1,5 +1,5 @@
 Rails.application.configure do
-  config.cache_classes = false
+  config.enable_reloading = false
   config.eager_load = false
   config.public_file_server.enabled = true
   config.public_file_server.headers = {
@@ -14,7 +14,7 @@ Rails.application.configure do
   config.action_mailer.perform_caching = false
   config.action_mailer.delivery_method = :test
   config.action_mailer.logger = nil
-  config.active_support.deprecation = :stderr
+  config.active_support.report_deprecations = true
   # Disable parameter filtering in SQL logs to avoid Rails 7.1 ParameterFilter recursion bug
   # with complex bind parameters (e.g. from Globalize uniqueness validators)
   config.filter_parameters = []

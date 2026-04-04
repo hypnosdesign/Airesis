@@ -1,7 +1,7 @@
 Rails.application.configure do
   config.active_storage.service = ENV['AWS_HOST'].present? ? :amazon : :local
 
-  config.cache_classes = true
+  config.enable_reloading = false
 
   config.eager_load = true
 
@@ -12,7 +12,7 @@ Rails.application.configure do
 
   config.i18n.fallbacks = true
 
-  config.assets.js_compressor = :uglifier
+  # JS minification handled by esbuild; CSS by tailwindcss-rails
   config.assets.css_compressor = :sass
 
   config.action_mailer.perform_deliveries = true
@@ -35,7 +35,7 @@ Rails.application.configure do
 
   config.action_mailer.perform_caching = false
 
-  config.active_support.deprecation = :notify
+  config.active_support.report_deprecations = false
 
   if ENV['RAILS_LOG_TO_STDOUT'].present?
     logger = ActiveSupport::Logger.new(STDOUT)
