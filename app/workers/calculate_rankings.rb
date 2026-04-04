@@ -1,4 +1,4 @@
-class CalculateRankings
+class CalculateRankings < ApplicationJob
   def perform(*_args)
     User.find_each do |user|
       # number of comments created

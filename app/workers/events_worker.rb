@@ -1,9 +1,8 @@
-class EventsWorker
+class EventsWorker < ApplicationJob
   include ProposalsHelper
   include Rails.application.routes.url_helpers
-  include Sidekiq::Worker
 
-  sidekiq_options queue: :high_priority
+  queue_as :high_priority
 
   STARTVOTATION = 'startvotation'.freeze
   ENDVOTATION = 'endvotation'.freeze

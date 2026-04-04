@@ -1,4 +1,4 @@
-class CalculateGroupStatistics
+class CalculateGroupStatistics < ApplicationJob
   def perform(*_args)
     Group.all.find_each do |group|
       statistic = group.statistic

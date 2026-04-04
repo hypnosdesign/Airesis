@@ -55,7 +55,7 @@ class Alert < ApplicationRecord
 
   def accumulate
     increase_count! # increase the count in the alert
-    if email_job.present? && email_job.sidekiq_job.present? # an email is in queue?
+    if email_job.present? && email_job.scheduled_in_queue? # an email is in queue?
       email_job.accumulate # requeue it on new daly
     else # alert is sent, email is sent, but alert is not read yet, just send a new email for the previous (accumulated) alert
       send_email(true)
@@ -113,8 +113,8 @@ class Alert < ApplicationRecord
 
     delay = notification.notification_type.email_delay
     delay += notification.notification_type.alert_delay if add_alert_delay
-    jid = EmailsWorker.perform_in(delay.minutes, id)
-    EmailJob.create(alert: self, jid: jid)
+    job = EmailsWorker.set(wait: delay.minutes).perform_later(id)
+    EmailJob.create(alert: self, jid: job.job_id)
   end
 
   def private_pub

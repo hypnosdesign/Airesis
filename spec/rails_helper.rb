@@ -12,7 +12,6 @@ require File.expand_path('../config/environment', __dir__)
 require 'rspec/rails'
 require 'active_storage_validations/matchers'
 require 'shoulda/matchers'
-require 'sidekiq/testing'
 require 'capybara/rspec'
 require 'capybara/rails'
 require 'selenium/webdriver'
@@ -32,11 +31,11 @@ RSpec.configure do |config|
 
   config.before do
     ActionMailer::Base.deliveries.clear
-    Sidekiq::Worker.clear_all
     I18n.locale = I18n.default_locale = :'en-EU'
   end
 
   config.include ActiveStorageValidations::Matchers
+  config.include ActiveJob::TestHelper
   config.include FactoryBot::Syntax::Methods
   config.include Devise::Test::IntegrationHelpers, type: :request
   config.include Warden::Test::Helpers

@@ -61,7 +61,7 @@ module User::Profileable
     Tutorial.all.find_each do |tutorial|
       assign_tutorial(self, tutorial)
     end
-    GeocodeUser.perform_in(5.seconds, id)
+    GeocodeUser.set(wait: 5.seconds).perform_later(id)
   end
 
   def update_borders

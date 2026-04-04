@@ -30,7 +30,7 @@ class ProposalRanking < ApplicationRecord
   # invia le notifiche quando un utente valuta la proposta
   # le notifiche vengono inviate ai creatori e ai partecipanti alla proposta
   def send_notifications
-    NotificationProposalRankingCreate.perform_async(id)
+    NotificationProposalRankingCreate.perform_later(id)
   end
 
   def check_proposal_state

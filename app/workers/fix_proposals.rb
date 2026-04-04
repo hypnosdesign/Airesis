@@ -1,4 +1,4 @@
-class FixProposals
+class FixProposals < ApplicationJob
   def perform(*_args)
     # check all proposals in debate and time expired and close the debate
     Proposal.invalid_debate_phase.each(&:check_phase)

@@ -9,6 +9,6 @@ class AvailableAuthor < ApplicationRecord
   protected
 
   def send_notifications
-    NotificationAvailableAuthorCreate.perform_async(id)
+    NotificationAvailableAuthorCreate.perform_later(id)
   end
 end

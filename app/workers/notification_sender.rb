@@ -1,10 +1,10 @@
 # TODO: duplicated code, all that code is duplicated from notification helper. please fix it asap
-class NotificationSender
+class NotificationSender < ApplicationJob
   include Rails.application.routes.url_helpers
   include ProposalsHelper
-  include Sidekiq::Worker
 
-  sidekiq_options queue: :notifications, retry: 1
+  queue_as :notifications
+  retry_on StandardError, attempts: 2
 
   protected
 
@@ -61,7 +61,7 @@ class NotificationSender
   def send_cumulable_alert_to_user(notification, user)
     alert_job = search_for_cumulable(notification.notification_type, user)
     if alert_job.present? # an alert is already in queue
-      if alert_job.sidekiq_job.present?
+      if alert_job.scheduled_in_queue?
         accumulate(alert_job) # accumulate one notification on the previous one
         return
       else

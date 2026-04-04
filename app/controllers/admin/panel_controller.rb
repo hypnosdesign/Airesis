@@ -40,7 +40,7 @@ module Admin
 
     # invia una mail di prova tramite resque e redis
     def test_redis
-      ResqueMailer.delay.test_mail
+      ResqueMailer.test_mail.deliver_later
       flash[:notice] = 'Test avviato'
       redirect_to admin_panel_path
     end
@@ -48,12 +48,12 @@ module Admin
     # invia una notifica di prova tramite resque e redis
     def test_notification
       if params[:alert_id].to_s != ''
-        ResqueMailer.delay.notification(params[:alert_id])
+        ResqueMailer.notification(params[:alert_id]).deliver_later
       else
         NotificationType.all.each do |type|
           notification = type.notifications.order('created_at desc').first
           alert = notification.alerts.first if notification
-          ResqueMailer.delay.notification(alert.id) if alert
+          ResqueMailer.notification(alert.id).deliver_later if alert
         end
       end
       flash[:notice] = 'Test avviato'
@@ -66,7 +66,7 @@ module Admin
 
     # esegue un job di prova tramite resque_scheduler
     def test_scheduler
-      ProposalsWorker.perform_at(15.seconds.from_now, 'proposal_id' => 1)
+      ProposalsWorker.set(wait: 15.seconds).perform_later( 'proposal_id' => 1)
       flash[:notice] = 'Test avviato'
       redirect_to admin_panel_path
     rescue Exception => e

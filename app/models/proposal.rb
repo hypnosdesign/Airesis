@@ -542,7 +542,7 @@ class Proposal < ApplicationRecord
     self.valutations = 0
     self.rank = 0
 
-    NotificationProposalAbandoned.perform_in(1.minute, id, participants.map(&:id))
+    NotificationProposalAbandoned.set(wait: 1.minute).perform_later(id, participants.map(&:id))
     # and authors
     proposal_presentations.destroy_all
 
@@ -570,12 +570,12 @@ class Proposal < ApplicationRecord
     # if the time is fixed we schedule notifications 24h and 1h before the end of debate
     if quorum.time_fixed?
       if quorum.minutes > 1440
-        ProposalsWorker.perform_at(quorum.ends_at - 24.hours,
-                                   'action' => ProposalsWorker::LEFT24, 'proposal_id' => id)
+        ProposalsWorker.set(wait_until: quorum.ends_at - 24.hours)
+                       .perform_later('action' => ProposalsWorker::LEFT24, 'proposal_id' => id)
       end
       if quorum.minutes > 60
-        ProposalsWorker.perform_at(quorum.ends_at - 1.hour,
-                                   'action' => ProposalsWorker::LEFT1, 'proposal_id' => id)
+        ProposalsWorker.set(wait_until: quorum.ends_at - 1.hour)
+                       .perform_later('action' => ProposalsWorker::LEFT1, 'proposal_id' => id)
       end
     end
   end
@@ -590,17 +590,15 @@ class Proposal < ApplicationRecord
       vote_data.save!
     end
 
-    NotificationProposalVoteStarts.perform_async(id, groups.first.try(:id), presentation_areas.first.try(:id))
+    NotificationProposalVoteStarts.perform_later(id, groups.first.try(:id), presentation_areas.first.try(:id))
 
     if (vote_period.duration / 60) > 1440
-      ProposalsWorker.
-        perform_at(vote_period.endtime - 24.hours,
-                   'action' => ProposalsWorker::LEFT24VOTE, 'proposal_id' => id)
+      ProposalsWorker.set(wait_until: vote_period.endtime - 24.hours)
+                     .perform_later('action' => ProposalsWorker::LEFT24VOTE, 'proposal_id' => id)
     end
     if (vote_period.duration / 60) > 60
-      ProposalsWorker.
-        perform_at(vote_period.endtime - 1.hour,
-                   'action' => ProposalsWorker::LEFT1VOTE, 'proposal_id' => id)
+      ProposalsWorker.set(wait_until: vote_period.endtime - 1.hour)
+                     .perform_later('action' => ProposalsWorker::LEFT1VOTE, 'proposal_id' => id)
     end
   end
 
@@ -718,30 +716,30 @@ class Proposal < ApplicationRecord
     # if the time is fixed we schedule notifications 24h and 1h before the end of debate
     if quorum.time_fixed?
       if quorum.minutes > 1440
-        ProposalsWorker.perform_at(quorum.ends_at - 24.hours,
-                                   'action' => ProposalsWorker::LEFT24, 'proposal_id' => id)
+        ProposalsWorker.set(wait_until: quorum.ends_at - 24.hours)
+                       .perform_later('action' => ProposalsWorker::LEFT24, 'proposal_id' => id)
       end
       if quorum.minutes > 60
-        ProposalsWorker.perform_at(quorum.ends_at - 1.hour,
-                                   'action' => ProposalsWorker::LEFT1, 'proposal_id' => id)
+        ProposalsWorker.set(wait_until: quorum.ends_at - 1.hour)
+                       .perform_later('action' => ProposalsWorker::LEFT1, 'proposal_id' => id)
       end
     end
 
     # end of debate timer
-    ProposalsWorker.perform_at(quorum.ends_at, 'action' => ProposalsWorker::ENDTIME, 'proposal_id' => id) if quorum.minutes
+    ProposalsWorker.set(wait_until: quorum.ends_at).perform_later('action' => ProposalsWorker::ENDTIME, 'proposal_id' => id) if quorum.minutes
 
     # alert users of the new proposal
-    NotificationProposalCreate.perform_async(id)
+    NotificationProposalCreate.perform_later(id)
   end
 
   def send_update_notifications
     if quorum_id_changed? # regenerated
-      ProposalsWorker.perform_at(quorum.ends_at, 'action' => ProposalsWorker::ENDTIME, 'proposal_id' => id)
+      ProposalsWorker.set(wait_until: quorum.ends_at).perform_later('action' => ProposalsWorker::ENDTIME, 'proposal_id' => id)
     elsif current_user_id # updated or set votation date
       if waiting? # someone chose votation date
-        NotificationProposalWaitingForDate.perform_async(id, current_user_id)
+        NotificationProposalWaitingForDate.perform_later(id, current_user_id)
       else # standard update
-        NotificationProposalUpdate.perform_async(current_user_id, id, groups.first.try(:id))
+        NotificationProposalUpdate.perform_later(current_user_id, id, groups.first.try(:id))
       end
     end
   end

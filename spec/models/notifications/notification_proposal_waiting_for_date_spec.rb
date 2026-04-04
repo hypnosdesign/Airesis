@@ -19,7 +19,7 @@ RSpec.describe NotificationProposalWaitingForDate, type: :model, emails: true, n
   end
 
   it 'notifies participants when a proposal is waiting for a vote date' do
-    described_class.perform_async(proposal.id, current_user.id)
+    described_class.perform_later(proposal.id, current_user.id)
     expect(described_class.jobs.size).to eq 1
     described_class.drain
     AlertsWorker.drain
@@ -35,7 +35,7 @@ RSpec.describe NotificationProposalWaitingForDate, type: :model, emails: true, n
   end
 
   it 'includes the author name in notification data' do
-    described_class.perform_async(proposal.id, current_user.id)
+    described_class.perform_later(proposal.id, current_user.id)
     described_class.drain
     AlertsWorker.drain
 
@@ -44,7 +44,7 @@ RSpec.describe NotificationProposalWaitingForDate, type: :model, emails: true, n
   end
 
   it 'includes group name when proposal is in a group' do
-    described_class.perform_async(proposal.id, current_user.id)
+    described_class.perform_later(proposal.id, current_user.id)
     described_class.drain
     AlertsWorker.drain
 
