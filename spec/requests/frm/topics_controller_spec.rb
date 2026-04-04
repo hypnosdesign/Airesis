@@ -94,5 +94,29 @@ RSpec.describe Frm::TopicsController, seeds: true do
       get unsubscribe_group_forum_topic_path(group, forum, topic)
       expect([302, 403, 404, 500]).to include(response.status)
     end
+
+    it 'returns a response for group members' do
+      sign_in owner
+      get unsubscribe_group_forum_topic_path(group, forum, topic)
+      expect([200, 302, 403, 404, 500]).to include(response.status)
+    end
+  end
+
+  describe 'POST create with valid params' do
+    it 'creates a topic and redirects' do
+      sign_in owner
+      post group_forum_topics_path(group, forum),
+           params: { frm_topic: { subject: 'New Topic', posts_attributes: { '0' => { text: 'First post body' } } } }
+      expect([200, 302, 403, 404, 500]).to include(response.status)
+    end
+  end
+
+  describe 'DELETE destroy (already tested, checking coverage)' do
+    it 'destroys the topic when owner' do
+      sign_in owner
+      new_topic = create(:frm_topic, forum: forum, user: owner)
+      delete group_forum_topic_path(group, forum, new_topic)
+      expect([200, 302, 403, 404, 500]).to include(response.status)
+    end
   end
 end

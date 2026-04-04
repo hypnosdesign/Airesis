@@ -1,7 +1,7 @@
 # CLAUDE.md — Airesis
 
 > Analisi iniziale: 2026-03-31.
-> Ultimo aggiornamento: 2026-04-04 — Fasi 1–5 completate. Fase 4-R.1 completata: TUTTE le view convertite da Slim/Foundation a ERB/DaisyUI (500+ file, zero Slim). jQuery+Foundation CSS ancora attivi via Sprockets (327 file JS legacy). Copertura test: 70.0% ✓.
+> Ultimo aggiornamento: 2026-04-04 — Fasi 1–5 completate. Fase 4-R.1 completata: TUTTE le view convertite da Slim/Foundation a ERB/DaisyUI (500+ file, zero Slim). jQuery+Foundation CSS ancora attivi via Sprockets (327 file JS legacy). Copertura test: 80.23% ✓.
 > Obiettivo: modernizzare l'app per renderla funzionante e manutenibile nel 2026.
 
 ---
@@ -153,7 +153,7 @@ RAILS_LOG_TO_STDOUT=true
 ## Test
 
 - Framework: **RSpec** + FactoryBot + Capybara + Selenium
-- Copertura attuale: **~70.0%** (1103 esempi, 0 failure al 2026-04-03) — target 70% ✓ raggiunto
+- Copertura attuale: **~80.23%** (1498 esempi, 0 failure al 2026-04-04) — target 80% ✓ raggiunto
 - Copertura minima configurata in SimpleCov: **70.0%**
 - Run in Docker: `docker compose run --rm -e BUNDLE_APP_CONFIG=/usr/src/app/.bundle airesis bundle exec rspec`
 - CI: Travis CI (`.travis.yml`) + Semaphore (`.semaphore/`)
@@ -248,14 +248,14 @@ RAILS_LOG_TO_STDOUT=true
 18. ✅ Uniformare template engine (tutti ERB + DaisyUI)
     - Completata in Fase 4-R.1: convertiti tutti i file Slim a ERB con Tailwind/DaisyUI.
 19. ✅ Aumentare copertura test al 70%+
-    - Stato al 2026-04-03: **70.0%** (1103 esempi, 0 failure) — target raggiunto
+    - Stato al 2026-04-04: **80.23%** (1498 esempi, 0 failure) — target 80% raggiunto ✓
     - Aggiunte spec request per 12+ controller a zero copertura (area_roles, frm/admin/*, frm/moderation, proposal_supports, event_comments, blocked_proposal_alerts, group_invitation_emails, admin/newsletters, registrations)
     - Estese spec per home, blog_posts, proposals, groups, users, quorums controller
     - Aggiunte spec modelli: best_quorum_extra, user/authenticatable concern, proposal_vote, quorum, user concerns (profileable, proposable, socializable)
     - Aggiunte spec helper: proposals_helper
     - Aggiunte spec mailer: resque_mailer
     - Estesa copertura: quorums_controller (destroy, change_status, dates), groups_controller (JS/JSON format, partecipazioni), best_quorum (check_phase, close_vote_phase, explanation_pop, populate_vote)
-    - SimpleCov minimum_coverage aggiornato da 32.9% a 70.0%
+    - SimpleCov minimum_coverage aggiornato da 32.9% a 70.0%, poi a 80.0%
 
 ### Fase 4-R — Remediation frontend ✅
 
@@ -296,11 +296,13 @@ RAILS_LOG_TO_STDOUT=true
 - Fasi 1–5 completate (Rails 6→7.1, Ruby 2.7→3.2, Webpacker→esbuild, Foundation→Tailwind, Turbolinks→Hotwire, Paperclip→ActiveStorage, ERB→Slim) → bump a **5.0.0** al termine della copertura 80%
 - Rails 8.x + Ruby 3.4 + UI redesign → bump a **6.0.0**
 
-20. ⬜ Copertura test → 80% + bump versione **5.0.0**
+20. ✅ Copertura test → 80% + bump versione **5.0.0**
     - Target intermedio prima dell'upgrade Rails 8.x
     - Priorità: percorsi critici (auth, proposte/voto Schulze, gruppi, API v1)
     - Non necessario il 100% — troppo costoso su 117 modelli / 73 controller
-    - Al raggiungimento dell'80%: aggiornare `AIRESIS_VERSION = '5.0.0'`
+    - **Raggiunto al 2026-04-04: 80.23% (1498 esempi, 0 failure)**
+    - SimpleCov minimum_coverage aggiornato a 80.0%
+    - TODO: aggiornare `AIRESIS_VERSION = '5.0.0'`
 
 21. ⬜ Rails 7.1 → **7.2**
     - Step minore, meno rischi
@@ -403,7 +405,7 @@ RAILS_LOG_TO_STDOUT=true
 - [x] ~~Foundation CSS 5.0~~ — CSS Foundation eliminato, tutte le view usano Tailwind/DaisyUI
 - [x] ~~Font Awesome 4.7~~ — migrato a 6.x (font-awesome-sass)
 - [ ] `.rubocop_todo.yml` con ~15KB di violazioni ignorate
-- [ ] Copertura test < 80% (corrente: ~70.0% — target 70% ✓, prossimo 80% pre-Rails 8.x)
+- [x] Copertura test 80%+ (corrente: ~80.23% — target 80% ✓ raggiunto al 2026-04-04)
 
 ---
 

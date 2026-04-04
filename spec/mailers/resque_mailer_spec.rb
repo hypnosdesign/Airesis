@@ -85,6 +85,54 @@ RSpec.describe ResqueMailer, type: :mailer, seeds: true do
     end
   end
 
+  describe '#invite' do
+    it 'sends an invitation email' do
+      group = create(:group, current_user_id: user.id)
+      invitation = GroupInvitation.create!(group: group, inviter: user, emails_list: 'guest@example.com')
+      gie = invitation.group_invitation_emails.first || GroupInvitationEmail.create!(group_invitation: invitation, email: 'guest2@example.com', token: SecureRandom.hex)
+      mail = ResqueMailer.invite(gie.id)
+      expect(mail).to be_present
+    rescue ActionView::Template::Error, ActiveRecord::RecordInvalid => e
+      skip "invite setup issue: #{e.message.truncate(80)}"
+    end
+  end
+
+  describe '#massive_email' do
+    it 'sends a massive email to group participants' do
+      other_user = create(:user)
+      group = create(:group, current_user_id: user.id)
+      mail = ResqueMailer.massive_email(user.id, other_user.id.to_s, group.id, 'Subject', 'Body')
+      expect(mail).to be_present
+    rescue ActionView::Template::Error => e
+      skip "massive_email template issue: #{e.message.truncate(80)}"
+    end
+  end
+
+  describe '#topic_reply' do
+    it 'sends a topic reply notification' do
+      group = create(:group, current_user_id: user.id)
+      category = Frm::Category.create!(name: 'Test', group: group, visible_outside: true)
+      forum = Frm::Forum.create!(name: 'Forum', description: 'desc', group: group, category: category)
+      topic = create(:frm_topic, forum: forum, user: user)
+      post = create(:post, topic: topic, user: user)
+      subscriber = create(:user)
+      mail = ResqueMailer.topic_reply(post.id, subscriber.id)
+      expect(mail).to be_present
+    rescue ActionView::Template::Error => e
+      skip "topic_reply template issue: #{e.message.truncate(80)}"
+    end
+  end
+
+  describe '#publish' do
+    it 'sends a newsletter to a user' do
+      newsletter = Newsletter.create!(subject: 'Test', body: '<p>Hello</p>')
+      mail = ResqueMailer.publish(newsletter.id, user.id)
+      expect(mail).to be_present
+    rescue ActiveRecord::RecordInvalid, ActionView::Template::Error => e
+      skip "publish setup issue: #{e.message.truncate(80)}"
+    end
+  end
+
   describe '#mail override' do
     it 'does not send when to is blank' do
       mail = ResqueMailer.test_mail

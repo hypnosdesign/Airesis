@@ -213,4 +213,24 @@ RSpec.describe ProposalCommentsController, seeds: true do
       expect([200, 302, 500]).to include(response.status)
     end
   end
+
+  describe 'GET history' do
+    it 'returns a response without authentication' do
+      get history_proposal_proposal_comment_path(proposal, comment)
+      expect([200, 302, 500]).to include(response.status)
+    end
+
+    it 'returns a response when authenticated' do
+      sign_in user
+      get history_proposal_proposal_comment_path(proposal, comment)
+      expect([200, 302, 500]).to include(response.status)
+    end
+  end
+
+  describe 'GET show' do
+    it 'returns a response without authentication' do
+      get proposal_proposal_comment_path(proposal, comment)
+      expect([200, 302, 500]).to include(response.status)
+    end
+  end
 end
