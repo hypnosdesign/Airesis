@@ -14,28 +14,32 @@
     </div>
   </div>
   <script type="text/javascript">
-    $(function () {
+    (function() {
       var currentPage = 1;
-      $('#loading_proposals<%= params[:state] || params[:view] %>').click(function () {
-        $(this).hide();
-        $(this).next().show();
-        currentPage++;
-        var cat = <%= params[:category] || 'null' %>;
-        var view = <%= params[:view] || 'null' %>;
-        var state = '<%= @search.proposal_state_tab || 'null' %>';
-        var group = <%= @search.group_id || 'null' %>;
-        var order = '<%= params[:order] || 'null' %>';
-        var nurl = '/proposals/endless_index?scroll=true';
-        if (cat != null && cat != 'null') nurl += '&category=' + cat;
-        if (view != null && view != 'null') nurl += '&view=' + view;
-        if (state != null && state != 'null') nurl += '&state=' + state;
-        if (group != null && group != 'null') nurl += '&group_id=' + group;
-        if (order != null && order != 'null') nurl += '&order=' + order;
-        $.ajax({ url: nurl, data: {page: currentPage}, type: 'get'});
-      });
-    })
+      var btn = document.getElementById('loading_proposals<%= params[:state] || params[:view] %>');
+      if (btn) {
+        btn.addEventListener('click', function () {
+          btn.style.display = 'none';
+          btn.nextElementSibling.style.display = '';
+          currentPage++;
+          var cat = <%= params[:category] || 'null' %>;
+          var view = <%= params[:view] || 'null' %>;
+          var state = '<%= @search.proposal_state_tab || 'null' %>';
+          var group = <%= @search.group_id || 'null' %>;
+          var order = '<%= params[:order] || 'null' %>';
+          var nurl = '/proposals/endless_index?scroll=true';
+          if (cat != null && cat != 'null') nurl += '&category=' + cat;
+          if (view != null && view != 'null') nurl += '&view=' + view;
+          if (state != null && state != 'null') nurl += '&state=' + state;
+          if (group != null && group != 'null') nurl += '&group_id=' + group;
+          if (order != null && order != 'null') nurl += '&order=' + order;
+          fetch(nurl + '&page=' + currentPage, {
+            headers: { 'Accept': 'text/vnd.turbo-stream.html' }
+          }).then(function(r) { return r.text(); }).then(function(html) {
+            Turbo.renderStreamMessage(html);
+          });
+        });
+      }
+    })();
   </script>
 <% end %>
-<script type="text/javascript">
-  $(function () { disegnaProgressBar(); disegnaCountdown(); });
-</script>

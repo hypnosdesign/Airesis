@@ -15,5 +15,13 @@
 <div style="clear: both;"></div>
 <br>
 <script type="text/javascript">
-  $(function () { $('.groupListContainer').click(function () { $(this).toggleClass('highlighted'); var text = $('.groupListContainer.highlighted').map(function () { return $(this).data('id') }).get().join(';'); $('#groupsi_group_ids').val(text); return false; }) });
+  document.querySelectorAll('.groupListContainer').forEach(function(el) {
+    el.addEventListener('click', function() {
+      this.classList.toggle('highlighted');
+      var ids = Array.from(document.querySelectorAll('.groupListContainer.highlighted')).map(function(e) { return e.dataset.id; }).join(';');
+      var input = document.getElementById('groupsi_group_ids');
+      if (input) input.value = ids;
+      return false;
+    });
+  });
 </script>

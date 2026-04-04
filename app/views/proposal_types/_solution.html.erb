@@ -43,6 +43,15 @@
   </div>
   <% _section_nav_js = solution.sections.each_with_index.map { |section, j| link = link_to(section.title, '#', onclick: 'return scrollToSection(this);', class: 'sec_title'); "sub_nav.append('<li data-section_id=\"#{j}\">#{link}</li>');" }.join(" ") %>
   <script type="text/javascript">
-    var sol_link = $('<li data-solution_id="new"><span class="sol_title"><%= solution.title %></span></li>'); var sub_nav = $('<ul class="sub_navigator"></ul>'); sol_link.append(sub_nav); $('.navigator').append(sol_link); <%= _section_nav_js %>
+    (function() {
+      var sol_link = document.createElement('li');
+      sol_link.dataset.solution_id = 'new';
+      sol_link.innerHTML = '<span class="sol_title"><%= j solution.title %></span>';
+      var sub_nav = document.createElement('ul');
+      sub_nav.className = 'sub_navigator';
+      sol_link.appendChild(sub_nav);
+      var nav = document.querySelector('.navigator');
+      if (nav) nav.appendChild(sol_link);
+    })();
   </script>
 <% end %>

@@ -4,13 +4,11 @@
   <div style="clear: both;"></div>
 </div>
 
-<script type="text/javascript">
+<script>
   function showSection(id) {
-    $('.quorum_section').hide();
-    $('#'+id).fadeIn();
+    document.querySelectorAll('.quorum_section').forEach(function (el) { el.style.display = 'none'; });
+    document.getElementById(id).style.display = '';
   }
-  $(function() {
-    $('.quorum_section').hide();
-    $('#whatis').fadeIn();
-  })
+  document.querySelectorAll('.quorum_section').forEach(function (el) { el.style.display = 'none'; });
+  document.getElementById('whatis').style.display = '';
 </script>

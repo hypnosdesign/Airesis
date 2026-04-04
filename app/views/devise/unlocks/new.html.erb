@@ -1,7 +1,13 @@
 <div class="card bg-base-200 p-4">
   <h2>Resend unlock instructions</h2>
   <%= form_for(resource, as: resource_name, url: unlock_path(resource_name), html: { method: :post }) do |f| %>
-    <%= devise_error_messages! %>
+    <% if resource.errors.any? %>
+      <div role="alert" class="alert alert-error">
+        <ul class="list-disc list-inside text-sm">
+          <% resource.errors.full_messages.each do |msg| %><li><%= msg %></li><% end %>
+        </ul>
+      </div>
+    <% end %>
     <div class="form-control">
       <%= f.label :email %>
       <br>

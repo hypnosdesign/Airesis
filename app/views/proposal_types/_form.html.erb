@@ -1,6 +1,6 @@
 <h2><%= @title %></h2>
 <div id="create_proposal">
-  <%= simple_form_for @group.present? ? [@group, @proposal] : @proposal, validate: true, remote: request.xhr? do |f| %>
+  <%= simple_form_for @group.present? ? [@group, @proposal] : @proposal, html: { data: { turbo: false } } do |f| %>
     <div class="step root root">
       <div class="mb-2">
         <%= t('pages.proposals.new.step_1_title', app_short_name: APP_SHORT_NAME) %>

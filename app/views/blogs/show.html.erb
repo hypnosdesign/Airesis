@@ -25,16 +25,18 @@
   </div>
 <% end %>
 
-<script type="text/javascript">
-  $(function () {
-    $('.hidden_menu').click(function (event) {});
-    $('html').click(function () {
-      $('.hidden_menu').hide();
-      $('.hidden_link.visible').removeClass('visible');
-    });
-    $('.hidden_link').click(function (event) {
-      $(this).addClass('visible');
-      $(this).next().show().position({ my: "right top", at: "right bottom", of: $(this) });
+<script>
+  document.querySelectorAll('.hidden_menu').forEach(function (el) {
+    el.addEventListener('click', function (event) {});
+  });
+  document.documentElement.addEventListener('click', function () {
+    document.querySelectorAll('.hidden_menu').forEach(function (el) { el.style.display = 'none'; });
+    document.querySelectorAll('.hidden_link.visible').forEach(function (el) { el.classList.remove('visible'); });
+  });
+  document.querySelectorAll('.hidden_link').forEach(function (el) {
+    el.addEventListener('click', function (event) {
+      this.classList.add('visible');
+      this.nextElementSibling.style.display = '';
       event.stopPropagation();
     });
   });

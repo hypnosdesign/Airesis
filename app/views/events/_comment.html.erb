@@ -10,9 +10,9 @@
   </div>
   <div class="blog-comment-footer">
     <% if comment.likers.include? current_user %>
-      <%= link_to 'Unlike', like_event_event_comment_path(@event, comment), method: :post, remote: true, data: {other: 'Like'}, onclick: 'switchText($(this))' %>
+      <%= link_to 'Unlike', like_event_event_comment_path(@event, comment), method: :post, remote: true, data: {other: 'Like'}, onclick: 'switchText(this)' %>
     <% else %>
-      <%= link_to 'Like', like_event_event_comment_path(@event, comment), method: :post, remote: true, data: {other: 'Unlike'}, onclick: 'switchText($(this))' %>
+      <%= link_to 'Like', like_event_event_comment_path(@event, comment), method: :post, remote: true, data: {other: 'Unlike'}, onclick: 'switchText(this)' %>
     <% end %>
     &middot;
     <%= time_in_words(comment.created_at) %>

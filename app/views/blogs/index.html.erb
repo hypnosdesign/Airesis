@@ -35,42 +35,13 @@
 
 <script type="text/javascript">
   function checkCharacters() {
-    if (($('#search').val().length > 2) || ($('#interest_border').val() != '')) {
+    var search = document.getElementById('search');
+    var border = document.getElementById('interest_border');
+    if ((search && search.value.length > 2) || (border && border.value !== '')) {
       return true;
     } else {
       alert('<%= t('pages.blogs.index.insert_query') %>');
       return false;
     }
   }
-  $('#interest_border').tokenInput("<%= interest_borders_path(format: :json) %>", {
-    propertyToSearch: 'text',
-    crossDomain: false,
-    prePopulate: $('#interest_border').data("pre"),
-    hintText: "<%= t('interest_borders.hint') %>",
-    noResultsText: "<%= t('interest_borders.no_place_found') %>",
-    searchingText: "<%= t('interest_borders.searching') %>",
-    preventDuplicates: true,
-    tokenLimit: 1,
-    allowTabOut: true
-  });
-  var everPushedSomething = false;
-  var initialUrl = location.href;
-  $(window).bind('popstate', function (event) {
-    var onloadPop = !everPushedSomething && location.href == initialUrl;
-    everPushedSomething = true;
-    if (onloadPop) { return; }
-    $.getScript(addQueryParam(location.href, 'back', 'true'));
-  });
-  $("#and").switchButton({
-    checked: <%= params[:and] == 'on' %>,
-    on_label: $('<div class="switch_opt">&</div>'),
-    off_label: $('<div class="switch_opt">||</div>'),
-    on_title: '<%= t('pages.groups.index.switchButton.all_words') %>',
-    off_title: '<%= t('pages.groups.index.switchButton.one_word') %>'
-  });
-  $('.switch-button-label.on, .switch-button-label.off').qtip({
-    prerender: true,
-    position: { at: 'top center', my: 'bottom center', viewport: $(window), effect: false },
-    style: { classes: 'qtip-dark' }
-  });
 </script>

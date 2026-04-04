@@ -4,12 +4,3 @@
   <%= f.submit t('pages.blog_comments.new.insert_comment'), data: { disable_with: t('loading') }, class: 'btn btn-success' %>
 <% end %>
 
-<script type="text/javascript">
-  $(function () {
-    var comment_input = $('#blog_comment_body');
-    comment_input.charCount({ allowed: <%= CONTRIBUTE_MAX_LENGTH %>, warning: 100, counterText: '<%= t('pages.proposals.show.characters_left') %> ' });
-    comment_input.elastic();
-    comment_input.attr('data-initialized', 1);
-  });
-  disegnaCountdown();
-</script>

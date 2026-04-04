@@ -8,21 +8,3 @@
 <%= f.association :mods, collection: @group.mods, as: :check_boxes %>
 <%= f.submit class: "btn btn-primary mt-4" %>
 
-<script type="text/javascript">
-  $(function () {
-    var input = $('#frm_forum_tags_list')
-    if (input != null) {
-      input.tokenInput("<%= tags_path(format: :json) %>", {
-        theme: "facebook", crossDomain: false, allowFreeTagging: true, minChars: 3,
-        hintText: "<%= t('digit_tags') %>", searchingText: "<%= t('digit_tags') %>",
-        prePopulate: <%= raw @forum.tags_data %>,
-        preventDuplicates: true, allowTabOut: true, tokenValue: "name", tokenLimit: 5
-      })
-    }
-    $('#frm_forum_category').change(function(ev) {
-      var tags_ = $(this).find(':selected').data('tags');
-      input.tokenInput('clear');
-      $.each(tags_, function (index, value) { input.tokenInput('add', value); });
-    });
-  });
-</script>

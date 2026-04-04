@@ -13,5 +13,15 @@
 <% end %>
 <div style="clear: both;"></div>
 <script type="text/javascript">
-  $(function () { UsersBorderPreferences.init(); $('#submit_borders').click(function () { $(this).hide(); $('#border_fields').hide(); $('#loading_borders').fadeIn(); return true; }); });
+  var submitBtn = document.getElementById('submit_borders');
+  if (submitBtn) {
+    submitBtn.addEventListener('click', function() {
+      this.style.display = 'none';
+      var fields = document.getElementById('border_fields');
+      if (fields) fields.style.display = 'none';
+      var loading = document.getElementById('loading_borders');
+      if (loading) loading.style.display = '';
+      return true;
+    });
+  }
 </script>

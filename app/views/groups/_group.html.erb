@@ -57,11 +57,7 @@
   <% end %>
 <% end %>
 <% if ['new', 'create'].include?(params[:action]) %>
-  <% _role_actions_js = @group.default_role_actions.to_a.map { |id| "$('#group_default_role_actions_#{id}').prop('checked', true);" }.join(" ") %>
-  <% _permissions_js = "$('#change_permissions_button').click(function () { $('#permessi').foundation('reveal', 'close'); return false; }); $('#default_permissions_button').click(function () { $(\"input[name=group\\\\[default_role_actions\\\\]\\\\[\\\\]]\").prop('checked', false); #{_role_actions_js} return false; }); " %>
+  <% _role_actions_js = @group.default_role_actions.to_a.map { |id| "var cb = document.getElementById('group_default_role_actions_#{id}'); if (cb) cb.checked = true;" }.join(" ") %>
 <% else %>
-  <% _permissions_js = "" %>
+  <% _role_actions_js = "" %>
 <% end %>
-<script type="text/javascript">
-  $(function () { var description_editor = CKEDITOR.instances['group_description']; description_editor.on('change', function (event) { description_editor.updateElement(); $('form').formValidation('revalidateField', 'group[description]'); return true; }); var input_interest_border = $('#group_interest_border_tkn'); input_interest_border.select2({ ajax: { url: "<%= interest_borders_path %>", dataType: 'json', delay: 250, data: function (params) { return { q: params.term, l: Airesis.i18n.locale, pp: 'disable' }; }, processResults: function (data, page) { return { results: data }; }, cache: true }, escapeMarkup: function (markup) { return markup; }, minimumInputLength: 1 }).on("select2:close", function () { $('#new_group', '#edit_group').formValidation('revalidateField', 'group[interest_border_tkn]'); }); }); <%= raw _permissions_js %> $(function () { var input = $('#group_tags_list'); if (input != null) { input.tokenInput("<%= tags_path(format: :json) %>", { theme: "facebook", crossDomain: false, allowFreeTagging: true, minChars: 3, prePopulate: <%= raw @group.tags.map{|t| {id: t.text, name: t.text}}.to_json.to_s %>, hintText: "<%= t('digit_tags') %>", searchingText: "<%= t('digit_tags') %>", preventDuplicates: true, allowTabOut: true, tokenValue: "name", tokenLimit: 5 }) } });
-</script>

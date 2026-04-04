@@ -122,27 +122,19 @@
 <script type="text/javascript">
   function update_participants(value) {
     var calculated = Math.min(Math.floor(parseFloat(value) * 0.01 * parseFloat(<%= @group_participations_count %>)) + 1, <%= @group_participations_count %>);
-    $('#participants_number').html(calculated);
+    document.getElementById('participants_number').innerHTML = calculated;
   }
   update_participants(<%= @quorum.percentage %>);
-  $(".participants").on('input', function (e) {
-    var num = $(this).val();
-    update_participants(num);
+  document.querySelectorAll(".participants").forEach(function(el) {
+    el.addEventListener('input', function() { update_participants(this.value); });
   });
   function update_vote_participants(value) {
     var calculated = Math.min(Math.floor(parseFloat(value) * 0.01 * parseFloat(<%= @vote_participants_count %>)) + 1, <%= @vote_participants_count %>);
-    $('#vote_participants_number').html(calculated);
+    document.getElementById('vote_participants_number').innerHTML = calculated;
   }
-  $(".vote_participants").on('input', function (e) {
-    var num = $(this).val();
-    update_vote_participants(num);
+  document.querySelectorAll(".vote_participants").forEach(function(el) {
+    el.addEventListener('input', function() { update_vote_participants(this.value); });
   });
   update_vote_participants(<%= @quorum.vote_percentage %>);
-  function closeMe() {
-    $('#quorum_container').foundation('reveal', 'close');
-  }
-  $(function () {
-    $('.advanced').hide();
-    $(".elastic").elastic();
-  });
+  document.querySelectorAll('.advanced').forEach(function(el) { el.style.display = 'none'; });
 </script>

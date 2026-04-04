@@ -34,7 +34,13 @@
         <%= f.submit t('pages.events.show.reply'), class: 'btn btn-primary', data: { disable_with: t('sending') } %>
       <% end %>
       <script type="text/javascript">
-        $(function () { $('#meeting_participation_comment').charCount({ allowed: 255, warning: 10, counterText: '<%= j t('pages.proposals.show.characters_left') %>' }); $("input[name='meeting_participation[response]']").change(function () { var selected_radio = $("input[name='meeting_participation[response]']:checked").val(); if (selected_radio == 'Y') { $('#guests_number').fadeIn(); } else { $('#guests_number').fadeOut(); } }); });
+        document.querySelectorAll("input[name='meeting_participation[response]']").forEach(function(radio) {
+          radio.addEventListener('change', function() {
+            var selected = document.querySelector("input[name='meeting_participation[response]']:checked");
+            var guests = document.getElementById('guests_number');
+            if (guests) guests.style.display = (selected && selected.value === 'Y') ? '' : 'none';
+          });
+        });
       </script>
     <% end %>
   <% end %>

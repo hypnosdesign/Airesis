@@ -5,10 +5,8 @@
       <h3><%= title %></h3>
     <% end %>
     <ul>
-      <% resource.errors.each do |attr, msg| %>
-        <% if resource.errors[attr].first == msg %>
-          <li><b><%= resource.class.human_attribute_name(attr) %></b>: <%= msg %></li>
-        <% end %>
+      <% resource.errors.each do |error| %>
+        <li><b><%= resource.class.human_attribute_name(error.attribute) %></b>: <%= error.message %></li>
       <% end %>
     </ul>
   </div>
