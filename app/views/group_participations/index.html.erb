@@ -37,7 +37,7 @@
               <i class="fa-solid fa-envelope"></i>
               <%= t('pages.groups.participations.send_email') %>
             <% end %>
-            <div id="email_panel" class="reveal-modal small" data-reveal>
+            <div id="email_panel" class="small">
               <h2><%= t('pages.users.send_message.massive_email') %></h2>
               <%= simple_form_for 'message', url: send_email_group_group_participations_path(@group), data: { turbo_method: :post } do |e| %>
                 <%= e.input 'subject', label: t('pages.users.send_message.subject_label') %>
@@ -48,7 +48,7 @@
                 </a>
                 <%= e.submit t('buttons.send'), class: 'btn btn-primary', data: { disable_with: t('sending') } %>
               <% end %>
-              <a class="close-reveal-modal">&times;</a>
+              <a class="close-">&times;</a>
             </div>
             <%= form_for 'destroy', url: destroy_all_group_group_participations_path(@group), data: { turbo_method: :post }, html: { style: 'display:inline;' } do |e| %>
               <%= e.hidden_field 'ids', value: @unscoped_group_participations.map { |p| p.id }.join(',') %>

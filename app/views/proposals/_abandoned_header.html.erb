@@ -9,7 +9,7 @@
     <%= t('proposals.regenerate_button') %>
   <% end %>
 <% end %>
-<div id="regenerate_container" class="reveal-modal" data-reveal>
+<div id="regenerate_container" class="">
   <h2><%= t('pages.proposals.show.new_quorum_title') %></h2>
   <%= simple_form_for @proposal, url: (@group ? regenerate_group_proposal_path(@group, @proposal) : regenerate_proposal_path(@proposal)) do |f| %>
     <%= render partial: '/proposal_types/quorum_choice', locals: { f: f } %>
@@ -18,5 +18,5 @@
     </a>
     <%= f.submit t('pages.proposals.show.back_debate_button'), class: 'btn btn-primary', data: { disable_with: t('loading') } %>
   <% end %>
-  <a class="close-reveal-modal">&times;</a>
+  <a class="close-">&times;</a>
 </div>

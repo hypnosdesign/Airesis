@@ -80,7 +80,7 @@
   </div>
 <% end %>
 
-<a class="close-reveal-modal">&times;</a>
+<a class="close-">&times;</a>
 
 <% if @event.place %>
   <% _place_js = "EventsEdit.placeDefined = true; EventsEdit.latitudeOriginal = #{@event.place.latitude_original}; EventsEdit.longitudeOriginal = #{@event.place.longitude_original}; EventsEdit.latitudeCenter = #{@event.place.latitude_center}; EventsEdit.longitudeCenter = #{@event.place.longitude_center}; EventsEdit.zoom = #{@event.place.zoom}; " %>
