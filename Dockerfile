@@ -29,7 +29,7 @@ WORKDIR /usr/src/app
 EXPOSE 3000
 
 COPY Gemfile Gemfile.lock .ruby-version ./
-RUN bundle install -j4 --without test
+RUN bundle install -j4
 
 COPY package.json yarn.lock ./
 RUN yarn install

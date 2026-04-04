@@ -4,8 +4,6 @@ module Api
       respond_to :json
       skip_before_action :verify_authenticity_token, if: :json_request?
 
-      acts_as_token_authentication_handler_for User
-      skip_before_action :authenticate_user_from_token!
       before_action :authenticate_user_from_token!, only: [:destroy]
 
       def create
@@ -24,6 +22,16 @@ module Api
       end
 
       private
+
+      def authenticate_user_from_token!
+        token = request.headers['X-User-Token']
+        email = request.headers['X-User-Email']
+        user = email.present? && User.find_by(email: email)
+        if user && user.authentication_token.present? &&
+           ActiveSupport::SecurityUtils.secure_compare(user.authentication_token, token.to_s)
+          sign_in user, store: false
+        end
+      end
 
       def json_request?
         request.format.json?

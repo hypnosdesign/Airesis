@@ -8,7 +8,7 @@ class StepsController < ApplicationController
     assignee.update_attribute(:status, TutorialProgress::DONE)
     respond_to do |format|
       format.html { redirect_back(fallback_location: root_path) }
-      format.js { render nothing: true }
+      format.js { head :ok }
     end
   end
 

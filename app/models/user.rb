@@ -1,7 +1,7 @@
 require 'digest/sha1'
 
 class User < ApplicationRecord
-  acts_as_token_authenticatable
+  has_secure_token :authentication_token
 
   devise :database_authenticatable, :registerable, :confirmable, :omniauthable,
          :blockable, :recoverable, :rememberable, :trackable, :validatable, :traceable
@@ -103,6 +103,16 @@ class User < ApplicationRecord
 
   def ability
     @ability ||= Ability.new(self)
+  end
+
+  def ensure_authentication_token!
+    regenerate_authentication_token if authentication_token.blank?
+    save!
+  end
+
+  def reset_authentication_token!
+    regenerate_authentication_token
+    save!
   end
 
   private

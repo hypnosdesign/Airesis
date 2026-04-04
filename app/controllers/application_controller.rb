@@ -292,7 +292,7 @@ class ApplicationController < ActionController::Base
       end
       format.all do
         log_error(exception)
-        render text: 'Permission denied', status: :forbidden
+        render plain: 'Permission denied', status: :forbidden
       end
     end
   end

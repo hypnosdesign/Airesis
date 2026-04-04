@@ -145,7 +145,7 @@ class ProposalCommentsController < ApplicationController
 
     respond_to do |format|
       format.html { redirect_to @proposal }
-      format.js { render nothing: true }
+      format.js { head :ok }
     end
   end
 

@@ -13,7 +13,7 @@ class SysPaymentNotificationsController < ApplicationController
     when 'INVALID'
       log_error Exception.new('invalid ipn received')
     end
-    render nothing: true
+    head :ok
   end
 
   protected

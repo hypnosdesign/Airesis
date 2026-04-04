@@ -132,7 +132,7 @@ class ProposalsController < ApplicationController
         flash.now[:info] = I18n.t('info.proposal.voting') if @proposal.voting?
       end
       format.js do
-        render nothing: true
+        head :ok
       end
       format.json
       format.pdf do
