@@ -27,7 +27,7 @@ class ApplicationController < ActionController::Base
   helper_method :is_admin?, :is_moderator?, :is_proprietary?, :current_url, :link_to_auth, :age, :is_group_admin?
 
   def configure_permitted_parameters
-    devise_parameter_sanitizer.permit(:sign_up, keys: %i[username email name surname accept_conditions sys_locale_id password])
+    devise_parameter_sanitizer.permit(:sign_up, keys: %i[username email name surname accept_conditions accept_privacy sys_locale_id password])
   end
 
   # redirect all'ultima pagina in cui ero
