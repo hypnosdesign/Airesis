@@ -31,7 +31,7 @@ gem 'omniauth-google-oauth2'
 gem 'omniauth-twitter'
 gem 'pg'
 gem 'premailer-rails', '>= 1.12.0'
-# gem 'private_pub' # removed: not loaded in layout, to replace with Action Cable
+# private_pub removed — replaced by Action Cable + Turbo Streams
 gem 'rack-cors', require: 'rack/cors'
 gem 'rails_admin'
 gem 'rails_autolink'
@@ -90,12 +90,11 @@ group :development do
   gem 'i18n-tasks'
 
 
-  gem 'letter_opener'
   gem 'pry-byebug'
   gem 'pry-rails'
   gem 'rack-mini-profiler', require: false
   gem 'spring'
-  gem 'thin', require: false # required for private_pub
+  gem 'thin', require: false
 end
 
 group :test do

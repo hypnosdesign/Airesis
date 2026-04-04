@@ -319,8 +319,6 @@ GEM
       addressable (~> 2.8)
       childprocess (~> 5.0)
       logger (~> 1.6)
-    letter_opener (1.10.0)
-      launchy (>= 2.2, < 4)
     lint_roller (1.1.0)
     listen (2.10.1)
       celluloid (~> 0.16.0)
@@ -778,7 +776,6 @@ DEPENDENCIES
   jsbundling-rails
   kaminari
   koala
-  letter_opener
   lograge
   mailman
   matrix
