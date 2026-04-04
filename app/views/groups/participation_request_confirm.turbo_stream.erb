@@ -1,0 +1,15 @@
+<% if params[:from_list] %>
+  <%= turbo_stream.remove "request_#{@request.id}" %>
+<% else %>
+  <%= turbo_stream.replace "participants_container" do %>
+    <div class="participants_container" id="participants_container">
+      <%= render "participants_panel" %>
+    </div>
+  <% end %>
+  <%= turbo_stream.replace "participation_requests_container" do %>
+    <div class="participation_requests_container" id="participation_requests_container">
+      <%= render "participation_requests_panel" %>
+    </div>
+  <% end %>
+<% end %>
+<%= render partial: "layouts/flash_stream" %>

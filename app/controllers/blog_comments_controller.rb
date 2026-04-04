@@ -17,11 +17,11 @@ class BlogCommentsController < ApplicationController
         flash[:notice] = t('info.blog.comment_added')
         @blog_comment.collapsed = true
         format.html
-        format.js
+        format.turbo_stream
       else
         flash[:error] = t('error.blog.comment_added')
         format.html
-        format.js { render 'blog_comments/errors/create' }
+        format.turbo_stream { render 'blog_comments/errors/create' }
       end
     end
   end
@@ -30,8 +30,8 @@ class BlogCommentsController < ApplicationController
     @blog_comment.destroy
     flash[:notice] = t('info.blog_comment.destroyed')
     respond_to do |format|
+      format.turbo_stream
       format.html { redirect_to blog_blog_post_url(@blog, @blog_post) }
-      format.js
     end
   end
 

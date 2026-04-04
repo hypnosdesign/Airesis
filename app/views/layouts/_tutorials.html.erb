@@ -1,7 +1,4 @@
-<% if user_signed_in? && @step %>
-  <% if @step.is_html? %>
-    <%= render partial: "steps/#{@step.fragment}", formats: :html, layout: "layouts/tutorial" %>
-  <% else %>
-    <script><%= render partial: "steps/#{@step.fragment}", formats: :js, layout: "layouts/tutorial" %></script>
-  <% end %>
+<% if user_signed_in? && @step && @step.is_html? %>
+  <%= render partial: "steps/#{@step.fragment}", formats: :html, layout: "layouts/tutorial" %>
 <% end %>
+<%# JS-format tutorial steps (intro.js overlays) are disabled — requires jQuery+intro.js which are removed %>

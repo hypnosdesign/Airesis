@@ -1,0 +1,10 @@
+<%= turbo_stream.replace "available_authors_modal" do %>
+  <dialog id="available_authors_modal" data-controller="modal" class="modal">
+    <div class="modal-box shadow-brutal border-2 border-base-content max-w-3xl">
+      <%= render "available_authors_list_panel" %>
+    </div>
+    <form method="dialog" class="modal-backdrop" data-action="click->modal#backdropClose">
+      <button>close</button>
+    </form>
+  </dialog>
+<% end %>

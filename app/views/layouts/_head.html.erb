@@ -134,7 +134,6 @@ Airesis.i18n = {
 <% end %>
 
 <%= yield :google_maps %>
-<script async defer src="//maps.googleapis.com/maps/api/js?key=<%= ENV['MAPS_API_KEY'] %>"></script>
 
 <% if defined?(Sentry) %>
   <script>

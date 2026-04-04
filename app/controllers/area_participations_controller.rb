@@ -22,11 +22,19 @@ class AreaParticipationsController < ApplicationController
     else
       flash[:error] = t('error.area_participation.create')
     end
+    respond_to do |format|
+      format.turbo_stream { render partial: 'layouts/flash_stream' }
+      format.html { redirect_back fallback_location: group_group_area_path(@group, @group_area) }
+    end
   end
 
   def destroy
     @area_participation.destroy
     flash[:notice] = t('info.area_participation.destroy')
+    respond_to do |format|
+      format.turbo_stream { render partial: 'layouts/flash_stream' }
+      format.html { redirect_back fallback_location: group_group_area_path(@group, @group_area) }
+    end
   end
 
   protected

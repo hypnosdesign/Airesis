@@ -1,0 +1,18 @@
+<% if @proposal_comment.is_reply? %>
+  <%= turbo_stream.replace "ranking_panel_#{@proposal_comment.parent_proposal_comment_id}" do %>
+    <%= render "ranking_panel", comment: @proposal_comment.parent %>
+  <% end %>
+  <%= turbo_stream.append "replies_#{@proposal_comment.parent_proposal_comment_id}" do %>
+    <%= render partial: "proposal_comments/reply", locals: { reply: @proposal_comment } %>
+  <% end %>
+<% else %>
+  <%= turbo_stream.prepend "proposalCommentsContainer" do %>
+    <%= render partial: "proposal_comments/proposal_comment", locals: { comment: @proposal_comment } %>
+  <% end %>
+  <%= turbo_stream.replace "new_comment_form" do %>
+    <div id="new_comment_form">
+      <%= render partial: "proposal_comments/new_proposal_comment" %>
+    </div>
+  <% end %>
+<% end %>
+<%= render partial: "layouts/flash_stream" %>

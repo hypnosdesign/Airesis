@@ -1,0 +1,6 @@
+<%= turbo_stream.append "edit_comments_container" do %>
+  <%= render partial: "proposal_comments/proposal_comment", collection: @proposal_comments, as: :comment %>
+<% end %>
+<% unless @proposal_comments.total_pages > @proposal_comments.current_page %>
+  <%= turbo_stream.remove "loading_results" %>
+<% end %>

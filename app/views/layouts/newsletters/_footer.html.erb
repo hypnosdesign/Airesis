@@ -36,16 +36,19 @@
       <table class="twelve columns">
         <tr>
           <td align="center">
+            <% _locale = @user&.original_locale || SysLocale.find_by(default: true) %>
+            <% _host = _locale&.host || ENV['MAILER_DEFAULT_HOST'] || 'localhost' %>
+            <% _lang = _locale&.lang %>
             <center>
               <p style="text-align:center;">
-                <%= link_to t('mailer.default.terms'), terms_url(host: @user.original_locale.host, l: @user.original_locale.lang), target: '_blank' %>
+                <%= link_to t('mailer.default.terms'), terms_url(host: _host, l: _lang), target: '_blank' %>
                 &nbsp;|
-                <%= link_to t('mailer.default.privacy'), privacy_url(host: @user.original_locale.host, l: @user.original_locale.lang), target: '_blank' %>
+                <%= link_to t('mailer.default.privacy'), privacy_url(host: _host, l: _lang), target: '_blank' %>
                 &nbsp;|
                 <% if @unregistered %>
                   <%= link_to t('mailer.invite.no_more_button'), anymore_group_group_invitation_group_invitation_email_url(@group, @group_invitation, @group_invitation_email.token, email: @group_invitation_email.email) %>
                 <% else %>
-                  <%= link_to t('mailer.default.edit_preferences'), alarm_preferences_users_url(host: @user.original_locale.host, l: @user.original_locale.lang), target: '_blank' %>
+                  <%= link_to t('mailer.default.edit_preferences'), alarm_preferences_users_url(host: _host, l: _lang), target: '_blank' %>
                 <% end %>
               </p>
             </center>

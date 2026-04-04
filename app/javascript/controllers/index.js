@@ -4,8 +4,17 @@
 
 import { application } from "./application"
 
+import CountdownController from "./countdown_controller"
+application.register("countdown", CountdownController)
+
 import FlashController from "./flash_controller"
 application.register("flash", FlashController)
+
+import InfiniteScrollController from "./infinite_scroll_controller"
+application.register("infinite-scroll", InfiniteScrollController)
+
+import ModalController from "./modal_controller"
+application.register("modal", ModalController)
 
 import ThemeController from "./theme_controller"
 application.register("theme", ThemeController)

@@ -14,7 +14,7 @@ class BlogsController < ApplicationController
 
     respond_to do |format|
       format.html
-      format.js
+      format.turbo_stream
     end
   end
 
@@ -23,9 +23,9 @@ class BlogsController < ApplicationController
     @blog_posts = @blog_posts.published.page(params[:page]).per(COMMENTS_PER_PAGE)
     respond_to do |format|
       format.html
-      format.js
+      format.turbo_stream
       format.atom
-      format.json
+      format.turbo_streamon
     end
   end
 
@@ -35,7 +35,7 @@ class BlogsController < ApplicationController
 
     respond_to do |format|
       format.html
-      format.js
+      format.turbo_stream
     end
   end
 

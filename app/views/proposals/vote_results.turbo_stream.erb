@@ -1,0 +1,17 @@
+<%= turbo_stream.replace "vote_results_modal" do %>
+  <dialog id="vote_results_modal" data-controller="modal" class="modal">
+    <div class="modal-box shadow-brutal border-2 border-base-content max-w-3xl">
+      <% if @proposal.is_schulze? %>
+        <%= render partial: "proposals/schulze_vote_results" %>
+      <% else %>
+        <%= render partial: "proposals/vote_results" %>
+      <% end %>
+      <div class="modal-action">
+        <button class="btn" data-action="click->modal#close"><%= t("buttons.close") %></button>
+      </div>
+    </div>
+    <form method="dialog" class="modal-backdrop" data-action="click->modal#backdropClose">
+      <button>close</button>
+    </form>
+  </dialog>
+<% end %>

@@ -1,0 +1,14 @@
+<% if params[:page].blank? || params[:page].to_i <= 1 %>
+  <%= turbo_stream.replace "proposalCommentsContainer" do %>
+    <div id="proposalCommentsContainer">
+      <%= render partial: "proposal_comments/proposal_comment", collection: @proposal_comments, as: :comment %>
+    </div>
+  <% end %>
+<% else %>
+  <%= turbo_stream.append "proposalCommentsContainer" do %>
+    <%= render partial: "proposal_comments/proposal_comment", collection: @proposal_comments, as: :comment %>
+  <% end %>
+<% end %>
+<% unless @proposal_comments.total_pages > @proposal_comments.current_page %>
+  <%= turbo_stream.remove "loading_results" %>
+<% end %>

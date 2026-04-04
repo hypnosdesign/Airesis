@@ -27,11 +27,19 @@ class GroupAreasController < ApplicationController
   def new
     @group_area = @group.group_areas.build
     @group_area.default_role_actions = DEFAULT_AREA_ACTIONS
+    respond_to do |format|
+      format.turbo_stream
+      format.html
+    end
   end
 
   def edit
     authorize! :update, @group_area
     @page_title = t('pages.groups.edit_work_areas.manage.title')
+    respond_to do |format|
+      format.turbo_stream
+      format.html
+    end
   end
 
   def edit_permissions
@@ -45,14 +53,14 @@ class GroupAreasController < ApplicationController
       @group_participations = @group.participants
       respond_to do |format|
         flash[:notice] = t('info.groups.work_area.area_created')
+        format.turbo_stream
         format.html { redirect_to [@group, @group_area] }
-        format.js
       end
     else
       respond_to do |format|
         flash[:error] = t('error.groups.work_area.area_created')
+        format.turbo_stream { render 'group_areas/errors/create' }
         format.html { render action: :new }
-        format.js { render 'group_areas/errors/create' }
       end
     end
   end
@@ -84,6 +92,10 @@ class GroupAreasController < ApplicationController
   def destroy
     authorize! :destroy, @group_area
     @group_area.destroy
+    respond_to do |format|
+      format.turbo_stream
+      format.html { redirect_back fallback_location: group_group_areas_path(@group) }
+    end
   end
 
   def participants_list_panel

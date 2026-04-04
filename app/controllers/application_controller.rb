@@ -164,12 +164,13 @@ class ApplicationController < ActionController::Base
   def render_error(exception)
     log_error(exception)
     respond_to do |format|
-      format.js do
+      format.turbo_stream do
         flash.now[:error] = "<b>#{t('error.error_500.title')}</b></br>#{t('error.error_500.description')}"
-        render template: 'layouts/error', status: 500, layout: 'application'
+        render partial: 'layouts/flash_stream', status: :internal_server_error
       end
+      format.js { head :internal_server_error }
       format.html do
-        render template: 'errors/500', status: 500, layout: 'application'
+        render template: 'errors/500', status: :internal_server_error, layout: 'application'
       end
     end
   end
@@ -193,11 +194,12 @@ class ApplicationController < ActionController::Base
   def render_404(exception = nil)
     log_error(exception) if exception
     respond_to do |format|
-      format.js do
+      format.turbo_stream do
         flash.now[:error] = 'Page not available.'
-        render template: '/errors/invalid_locale.js.erb', status: 404, layout: 'application'
+        render partial: 'layouts/flash_stream', status: :not_found
       end
-      format.html { render 'errors/404', status: 404, layout: 'application' }
+      format.js { head :not_found }
+      format.html { render 'errors/404', status: :not_found, layout: 'application' }
     end
   end
 
@@ -253,11 +255,12 @@ class ApplicationController < ActionController::Base
   # response if you must be an administrator
   def admin_denied
     respond_to do |format|
-      format.js do # se era una chiamata ajax, mostra il messaggio
+      format.turbo_stream do
         flash.now[:error] = t('error.admin_required')
-        render 'layouts/error'
+        render partial: 'layouts/flash_stream', status: :forbidden
       end
-      format.html do # ritorna indietro oppure all'HomePage
+      format.js { head :forbidden }
+      format.html do
         store_location
         flash[:error] = t('error.admin_required')
         redirect_back(fallback_location: proposals_path)
@@ -272,15 +275,16 @@ class ApplicationController < ActionController::Base
   # response if you do not have permissions to do an action
   def permissions_denied(exception = nil)
     respond_to do |format|
-      format.js do # se era una chiamata ajax, mostra il messaggio
+      format.turbo_stream do
         if current_user
           log_error(exception)
           flash.now[:error] = exception.message
-          render 'layouts/error', status: :forbidden
+          render partial: 'layouts/flash_stream', status: :forbidden
         else
-          render 'layouts/authenticate'
+          redirect_to new_user_session_path
         end
       end
+      format.js { head :forbidden }
       format.html do # ritorna indietro oppure all'HomePage
         if current_user
           log_error(exception)

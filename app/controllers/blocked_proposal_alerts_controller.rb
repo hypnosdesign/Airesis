@@ -13,12 +13,12 @@ class BlockedProposalAlertsController < ApplicationController
     respond_to do |format|
       if @blocked_alerts.save
         flash[:notice] = 'Notifiche disattivate'
+        format.turbo_stream { render 'replace' }
         format.html { redirect_to redirect_url(@proposal) }
-        format.js { render 'replace' }
       else
-        flash[:notice] = 'Errore durante la disattivazione delle notifiche'
+        flash[:error] = 'Errore durante la disattivazione delle notifiche'
+        format.turbo_stream { render partial: 'layouts/flash_stream' }
         format.html { redirect_to redirect_url(@proposal) }
-        format.js { render 'layouts/error' }
       end
     end
   end
@@ -29,12 +29,12 @@ class BlockedProposalAlertsController < ApplicationController
       if @blocked_alerts.destroy
         flash[:notice] = 'Notifiche attivate'
         @blocked_alerts = nil
+        format.turbo_stream { render 'replace' }
         format.html { redirect_to redirect_url(@proposal) }
-        format.js { render 'replace' }
       else
-        flash[:notice] = "Errore durante l'attivazione delle notifiche"
+        flash[:error] = "Errore durante l'attivazione delle notifiche"
+        format.turbo_stream { render partial: 'layouts/flash_stream' }
         format.html { redirect_to redirect_url(@proposal) }
-        format.js { render 'layouts/error' }
       end
     end
   end

@@ -1,0 +1,6 @@
+<%= turbo_stream.replace "comment_content_#{@proposal_comment.id}" do %>
+  <div id="comment_content_<%= @proposal_comment.id %>">
+    <%= render partial: "proposal_comments/comment_body", locals: { comment: @proposal_comment } %>
+  </div>
+<% end %>
+<%= render partial: "layouts/flash_stream" %>

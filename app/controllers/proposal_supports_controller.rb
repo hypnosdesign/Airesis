@@ -14,7 +14,7 @@ class ProposalSupportsController < ApplicationController
     @proposal_support = @proposal.proposal_supports.build
     respond_to do |format|
       format.html
-      format.js
+      format.turbo_stream
     end
   end
 
@@ -47,12 +47,12 @@ class ProposalSupportsController < ApplicationController
       format.html do
         redirect_to @proposal
       end
-      format.js
+      format.turbo_stream
     end
   rescue ActiveRecord::ActiveRecordError => e
     respond_to do |format|
       format.html redirect_to proposal_path(@proposal)
-      format.js do
+      format.turbo_stream do
         render :update do |page|
           page.alert "Errore durante l'operazione"
         end

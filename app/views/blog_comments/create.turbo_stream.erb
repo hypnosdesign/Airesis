@@ -1,0 +1,9 @@
+<%= turbo_stream.prepend "blogPostCommentsContainer" do %>
+  <%= render partial: "blog_posts/comment", locals: { comment: @blog_comment } %>
+<% end %>
+<%= turbo_stream.replace "blogNewComment" do %>
+  <div id="blogNewComment">
+    <%= render partial: "blog_comments/new_blog_comment", locals: { blog_comment: @blog_post.blog_comments.new } %>
+  </div>
+<% end %>
+<%= render partial: "layouts/flash_stream" %>

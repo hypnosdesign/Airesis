@@ -1,7 +1,6 @@
 class QuorumsController < ApplicationController
   layout :choose_layout
 
-  # security controls
   before_action :authenticate_user!
 
   before_action :load_group, except: :help
@@ -20,24 +19,24 @@ class QuorumsController < ApplicationController
     @group_participations_count = @group.scoped_participants(:participate_proposals).count
     @vote_participants_count = @group.scoped_participants(:vote_proposals).count
     respond_to do |format|
+      format.turbo_stream
       format.html
-      format.js
     end
   end
 
   def create
     @quorum.public = false
     if @quorum.save
+      flash[:notice] = t('info.quorums.quorum_created')
       respond_to do |format|
-        flash[:notice] = t('info.quorums.quorum_created')
-        format.js
+        format.turbo_stream
         format.html { redirect_to group_quorums_url(@group) }
       end
     else
+      flash[:error] = t('error.quorums.quorum_creation')
       respond_to do |format|
-        flash[:error] = t('error.quorums.quorum_creation')
-        format.js { render 'layouts/active_record_error', locals: { object: @quorum } }
-        format.html { render :new }
+        format.turbo_stream { render partial: 'layouts/flash_stream', status: :unprocessable_entity }
+        format.html { render :new, status: :unprocessable_entity }
       end
     end
   end
@@ -46,21 +45,24 @@ class QuorumsController < ApplicationController
     @page_title = t('pages.groups.edit_quorums.edit_quorum')
     @group_participations_count = @group.scoped_participants(:participate_proposals).count
     @vote_participants_count = @group.scoped_participants(:vote_proposals).count
+    respond_to do |format|
+      format.turbo_stream
+      format.html
+    end
   end
 
   def update
     if @quorum.update(best_quorum_params)
+      flash[:notice] = t('info.quorums.quorum_updated')
       respond_to do |format|
-        flash[:notice] = t('info.quorums.quorum_updated')
-        format.js
-        format.html do
-          redirect_to group_quorums_url(@group)
-        end
+        format.turbo_stream
+        format.html { redirect_to group_quorums_url(@group) }
       end
     else
+      flash[:error] = t('error.quorums.quorum_modification')
       respond_to do |format|
-        flash[:error] = t('error.quorums.quorum_modification')
-        format.js { render 'layouts/active_record_error', locals: { object: @quorum } }
+        format.turbo_stream { render partial: 'layouts/flash_stream', status: :unprocessable_entity }
+        format.html { render :edit, status: :unprocessable_entity }
       end
     end
   end
@@ -69,14 +71,9 @@ class QuorumsController < ApplicationController
     @quorum = @group.quorums.find_by(id: params[:id])
     @quorum.destroy
     flash[:notice] = t('info.quorums.quorum_deleted')
-
     respond_to do |format|
-      format.js do
-        render :update do |page|
-          page.replace_html 'flash_messages', partial: 'layouts/flash', locals: { flash: flash }
-          page.replace_html 'quorum_panel_container', partial: 'groups/quorums_panel'
-        end
-      end
+      format.turbo_stream
+      format.html { redirect_to group_quorums_url(@group) }
     end
   end
 
@@ -84,19 +81,32 @@ class QuorumsController < ApplicationController
     Quorum.transaction do
       quorum = @group.quorums.find_by(id: params[:id])
       if quorum
-        if params[:active] == 'true' # devo togliere i permessi
+        if params[:active] == 'true'
           quorum.active = true
           flash[:notice] = t('info.quorums.quorum_activated')
-        else # lo disattivo
+        else
           quorum.active = false
           flash[:notice] = t('info.quorums.quorum_deactivated')
         end
         quorum.save!
       end
     end
-
     respond_to do |format|
-      format.js { render 'layouts/success' }
+      format.turbo_stream { render partial: 'layouts/flash_stream' }
+      format.html { redirect_back fallback_location: group_quorums_path(@group) }
+    end
+  end
+
+  def dates
+    starttime = (@quorum.minutes.minutes + DEBATE_VOTE_DIFFERENCE).from_now
+    @dates = if @group
+               @group.events.not_visible.vote_period(starttime).collect { |p| ["da #{l p.starttime} a #{l p.endtime}", p.id, { 'data-start' => (l p.starttime), 'data-end' => (l p.endtime), 'data-title' => p.title }] }
+             else
+               Event.visible.vote_period(starttime).collect { |p| ["da #{l p.starttime} a #{l p.endtime}", p.id] }
+             end
+    respond_to do |format|
+      format.turbo_stream
+      format.html
     end
   end
 
@@ -108,19 +118,9 @@ class QuorumsController < ApplicationController
       @quorums = Quorum.visible.active.all
     end
     respond_to do |format|
+      format.turbo_stream
       format.html
-      format.js
     end
-  end
-
-  # retrieve a list of votation dates compatibles with that quorum
-  def dates
-    starttime = (@quorum.minutes.minutes + DEBATE_VOTE_DIFFERENCE).from_now
-    @dates = if @group
-               @group.events.not_visible.vote_period(starttime).collect { |p| ["da #{l p.starttime} a #{l p.endtime}", p.id, { 'data-start' => (l p.starttime), 'data-end' => (l p.endtime), 'data-title' => p.title }] } # TODO: I18n
-             else
-               Event.visible.vote_period(starttime).collect { |p| ["da #{l p.starttime} a #{l p.endtime}", p.id] } # TODO: I18n
-             end
   end
 
   protected

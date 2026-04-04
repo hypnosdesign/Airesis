@@ -1,0 +1,10 @@
+<%= turbo_stream.replace "noise_modal" do %>
+  <dialog id="noise_modal" data-controller="modal" class="modal">
+    <div class="modal-box shadow-brutal border-2 border-base-content">
+      <%= render "noise_panel" %>
+    </div>
+    <form method="dialog" class="modal-backdrop" data-action="click->modal#backdropClose">
+      <button>close</button>
+    </form>
+  </dialog>
+<% end %>
