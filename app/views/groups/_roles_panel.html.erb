@@ -1,22 +1,25 @@
-<dl id="roles_accordion" class="accordion" data-accordion>
+<div id="roles_panel_container">
   <% @participation_roles.each_with_index do |role, idx| %>
-    <dd class="accordion-navigation">
-      <a href="#role_<%= role.id %>">
+    <div class="collapse collapse-arrow bg-base-200 mb-2 border border-base-300">
+      <input type="radio" name="roles-accordion" <%= 'checked' if idx == 0 %> />
+      <div class="collapse-title font-medium">
         <%= role.name %>
         <% if role.id == @group.participation_role_id %>
-          (default)
+          <span class="badge badge-sm badge-primary ml-2">default</span>
         <% end %>
-      </a>
-      <div id="role_<%= role.id %>" class="content <%= 'active' if idx == 0 %>">
-        <%= link_to group_participation_role_url(@group, role), data: { turbo_method: :delete }, class: 'btn', style: 'float:right', data: { turbo_confirm: t('pages.groups.edit_permissions.confirm_role_deletion'), disable_with: t('loading') } do %>
-          <i class="fa-regular fa-trash-can"></i>
-          <%= t('buttons.delete') %>
-        <% end %>
-        <%= link_to edit_group_participation_role_url(@group, role), class: 'btn', style: 'float:right', data: { disable_with: t('loading') } do %>
-          <i class="fa-solid fa-pencil"></i>
-          <%= t('buttons.edit') %>
-        <% end %>
-        <h4><%= role.description %></h4>
+      </div>
+      <div class="collapse-content">
+        <div class="flex gap-2 mb-4 justify-end">
+          <%= link_to edit_group_participation_role_url(@group, role), class: 'btn btn-sm' do %>
+            <i class="fa-solid fa-pencil"></i>
+            <%= t('buttons.edit') %>
+          <% end %>
+          <%= link_to group_participation_role_url(@group, role), data: { turbo_method: :delete, turbo_confirm: t('pages.groups.edit_permissions.confirm_role_deletion') }, class: 'btn btn-sm btn-error' do %>
+            <i class="fa-regular fa-trash-can"></i>
+            <%= t('buttons.delete') %>
+          <% end %>
+        </div>
+        <h4 class="font-semibold mb-2"><%= role.description %></h4>
         <%= simple_form_for [@group, role] do |f| %>
           <input type="hidden" name="no_refresh" value="1">
           <%= f.input :view_proposals, label: I18n.t("db.group_actions.view_proposals.description"), input_html: { data: { action_abilitation: '' } } %>
@@ -32,6 +35,6 @@
           <%= f.input :accept_participation_requests, label: I18n.t("db.group_actions.accept_participation_requests.description"), input_html: { data: { action_abilitation: '' } } %>
         <% end %>
       </div>
-    </dd>
+    </div>
   <% end %>
-</dl>
+</div>
