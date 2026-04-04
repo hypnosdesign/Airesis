@@ -70,6 +70,6 @@ class BlogPost < ApplicationRecord
   protected
 
   def send_notifications
-    NotificationBlogPostCreate.perform_async(id) unless draft?
+    NotificationBlogPostCreate.perform_later(id) unless draft?
   end
 end

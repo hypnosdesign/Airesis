@@ -15,7 +15,7 @@ module Admin
         @user.save!
       end
       flash[:notice] = t('info.moderator_panel.account_blocked')
-      ResqueMailer.delay.blocked(@user.id)
+      ResqueMailer.blocked(@user.id).deliver_later
       redirect_back(fallback_location: root_path)
     end
 

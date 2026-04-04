@@ -43,11 +43,13 @@ gem 'ostruct'
 gem 'sanitize', '>= 6.0'
 gem 'sass-rails'
 # gem 'select2-rails' # removed: Select2 loaded from CDN, not via Sprockets
-gem 'sidekiq'
-gem 'sidekiq-failures'
+gem 'solid_queue'
+gem 'solid_cable'
+# gem 'sidekiq'          # removed: replaced by solid_queue (Rails 8 native, no Redis)
+# gem 'sidekiq-failures' # removed: solid_queue persists failures in DB
 gem 'simple_form'
 # gem 'simple_token_authentication' # removed: replaced by has_secure_token (Rails native)
-gem 'sinatra', require: false
+# gem 'sinatra', require: false # removed: was only needed for sidekiq-failures UI
 gem 'sitemap_generator'
 # gem 'slim-rails' # removed: all views converted to ERB
 gem 'sprockets', '~> 4.0'

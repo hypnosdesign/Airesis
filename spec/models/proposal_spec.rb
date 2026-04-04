@@ -151,4 +151,141 @@ RSpec.describe Proposal, type: :model do
       end
     end
   end
+
+  describe '#in_valutation?' do
+    it 'returns true when proposal is in valutation state' do
+      p = create(:public_proposal, current_user_id: user.id)
+      expect(p.in_valutation?).to be true
+    end
+  end
+
+  describe '#waiting_date?' do
+    it 'returns false by default' do
+      p = create(:public_proposal, current_user_id: user.id)
+      expect(p.waiting_date?).to be false
+    end
+  end
+
+  describe '#voting?' do
+    it 'returns false by default' do
+      p = create(:public_proposal, current_user_id: user.id)
+      expect(p.voting?).to be false
+    end
+  end
+
+  describe '#abandoned?' do
+    it 'returns false by default' do
+      p = create(:public_proposal, current_user_id: user.id)
+      expect(p.abandoned?).to be false
+    end
+  end
+
+  describe '#voted?' do
+    it 'returns false for proposals in debate' do
+      p = create(:public_proposal, current_user_id: user.id)
+      expect(p.voted?).to be false
+    end
+  end
+
+  describe '#accepted?' do
+    it 'returns false by default' do
+      p = create(:public_proposal, current_user_id: user.id)
+      expect(p.accepted?).to be false
+    end
+  end
+
+  describe '#rejected?' do
+    it 'returns false by default' do
+      p = create(:public_proposal, current_user_id: user.id)
+      expect(p.rejected?).to be false
+    end
+  end
+
+  describe '#is_current?' do
+    it 'returns true when in valutation' do
+      p = create(:public_proposal, current_user_id: user.id)
+      expect(p.is_current?).to be true
+    end
+  end
+
+  describe '#is_schulze?' do
+    it 'returns false when there is only one solution' do
+      p = create(:public_proposal, current_user_id: user.id)
+      expect(p.is_schulze?).to be false
+    end
+  end
+
+  describe '#to_param' do
+    it 'returns a SEO-friendly URL parameter' do
+      p = create(:public_proposal, current_user_id: user.id, title: 'Hello World Proposal')
+      expect(p.to_param).to include(p.id.to_s)
+      expect(p.to_param).to include('hello-world-proposal')
+    end
+  end
+
+  describe '#user' do
+    it 'returns the first author' do
+      p = create(:public_proposal, current_user_id: user.id)
+      expect(p.user).to be_a(User)
+    end
+  end
+
+  describe '#group' do
+    it 'returns nil for public proposals' do
+      p = create(:public_proposal, current_user_id: user.id)
+      expect(p.group).to be_nil
+    end
+  end
+
+  describe '#in_group?' do
+    it 'returns false for public proposals' do
+      p = create(:public_proposal, current_user_id: user.id)
+      expect(p.in_group?).to be false
+    end
+  end
+
+  describe '#is_anonima?' do
+    it 'returns false for non-anonymous proposals' do
+      p = create(:public_proposal, current_user_id: user.id, anonima: false)
+      expect(p.is_anonima?).to be false
+    end
+  end
+
+  describe '#count_notifications' do
+    it 'returns 0 when no unread alerts' do
+      p = create(:public_proposal, current_user_id: user.id)
+      expect(p.count_notifications(user.id)).to eq(0)
+    end
+  end
+
+  describe '#integrated_contributes_ids_list=' do
+    it 'splits comma-separated string into array' do
+      p = Proposal.new
+      p.integrated_contributes_ids_list = '1, 2, 3'
+      expect(p.integrated_contributes_ids).to eq(['1', '2', '3'])
+    end
+  end
+
+  describe '#eligible_voters_count' do
+    it 'returns a count for public proposals' do
+      p = create(:public_proposal, current_user_id: user.id)
+      expect(p.eligible_voters_count).to be >= 0
+    end
+  end
+
+  describe 'scopes' do
+    let!(:p1) { create(:public_proposal, current_user_id: user.id) }
+
+    it '.in_valutation returns proposals in valutation state' do
+      expect(Proposal.in_valutation).to include(p1)
+    end
+
+    it '.current returns current proposals' do
+      expect(Proposal.current).to include(p1)
+    end
+
+    it '.visible returns public proposals' do
+      expect(Proposal.visible).to include(p1)
+    end
+  end
 end

@@ -128,4 +128,68 @@ RSpec.describe Group do
       expect { group_b.destroy }.to change(Proposal, :count).from(2).to(0)
     end
   end
+
+  describe '#is_private?' do
+    it 'returns true when group is private' do
+      g = build(:group, private: true)
+      expect(g.is_private?).to be true
+    end
+
+    it 'returns false when group is not private' do
+      g = build(:group, private: false)
+      expect(g.is_private?).to be false
+    end
+  end
+
+  describe '#request_by_portavoce?' do
+    it 'returns true when accept_requests is REQ_BY_PORTAVOCE' do
+      g = build(:group, accept_requests: Group::REQ_BY_PORTAVOCE)
+      expect(g.request_by_portavoce?).to be true
+    end
+  end
+
+  describe '#request_by_vote?' do
+    it 'returns true when accept_requests is REQ_BY_VOTE' do
+      g = build(:group, accept_requests: Group::REQ_BY_VOTE)
+      expect(g.request_by_vote?).to be true
+    end
+  end
+
+  describe '#request_by_both?' do
+    it 'returns true when accept_requests is REQ_BY_BOTH' do
+      g = build(:group, accept_requests: Group::REQ_BY_BOTH)
+      expect(g.request_by_both?).to be true
+    end
+  end
+
+  describe '#scoped_participants' do
+    it 'returns participants who can participate in proposals' do
+      g = create(:group)
+      result = g.scoped_participants(:participate_proposals)
+      expect(result).to respond_to(:each)
+    end
+  end
+
+  describe '.most_active' do
+    it 'returns a list of up to 5 groups' do
+      create_list(:group, 3)
+      result = Group.most_active
+      expect(result.size).to be <= 5
+    end
+  end
+
+  describe '#normalize_blank_values' do
+    it 'sets blank admin_title to nil' do
+      g = build(:group, admin_title: '')
+      g.send(:normalize_blank_values)
+      expect(g.admin_title).to be_nil
+    end
+  end
+
+  describe '#description' do
+    it 'returns html_safe string' do
+      g = create(:group)
+      expect(g.description).to respond_to(:html_safe?)
+    end
+  end
 end

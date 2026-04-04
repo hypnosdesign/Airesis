@@ -1,8 +1,6 @@
 require 'rails_helper'
 
 RSpec.describe ProposalsWorker, type: :worker, seeds: true do
-  before { Sidekiq::Testing.fake! }
-
   let!(:user) { create(:user) }
   let!(:group) { create(:group, current_user_id: user.id) }
   let!(:proposal) { create(:group_proposal, current_user_id: user.id, group_proposals: [GroupProposal.new(group: group)]).reload }
@@ -17,38 +15,33 @@ RSpec.describe ProposalsWorker, type: :worker, seeds: true do
 
   describe 'LEFT24 action' do
     it 'schedules NotificationProposalTimeLeft with 24_hours' do
-      worker = described_class.new
-      worker.perform('proposal_id' => proposal.id, 'action' => 'left24')
-      expect(NotificationProposalTimeLeft.jobs.size).to eq 1
-      job = NotificationProposalTimeLeft.jobs.first
-      expect(job['args']).to include(proposal.id, '24_hours')
+      expect {
+        described_class.new.perform('proposal_id' => proposal.id, 'action' => 'left24')
+      }.to have_enqueued_job(NotificationProposalTimeLeft).with(proposal.id, '24_hours')
     end
   end
 
   describe 'LEFT1 action' do
     it 'schedules NotificationProposalTimeLeft with 1_hour' do
-      worker = described_class.new
-      worker.perform('proposal_id' => proposal.id, 'action' => 'left1')
-      expect(NotificationProposalTimeLeft.jobs.size).to eq 1
-      expect(NotificationProposalTimeLeft.jobs.first['args']).to include(proposal.id, '1_hour')
+      expect {
+        described_class.new.perform('proposal_id' => proposal.id, 'action' => 'left1')
+      }.to have_enqueued_job(NotificationProposalTimeLeft).with(proposal.id, '1_hour')
     end
   end
 
   describe 'LEFT24VOTE action' do
     it 'schedules NotificationProposalTimeLeftVote with 24_hours_vote' do
-      worker = described_class.new
-      worker.perform('proposal_id' => proposal.id, 'action' => 'left24_vote')
-      expect(NotificationProposalTimeLeftVote.jobs.size).to eq 1
-      expect(NotificationProposalTimeLeftVote.jobs.first['args']).to include(proposal.id, '24_hours_vote')
+      expect {
+        described_class.new.perform('proposal_id' => proposal.id, 'action' => 'left24_vote')
+      }.to have_enqueued_job(NotificationProposalTimeLeftVote).with(proposal.id, '24_hours_vote')
     end
   end
 
   describe 'LEFT1VOTE action' do
     it 'schedules NotificationProposalTimeLeftVote with 1_hour_vote' do
-      worker = described_class.new
-      worker.perform('proposal_id' => proposal.id, 'action' => 'left1_vote')
-      expect(NotificationProposalTimeLeftVote.jobs.size).to eq 1
-      expect(NotificationProposalTimeLeftVote.jobs.first['args']).to include(proposal.id, '1_hour_vote')
+      expect {
+        described_class.new.perform('proposal_id' => proposal.id, 'action' => 'left1_vote')
+      }.to have_enqueued_job(NotificationProposalTimeLeftVote).with(proposal.id, '1_hour_vote')
     end
   end
 

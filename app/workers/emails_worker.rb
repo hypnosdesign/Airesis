@@ -1,11 +1,10 @@
 # worker to create emails
-class EmailsWorker
-  include Sidekiq::Worker
-  sidekiq_options queue: :low_priority, retry: 1
+class EmailsWorker < ApplicationJob
+  queue_as :low_priority
+  retry_on StandardError, attempts: 2
 
-  def perform(attributes)
-    ResqueMailer.notification(attributes).deliver_now
-    email_job = EmailJob.find_by(jid: jid)
-    email_job.try(:destroy)
+  def perform(alert_id)
+    ResqueMailer.notification(alert_id).deliver_now
+    EmailJob.find_by(jid: job_id)&.destroy
   end
 end

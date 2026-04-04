@@ -151,7 +151,7 @@ module Frm
     end
 
     def send_notifications
-      NotificationForumTopicCreate.perform_async(id) if approved?
+      NotificationForumTopicCreate.perform_later(id) if approved?
     end
   end
 end

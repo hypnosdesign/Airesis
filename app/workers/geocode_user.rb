@@ -1,6 +1,4 @@
-class GeocodeUser
-  include Sidekiq::Worker
-
+class GeocodeUser < ApplicationJob
   def perform(*args)
     user_id = args[0]
     @user = User.find_by(id: user_id)

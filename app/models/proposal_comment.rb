@@ -108,11 +108,11 @@ class ProposalComment < ApplicationRecord
   end
 
   def send_email
-    NotificationProposalCommentCreate.perform_async(id)
+    NotificationProposalCommentCreate.perform_later(id)
   end
 
   def send_update_notifications
-    NotificationProposalCommentUpdate.perform_async(id) if previous_changes.include?(:content) && previous_changes[:content].first != previous_changes[:content].last
+    NotificationProposalCommentUpdate.perform_later(id) if previous_changes.include?(:content) && previous_changes[:content].first != previous_changes[:content].last
   end
 
   def generate_nickname

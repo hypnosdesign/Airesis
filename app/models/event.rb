@@ -124,13 +124,13 @@ class Event < ApplicationRecord
   protected
 
   def send_notifications
-    NotificationEventCreate.perform_async(id)
+    NotificationEventCreate.perform_later(id)
 
     # timers for start and endtime
     return unless votation?
 
-    EventsWorker.perform_at(starttime, 'action' => EventsWorker::STARTVOTATION, 'event_id' => id)
-    EventsWorker.perform_at(endtime, 'action' => EventsWorker::ENDVOTATION, 'event_id' => id)
+    EventsWorker.set(wait_until: starttime).perform_later( 'action' => EventsWorker::STARTVOTATION, 'event_id' => id)
+    EventsWorker.set(wait_until: endtime).perform_later( 'action' => EventsWorker::ENDVOTATION, 'event_id' => id)
   end
 
   def remove_scheduled_tasks

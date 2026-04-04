@@ -154,7 +154,7 @@ class BestQuorum < Quorum
         proposal.vote_period = @event
       else
         proposal.proposal_state_id = ProposalState::WAIT_DATE # we passed the debate, we are now waiting for someone to choose the vote date
-        NotificationProposalReadyForVote.perform_async(proposal.id)
+        NotificationProposalReadyForVote.perform_later(proposal.id)
       end
       proposal.save
       # remove the timer if is still there
@@ -197,7 +197,7 @@ class BestQuorum < Quorum
                                    end
     end
     proposal.save!
-    NotificationProposalVoteClosed.perform_async(proposal.id)
+    NotificationProposalVoteClosed.perform_later(proposal.id)
   end
 
   def has_bad_score?

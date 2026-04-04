@@ -1,12 +1,14 @@
 RSpec.configure do |config|
   config.before(:each, notifications: true) do
-    allow_any_instance_of(AlertJob).to receive(:sidekiq_job) do |alert_job|
-      AlertsWorker.jobs.select { |job| job['jid'] == alert_job.jid }[0]
+    # SolidQueue is not used in test env (test adapter stores jobs in memory).
+    # Stub scheduled_in_queue? to check the in-memory queue instead of the DB.
+    allow_any_instance_of(AlertJob).to receive(:scheduled_in_queue?) do |alert_job|
+      AlertsWorker.jobs.any? { |job| job["job_id"] == alert_job.jid }
     end
     allow_any_instance_of(AlertJob).to receive(:reschedule)
 
-    allow_any_instance_of(EmailJob).to receive(:sidekiq_job) do |email_job|
-      EmailsWorker.jobs.select { |job| job['jid'] == email_job.jid }[0]
+    allow_any_instance_of(EmailJob).to receive(:scheduled_in_queue?) do |email_job|
+      EmailsWorker.jobs.any? { |job| job["job_id"] == email_job.jid }
     end
     allow_any_instance_of(EmailJob).to receive(:reschedule)
   end

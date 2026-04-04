@@ -11,6 +11,6 @@ class GroupParticipationRequest < ApplicationRecord
   protected
 
   def send_notifications
-    NotificationParticipationRequestCreate.perform_async(id) if pending?
+    NotificationParticipationRequestCreate.perform_later(id) if pending?
   end
 end

@@ -30,18 +30,20 @@ class AlertJob < ApplicationRecord
     update(status: 2, alert: alert)
   end
 
-  def sidekiq_job
-    @sidekiq_job ||= Sidekiq::ScheduledSet.new.find_job(jid)
+  def scheduled_in_queue?
+    SolidQueue::Job.find_by(active_job_id: jid)&.scheduled_execution.present?
   end
 
-  delegate :reschedule, to: :sidekiq_job
+  def reschedule(new_time)
+    SolidQueue::Job.find_by(active_job_id: jid)&.scheduled_execution&.update!(scheduled_at: new_time)
+  end
 
   def accumulate(by = 1)
     increment!(:accumulated_count, by)
-    if sidekiq_job.present?
+    if scheduled_in_queue?
       reschedule(notification_type.alert_delay.minutes.from_now)
     else
-      Rails.logger.error('sidekiq process not found when trying to accumulate on an existing alert process')
+      Rails.logger.error('job not found when trying to accumulate on an existing alert process')
     end
   end
 
@@ -50,15 +52,16 @@ class AlertJob < ApplicationRecord
   end
 
   def self.factory(notification, user, trackable)
-    jid = AlertsWorker.perform_in(delay_for(notification),
-                                  'user_id' => user.id,
-                                  'notification_id' => notification.id,
-                                  'checked' => false,
-                                  'trackable_id' => trackable.id,
-                                  'trackable_type' => trackable.class.name)
+    job = AlertsWorker.set(wait: delay_for(notification)).perform_later(
+      'user_id' => user.id,
+      'notification_id' => notification.id,
+      'checked' => false,
+      'trackable_id' => trackable.id,
+      'trackable_type' => trackable.class.name
+    )
     create!(trackable: trackable,
             notification_type: notification.notification_type,
             user: user,
-            jid: jid)
+            jid: job.job_id)
   end
 end

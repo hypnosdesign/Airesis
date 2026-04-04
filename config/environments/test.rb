@@ -15,6 +15,7 @@ Rails.application.configure do
   config.action_mailer.delivery_method = :test
   config.action_mailer.logger = nil
   config.active_support.report_deprecations = true
+  config.active_job.queue_adapter = :test
   # Disable parameter filtering in SQL logs to avoid Rails 7.1 ParameterFilter recursion bug
   # with complex bind parameters (e.g. from Globalize uniqueness validators)
   config.filter_parameters = []

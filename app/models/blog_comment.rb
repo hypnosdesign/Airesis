@@ -40,6 +40,6 @@ class BlogComment < ApplicationRecord
   protected
 
   def send_notifications
-    NotificationBlogCommentCreate.perform_async(id)
+    NotificationBlogCommentCreate.perform_later(id)
   end
 end

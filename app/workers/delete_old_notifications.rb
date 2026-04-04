@@ -1,4 +1,4 @@
-class DeleteOldNotifications
+class DeleteOldNotifications < ApplicationJob
   def perform(*_args)
     count = 0
     deleted = Notification.where('created_at < ?', 6.months.ago).destroy_all
