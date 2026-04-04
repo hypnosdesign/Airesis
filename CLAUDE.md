@@ -1,7 +1,7 @@
 # CLAUDE.md — Airesis
 
 > Analisi iniziale: 2026-03-31.
-> Ultimo aggiornamento: 2026-04-04 — Rails 8.1.3 ✓, Ruby 3.4.4 ✓. Fasi 1–5 + 4-R completate. Copertura test: 80.17% ✓.
+> Ultimo aggiornamento: 2026-04-04 — Rails 8.1.3 ✓, Ruby 3.4.4 ✓, Solid Queue ✓. Fasi 1–5 + 4-R completate. Copertura test: 80.24% ✓.
 > Obiettivo: modernizzare l'app per renderla funzionante e manutenibile nel 2026.
 
 ---
@@ -24,8 +24,8 @@ Repo originale: https://github.com/coorasse/airesis (branch `develop`)
 | Ruby           | 2.7.5 (EOL)       | **3.4.4** ✓     | 3.4.x               |
 | Rails          | 6.0.3.1 (EOL)     | **8.1.3** ✓     | 8.1.x               |
 | PostgreSQL     | qualsiasi         | 14-alpine ✓     | 14+                 |
-| Redis          | qualsiasi         | 7-alpine ✓      | 7.x                 |
-| Sidekiq        | 6.1.2             | 6.1.x           | 7.x                 |
+| Redis          | qualsiasi         | **rimosso** ✓   | non necessario      |
+| Sidekiq        | 6.1.2             | **rimosso** ✓   | Solid Queue (Rails 8 nativo) |
 | Devise         | 4.7.1             | **5.0.3** ✓     | 5.x                 |
 | CanCanCan      | 3.1.1             | **3.6.1** ✓     | 3.x                 |
 | rails_admin    | 2.0.1             | **3.3.0** ✓     | 3.x                 |
@@ -46,7 +46,7 @@ Repo originale: https://github.com/coorasse/airesis (branch `develop`)
 app/
   models/        # 117 modelli
   controllers/   # 73 controller (namespace: api/v1, admin/, frm/)
-  workers/       # 39 Sidekiq worker
+  workers/       # 37 ActiveJob workers (ex Sidekiq)
   cancan/        # abilities (Guest, Logged, Moderator, Admin)
   views/         # ERB (500+ file). Tutte con classi Tailwind/DaisyUI. Zero file Slim.
 config/
@@ -65,7 +65,7 @@ spec/            # RSpec, ~7400 linee
 - `Proposal` — entità centrale, stati via `workflow` gem, voto Schulze
 - `Group` — comunità con ruoli, eventi, blog, forum
 - `Event` — incontri con partecipanti e commenti
-- `Alert` / `Notification` — sistema notifiche (20+ worker Sidekiq)
+- `Alert` / `Notification` — sistema notifiche (20+ ActiveJob worker)
 
 ---
 
@@ -79,14 +79,16 @@ spec/            # RSpec, ~7400 linee
 
 ---
 
-## Job asincroni (Sidekiq)
+## Job asincroni (Solid Queue)
 
-Code configurate in `config/sidekiq.yml`:
-- `high_priority` — 5 concorrenti
-- `notifications` — 3 concorrenti
-- `default` — 2 concorrenti
-- `low_priority` — 1 concorrente
-- `mailers` — 1 concorrente
+Queue configurate in `config/queue.yml` (Solid Queue, Rails 8 nativo, no Redis):
+- `high_priority` — alta priorità (AlertsWorker)
+- `notifications` — notifiche (NotificationSender e subclassi)
+- `default` — default (ProposalsWorker, EventsWorker)
+- `low_priority` — bassa priorità (EmailsWorker, UpdateSitemap)
+- `mailers` — email (ResqueMailer via deliver_later)
+
+Avvio: `bundle exec rails solid_queue:start`
 
 ---
 
@@ -100,8 +102,7 @@ docker compose up
 Servizi:
 - `airesis` — app Rails (porta 3000). Nota: `NODE_OPTIONS=--openssl-legacy-provider` ancora nel docker-compose (legacy Webpack, da rimuovere in Fase 4-R)
 - `db` — PostgreSQL 14 (porta 5433, user `postgres`, trust auth)
-- `redis` — Redis 7
-- `sidekiq` — worker Sidekiq
+- `solid_queue` — Solid Queue worker (porta nessuna, DB-backed)
 
 Comandi utili:
 ```bash
@@ -335,10 +336,15 @@ RAILS_LOG_TO_STDOUT=true
     - rails_admin emette warning deprecazione Symbol#to_s frozen string — non bloccante
     - SimpleCov.maximum_coverage_drop 0 → 0.5 (Ruby 3.4 conta linee diversamente)
 
-25. ⬜ Rimuovere Sidekiq e Redis (opzionale, post Rails 8)
-    - Solo se migrazione a Solid Queue completata
-    - Semplifica infrastruttura Docker (elimina servizio `redis` per i job)
-    - Mantenere Redis se usato per altri scopi (cache, sessioni)
+25. ✅ Rimuovere Sidekiq e Redis → Solid Queue + Solid Cable
+    - 37 worker Sidekiq convertiti a ActiveJob (ApplicationJob)
+    - `perform_async` → `perform_later`, `perform_in/at` → `set(wait:).perform_later`
+    - `ResqueMailer.delay.method` → `method.deliver_later`
+    - AlertJob/EmailJob: `scheduled_in_queue?` tramite SolidQueue::Job DB lookup
+    - docker-compose.yml: servizio `redis` rimosso, `solid_queue` aggiunto
+    - `alert.rb`: `email_job.sidekiq_job` → `email_job.scheduled_in_queue?`
+    - `ApplicationJob`: `.jobs` e `.drain` per compatibilità test (Sidekiq fake mode → test adapter)
+    - `spec/support/notifications.rb`: stub `scheduled_in_queue?` invece di `sidekiq_job`
 
 ### Fase 7 — UI/UX redesign moderno ⬜
 
@@ -421,7 +427,7 @@ RAILS_LOG_TO_STDOUT=true
 - Template engine primario: **ERB** (`.erb`) — zero file Slim
 - ORM: **ActiveRecord** con PostgreSQL
 - Autorizzazione: sempre via **CanCanCan** (`can?` / `authorize!`)
-- Job asincroni: sempre via **Sidekiq** (non `ActiveJob` diretto)
+- Job asincroni: sempre via **ActiveJob** (`perform_later`) — Solid Queue come adapter in production
 - Ricerca full-text: **pg_search** (non LIKE)
 - Paginazione: **kaminari**
 - Form: **simple_form** (wrapper ancora Foundation — da migrare a Tailwind/DaisyUI in Fase 4-R)
