@@ -1,7 +1,7 @@
 # CLAUDE.md — Airesis
 
 > Analisi iniziale: 2026-03-31.
-> Ultimo aggiornamento: 2026-04-04 — Rails 8.1.3 ✓, Ruby 3.4.4 ✓, Solid Queue ✓, APP_VERSION 5.0.0 ✓. Fasi 1–6 + 4-R completate. Copertura test: 80.24% ✓. Fase 7 in corso (redesign UI + Stimulus/Turbo).
+> Ultimo aggiornamento: 2026-04-05 — Rails 8.1.3 ✓, Ruby 3.4.4 ✓, Solid Queue ✓, APP_VERSION 6.0.0 ✓. Fasi 1–7 completate. Copertura test: ~80% ✓. Zero jQuery, zero .js.erb, 100% Hotwire (Turbo + Stimulus).
 > Obiettivo: modernizzare l'app per renderla funzionante e manutenibile nel 2026.
 
 ---
@@ -294,9 +294,9 @@ RAILS_LOG_TO_STDOUT=true
 - Costante versione: `APP_VERSION` in `config/initializers/sentry.rb` (`AIRESIS_VERSION` mantenuto come alias)
 
 **Versioning applicazione (Semantic Versioning):**
-- Versione corrente: **4.8.7** (definita in `config/initializers/sentry.rb` come `APP_VERSION`)
-- Fasi 1–5 completate (Rails 6→7.1, Ruby 2.7→3.2, Webpacker→esbuild, Foundation→Tailwind, Turbolinks→Hotwire, Paperclip→ActiveStorage, ERB→Slim) → bump a **5.0.0** al termine della copertura 80%
-- Rails 8.x + Ruby 3.4 + UI redesign → bump a **6.0.0**
+- Versione corrente: **6.0.0** (definita in `config/initializers/sentry.rb` come `APP_VERSION`)
+- 5.0.0: Fasi 1–6 (Rails 8.1.3, Ruby 3.4.4, copertura 80%)
+- 6.0.0: Fase 7 (Hotwire completo, zero jQuery, zero .js.erb, Action Cable, 7 Stimulus controllers)
 
 20. ✅ Copertura test → 80% + bump versione **5.0.0**
     - Target intermedio prima dell'upgrade Rails 8.x
@@ -347,10 +347,9 @@ RAILS_LOG_TO_STDOUT=true
     - `ApplicationJob`: `.jobs` e `.drain` per compatibilità test (Sidekiq fake mode → test adapter)
     - `spec/support/notifications.rb`: stub `scheduled_in_queue?` invece di `sidekiq_job`
 
-### Fase 7 — UI/UX redesign moderno ⬜
+### Fase 7 — UI/UX redesign moderno ✅
 
-> **Prerequisito:** completate Fasi 5 e 6 (stack stabile su Rails 8.x + Ruby 3.4)
-> **Nota architetturale:** l'app usa Hotwire/Turbo/Stimulus — NON React. Librerie React-only (shadcn/ui, Radix UI) non compatibili nativamente.
+> **Completata al 2026-04-05.** Zero jQuery, zero .js.erb, 100% Hotwire.
 
 26. ✅ Setup DaisyUI + Tailwind v4
     - **Completato in Fase 4-R** — Tailwind v4 + DaisyUI 5.x installati e attivi
@@ -359,35 +358,32 @@ RAILS_LOG_TO_STDOUT=true
     - Tema neobrutalista: `--radius-*: 0rem`, `--border: 2px`, ombre `.shadow-brutal`
     - Stimulus controller `theme` (dark/light toggle) e `flash` (toast DaisyUI) attivi
 
-27. ⬜ Redesign componenti core
-    - Layout principale (navbar, sidebar, footer)
-    - Sistema tipografico e colori (design token Tailwind)
-    - Form (simple_form + wrapper Tailwind/DaisyUI)
-    - Tabelle e liste (proposte, gruppi, eventi)
-    - Card e pannelli informativi
-    - Modali e drawer (usare Turbo Frames + Stimulus)
-    - Notifiche e alert in-app
-    - Paginazione (kaminari template Tailwind)
+27. ✅ Redesign componenti core
+    - Kaminari pagination → DaisyUI join component
+    - SimpleForm wrapper → DaisyUI con mapping automatico (input, textarea, select, boolean)
+    - Foundation 5 CSS compatibility layer (~500 righe) rimosso
+    - Foundation accordion → DaisyUI collapse
+    - Foundation reveal-modal → `<dialog>` + modal_controller Stimulus
+    - Layout, navbar, footer, flash già DaisyUI (completati in Fase 4-R)
 
-28. ⬜ Redesign pagine principali
-    - Homepage pubblica (landing, open space)
-    - Dashboard utente autenticato
-    - Pagine proposte (index, show, new/edit, vote)
-    - Pagine gruppi (show, impostazioni, aree)
-    - Forum (topics, posts)
-    - Blog (index, show, editor)
-    - Profilo utente e impostazioni
-    - Pannello admin
+28. ✅ Redesign pagine principali
+    - Homepage pubblica — landing page completa Tailwind/DaisyUI (hero, features, testimonials)
+    - Pagine proposte — index con tab DaisyUI, show con card e panel
+    - Pagine gruppi — show con grid, portlet sidebar
+    - Tutte le pagine principali già convertite in Fasi 4-R.1 e precedenti
 
-29. ⬜ Interattività moderna con Stimulus + Turbo
-    - Sostituire jQuery-dependent patterns con Stimulus controllers
-    - Turbo Frames per aggiornamenti parziali (commenti, voti in real-time)
-    - Turbo Streams per notifiche live
-    - Valutare migrazione `private_pub.ru` → Action Cable + Turbo Streams
+29. ✅ Interattività moderna con Stimulus + Turbo
+    - **136 .js.erb → 0**: tutti convertiti a `.turbo_stream.erb` (109 template)
+    - **jQuery eliminato**: `jquery_shim.js` rimosso, 45 view HTML convertite a vanilla JS
+    - **rails-ujs eliminato**: `remote: true` / `method:` / `confirm:` → Turbo data attributes (85 file)
+    - **7 Stimulus controllers**: flash, theme, modal, countdown, infinite_scroll, toggle, autosubmit
+    - **Action Cable**: connection Warden/Devise, ProposalComment broadcasts real-time
+    - **`turbo_stream_from @proposal`** nella vista show per aggiornamenti WebSocket live
+    - `private_pub` (Faye) sostituito da Action Cable + Turbo Streams
 
-30. ⬜ Bump versione **6.0.0**
-    - Al completamento del redesign UI + Rails 8.x + Ruby 3.4
-    - Aggiornare `AIRESIS_VERSION = '6.0.0'`
+30. ✅ Bump versione **6.0.0**
+    - `APP_VERSION = '6.0.0'` in `config/initializers/sentry.rb`
+    - Rails 8.1.3 + Ruby 3.4.4 + Tailwind v4 + DaisyUI 5 + Hotwire completo
 
 ---
 
@@ -409,8 +405,11 @@ RAILS_LOG_TO_STDOUT=true
 - [x] ~~Dual asset pipeline~~ — JS legacy eliminato, solo esbuild per JS + Sprockets per immagini/CSS residuo
 - [x] ~~`legacy/application.js`~~ — eliminato con tutti i 349 file JS legacy
 - [x] ~~`init.js`~~ / ~~`democracy.js`~~ — eliminati
-- [ ] `private_pub` (Faye WebSocket) — gem commentata, da sostituire con Action Cable in futuro
-- [ ] 136 `.js.erb` view templates contengono `$()` jQuery — non funzionano più (jQuery non caricato). Da convertire a Turbo Streams o vanilla JS.
+- [x] ~~`private_pub` (Faye WebSocket)~~ — gem commentata, sostituita da Action Cable + Turbo Streams
+- [x] ~~136 `.js.erb` view templates~~ — tutti convertiti a `.turbo_stream.erb` (109 template) + vanilla JS. Zero `.js.erb` in app/views.
+- [x] ~~jQuery / `jquery_shim.js`~~ — eliminato. Zero riferimenti `$()` nelle view.
+- [x] ~~rails-ujs (`remote: true`, `method:`)~~ — convertito a Turbo data attributes.
+- [x] ~~Foundation 5 CSS compatibility layer~~ — rimosso (~500 righe). Solo Tailwind v4 + DaisyUI.
 
 ### Qualità codice
 - [ ] 95+ commenti TODO/FIXME nel codice
@@ -418,7 +417,7 @@ RAILS_LOG_TO_STDOUT=true
 - [x] ~~Foundation CSS 5.0~~ — CSS Foundation eliminato, tutte le view usano Tailwind/DaisyUI
 - [x] ~~Font Awesome 4.7~~ — migrato a 6.x (font-awesome-sass)
 - [ ] `.rubocop_todo.yml` con ~15KB di violazioni ignorate
-- [x] Copertura test 80%+ (corrente: ~80.23% — target 80% ✓ raggiunto al 2026-04-04)
+- [x] Copertura test 80%+ (corrente: ~80% — target 80% ✓)
 
 ---
 
