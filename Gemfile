@@ -2,7 +2,7 @@ source 'http://rubygems.org'
 
 ruby File.read(File.join(__dir__, '.ruby-version'))
 
-gem 'rails', '~> 7.2.0'
+gem 'rails', '~> 8.0'
 
 gem 'aws-sdk-s3'
 gem 'bootsnap'
@@ -46,7 +46,7 @@ gem 'sass-rails'
 gem 'sidekiq'
 gem 'sidekiq-failures'
 gem 'simple_form'
-gem 'simple_token_authentication'
+# gem 'simple_token_authentication' # removed: replaced by has_secure_token (Rails native)
 gem 'sinatra', require: false
 gem 'sitemap_generator'
 # gem 'slim-rails' # removed: all views converted to ERB

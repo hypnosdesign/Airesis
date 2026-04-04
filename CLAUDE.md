@@ -1,7 +1,7 @@
 # CLAUDE.md — Airesis
 
 > Analisi iniziale: 2026-03-31.
-> Ultimo aggiornamento: 2026-04-04 — Fasi 1–5 completate. Fase 4-R.1 completata: TUTTE le view convertite da Slim/Foundation a ERB/DaisyUI (500+ file, zero Slim). jQuery+Foundation CSS ancora attivi via Sprockets (327 file JS legacy). Copertura test: 80.23% ✓.
+> Ultimo aggiornamento: 2026-04-04 — Rails 8.1.3 ✓. Fasi 1–5 + 4-R completate. Copertura test: 80.27% ✓.
 > Obiettivo: modernizzare l'app per renderla funzionante e manutenibile nel 2026.
 
 ---
@@ -22,7 +22,7 @@ Repo originale: https://github.com/coorasse/airesis (branch `develop`)
 | Componente     | Versione originale | Versione attuale | Target              |
 |----------------|-------------------|-----------------|---------------------|
 | Ruby           | 2.7.5 (EOL)       | **3.2.8** ✓     | 3.2.x               |
-| Rails          | 6.0.3.1 (EOL)     | **7.1.6** ✓     | 7.1.x               |
+| Rails          | 6.0.3.1 (EOL)     | **8.1.3** ✓     | 8.1.x               |
 | PostgreSQL     | qualsiasi         | 14-alpine ✓     | 14+                 |
 | Redis          | qualsiasi         | 7-alpine ✓      | 7.x                 |
 | Sidekiq        | 6.1.2             | 6.1.x           | 7.x                 |
@@ -155,7 +155,8 @@ RAILS_LOG_TO_STDOUT=true
 - Framework: **RSpec** + FactoryBot + Capybara + Selenium
 - Copertura attuale: **~80.23%** (1498 esempi, 0 failure al 2026-04-04) — target 80% ✓ raggiunto
 - Copertura minima configurata in SimpleCov: **70.0%**
-- Run in Docker: `docker compose run --rm -e BUNDLE_APP_CONFIG=/usr/src/app/.bundle airesis bundle exec rspec`
+- Run in Docker: `docker compose run --rm -e RAILS_ENV=test airesis bundle exec rspec`
+- Escludi system spec (Selenium non disponibile nel container): `docker compose run --rm -e RAILS_ENV=test airesis bundle exec rspec --exclude-pattern "**/system/**/*_spec.rb"`
 - CI: Travis CI (`.travis.yml`) + Semaphore (`.semaphore/`)
 
 ---
@@ -304,22 +305,27 @@ RAILS_LOG_TO_STDOUT=true
     - SimpleCov minimum_coverage aggiornato a 80.0%
     - TODO: aggiornare `AIRESIS_VERSION = '5.0.0'`
 
-21. ⬜ Rails 7.1 → **7.2**
-    - Step minore, meno rischi
-    - Verificare compatibilità: `rails_admin`, `simple_token_authentication`, `vote-schulze` (gem su git), `airesis_i18n` (gem su git)
-    - Aggiornare `config.load_defaults 7.2`
-    - Eseguire `rails app:update` interattivo nel container
+21. ✅ Rails 7.1 → **7.2.3**
+    - `config.load_defaults 7.2`
+    - `config.cache_classes` → `config.enable_reloading`
+    - `enum` keyword arguments → positional syntax (5 modelli)
+    - Rimosso `ActiveRecord::Migration.check_pending!` (Rails 7.2 non lo supporta)
+    - `simple_token_authentication` bloccante (actionpack < 8) — risolto in step 22
 
-22. ⬜ Rails 7.2 → **8.0**
-    - Verificare `rails_admin` (supporto Rails 8 non garantito — potrebbe richiedere sostituzione)
-    - Valutare migrazione da Sidekiq → **Solid Queue** (built-in Rails 8, elimina dipendenza Redis per i job)
-    - Valutare migrazione da Redis cache → **Solid Cache**
-    - `ActionController::Parameters` e altri breaking changes 8.0
-    - Aggiornare `config.load_defaults 8.0`
+22. ✅ Rails 7.2 → **8.1.3** (saltato 8.0, direttamente a 8.1.3)
+    - `simple_token_authentication` rimosso → `has_secure_token :authentication_token` (Rails native)
+    - `authenticate_user_from_token!` custom in `Api::V1::ApplicationController` e `SessionsController`
+    - `render text:` → `render plain:` (3 controller)
+    - `render nothing: true` → `head :ok` (8 controller)
+    - `.scoped` → `.all` (2 view ckeditor)
+    - `ActiveSupport::Logger` → `Logger` (production.rb)
+    - `config.load_defaults 8.0`
+    - Dockerfile: rimosso `--without test` per abilitare gem di test nel container
+    - Run tests: `docker compose run --rm -e RAILS_ENV=test airesis bundle exec rspec`
+    - **Nota:** RAILS_ENV deve essere impostato esplicitamente — docker-compose.yml ha `RAILS_ENV=development`
 
-23. ⬜ Rails 8.0 → **8.1.x** (target: 8.1.3+)
-    - Step minore rispetto a 8.0
-    - Aggiornare `config.load_defaults 8.1`
+23. ⬜ Rails 8.1 → **8.1.x aggiornamenti minori**
+    - Valutare `config.load_defaults 8.1` (attualmente su 8.0)
     - Valutare **Solid Cable** per WebSocket (sostituisce `private_pub.ru` via Faye)
 
 24. ⬜ Ruby 3.2.8 → **3.4.x**

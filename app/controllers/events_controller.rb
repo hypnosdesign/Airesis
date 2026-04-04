@@ -35,7 +35,7 @@ class EventsController < ApplicationController
         calendar = Icalendar::Calendar.new
         calendar.add_event(@event.to_ics)
         calendar.publish
-        render text: calendar.to_ical
+        render plain: calendar.to_ical
       end
     end
   end
@@ -114,12 +114,12 @@ class EventsController < ApplicationController
 
   def move
     @event.move(params[:minute_delta].to_i, params[:day_delta].to_i, params[:all_day])
-    render nothing: true
+    head :ok
   end
 
   def resize
     @event.resize(params[:minute_delta].to_i, params[:day_delta].to_i)
-    render nothing: true
+    head :ok
   end
 
   def edit; end

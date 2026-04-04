@@ -48,7 +48,7 @@ class AlertsController < ApplicationController
 
     respond_to do |format|
       format.html { redirect_to calculate_alert_path(@alert) }
-      format.js { render nothing: true }
+      format.js { head :ok }
     end
   rescue Exception => e
     @title = 'Impossibile recuperare la notifica' # TODO: I18n
@@ -61,7 +61,7 @@ class AlertsController < ApplicationController
   def check_all
     current_user.unread_alerts.check_all
     respond_to do |format|
-      format.js { render nothing: true }
+      format.js { head :ok }
     end
   end
 

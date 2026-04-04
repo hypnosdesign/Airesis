@@ -72,9 +72,9 @@ class HomeController < ApplicationController
         feedback.save!
 
         ResqueMailer.feedback(feedback.id).deliver_later
-        render nothing: true
+        head :ok
       end
-      format.html { render nothing: true }
+      format.html { head :ok }
     end
   end
 
