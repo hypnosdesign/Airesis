@@ -1,4 +1,4 @@
-FROM ruby:3.2.8
+FROM ruby:3.4.4
 
 # System dependencies
 RUN apt-get update && apt-get install -y --no-install-recommends \
@@ -22,7 +22,7 @@ RUN curl -fsSL https://deb.nodesource.com/setup_18.x | bash - \
 RUN npm install -g yarn
 
 # Bundler
-RUN gem install bundler -v 2.4.22
+RUN gem install bundler -v 2.5.23
 
 WORKDIR /usr/src/app
 
