@@ -8,16 +8,16 @@
         <% end %>
       </a>
       <div id="role_<%= role.id %>" class="content <%= 'active' if idx == 0 %>">
-        <%= link_to [@group, @group_area, role], method: :delete, class: 'btn', style: 'float:right', data: {remote: true, confirm: t('pages.groups.edit_permissions.confirm_role_deletion'), disable_with: t('loading')} do %>
+        <%= link_to [@group, @group_area, role], data: { turbo_method: :delete }, class: 'btn', style: 'float:right', data: {turbo_confirm: t('pages.groups.edit_permissions.confirm_role_deletion'), disable_with: t('loading')} do %>
           <i class="fa-regular fa-trash-can"></i>
           <%= t('buttons.delete') %>
         <% end %>
-        <%= link_to edit_group_group_area_area_role_url(@group, @group_area, role), class: 'btn', style: 'float:right', data: {remote: true, disable_with: t('loading')} do %>
+        <%= link_to edit_group_group_area_area_role_url(@group, @group_area, role), class: 'btn', style: 'float:right', data: {disable_with: t('loading')} do %>
           <i class="fa-solid fa-pencil"></i>
           <%= t('buttons.edit') %>
         <% end %>
         <h4><%= role.description %></h4>
-        <%= simple_form_for [@group, @group_area, role], remote: true do |f| %>
+        <%= simple_form_for [@group, @group_area, role] do |f| %>
           <input type="hidden" name="no_refresh" value="1">
           <%= f.input :view_proposals, label: I18n.t('db.group_actions.view_proposals.description'), input_html: { data: { area_action_abilitation: '' } } %>
           <%= f.input :participate_proposals, label: I18n.t('db.group_actions.participate_proposals.description'), input_html: { data: { area_action_abilitation: '' } } %>

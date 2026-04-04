@@ -85,7 +85,7 @@
               <i class="fa-brands fa-twitter fa-social"></i> Twitter
             <% end %>
             <% if @user.email %>
-              <%= link_to t('buttons.detach'), [@user, authentication], method: :delete, data: { confirm: t('confirm_detach') }, class: 'btn btn-sm btn-error' %>
+              <%= link_to t('buttons.detach'), [@user, authentication], data: { turbo_method: :delete, turbo_confirm: t('confirm_detach') }, class: 'btn btn-sm btn-error' %>
             <% else %>
               <%= link_to t('buttons.detach'), '#', data: { detach_disabled: true }, class: 'btn btn-sm btn-disabled' %>
             <% end %>

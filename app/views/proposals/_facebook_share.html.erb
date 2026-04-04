@@ -11,7 +11,7 @@
                   <%= image_tag friend['picture']['data']['url'] %>
                 </div>
                 <div class="w-full lg:w-10/12">
-                  <%= form_for 'message', url: facebook_send_message_proposal_url(@proposal), remote: true do |f| %>
+                  <%= form_for 'message', url: facebook_send_message_proposal_url(@proposal) do |f| %>
                     <div class="flex flex-wrap name">
                       <div class="w-full">
                         <%= friend['name'] %>

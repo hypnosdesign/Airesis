@@ -48,7 +48,7 @@
     <% if can? :destroy, @group %>
       <div class="alert alert-warning" data-alert>
         <%= t('.delete_group_warning_html') %>
-        <%= link_to @group, method: :delete, data: { confirm: t('pages.groups.show.confirm_destroy') }, class: 'btn btn-error' do %>
+        <%= link_to @group, data: { turbo_method: :delete, turbo_confirm: t('pages.groups.show.confirm_destroy') }, class: 'btn btn-error' do %>
           <i class="fa-regular fa-trash-can"></i>
           <%= t('pages.groups.show.destroy_button') %>
         <% end %>

@@ -4,7 +4,7 @@
       <button class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2">✕</button>
     </form>
 
-    <%= form_for 'proposal_comment', url: report_proposal_proposal_comments_path(@proposal), remote: true do |f| %>
+    <%= form_for 'proposal_comment', url: report_proposal_proposal_comments_path(@proposal) do |f| %>
       <%= cache "report_panel_#{I18n.locale}" do %>
         <input id="report_contribute_id" type="hidden" name="id" value="0">
 

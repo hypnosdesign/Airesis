@@ -9,7 +9,7 @@
     </div>
     <div class="regenerate_nickname">
       <% if can? :update, @my_nickname %>
-        <%= link_to t('pages.proposals.show.regenerate_nickname'), proposal_nickname_path(@my_nickname), method: :put, class: 'btn', style: 'display: inline-block' %>
+        <%= link_to t('pages.proposals.show.regenerate_nickname'), proposal_nickname_path(@my_nickname), data: { turbo_method: :put }, class: 'btn', style: 'display: inline-block' %>
         <div>
           <%= '(puoi farlo ancora per ' %>
           <span class="change_nick"></span>

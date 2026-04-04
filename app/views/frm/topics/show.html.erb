@@ -8,7 +8,7 @@
     <div id="topic_moderation" class="moderation alert alert-warning mb-4">
       <%= t("frm.topics.show.pending_review") %>
       <% if forem_admin_or_moderator?(@topic.forum) %>
-        <%= form_for @topic, url: group_frm_moderate_forum_topic_url(@topic.forum, @topic), method: :put do |f| %>
+        <%= form_for @topic, url: group_frm_moderate_forum_topic_url(@topic.forum, @topic), data: { turbo_method: :put } do |f| %>
           <%= render "/frm/moderation/options", f: f %>
         <% end %>
       <% end %>
@@ -40,7 +40,7 @@
         <% end %>
       <% end %>
       <% if @topic.user == current_user || forem_admin?(@group) %>
-        <%= link_to group_forum_topic_url(@group, @forum, @topic), method: :delete, data: { confirm: t("are_you_sure") }, class: "btn btn-sm" do %>
+        <%= link_to group_forum_topic_url(@group, @forum, @topic), data: { turbo_method: :delete, turbo_confirm: t("are_you_sure") }, class: "btn btn-sm" do %>
           <i class="fa-regular fa-trash-can"></i>
           <%= t(".delete") %>
         <% end %>
@@ -70,15 +70,15 @@
           <i class="fa-solid fa-pencil"></i>
           <%= t('frm.topic.links.edit') %>
         <% end %>
-        <%= link_to toggle_hide_group_frm_admin_forum_topic_url(@group, @forum, @topic), method: :put, class: "btn btn-sm", data: { disable_with: t('loading') } do %>
+        <%= link_to toggle_hide_group_frm_admin_forum_topic_url(@group, @forum, @topic), data: { turbo_method: :put }, class: "btn btn-sm", data: { disable_with: t('loading') } do %>
           <i class="fa-solid fa-eye-slash"></i>
           <%= t("frm.topics.show.hide.#{@topic.hidden}") %>
         <% end %>
-        <%= link_to toggle_lock_group_frm_admin_forum_topic_url(@group, @forum, @topic), method: :put, class: "btn btn-sm", data: { disable_with: t('loading') } do %>
+        <%= link_to toggle_lock_group_frm_admin_forum_topic_url(@group, @forum, @topic), data: { turbo_method: :put }, class: "btn btn-sm", data: { disable_with: t('loading') } do %>
           <i class="fa-solid fa-lock"></i>
           <%= t("frm.topics.show.lock.#{@topic.locked}") %>
         <% end %>
-        <%= link_to toggle_pin_group_frm_admin_forum_topic_url(@group, @forum, @topic), method: :put, class: "btn btn-sm", data: { disable_with: t('loading') } do %>
+        <%= link_to toggle_pin_group_frm_admin_forum_topic_url(@group, @forum, @topic), data: { turbo_method: :put }, class: "btn btn-sm", data: { disable_with: t('loading') } do %>
           <i class="fa-solid fa-thumbtack"></i>
           <%= t("frm.topics.show.pin.#{@topic.pinned}") %>
         <% end %>

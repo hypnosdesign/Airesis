@@ -13,7 +13,7 @@
       <%= time_in_words comment.created_at %>
       <% if can? :destroy, comment %>
         <div style="float:right">
-          <%= link_to t('pages.blog_posts.comment.delete_button'), [@blog, @blog_post, comment], method: :delete, data: { remote: true, confirm: t('pages.proposals.show.delete_contribute_confirmation') }, class: "deleteCommentLink btn btn-ghost btn-xs" %>
+          <%= link_to t('pages.blog_posts.comment.delete_button'), [@blog, @blog_post, comment], data: { turbo_method: :delete, turbo_confirm: t('pages.proposals.show.delete_contribute_confirmation') }, class: "deleteCommentLink btn btn-ghost btn-xs" %>
         </div>
       <% end %>
     </div>

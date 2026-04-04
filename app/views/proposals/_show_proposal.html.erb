@@ -12,9 +12,9 @@
     <% @removable_count = @proposal.contributes.unintegrated.removable.count %>
     <% @removed_count = @proposal.contributes.noise.count %>
     <% if ((is_proprietary? @proposal) || is_admin?) && (@removable_count + @removed_count > 0) %>
-      <%= link_to t('pages.proposals.show.manage_noise_folder', removable: @removable_count, removed: @removed_count), manage_noise_proposal_proposal_comments_url(@proposal), remote: true, class: 'btn btn-sm' %>
+      <%= link_to t('pages.proposals.show.manage_noise_folder', removable: @removable_count, removed: @removed_count), manage_noise_proposal_proposal_comments_url(@proposal), class: 'btn btn-sm' %>
     <% elsif @proposal.contributes.noise.count > 0 %>
-      <%= link_to t('pages.proposals.show.noise_folder'), noise_proposal_proposal_comments_url(@proposal), remote: true, class: 'btn btn-sm' %>
+      <%= link_to t('pages.proposals.show.noise_folder'), noise_proposal_proposal_comments_url(@proposal), class: 'btn btn-sm' %>
     <% end %>
   <% end %>
 
@@ -22,20 +22,20 @@
     <%= link_to edit_group_proposal_url(@group, @proposal), class: 'btn btn-sm' do %>
       <i class="fa-solid fa-pencil"></i> <%= t('pages.proposals.show.edit_button') %>
     <% end %>
-    <%= link_to group_proposal_url(@group, @proposal), method: :delete, data: { confirm: t('pages.proposals.show.delete_proposal_confirmation') }, class: 'btn btn-sm btn-error btn-outline' do %>
+    <%= link_to group_proposal_url(@group, @proposal), data: { turbo_method: :delete, turbo_confirm: t('pages.proposals.show.delete_proposal_confirmation') }, class: 'btn btn-sm btn-error btn-outline' do %>
       <i class="fa-regular fa-trash-can"></i> <%= t('pages.proposals.show.delete_button') %>
     <% end %>
   <% else %>
     <%= link_to edit_proposal_path(@proposal), class: 'btn btn-sm' do %>
       <i class="fa-solid fa-pencil"></i> <%= t('pages.proposals.show.edit_button') %>
     <% end %>
-    <%= link_to @proposal, method: :delete, data: { confirm: t('pages.proposals.show.delete_proposal_confirmation') }, class: 'btn btn-sm btn-error btn-outline' do %>
+    <%= link_to @proposal, data: { turbo_method: :delete, turbo_confirm: t('pages.proposals.show.delete_proposal_confirmation') }, class: 'btn btn-sm btn-error btn-outline' do %>
       <i class="fa-regular fa-trash-can"></i> <%= t('pages.proposals.show.delete_button') %>
     <% end %>
   <% end %>
 
   <% if @proposal.in_valutation? %>
-    <%= link_to @group ? close_debate_group_proposal_url(@group, @proposal) : close_debate_proposal_url(@proposal), method: :post, data: { confirm: t('pages.proposals.show.close_debate_proposal_confirmation') }, class: 'btn btn-sm btn-warning' do %>
+    <%= link_to @group ? close_debate_group_proposal_url(@group, @proposal) : close_debate_proposal_url(@proposal), data: { turbo_method: :post, turbo_confirm: t('pages.proposals.show.close_debate_proposal_confirmation') }, class: 'btn btn-sm btn-warning' do %>
       <i class="fa-solid fa-xmark"></i> <%= t('pages.proposals.show.close_debate_button') %>
     <% end %>
   <% elsif @proposal.waiting_date? %>
@@ -51,7 +51,7 @@
   <% elsif @proposal.voted? %>
     <div class="card hidden md:block"></div>
     <h2 id="status" class="text-xl font-bold"><%= @proposal.in_valutation? ? t('pages.proposals.show.during_debate') : @proposal.state.description %></h2>
-    <%= link_to vote_results_proposal_url(@proposal), remote: true, class: 'btn btn-sm results-button' do %>
+    <%= link_to vote_results_proposal_url(@proposal), class: 'btn btn-sm results-button' do %>
       <%= t('pages.proposals.show.votation_results') %>
     <% end %>
   <% end %>
@@ -69,17 +69,17 @@
       <% if signed_in? %>
         <% if @group.participants.include? current_user %>
           <%= t('pages.proposals.show.cant_participate.no_permissions') %>
-          <%= link_to show_message_user_path(@group.portavoce.first), remote: true do %>
+          <%= link_to show_message_user_path(@group.portavoce.first) do %>
             <%= t('pages.proposals.show.cant_participate.ask_permissions') %>
           <% end %>
         <% elsif @group.requesting.include? current_user %>
           <%= t('pages.proposals.show.cant_participate.request_pending') %>
-          <%= link_to show_message_user_path(@group.portavoce.first), remote: true do %>
+          <%= link_to show_message_user_path(@group.portavoce.first) do %>
             <%= t('pages.proposals.show.cant_participate.send_message') %>
           <% end %>
         <% else %>
           <%= t('pages.proposals.show.cant_participate.not_a_member') %>
-          <%= link_to ask_for_participation_group_url(@group), method: :post, class: "btn btn-sm btn-primary" do %>
+          <%= link_to ask_for_participation_group_url(@group), data: { turbo_method: :post }, class: "btn btn-sm btn-primary" do %>
             <i class="fa-solid fa-pencil"></i> <%= t('pages.groups.show.ask_participate_button') %>
           <% end %>
         <% end %>
@@ -93,7 +93,7 @@
 
 <% unless @proposal.is_petition? %>
   <% if @proposal.waiting? %>
-    <%= link_to @group ? start_votation_group_proposal_url(@group, @proposal) : start_votation_proposal_url(@proposal), method: :post, data: { confirm: t('pages.proposals.show.start_votation_proposal_confirmation') }, class: 'btn btn-primary mb-4' do %>
+    <%= link_to @group ? start_votation_group_proposal_url(@group, @proposal) : start_votation_proposal_url(@proposal), data: { turbo_method: :post, turbo_confirm: t('pages.proposals.show.start_votation_proposal_confirmation') }, class: 'btn btn-primary mb-4' do %>
       <i class="fa-solid fa-check-square-o"></i> <%= t('pages.proposals.show.start_votation_button') %>
     <% end %>
     <div class="status_description card bg-base-200 p-4 mb-4">

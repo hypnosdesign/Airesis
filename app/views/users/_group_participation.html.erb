@@ -25,7 +25,7 @@
   </td>
   <td>
     <% if can? :destroy, participation %>
-      <%= link_to t('pages.users.show.get_out_of_group_button'), group_group_participation_url(participation.group, participation), method: :delete, data: { confirm: t('pages.users.show.get_out_of_group_confermation') }, class: 'btn btn-sm btn-error' %>
+      <%= link_to t('pages.users.show.get_out_of_group_button'), group_group_participation_url(participation.group, participation), data: { turbo_method: :delete, turbo_confirm: t('pages.users.show.get_out_of_group_confermation') }, class: 'btn btn-sm btn-error' %>
     <% end %>
   </td>
 </tr>

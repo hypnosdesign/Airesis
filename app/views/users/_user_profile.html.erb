@@ -10,7 +10,7 @@
 
   <% if ::Configuration::user_messages %>
     <div class="mb-4">
-      <%= link_to show_message_user_path(@user), remote: true, class: 'btn btn-sm disable' do %>
+      <%= link_to show_message_user_path(@user), class: 'btn btn-sm disable' do %>
         <i class="fa-solid fa-envelope"></i>
         <%= t('pages.users.show.send_message_button') %>
       <% end %>

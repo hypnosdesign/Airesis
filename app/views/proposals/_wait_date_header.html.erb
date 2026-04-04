@@ -13,7 +13,7 @@
         <p>
           <%= t('pages.proposals.show.choose_votation_period') %>
           <%= f.select :vote_period_id, options_for_select(collection), { style: 'width:400px' } %>
-          <%= f.submit t('pages.proposals.show.choose_votation_period_button'), data: { confirm: t('pages.proposals.show.choose_votation_period_alert') }, class: 'btn btn-primary' %>
+          <%= f.submit t('pages.proposals.show.choose_votation_period_button'), data: { turbo_confirm: t('pages.proposals.show.choose_votation_period_alert') }, class: 'btn btn-primary' %>
         </p>
       <% end %>
     <% else %>
@@ -21,7 +21,7 @@
     <% end %>
     <%= link_to(@group ?
       new_group_event_url(@group, event_type_id: EventType::VOTATION, proposal_id: @proposal.id) :
-      new_event_url(event_type_id: EventType::VOTATION, proposal_id: @proposal.id), remote: true, class: 'btn disable') do %>
+      new_event_url(event_type_id: EventType::VOTATION, proposal_id: @proposal.id), class: 'btn disable') do %>
       <i class="fa-solid fa-plus"></i>
       <%= t('pages.proposals.show.choose_new_votation_period_button') %>
     <% end %>
