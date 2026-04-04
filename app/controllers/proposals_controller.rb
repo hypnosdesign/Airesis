@@ -235,11 +235,7 @@ class ProposalsController < ApplicationController
   def update
     @proposal.current_user_id = current_user.id
     if @proposal.update(update_proposal_params)
-      begin
-        PrivatePub.publish_to(proposal_path(@proposal), reload_message)
-      rescue StandardError
-        nil
-      end
+      Turbo::StreamsChannel.broadcast_action_to(@proposal, action: :refresh, target: "")
       respond_to do |format|
         flash.now[:notice] = I18n.t('info.proposal.proposal_updated')
         format.html do

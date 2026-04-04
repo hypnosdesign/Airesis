@@ -18,7 +18,7 @@ class Alert < ApplicationRecord
   before_create :continue?
 
   after_commit :send_email, on: :create
-  after_commit :private_pub, on: :create
+  after_commit :broadcast_notification, on: :create
   after_commit :complete_alert_job, on: :create
 
   def alert_job
@@ -60,7 +60,7 @@ class Alert < ApplicationRecord
     else # alert is sent, email is sent, but alert is not read yet, just send a new email for the previous (accumulated) alert
       send_email(true)
     end
-    private_pub
+    broadcast_notification
   end
 
   def increase_count!
@@ -117,10 +117,15 @@ class Alert < ApplicationRecord
     EmailJob.create(alert: self, jid: job.job_id)
   end
 
-  def private_pub
-    PrivatePub.publish_to("/notifications/#{user.id}", pull: 'hello')
-  rescue StandardError
-    Rails.logger.error 'Error while pushing to PrivatePub'
+  def broadcast_notification
+    Turbo::StreamsChannel.broadcast_replace_to(
+      "notifications_#{user.id}",
+      target: "flash-container",
+      partial: "layouts/flash",
+      locals: { flash: { notice: message } }
+    )
+  rescue StandardError => e
+    Rails.logger.error "Error broadcasting notification: #{e.message}"
   end
 
   def complete_alert_job

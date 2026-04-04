@@ -20,8 +20,8 @@ class User < ApplicationRecord
   validates :name, presence: true, length: { maximum: 50 }, format: { with: AuthenticationModule.name_regex, allow_nil: true }
   validates :surname, length: { maximum: 50 }, format: { with: AuthenticationModule.name_regex, allow_nil: true }
   validates :password, confirmation: true
-  validates :accept_conditions, acceptance: { message: -> { I18n.t('activerecord.errors.messages.TOS') } }
-  validates :accept_privacy, acceptance: { message: -> { I18n.t('activerecord.errors.messages.privacy') } }
+  validates :accept_conditions, acceptance: { message: ->(_obj, _opts) { I18n.t('activerecord.errors.messages.TOS') } }
+  validates :accept_privacy, acceptance: { message: ->(_obj, _opts) { I18n.t('activerecord.errors.messages.privacy') } }
 
   enum :user_type_id, { administrator: 1, moderator: 2, authenticated: 3 }, prefix: true
 

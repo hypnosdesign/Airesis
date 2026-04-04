@@ -28,6 +28,12 @@ services:
       - .:/usr/src/app
       - node_modules:/usr/src/app/node_modules
 
+  mailpit:
+    image: axllent/mailpit
+    ports:
+      - "8025:8025"
+      - "1025:1025"
+
   db:
     image: postgres:14-alpine
     environment:

@@ -2,4 +2,6 @@
 
 <%= render '/layouts/top_menu' %>
 
-<%# TODO: sostituire con Action Cable/Turbo Streams (PrivatePub rimosso) %>
+<% if current_user %>
+  <%= turbo_stream_from "notifications_#{current_user.id}" %>
+<% end %>
