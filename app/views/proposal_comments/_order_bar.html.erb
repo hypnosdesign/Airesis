@@ -26,6 +26,12 @@
     <% end %>
   </span>
   <script type="text/javascript">
-    function hideContributes(view) { ProposalsShow.checkActive = false; ProposalsShow.currentPage = 1; ProposalsShow.currentView = view; $('#loading_contributes').show(); $('#proposalCommentsContainer').html(""); }
+    function hideContributes(view) {
+      ProposalsShow.checkActive = false; ProposalsShow.currentPage = 1; ProposalsShow.currentView = view;
+      var loading = document.getElementById('loading_contributes');
+      var container = document.getElementById('proposalCommentsContainer');
+      if (loading) loading.style.display = '';
+      if (container) container.innerHTML = '';
+    }
   </script>
 <% end %>

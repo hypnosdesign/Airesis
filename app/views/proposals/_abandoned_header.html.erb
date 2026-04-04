@@ -13,7 +13,7 @@
   <h2><%= t('pages.proposals.show.new_quorum_title') %></h2>
   <%= simple_form_for @proposal, url: (@group ? regenerate_group_proposal_path(@group, @proposal) : regenerate_proposal_path(@proposal)), remote: true do |f| %>
     <%= render partial: '/proposal_types/quorum_choice', locals: { f: f } %>
-    <a class="btn" href="#" onclick="$('#regenerate_container').foundation('reveal','close');">
+    <a class="btn" href="#" onclick="var d=document.getElementById('regenerate_container');if(d&&d.close)d.close();return false;">
       <%= t('buttons.cancel') %>
     </a>
     <%= f.submit t('pages.proposals.show.back_debate_button'), class: 'btn btn-primary', data: { disable_with: t('loading') } %>

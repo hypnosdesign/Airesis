@@ -9,13 +9,11 @@
       <%= image_tag "facebook-loader.gif", alt: "loading..." %>
     </div>
   </div>
-  <script type="text/javascript">
-    $(function() {
-      $('#more_blogs a').click(function() {
-        $('#more_blogs').hide();
-        $('#loading_blogs').show();
-        return true;
-      });
-    })
+  <script>
+    document.querySelector('#more_blogs a').addEventListener('click', function () {
+      document.getElementById('more_blogs').style.display = 'none';
+      document.getElementById('loading_blogs').style.display = '';
+      return true;
+    });
   </script>
 <% end %>

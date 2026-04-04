@@ -66,7 +66,7 @@
   Airesis.can_participate = <%= can? :participate, @proposal %>;
 
   <% if signed_in? %>
-    Airesis.image_tag = $('<%= j avatar(current_user, size: 32) %>');
+    Airesis.image_tag = '<%= j avatar(current_user, size: 32) %>';
     Airesis.resource_viewable = true;
   <% end %>
 
@@ -95,9 +95,6 @@
     ProposalsShow.times.descriptions.vote_ends_at = '<%= j l @proposal.vote_period.endtime if @proposal.voting? %>';
   <% end %>
 
-  $(function () {
-    <%= render partial: 'show_tooltips' %>
-  });
 </script>
 
 <% content_for :left_panel do %>

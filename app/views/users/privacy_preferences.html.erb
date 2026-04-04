@@ -97,41 +97,33 @@
 <% end %>
 
 <% if can?(:change_rotp_enabled, current_user) %>
-  <% _rotp_js = "var confirm_msg = el.checked ? \"#{j t('pages.users.privacy_preferences.rotp_confirm_enable')}\" : '#{j t('pages.users.privacy_preferences.rotp_confirm_disable')}'; if (!confirm(confirm_msg)) { return false; } var active = (el.checked) ? \"true\" : \"false\"; $.ajax({ data: { active: active }, url: \"/users/change_rotp_enabled\", dataType: 'script', type: 'post' }); " %>
+  <% _rotp_js = "var confirm_msg = el.checked ? \"#{j t('pages.users.privacy_preferences.rotp_confirm_enable')}\" : '#{j t('pages.users.privacy_preferences.rotp_confirm_disable')}'; if (!confirm(confirm_msg)) { return false; } postPreference('/users/change_rotp_enabled', { active: el.checked ? 'true' : 'false' }); " %>
 <% else %>
   <% _rotp_js = "alert('Per abilitare il Token di sicurezza devi inserire un\\'indirizzo email valido'); return false; " %>
 <% end %>
 
 <script type="text/javascript">
-  $('a[data-detach-disabled]').click(function () {
-    alert('<%= j raw t('alert_detach') %>');
-    return false;
+  document.querySelectorAll('a[data-detach-disabled]').forEach(function(el) {
+    el.addEventListener('click', function(e) { alert('<%= j raw t('alert_detach') %>'); e.preventDefault(); });
   });
-  function change_show_tooltips(el) {
-    var active = (el.checked) ? "true" : "false";
-    $.ajax({ data: { active: active }, url: "/users/change_show_tooltips", dataType: 'script', type: 'post' });
+  function postPreference(url, data) {
+    var csrf = document.querySelector('meta[name="csrf-token"]');
+    fetch(url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded', 'X-CSRF-Token': csrf ? csrf.content : '', 'Accept': 'text/vnd.turbo-stream.html' },
+      body: new URLSearchParams(data).toString()
+    }).then(function(r) { return r.text(); }).then(function(html) { Turbo.renderStreamMessage(html); });
   }
-  function change_show_urls(el) {
-    var active = (el.checked) ? "true" : "false";
-    $.ajax({ data: { active: active }, url: "/users/change_show_urls", dataType: 'script', type: 'post' });
-  }
-  function change_receive_messages(el) {
-    var active = (el.checked) ? "true" : "false";
-    $.ajax({ data: { active: active }, url: "/users/change_receive_messages", dataType: 'script', type: 'post' });
-  }
+  function change_show_tooltips(el) { postPreference("/users/change_show_tooltips", { active: el.checked ? "true" : "false" }); }
+  function change_show_urls(el) { postPreference("/users/change_show_urls", { active: el.checked ? "true" : "false" }); }
+  function change_receive_messages(el) { postPreference("/users/change_receive_messages", { active: el.checked ? "true" : "false" }); }
   function change_rotp_enabled(el) {
     <%= raw _rotp_js %>
   }
-  $('#locale').bind("change", function () {
-    var currentValue = $(this).val();
-    $.ajax({ data: { locale: currentValue }, url: "/users/change_locale", dataType: 'script', type: 'post' });
-    return true;
-  });
-  $('#time_zone').bind("change", function () {
-    var currentValue = $(this).val();
-    $.ajax({ data: { time_zone: currentValue }, url: "/users/change_time_zone", dataType: 'script', type: 'post' });
-    return true;
-  });
+  var localeEl = document.getElementById('locale');
+  if (localeEl) localeEl.addEventListener('change', function() { postPreference("/users/change_locale", { locale: this.value }); });
+  var tzEl = document.getElementById('time_zone');
+  if (tzEl) tzEl.addEventListener('change', function() { postPreference("/users/change_time_zone", { time_zone: this.value }); });
 </script>
 
 <% content_for :left_panel do %>

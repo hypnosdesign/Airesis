@@ -1,4 +1,3 @@
-<script type="text/javascript" src="../src/plugins/jqplot.dateAxisRenderer.min.js"></script>
 <% @page_title = t('.title') %>
 
 <div class="flex flex-wrap">
@@ -27,6 +26,3 @@
   </div>
 </div>
 
-<script type="text/javascript">
-  $(function() { var line1=<%= @stat1.map{|h| [h['date'],h['sum'].to_i]}.to_s.gsub(/"/, "'").html_safe %>; var plot1 = $.jqplot('chart1', [line1], { title: '<%= j t('.proposals_per_month') %>', axes:{xaxis:{ renderer:$.jqplot.DateAxisRenderer, tickOptions:{ formatString:'%b %y' } }}, series:[{lineWidth:4, markerOptions:{style:'square'}}], highlighter: { show: true, sizeAdjust: 7.5 }, cursor: { show: false } }); });
-</script>

@@ -1,12 +1,13 @@
-<% host = @resource.original_locale.host %>
+<% locale = @resource.original_locale || SysLocale.find_by(default: true) %>
+<% host = locale&.host || ENV['MAILER_DEFAULT_HOST'] || 'localhost' %>
 <% url_params = { confirmation_token: @token, host: host, protocol: DEFAULT_EMAIL_PROTOCOL } %>
-<% url_params[:l] = @resource.original_locale.lang unless @resource.original_locale.lang.blank? %>
+<% url_params[:l] = locale.lang unless locale&.lang.blank? %>
 <% url = user_confirmation_url(url_params) %>
 
-<p><%= t('devise.mailer.confirmation_instructions.welcome', { app_name: APP_SHORT_NAME, user: @resource.fullname }) %></p>
+<p><%= t('devise.mailer.confirmation_instructions.welcome', app_name: APP_SHORT_NAME, user: @resource.fullname) %></p>
 <p><%= t('devise.mailer.confirmation_instructions.follow_link') %></p>
 <p><%= link_to t('devise.mailer.confirmation_instructions.confirm_account'), url %></p>
 <p><%= t('devise.mailer.confirmation_instructions.follow_link_2') %></p>
 <p><%= link_to url, url %></p>
-<p><%= t('devise.mailer.confirmation_instructions.access_by_email', { app_name: APP_SHORT_NAME }) %></p>
-<p><%= t('devise.mailer.confirmation_instructions.contact_assistance', { mail: ENV['APP_EMAIL_ADDRESS'] }) %></p>
+<p><%= t('devise.mailer.confirmation_instructions.access_by_email', app_name: APP_SHORT_NAME) %></p>
+<p><%= t('devise.mailer.confirmation_instructions.contact_assistance', mail: ENV['APP_EMAIL_ADDRESS']) %></p>

@@ -81,5 +81,28 @@
   </table>
 </div>
 <script type="text/javascript">
-  $(function () { $('input:radio')[0].checked = true; $("input:radio").change(executeDiff); executeDiff(); }); function executeDiff() { var newel = $("input[name='new']:checked"); var newval = newel.val(); if (newval) { if (newel.attr('data-is_life') == 'true') { $.ajax({ cache: true, url: '/proposals/<%= @proposal.id %>/proposal_lives/' + newval, method: 'get', dataType: 'script', beforeSend: function (msg) { $('.diffview .diffcontainer').hide(); $('.diffview .loading').show(); }, success: function (msg) { $('.diffview .diffcontainer').show(); $('.diffview .loading').hide(); } }); } else { $.ajax({ cache: true, url: '/proposals/<%= @proposal.id %>/proposal_revisions/' + newval, method: 'get', dataType: 'script', beforeSend: function (msg) { $('.diffview .diffcontainer').hide(); $('.diffview .loading').show(); }, success: function (msg) { $('.diffview .diffcontainer').show(); $('.diffview .loading').hide(); } }); } } }
+  (function() {
+    var radios = document.querySelectorAll('input[type=radio]');
+    if (radios[0]) radios[0].checked = true;
+    radios.forEach(function(r) { r.addEventListener('change', executeDiff); });
+    executeDiff();
+    function executeDiff() {
+      var newel = document.querySelector("input[name='new']:checked");
+      if (!newel) return;
+      var newval = newel.value;
+      var isLife = newel.dataset.is_life === 'true';
+      var url = isLife
+        ? '/proposals/<%= @proposal.id %>/proposal_lives/' + newval
+        : '/proposals/<%= @proposal.id %>/proposal_revisions/' + newval;
+      document.querySelectorAll('.diffview .diffcontainer').forEach(function(el) { el.style.display = 'none'; });
+      document.querySelectorAll('.diffview .loading').forEach(function(el) { el.style.display = ''; });
+      fetch(url, { headers: { 'Accept': 'text/vnd.turbo-stream.html' } })
+        .then(function(r) { return r.text(); })
+        .then(function(html) {
+          Turbo.renderStreamMessage(html);
+          document.querySelectorAll('.diffview .diffcontainer').forEach(function(el) { el.style.display = ''; });
+          document.querySelectorAll('.diffview .loading').forEach(function(el) { el.style.display = 'none'; });
+        });
+    }
+  })();
 </script>

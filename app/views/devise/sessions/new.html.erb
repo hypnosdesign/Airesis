@@ -12,7 +12,7 @@
     <div class="divider"></div>
   <% end %>
 
-  <%= simple_form_for @user, url: user_session_path, html: { class: 'flex flex-col gap-4' } do |f| %>
+  <%= simple_form_for @user, url: user_session_path, html: { class: 'flex flex-col gap-4' }, data: { turbo: false } do |f| %>
     <%= f.input :email, required: true, input_html: { class: 'input input-bordered w-full' } %>
     <%= f.input :password, required: true, input_html: { class: 'input input-bordered w-full' } %>
 
