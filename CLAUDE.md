@@ -1,7 +1,7 @@
 # CLAUDE.md — Airesis
 
 > Analisi iniziale: 2026-03-31.
-> Ultimo aggiornamento: 2026-04-04 — Rails 8.1.3 ✓, Ruby 3.4.4 ✓, Solid Queue ✓. Fasi 1–5 + 4-R completate. Copertura test: 80.24% ✓.
+> Ultimo aggiornamento: 2026-04-04 — Rails 8.1.3 ✓, Ruby 3.4.4 ✓, Solid Queue ✓, APP_VERSION 5.0.0 ✓. Fasi 1–6 + 4-R completate. Copertura test: 80.24% ✓. Fase 7 in corso (redesign UI + Stimulus/Turbo).
 > Obiettivo: modernizzare l'app per renderla funzionante e manutenibile nel 2026.
 
 ---
@@ -304,7 +304,7 @@ RAILS_LOG_TO_STDOUT=true
     - Non necessario il 100% — troppo costoso su 117 modelli / 73 controller
     - **Raggiunto al 2026-04-04: 80.23% (1498 esempi, 0 failure)**
     - SimpleCov minimum_coverage aggiornato a 80.0%
-    - TODO: aggiornare `AIRESIS_VERSION = '5.0.0'`
+    - `APP_VERSION = '5.0.0'` aggiornato in `config/initializers/sentry.rb` ✓
 
 21. ✅ Rails 7.1 → **7.2.3**
     - `config.load_defaults 7.2`
@@ -325,9 +325,10 @@ RAILS_LOG_TO_STDOUT=true
     - Run tests: `docker compose run --rm -e RAILS_ENV=test airesis bundle exec rspec`
     - **Nota:** RAILS_ENV deve essere impostato esplicitamente — docker-compose.yml ha `RAILS_ENV=development`
 
-23. ⬜ Rails 8.1 → **8.1.x aggiornamenti minori**
-    - Valutare `config.load_defaults 8.1` (attualmente su 8.0)
-    - Valutare **Solid Cable** per WebSocket (sostituisce `private_pub.ru` via Faye)
+23. ✅ Rails 8.1 → **8.1.x aggiornamenti minori**
+    - `config.load_defaults 8.1` applicato ✓ (era stato fatto con il bump a 8.1.3)
+    - Solid Cable installato (step 25) — adapter `:test` in test, `:async` in dev, `solid_cable` in prod
+    - `private_pub` (Faye) ancora commentata — Action Cable è disponibile ma la migrazione delle 136 .js.erb è in Fase 7
 
 24. ✅ Ruby 3.2.8 → **3.4.4**
     - FROM ruby:3.4.4 in Dockerfile, bundler 2.5.23
@@ -351,13 +352,12 @@ RAILS_LOG_TO_STDOUT=true
 > **Prerequisito:** completate Fasi 5 e 6 (stack stabile su Rails 8.x + Ruby 3.4)
 > **Nota architetturale:** l'app usa Hotwire/Turbo/Stimulus — NON React. Librerie React-only (shadcn/ui, Radix UI) non compatibili nativamente.
 
-26. ⬜ Setup DaisyUI + Tailwind v4
-    - **DaisyUI** — plugin Tailwind, zero JS overhead, componenti semantici
-    - Evoluzione naturale: già su Tailwind v4, DaisyUI si aggiunge come plugin npm
-    - Componenti core: button, card, modal, dropdown, navbar, badge, alert, table, form, drawer, tabs, avatar, tooltip
-    - Theming tramite CSS variables (light/dark mode nativo, temi custom per branding Airesis)
-    - Perfetta integrazione con Stimulus (DaisyUI non ha JS proprio — tutto JS gestito da Stimulus)
-    - Setup: `npm install daisyui` + aggiungere plugin in `tailwind.config.js`
+26. ✅ Setup DaisyUI + Tailwind v4
+    - **Completato in Fase 4-R** — Tailwind v4 + DaisyUI 5.x installati e attivi
+    - `@plugin "daisyui"` in `app/assets/tailwind/application.css`
+    - Tutte le 500+ view usano classi DaisyUI (card, btn, modal, badge, table, form, drawer, tabs...)
+    - Tema neobrutalista: `--radius-*: 0rem`, `--border: 2px`, ombre `.shadow-brutal`
+    - Stimulus controller `theme` (dark/light toggle) e `flash` (toast DaisyUI) attivi
 
 27. ⬜ Redesign componenti core
     - Layout principale (navbar, sidebar, footer)
@@ -430,7 +430,7 @@ RAILS_LOG_TO_STDOUT=true
 - Job asincroni: sempre via **ActiveJob** (`perform_later`) — Solid Queue come adapter in production
 - Ricerca full-text: **pg_search** (non LIKE)
 - Paginazione: **kaminari**
-- Form: **simple_form** (wrapper ancora Foundation — da migrare a Tailwind/DaisyUI in Fase 4-R)
+- Form: **simple_form** con wrapper Tailwind/DaisyUI
 - Internazionalizzazione: ogni stringa UI deve passare per `I18n.t()`
 
 ---
@@ -439,14 +439,13 @@ RAILS_LOG_TO_STDOUT=true
 
 - **`rails app:update` è pericoloso** — sovrascrive file custom senza backup. Usare sempre `rails app:update` in modalità interattiva dentro il container, oppure applicare le modifiche manualmente. I file sovrascritti accidentalmente possono essere recuperati dal repo GitHub: `curl https://raw.githubusercontent.com/coorasse/airesis/develop/CONFIG_FILE`.
 - **`lib/rails_admin/`** non segue le convenzioni Zeitwerk — è caricato esplicitamente nell'initializer ed escluso da `config/initializers/zeitwerk.rb`.
-- **`bin/webpack` e `bin/webpack-dev-server`** richiedono `require 'logger'` prima di `require 'webpacker'` (workaround per bootsnap ≥ 1.10 + Rails 7).
 - **`default_role`** rinominato in `Group` → `default_participation_role` e in `GroupArea` → `default_area_role` (conflitto con `ActiveRecord::Base.default_role` introdotto in Rails 6.1).
 - **Stub Sprockets per rails_admin** — `vendor/assets/javascripts/rails_admin/application.js` e `vendor/assets/stylesheets/rails_admin/application.css` sono stub vuoti. Sprockets 3.x scansiona tutti i logical paths quando verifica `precompiled_assets`; senza lo stub, troverebbe il manifest rails_admin della gem (`.js.erb`) che referenzia file solo in `src/` (webpacker). Lo stub ha priorità perché `vendor/assets` precede i gem paths in Sprockets. Se si rimuove webpacker in futuro, rimuovere anche questi stub.
 - **PaperTrail 14 con Rails 7.1** — emette un warning di compatibilità ma funziona. PaperTrail 15+ richiede Ruby ≥ 3.0; aggiornare dopo upgrade Ruby.
 - La gem `airesis_i18n` è su git — tenerla d'occhio durante l'upgrade Ruby.
 - La gem `vote-schulze` è su git — verificare compatibilità Ruby 3.
 - `private_pub.ru` usa WebSocket via Faye — valutare migrazione ad Action Cable.
-- **Dual asset pipeline (Sprockets + esbuild)** — entrambi attivi in parallelo. Sprockets compila `app/assets/javascripts/legacy/application.js` (327 file, jQuery+Foundation) + `application.css.scss` (Foundation CSS). esbuild compila `app/javascript/application.js` (Turbo+Stimulus). Il layout `_head.html.slim` carica entrambi. Rischio: handler eventi duplicati, CSS conflittuali, bloat. Da consolidare in Fase 4-R.
+- **Asset pipeline**: Sprockets solo per immagini, CSS residuo (newsletters, PDF) e stub rails_admin. esbuild per tutto il JS (Turbo+Stimulus). Tailwind v4 per il CSS principale. Il JS legacy (349 file jQuery+Foundation) è stato eliminato in Fase 4-R.
 - **`app/assets/javascripts/init.js`** è il punto di ingresso JS legacy — esegue `$(document).foundation()`, inizializza 15+ plugin jQuery, configura `window.Airesis`. Ogni pagina lo carica. Non può essere rimosso senza sostituire ogni plugin con Stimulus controller equivalente.
 - CORS è aperto a `*` per `/api/*` — restringere in produzione.
 - `config/locales/` contiene file sia YAML che RB — non mischiare i formati.
