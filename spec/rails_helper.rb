@@ -19,7 +19,6 @@ require 'selenium/webdriver'
 
 Dir[Rails.root.join('spec/support/**/*.rb')].sort.each { |f| require f }
 
-ActiveRecord::Migration.check_pending! if defined?(ActiveRecord::Migration)
 
 Shoulda::Matchers.configure do |config|
   config.integrate do |with|

@@ -13,7 +13,7 @@ module Airesis
   class Application < Rails::Application
     config.encoding = 'utf-8'
     config.coding = 'utf-8'
-    config.load_defaults 7.1
+    config.load_defaults 7.2
 
     # Configure sensitive parameters which will be filtered from the log file.
     config.filter_parameters += [:password]

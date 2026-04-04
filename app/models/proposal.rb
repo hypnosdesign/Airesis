@@ -84,7 +84,7 @@ class Proposal < ApplicationRecord
                 :integrated_contributes_ids_list, :topic_id, :votation, :petition_phase, :change_advanced_options,
                 :current_user_id, :interest_borders_tkn
 
-  enum proposal_votation_type_id: { standard: 1, preference: 2, schulze: 3 }, _prefix: true
+  enum :proposal_votation_type_id, { standard: 1, preference: 2, schulze: 3 }, prefix: true
 
   accepts_nested_attributes_for :sections, allow_destroy: true
   accepts_nested_attributes_for :solutions, allow_destroy: true
