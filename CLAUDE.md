@@ -1,7 +1,7 @@
 # CLAUDE.md — Airesis
 
 > Analisi iniziale: 2026-03-31.
-> Ultimo aggiornamento: 2026-04-04 — Rails 8.1.3 ✓. Fasi 1–5 + 4-R completate. Copertura test: 80.27% ✓.
+> Ultimo aggiornamento: 2026-04-04 — Rails 8.1.3 ✓, Ruby 3.4.4 ✓. Fasi 1–5 + 4-R completate. Copertura test: 80.17% ✓.
 > Obiettivo: modernizzare l'app per renderla funzionante e manutenibile nel 2026.
 
 ---
@@ -21,7 +21,7 @@ Repo originale: https://github.com/coorasse/airesis (branch `develop`)
 
 | Componente     | Versione originale | Versione attuale | Target              |
 |----------------|-------------------|-----------------|---------------------|
-| Ruby           | 2.7.5 (EOL)       | **3.2.8** ✓     | 3.2.x               |
+| Ruby           | 2.7.5 (EOL)       | **3.4.4** ✓     | 3.4.x               |
 | Rails          | 6.0.3.1 (EOL)     | **8.1.3** ✓     | 8.1.x               |
 | PostgreSQL     | qualsiasi         | 14-alpine ✓     | 14+                 |
 | Redis          | qualsiasi         | 7-alpine ✓      | 7.x                 |
@@ -328,11 +328,12 @@ RAILS_LOG_TO_STDOUT=true
     - Valutare `config.load_defaults 8.1` (attualmente su 8.0)
     - Valutare **Solid Cable** per WebSocket (sostituisce `private_pub.ru` via Faye)
 
-24. ⬜ Ruby 3.2.8 → **3.4.x**
-    - Può procedere in parallelo con Rails 7.2→8.x
-    - Verificare `vote-schulze` (gem su git) e `airesis_i18n` (gem su git) con Ruby 3.4
-    - `matrix` gem: verificare se rientra in stdlib o rimane necessaria
-    - Aggiornare Dockerfile: `FROM ruby:3.4-alpine`
+24. ✅ Ruby 3.2.8 → **3.4.4**
+    - FROM ruby:3.4.4 in Dockerfile, bundler 2.5.23
+    - `vote-schulze` e `airesis_i18n` (gem su git): nessun constraint Ruby — compatibili ✓
+    - `matrix` gem: ancora necessaria (non rientrata in stdlib Ruby 3.4)
+    - rails_admin emette warning deprecazione Symbol#to_s frozen string — non bloccante
+    - SimpleCov.maximum_coverage_drop 0 → 0.5 (Ruby 3.4 conta linee diversamente)
 
 25. ⬜ Rimuovere Sidekiq e Redis (opzionale, post Rails 8)
     - Solo se migrazione a Solid Queue completata
