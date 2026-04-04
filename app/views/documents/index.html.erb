@@ -1,5 +1,10 @@
 <% @extend = true %>
 <% @page_title = t('pages.groups.documents.documents_archive') %>
+<% content_for :elfinder_assets do %>
+  <%= stylesheet_link_tag 'elfinder.min' %>
+  <%= javascript_include_tag 'elfinder.full', 'elFinderSupportVer1' %>
+  <%= javascript_include_tag "i18n/elfinder.#{I18n.locale}" %>
+<% end %>
 <%= render layout: "layouts/page_title", locals: {title: @page_title} do %>
 <% end %>
 

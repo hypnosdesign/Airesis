@@ -12,17 +12,12 @@
 
 <%= turbo_include_tags %>
 
-<%= stylesheet_link_tag 'elfinder.min' %>
-<%= javascript_include_tag 'elfinder.full', 'elFinderSupportVer1' %>
-<%= javascript_include_tag "i18n/elfinder.#{I18n.locale}" %>
 <%= javascript_include_tag "vendor/modernizr" %>
+<%= yield :elfinder_assets %>
 <%= javascript_include_tag Ckeditor.cdn_url %>
 <%= csrf_meta_tag %>
 
 <%= render 'layouts/favicons' %>
-
-<link href="//cdnjs.cloudflare.com/ajax/libs/select2/4.0.0/css/select2.min.css" rel="stylesheet">
-<script src="//cdnjs.cloudflare.com/ajax/libs/select2/4.0.0/js/select2.full.min.js"></script>
 
 <script>
 window.Airesis = window.Airesis || {};
@@ -136,35 +131,11 @@ Airesis.i18n = {
   }
 };
 
-if ($.fn.fdatetimepicker) {
-  $.fn.fdatetimepicker.dates[Airesis.i18n.locale] = {
-    language: Airesis.i18n.locale,
-    days: Airesis.i18n.datepicker.days,
-    daysShort: Airesis.i18n.datepicker.daysShort,
-    months: Airesis.i18n.datepicker.months,
-    monthsShort: Airesis.i18n.datepicker.monthsShort,
-    today: Airesis.i18n.datepicker.today,
-    suffix: [],
-    meridiem: [],
-    weekStart: Airesis.i18n.datepicker.firstDay,
-    format: Airesis.i18n.datepicker.datetimeformat,
-    dateFormat: Airesis.i18n.datepicker.dateformat,
-    autoclose: true
-  };
-  $.fn.fdatetimepicker.defaults = $.fn.fdatetimepicker.dates[Airesis.i18n.locale];
-}
-
-if ($.countdown) {
-  $.countdown.regionalOptions[Airesis.i18n.locale] = {
-    digits: ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9'],
-    timeSeparator: ':', isRTL: false
-  };
-  $.countdown.setDefaults($.countdown.regionalOptions[Airesis.i18n.locale]);
-}
 </script>
 <% end %>
 
-<script type="text/javascript" src="//maps.googleapis.com/maps/api/js?key=<%= ENV['MAPS_API_KEY'] %>"></script>
+<%= yield :google_maps %>
+<script async defer src="//maps.googleapis.com/maps/api/js?key=<%= ENV['MAPS_API_KEY'] %>"></script>
 
 <% if defined?(Sentry) %>
   <script>
