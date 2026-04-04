@@ -15,7 +15,7 @@
 <div class="card bg-base-100 shadow-lg max-w-2xl mx-auto mt-8 p-8">
   <h2 class="text-2xl font-bold mb-6"><%= t('pages.registration.title') %></h2>
 
-  <%= simple_form_for resource, as: resource_name, url: registration_path(resource_name), html: { id: 'new_user', class: 'flex flex-col gap-4' } do |f| %>
+  <%= simple_form_for resource, as: resource_name, url: registration_path(resource_name), html: { id: 'new_user', class: 'flex flex-col gap-4', data: { turbo: false } } do |f| %>
     <%= f.error_notification %>
 
     <%= f.input :email, required: true, input_html: { class: 'input input-bordered w-full' } %>
