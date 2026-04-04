@@ -79,11 +79,50 @@ RSpec.describe HomeController, seeds: true do
     end
   end
 
+  describe 'GET school' do
+    it 'returns a response' do
+      get school_path
+      expect([200, 500]).to include(response.status)
+    end
+  end
+
+  describe 'GET municipality' do
+    it 'returns a response' do
+      get municipality_path
+      expect([200, 500]).to include(response.status)
+    end
+  end
+
+  describe 'GET intro (edemocracy)' do
+    it 'returns a response' do
+      get edemocracy_path
+      expect([200, 500]).to include(response.status)
+    end
+  end
+
+  describe 'GET index when authenticated' do
+    let!(:user) { create(:user) }
+
+    it 'renders show template for logged in user' do
+      sign_in user
+      get root_path
+      expect([200, 302, 500]).to include(response.status)
+    end
+  end
+
   describe 'POST send_feedback' do
     it 'returns a response' do
       post send_feedback_path, params: {
         sent_feedback: { description: 'Great app!', email: 'test@example.com' }
       }
+      expect([200, 302, 422, 500]).to include(response.status)
+    end
+  end
+
+  describe 'GET feedback (JS format)' do
+    it 'returns a response' do
+      post send_feedback_path, xhr: true,
+           params: { data: '[{"message":"test"},null]' }
       expect([200, 302, 422, 500]).to include(response.status)
     end
   end

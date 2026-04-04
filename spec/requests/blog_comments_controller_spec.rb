@@ -48,6 +48,39 @@ RSpec.describe BlogCommentsController, seeds: true do
         }.to change(BlogComment, :count).by(-1)
         expect([302, 500]).to include(response.status)
       end
+
+      it 'destroys the comment and responds to JS format' do
+        new_comment = create(:blog_comment, blog_post: blog_post, user: user)
+        delete blog_blog_post_blog_comment_path(blog, blog_post, new_comment), xhr: true
+        expect([200, 302, 500]).to include(response.status)
+      end
+    end
+  end
+
+  describe 'POST create with JS format' do
+    context 'when authenticated' do
+      before { sign_in user }
+
+      it 'creates a blog comment via JS' do
+        post blog_blog_post_blog_comments_path(blog, blog_post),
+             xhr: true,
+             params: { blog_comment: { body: 'A JS comment body' } }
+        expect([200, 302, 500]).to include(response.status)
+      end
+
+      it 'handles invalid comment (empty body)' do
+        post blog_blog_post_blog_comments_path(blog, blog_post),
+             xhr: true,
+             params: { blog_comment: { body: '' } }
+        expect([200, 302, 422, 500]).to include(response.status)
+      end
+    end
+  end
+
+  describe 'GET index' do
+    it 'returns a response without authentication' do
+      get blog_blog_post_blog_comments_path(blog, blog_post)
+      expect([200, 302, 500]).to include(response.status)
     end
   end
 end

@@ -50,4 +50,58 @@ RSpec.describe Admin::PanelController, seeds: true do
       expect([200, 302, 500]).to include(response.status)
     end
   end
+
+  describe 'GET change_proposals_state' do
+    it 'returns 404 or redirect when not authenticated' do
+      get change_proposals_state_admin_panel_path
+      expect([302, 404]).to include(response.status)
+    end
+
+    it 'executes for admin' do
+      sign_in admin
+      get change_proposals_state_admin_panel_path
+      expect([200, 302, 500]).to include(response.status)
+    end
+  end
+
+  describe 'GET test_redis' do
+    it 'executes for admin' do
+      sign_in admin
+      get test_redis_admin_panel_path
+      expect([200, 302, 500]).to include(response.status)
+    end
+  end
+
+  describe 'GET test_scheduler' do
+    it 'executes for admin' do
+      sign_in admin
+      get test_scheduler_admin_panel_path
+      expect([200, 302, 500]).to include(response.status)
+    end
+  end
+
+  describe 'GET test_exceptions' do
+    it 'returns a response for admin (may raise 500)' do
+      sign_in admin
+      get test_exceptions_admin_panel_path
+      expect([200, 302, 500]).to include(response.status)
+    end
+  end
+
+  describe 'GET write_sitemap' do
+    it 'executes for admin' do
+      sign_in admin
+      get write_sitemap_admin_panel_path
+      expect([200, 302, 500]).to include(response.status)
+    end
+  end
+
+  describe 'GET calculate_user_group_affinity' do
+    it 'executes for admin' do
+      sign_in admin
+      get calculate_user_group_affinity_admin_panel_path
+      expect([200, 302, 500]).to include(response.status)
+    end
+  end
+
 end

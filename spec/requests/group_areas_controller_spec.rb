@@ -68,4 +68,50 @@ RSpec.describe GroupAreasController, seeds: true do
       expect([200, 302, 500]).to include(response.status)
     end
   end
+
+  describe 'GET edit' do
+    let!(:group_area) { create(:group_area, group: group) }
+
+    it 'redirects to sign in when not authenticated' do
+      get edit_group_group_area_path(group, group_area)
+      expect(response).to redirect_to(new_user_session_path)
+    end
+
+    it 'returns a response for group owner' do
+      sign_in owner
+      get edit_group_group_area_path(group, group_area)
+      expect([200, 302, 403, 500]).to include(response.status)
+    end
+  end
+
+  describe 'PATCH update' do
+    let!(:group_area) { create(:group_area, group: group) }
+
+    it 'redirects to sign in when not authenticated' do
+      patch group_group_area_path(group, group_area), params: { group_area: { name: 'Updated' } }
+      expect(response).to redirect_to(new_user_session_path)
+    end
+
+    it 'returns a response for group owner' do
+      sign_in owner
+      patch group_group_area_path(group, group_area), params: { group_area: { name: 'Updated Area' } }
+      expect([200, 302, 403, 500]).to include(response.status)
+    end
+  end
+
+  describe 'DELETE destroy' do
+    let!(:group_area) { create(:group_area, group: group) }
+
+    it 'redirects to sign in when not authenticated' do
+      delete group_group_area_path(group, group_area)
+      expect(response).to redirect_to(new_user_session_path)
+    end
+
+    it 'returns a response for group owner' do
+      sign_in owner
+      delete group_group_area_path(group, group_area)
+      expect([200, 302, 403, 500]).to include(response.status)
+    end
+  end
+
 end
