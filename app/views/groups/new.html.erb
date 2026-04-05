@@ -1,6 +1,26 @@
 <% @page_title = t('pages.groups.new.title') %>
-<div class="card bg-base-200 p-4">
-  <h1><%= t('pages.groups.new.new_group') %></h1>
+
+<%# Hero banner %>
+<div class="bg-primary text-primary-content p-6 lg:p-8 mb-6 border-2 border-base-content/15 relative overflow-hidden">
+  <div class="relative z-10 max-w-xl">
+    <p class="text-[11px] font-bold tracking-widest text-primary-content/50 uppercase mb-3"><%= t('pages.sidebar.groups', default: 'Gruppi') %></p>
+    <h1 class="text-2xl lg:text-3xl font-extrabold leading-tight mb-2"><%= t('pages.groups.new.new_group') %></h1>
+    <p class="text-primary-content/60 text-sm"><%= t('pages.groups.new.title') %></p>
+  </div>
+  <i class="fa-solid fa-people-group absolute right-6 lg:right-12 top-1/2 -translate-y-1/2 text-[7rem] lg:text-[9rem] text-primary-content/[0.06] hidden md:block"></i>
+</div>
+
+<%# Form card %>
+<div class="bg-base-100 border-2 border-base-content/15 p-6">
+  <div class="flex items-center gap-3 mb-6">
+    <div class="w-8 h-8 flex items-center justify-center bg-primary/10 text-primary">
+      <i class="fa-solid fa-pen-to-square text-sm"></i>
+    </div>
+    <div>
+      <h2 class="font-bold text-sm"><%= t('pages.groups.new.new_group') %></h2>
+      <p class="text-[11px] text-base-content/40"><%= t('pages.groups.new.title') %></p>
+    </div>
+  </div>
   <%= render partial: @group, locals: { button_name: t('pages.groups.new.create_button')} %>
 </div>
 

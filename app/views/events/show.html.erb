@@ -3,83 +3,138 @@
   <% { itemscope: '', itemtype: 'http://schema.org/Event' } %>
 <% end %>
 
-<div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-  <div>
-    <div class="card bg-base-100 p-6 mb-4">
-      <div class="flex items-center gap-2 mb-4">
-        <span class="badge badge-outline"><%= @event.private ? 'private' : 'public' %></span>
-        <h1 class="text-2xl font-bold"><%= @event.title %></h1>
+<%# — Hero Banner — %>
+<div class="bg-primary text-primary-content p-6 lg:p-8 mb-6 border-2 border-base-content/15 relative overflow-hidden">
+  <i class="fa-solid fa-calendar-day absolute right-6 top-1/2 -translate-y-1/2 text-[120px] opacity-10"></i>
+  <div class="relative z-10">
+    <div class="flex items-center gap-3 mb-2">
+      <span class="badge badge-sm font-bold"><%= @event.private ? t('pages.events.show.private', default: 'Private') : t('pages.events.show.public', default: 'Public') %></span>
+      <% if @event.votation? %>
+        <span class="badge badge-sm font-bold"><i class="fa-solid fa-check-to-slot mr-1"></i> Votazione</span>
+      <% end %>
+    </div>
+    <h1 class="text-3xl lg:text-4xl font-extrabold" itemprop="name"><%= @event.title %></h1>
+    <p class="text-[11px] text-primary-content/60 mt-2">
+      <i class="fa-solid fa-clock mr-1"></i> <%= @event.formatted_starttime %>
+    </p>
+  </div>
+</div>
+
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+  <%# — Main Content (2/3) — %>
+  <div class="lg:col-span-2 space-y-6">
+
+    <%# Description Card %>
+    <div class="bg-base-100 border-2 border-base-content/15 p-6">
+      <div class="flex items-center gap-3 mb-4">
+        <div class="bg-primary/10 text-primary p-2">
+          <i class="fa-solid fa-align-left"></i>
+        </div>
+        <div>
+          <h2 class="font-bold text-lg"><%= t('pages.events.show.description', default: 'Descrizione') %></h2>
+        </div>
       </div>
       <div class="event_content prose max-w-none" itemprop="description">
         <%= simple_format(@event.description) %>
       </div>
     </div>
 
-    <div class="card bg-base-100 p-6 mb-4">
-      <h2 class="text-lg font-semibold mb-4"><%= @event.past? ? t('pages.events.show.when_past') : t('pages.events.show.when') %></h2>
+    <%# Voting Proposals %>
+    <% if @event.votation? %>
+      <div class="bg-base-100 border-2 border-base-content/15 p-6">
+        <div class="flex items-center gap-3 mb-4">
+          <div class="bg-secondary/10 text-secondary p-2">
+            <i class="fa-solid fa-check-to-slot"></i>
+          </div>
+          <div>
+            <h2 class="font-bold text-lg">
+              <% if @event.proposals.count > 0 %>
+                <%= t('pages.events.show.voting_proposals') %>
+              <% else %>
+                <%= t('pages.events.show.no_voting_proposals') %>
+              <% end %>
+            </h2>
+            <p class="text-[11px] text-base-content/40"><%= @event.proposals.count %> proposte</p>
+          </div>
+        </div>
+        <div class="space-y-4">
+          <% @proposals.each do |proposal| %>
+            <% if can? :show, proposal %>
+              <%= render 'proposals/proposal_list_element', proposal_list_element_for_mustache(proposal) %>
+            <% end %>
+          <% end %>
+        </div>
+      </div>
+    <% end %>
+
+    <%# Meeting Comments %>
+    <% if @event.meeting? %>
+      <div class="bg-base-100 border-2 border-base-content/15 p-6">
+        <div class="flex items-center gap-3 mb-4">
+          <div class="bg-accent/10 text-accent p-2">
+            <i class="fa-solid fa-comments"></i>
+          </div>
+          <div>
+            <h2 class="font-bold text-lg"><%= t('pages.events.show.comments', default: 'Commenti') %></h2>
+          </div>
+        </div>
+        <%= render partial: 'event_comments/new_event_comment', locals: { event_comment: @event_comment } %>
+      </div>
+
+      <div id="eventCommentsContainer">
+        <%= render partial: 'events/comments' %>
+      </div>
+      <div id="loading_results">
+        <span><%= t('pages.blog_posts.show.previous_comments') %></span>
+      </div>
+    <% end %>
+  </div>
+
+  <%# — Sidebar (1/3) — %>
+  <div class="space-y-6">
+
+    <%# Date/Time Card %>
+    <div class="bg-base-100 border-2 border-base-content/15 p-6">
+      <div class="flex items-center gap-3 mb-4">
+        <div class="bg-primary/10 text-primary p-2">
+          <i class="fa-solid fa-clock"></i>
+        </div>
+        <h2 class="font-bold text-lg"><%= @event.past? ? t('pages.events.show.when_past') : t('pages.events.show.when') %></h2>
+      </div>
       <div class="flex items-start gap-4">
         <%= render partial: 'events/calendar_icon', locals: { time: @event.starttime } %>
         <div class="event_dates_text">
           <meta itemprop="startDate" content="<%= l @event.starttime, format: '%Y-%m-%dT%H:%M' %>">
-          <b><%= @event.formatted_starttime %></b>
-          <div class="mt-1"><b><%= @event.formatted_endtime %></b></div>
+          <p class="font-bold"><%= @event.formatted_starttime %></p>
+          <p class="font-bold mt-1 text-base-content/60"><%= @event.formatted_endtime %></p>
         </div>
       </div>
     </div>
-  </div>
 
-  <% if @event.place %>
-    <div>
-      <div class="card bg-base-100 p-6 mb-4">
-        <h2 class="text-lg font-semibold mb-4"><%= @event.past? ? t('pages.events.show.where_past') : t('pages.events.show.where') %></h2>
+    <%# Location Card %>
+    <% if @event.place %>
+      <div class="bg-base-100 border-2 border-base-content/15 p-6">
+        <div class="flex items-center gap-3 mb-4">
+          <div class="bg-warning/10 text-warning p-2">
+            <i class="fa-solid fa-location-dot"></i>
+          </div>
+          <h2 class="font-bold text-lg"><%= @event.past? ? t('pages.events.show.where_past') : t('pages.events.show.where') %></h2>
+        </div>
         <div itemprop="location" itemscope itemtype="http://schema.org/Place">
           <div itemprop="address" itemscope itemtype="http://schema.org/PostalAddress">
-            <h4>
+            <p class="font-semibold">
               <span itemprop="addressLocality"><%= "#{@event.place.municipality.description}" if @event.place.municipality %></span>,
               <span itemprop="streetAddress"><%= @event.place.address %></span>
-            </h4>
+            </p>
           </div>
-          <div id="map_canvas" style="width: 100%; height: 320px;" class="mt-4"></div>
+          <div id="map_canvas" style="width: 100%; height: 240px;" class="mt-4 border-2 border-base-content/15"></div>
         </div>
       </div>
-    </div>
-  <% end %>
+    <% end %>
+  </div>
 </div>
 
 <div id="map_modal" title="<%= t('pages.events.show.event_place') %>" style="width:400px;height:400px;display:none"></div>
-
-<% if @event.votation? %>
-  <div class="mt-6">
-    <h3 class="text-lg font-semibold mb-4">
-      <% if @event.proposals.count > 0 %>
-        <%= t('pages.events.show.voting_proposals') %>
-      <% else %>
-        <%= t('pages.events.show.no_voting_proposals') %>
-      <% end %>
-    </h3>
-    <div class="space-y-4">
-      <% @proposals.each do |proposal| %>
-        <% if can? :show, proposal %>
-          <%= render 'proposals/proposal_list_element', proposal_list_element_for_mustache(proposal) %>
-        <% end %>
-      <% end %>
-    </div>
-  </div>
-<% end %>
-
-<% if @event.meeting? %>
-  <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-6">
-    <div>
-      <%= render partial: 'event_comments/new_event_comment', locals: { event_comment: @event_comment } %>
-    </div>
-  </div>
-  <div id="eventCommentsContainer">
-    <%= render partial: 'events/comments' %>
-  </div>
-  <div id="loading_results">
-    <span><%= t('pages.blog_posts.show.previous_comments') %></span>
-  </div>
-<% end %>
 
 <% content_for :left_panel do %>
   <%= render 'events/left_panel' %>

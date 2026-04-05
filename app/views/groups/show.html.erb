@@ -12,31 +12,109 @@
 <% end %>
 
 <% if can? :view_data, @group %>
+  <%# Hero banner %>
+  <div class="bg-primary text-primary-content p-6 lg:p-8 mb-6 border-2 border-base-content/15 relative overflow-hidden">
+    <div class="relative z-10 max-w-xl">
+      <p class="text-[11px] font-bold tracking-widest text-primary-content/50 uppercase mb-3"><%= t('pages.sidebar.groups', default: 'Gruppi') %></p>
+      <h1 class="text-2xl lg:text-3xl font-extrabold leading-tight mb-2"><%= @group.name %></h1>
+      <% if @group.interest_border.present? %>
+        <p class="text-primary-content/60 text-sm">
+          <i class="fa-solid fa-location-dot mr-1"></i> <%= @group.interest_border.territory.description %>
+        </p>
+      <% end %>
+    </div>
+    <i class="fa-solid fa-people-group absolute right-6 lg:right-12 top-1/2 -translate-y-1/2 text-[7rem] lg:text-[9rem] text-primary-content/[0.06] hidden md:block"></i>
+  </div>
+
+  <%# Stats row %>
+  <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+    <div class="bg-base-100 p-4 flex items-center gap-4 border-2 border-base-content/15">
+      <div class="w-10 h-10 flex items-center justify-center bg-primary/10 text-primary">
+        <i class="fa-solid fa-users"></i>
+      </div>
+      <div>
+        <p class="text-lg font-extrabold"><%= @group.group_participations_count %></p>
+        <p class="text-[11px] text-base-content/40"><%= t('pages.groups.index.participants_number', default: 'Membri') %></p>
+      </div>
+    </div>
+    <div class="bg-base-100 p-4 flex items-center gap-4 border-2 border-base-content/15">
+      <div class="w-10 h-10 flex items-center justify-center bg-secondary/10 text-secondary">
+        <i class="fa-solid fa-file-lines"></i>
+      </div>
+      <div>
+        <p class="text-lg font-extrabold"><%= @group.proposals_count %></p>
+        <p class="text-[11px] text-base-content/40"><%= t('pages.groups.index.proposals_number', default: 'Proposte') %></p>
+      </div>
+    </div>
+    <div class="bg-base-100 p-4 flex items-center gap-4 border-2 border-base-content/15">
+      <div class="w-10 h-10 flex items-center justify-center bg-accent/10 text-accent">
+        <i class="fa-solid fa-calendar"></i>
+      </div>
+      <div>
+        <p class="text-lg font-extrabold"><%= @group.next_events.size %></p>
+        <p class="text-[11px] text-base-content/40"><%= t('pages.groups.index.events_number', default: 'Eventi') %></p>
+      </div>
+    </div>
+    <div class="bg-base-100 p-4 flex items-center gap-4 border-2 border-base-content/15">
+      <div class="w-10 h-10 flex items-center justify-center bg-info/10 text-info">
+        <i class="fa-solid fa-comments"></i>
+      </div>
+      <div>
+        <p class="text-lg font-extrabold"><%= @group_posts.size %></p>
+        <p class="text-[11px] text-base-content/40"><%= t('pages.groups.show.no_blogs_yet', default: 'Post blog') %></p>
+      </div>
+    </div>
+  </div>
+
+  <%# Main content %>
   <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
     <div class="lg:col-span-2">
       <% if params[:action] == 'by_year_and_month' %>
-        <h2 class="text-xl font-bold mb-4"><%= t('pages.groups.archives.page_title', year: params[:year], month: month_long(params[:month])) %></h2>
+        <div class="flex items-center gap-3 mb-4">
+          <div class="w-8 h-8 flex items-center justify-center bg-primary/10 text-primary">
+            <i class="fa-solid fa-calendar-days text-sm"></i>
+          </div>
+          <div>
+            <h2 class="font-bold text-sm"><%= t('pages.groups.archives.page_title', year: params[:year], month: month_long(params[:month])) %></h2>
+          </div>
+        </div>
       <% else %>
-        <div class="card bg-base-100 p-6 mb-4 prose max-w-none"><%= @group.description %></div>
+        <div class="bg-base-100 border-2 border-base-content/15 p-6 mb-4">
+          <div class="flex items-center gap-3 mb-4">
+            <div class="w-8 h-8 flex items-center justify-center bg-primary/10 text-primary">
+              <i class="fa-solid fa-circle-info text-sm"></i>
+            </div>
+            <h2 class="font-bold text-sm"><%= t('pages.groups.show.rules_button', default: 'Descrizione') %></h2>
+          </div>
+          <div class="prose max-w-none text-sm"><%= @group.description %></div>
+        </div>
       <% end %>
 
-      <div id="posts_container">
-        <% if @group_posts.any? %>
-          <%= render collection: @group_posts, partial: 'blog_posts/group_blog_post', as: 'post_publishing' %>
-        <% else %>
-          <div class="card bg-base-200 p-4">
-            <p><%= t('pages.groups.show.no_blogs_yet') %></p>
+      <%# Blog posts section %>
+      <div class="bg-base-100 border-2 border-base-content/15 p-6 mb-4">
+        <div class="flex items-center gap-3 mb-4">
+          <div class="w-8 h-8 flex items-center justify-center bg-secondary/10 text-secondary">
+            <i class="fa-solid fa-newspaper text-sm"></i>
+          </div>
+          <h2 class="font-bold text-sm">Blog</h2>
+        </div>
+        <div id="posts_container">
+          <% if @group_posts.any? %>
+            <%= render collection: @group_posts, partial: 'blog_posts/group_blog_post', as: 'post_publishing' %>
+          <% else %>
+            <p class="text-[11px] text-base-content/40"><%= t('pages.groups.show.no_blogs_yet') %></p>
+          <% end %>
+        </div>
+
+        <% if @group_posts.size > COMMENTS_PER_PAGE %>
+          <div id="loading_results" class="post_results mt-4">
+            <span class="text-xs text-primary font-bold hover:underline cursor-pointer"><%= t('pages.blogs.show.previous_posts') %></span>
           </div>
         <% end %>
       </div>
-
-      <% if @group_posts.size > COMMENTS_PER_PAGE %>
-        <div id="loading_results" class="post_results">
-          <span><%= t('pages.blogs.show.previous_posts') %></span>
-        </div>
-      <% end %>
     </div>
 
+    <%# Sidebar portlets %>
     <div class="hidden lg:block space-y-4">
       <% if can? :view_proposal, @group %>
         <%= render partial: "groups/portlets/proposals", layout: "layouts/portlet" %>
