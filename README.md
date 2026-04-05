@@ -6,7 +6,7 @@ Airesis is a platform for participatory democracy that allows citizens, groups, 
 
 > **Current version: 6.0.0** — Rails 8.1.3 · Ruby 3.4.4 · Tailwind v4 + DaisyUI 5 · Hotwire (Turbo + Stimulus)
 >
-> This is a fork of the original [Airesis](https://github.com/coorasse/airesis) project by Alessandro Rodi, which is no longer maintained. The modernization effort (v4 → v6) is carried out by **Mattia Piano**.
+> This is a fork of the original [Airesis](https://github.com/coorasse/airesis) project by Alessandro Rodi. The original project has been inactive since 2019 and is no longer deployed in production. The modernization effort (v4 → v6) is carried out by **Mattia Piano**.
 
 ---
 
@@ -159,7 +159,7 @@ docker compose run --rm -e RAILS_ENV=test airesis bundle exec rspec --exclude-pa
 ### Local installation
 
 ```bash
-git clone https://github.com/airesis/airesis.git
+git clone https://github.com/hypnosdesign/Airesis.git
 cd airesis
 bundle install
 cp config/application.example.yml config/application.yml
@@ -194,7 +194,7 @@ Translations are managed in a separate gem: [airesis_i18n](https://github.com/ai
 ## Authors
 
 - **Mattia Piano** — current maintainer (fork, modernization v4 → v6)
-- **Alessandro Rodi** (coorasse@gmail.com) — original author (project no longer maintained)
+- **Alessandro Rodi** (coorasse@gmail.com) — original author
 
 ## License
 
