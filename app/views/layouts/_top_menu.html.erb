@@ -63,7 +63,7 @@
       </div>
 
     <% else %>
-      <button type="button" class="btn btn-ghost" onclick="document.getElementById('login_modal').showModal()"><%= t('pages.header.login') %></button>
+      <%= link_to t('pages.header.login'), new_user_session_path, class: "btn btn-ghost" %>
       <%= link_to t('pages.header.menu.registration_button'), new_registration_path(resource_name), class: 'btn btn-primary' %>
     <% end %>
   </div>
