@@ -1,70 +1,10 @@
 @import url('https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700;800&display=swap');
 @import "tailwindcss";
 @plugin "daisyui" {
-  themes: nord --default, night;
+  themes: nord --default, night --prefersdark;
 }
 
-@theme {
-  --font-sans: "Sora", ui-sans-serif, system-ui, sans-serif;
-  --shadow-brutal: 4px 4px 0px oklch(var(--n));
-  --shadow-brutal-lg: 8px 8px 0px oklch(var(--n));
+* {
+  font-family: 'Sora', sans-serif;
+  border-radius: 0 !important;
 }
-
-/*
- * Neobrutalismo: angoli netti, bordi spessi, ombre solide piene.
- * Sovrascrive i radius e border dei temi nord/night.
- * Colori ombre: neutral del tema (zero trasparenza).
- */
-:root, [data-theme] {
-  --radius-selector: 0rem;
-  --radius-field: 0rem;
-  --radius-box: 0rem;
-  --border: 2px;
-  --depth: 1;
-  --noise: 0;
-}
-
-/* Ombre solide neobrutaliste — piene, zero blur, zero trasparenza */
-.shadow-brutal {
-  box-shadow: 4px 4px 0px oklch(var(--n));
-}
-
-.shadow-brutal-lg {
-  box-shadow: 8px 8px 0px oklch(var(--n));
-}
-
-/* Card e modal con bordo netto e ombra solida piena */
-.card {
-  border: 2px solid oklch(var(--n));
-  box-shadow: 4px 4px 0px oklch(var(--n));
-}
-
-.modal-box {
-  border: 2px solid oklch(var(--n));
-  box-shadow: 8px 8px 0px oklch(var(--n));
-}
-
-/* Hover "schiaccia" — pattern universale neobrutalista */
-.btn {
-  box-shadow: 3px 3px 0px oklch(var(--n));
-  transition: all 0.2s ease;
-}
-
-.btn:hover {
-  transform: translate(2px, 2px);
-  box-shadow: 0 0 0 oklch(var(--n));
-}
-
-.btn:active {
-  transform: translate(3px, 3px);
-  box-shadow: none;
-}
-
-/* Font Sora su tutto il documento */
-html, body {
-  font-family: var(--font-sans);
-}
-
-/* Utility helpers */
-.clearboth { clear: both; }
-.hide { display: none; }
