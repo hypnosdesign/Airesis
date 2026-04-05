@@ -1,20 +1,289 @@
 <% @extend = true %>
-<div class="homecont">
-  <ul class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-4">
-    <li>
-      <%= render partial: "home/portlets/last_proposals", layout: "layouts/portlet" %>
-    </li>
-    <li>
-      <%= render partial: "home/portlets/from_blogs", layout: "layouts/portlet" %>
-    </li>
-    <li>
-      <%= render partial: "home/portlets/most_active_groups", layout: "layouts/portlet" %>
-    </li>
-    <li>
-      <%= render partial: "home/portlets/next_events", layout: "layouts/portlet" %>
-    </li>
-    <li>
-      <%= render partial: "home/portlets/tags", layout: "layouts/portlet" %>
-    </li>
-  </ul>
+
+<%# ===== HERO BANNER ===== %>
+<div class="bg-primary text-primary-content p-6 lg:p-8 mb-6 border-2 border-base-content/15 relative overflow-hidden">
+  <div class="relative z-10">
+    <h1 class="text-2xl lg:text-3xl font-bold mb-1">
+      <%= t('pages.open_space.layout.title', default: 'Open Space') %>
+    </h1>
+    <p class="text-primary-content/70 text-sm">
+      <%= t('pages.open_space.layout.subtitle', default: 'Proposte, blog, gruppi ed eventi aperti a tutta la community') %>
+    </p>
+  </div>
+  <i class="fa-solid fa-globe absolute -right-4 -bottom-4 text-[120px] text-primary-content/5"></i>
+</div>
+
+<%# ===== STATS ROW ===== %>
+<div class="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-6">
+  <div class="bg-base-100 p-4 flex items-center gap-4 border-2 border-base-content/15">
+    <div class="bg-primary/10 text-primary w-10 h-10 flex items-center justify-center">
+      <i class="fa-solid fa-file-lines text-lg"></i>
+    </div>
+    <div>
+      <div class="text-2xl font-bold"><%= @proposals.size %></div>
+      <div class="text-[11px] text-base-content/40 uppercase tracking-wider font-bold"><%= t('pages.home.index.last_proposals', default: 'Proposte') %></div>
+    </div>
+  </div>
+  <div class="bg-base-100 p-4 flex items-center gap-4 border-2 border-base-content/15">
+    <div class="bg-secondary/10 text-secondary w-10 h-10 flex items-center justify-center">
+      <i class="fa-solid fa-newspaper text-lg"></i>
+    </div>
+    <div>
+      <div class="text-2xl font-bold"><%= @blog_posts.size %></div>
+      <div class="text-[11px] text-base-content/40 uppercase tracking-wider font-bold"><%= t('pages.home.index.from_blogs', default: 'Blog') %></div>
+    </div>
+  </div>
+  <div class="bg-base-100 p-4 flex items-center gap-4 border-2 border-base-content/15">
+    <div class="bg-accent/10 text-accent w-10 h-10 flex items-center justify-center">
+      <i class="fa-solid fa-users text-lg"></i>
+    </div>
+    <div>
+      <div class="text-2xl font-bold"><%= @most_active_groups.size %></div>
+      <div class="text-[11px] text-base-content/40 uppercase tracking-wider font-bold"><%= t('pages.home.index.most_active_groups', default: 'Gruppi') %></div>
+    </div>
+  </div>
+  <div class="bg-base-100 p-4 flex items-center gap-4 border-2 border-base-content/15">
+    <div class="bg-warning/10 text-warning w-10 h-10 flex items-center justify-center">
+      <i class="fa-solid fa-calendar-days text-lg"></i>
+    </div>
+    <div>
+      <div class="text-2xl font-bold"><%= @events.size %></div>
+      <div class="text-[11px] text-base-content/40 uppercase tracking-wider font-bold"><%= t('pages.home.index.next_events', default: 'Eventi') %></div>
+    </div>
+  </div>
+</div>
+
+<%# ===== MAIN GRID ===== %>
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+
+  <%# LEFT: 2 columns - proposals + blog %>
+  <div class="lg:col-span-2 space-y-6">
+
+    <%# Latest proposals %>
+    <div class="bg-base-100 border-2 border-base-content/15">
+      <div class="p-4 border-b-2 border-base-content/15 flex items-center justify-between">
+        <div class="flex items-center gap-3">
+          <div class="bg-primary/10 text-primary w-8 h-8 flex items-center justify-center">
+            <i class="fa-solid fa-file-lines"></i>
+          </div>
+          <div>
+            <h2 class="font-bold text-sm"><%= t('pages.home.index.last_proposals', default: 'Ultime proposte') %></h2>
+            <p class="text-[11px] text-base-content/40"><%= t('pages.home.index.proposals_subtitle', default: 'Le proposte piu recenti nello spazio pubblico') %></p>
+          </div>
+        </div>
+        <%= link_to t('pages.home.open_space.proceed_to_proposals', default: 'Vedi tutte'), proposals_path, class: 'text-xs text-primary font-bold hover:underline' %>
+      </div>
+      <div class="p-4">
+        <% if @proposals.empty? %>
+          <p class="text-sm text-base-content/40 py-4 text-center">
+            <i class="fa-solid fa-inbox mr-1"></i>
+            <%= t('pages.home.index.no_proposals', default: 'Nessuna proposta al momento') %>
+          </p>
+        <% else %>
+          <div class="divide-y divide-base-content/10">
+            <% @proposals.each do |proposal| %>
+              <div class="py-3 flex items-start gap-3">
+                <div class="bg-base-200 w-8 h-8 flex items-center justify-center shrink-0 mt-0.5">
+                  <%= proposal_group_image_tag(proposal) %>
+                </div>
+                <div class="flex-1 min-w-0">
+                  <div class="font-bold text-sm">
+                    <% if current_user %>
+                      <%= user_valutation_image(current_user, proposal) %>
+                    <% end %>
+                    <%= link_to_proposal proposal, style: (proposal.rejected? ? 'text-decoration: line-through;' : ''), title: (proposal.rejected? ? 'Rifiutata' : nil), class: 'hover:text-primary' %>
+                  </div>
+                  <% unless proposal.is_petition? %>
+                    <% mustache_proposal = proposal_for_mustache(proposal) %>
+                    <% if mustache_proposal['voting_or_voted?'] %>
+                      <%= render 'proposals/new_vote_bar', mustache_proposal %>
+                    <% else %>
+                      <%= render 'proposals/new_rank_bar', mustache_proposal %>
+                    <% end %>
+                  <% end %>
+                  <% unless proposal.supporting_groups.empty? %>
+                    <div class="flex items-center gap-1 mt-1">
+                      <% proposal.supporting_groups.each do |group| %>
+                        <span class="badge badge-primary badge-sm font-bold"><%= group.name %></span>
+                      <% end %>
+                    </div>
+                  <% end %>
+                </div>
+              </div>
+            <% end %>
+          </div>
+        <% end %>
+      </div>
+    </div>
+
+    <%# Blog posts %>
+    <div class="bg-base-100 border-2 border-base-content/15">
+      <div class="p-4 border-b-2 border-base-content/15 flex items-center justify-between">
+        <div class="flex items-center gap-3">
+          <div class="bg-secondary/10 text-secondary w-8 h-8 flex items-center justify-center">
+            <i class="fa-solid fa-newspaper"></i>
+          </div>
+          <div>
+            <h2 class="font-bold text-sm"><%= t('pages.home.index.from_blogs', default: 'Dai blog') %></h2>
+            <p class="text-[11px] text-base-content/40"><%= t('pages.home.index.blogs_subtitle', default: 'Gli ultimi post dalla community') %></p>
+          </div>
+        </div>
+        <%= link_to t('pages.home.open_space.proceed_to_blogs', default: 'Vedi tutti'), blogs_path, class: 'text-xs text-primary font-bold hover:underline' %>
+      </div>
+      <div class="p-4">
+        <% if @blog_posts.empty? %>
+          <p class="text-sm text-base-content/40 py-4 text-center">
+            <i class="fa-solid fa-inbox mr-1"></i>
+            <%= t('pages.home.index.no_blog_posts', default: 'Nessun post al momento') %>
+          </p>
+        <% else %>
+          <div class="divide-y divide-base-content/10">
+            <% @blog_posts.each do |blog_post| %>
+              <div class="py-3 flex items-start gap-3">
+                <div class="avatar placeholder">
+                  <div class="bg-secondary text-secondary-content w-8 h-8 flex items-center justify-center">
+                    <span class="text-xs font-bold"><%= blog_post.user.name.first(2).upcase rescue 'BP' %></span>
+                  </div>
+                </div>
+                <div class="flex-1 min-w-0">
+                  <div class="font-bold text-sm">
+                    <%= link_to blog_post.title, [blog_post.blog, blog_post], class: 'hover:text-primary', title: blog_post.title %>
+                  </div>
+                  <div class="text-[11px] text-base-content/40">
+                    <%= raw t('pages.blog_posts.list_elements.inserted', name: (link_to blog_post.user.name, blog_post.user, class: 'text-primary font-bold hover:underline'), date: (l blog_post.created_at)) %>
+                  </div>
+                </div>
+              </div>
+            <% end %>
+          </div>
+        <% end %>
+      </div>
+    </div>
+  </div>
+
+  <%# RIGHT SIDEBAR %>
+  <div class="space-y-6">
+
+    <%# Most active groups %>
+    <div class="bg-base-100 border-2 border-base-content/15">
+      <div class="p-4 border-b-2 border-base-content/15 flex items-center justify-between">
+        <div class="flex items-center gap-3">
+          <div class="bg-accent/10 text-accent w-8 h-8 flex items-center justify-center">
+            <i class="fa-solid fa-users"></i>
+          </div>
+          <h2 class="font-bold text-sm"><%= t('pages.home.index.most_active_groups', default: 'Gruppi piu attivi') %></h2>
+        </div>
+        <%= link_to t('pages.home.index.show_groups', default: 'Vedi tutti'), groups_path, class: 'text-xs text-primary font-bold hover:underline' %>
+      </div>
+      <div class="p-4">
+        <% if @most_active_groups.empty? %>
+          <p class="text-sm text-base-content/40 py-2 text-center">
+            <%= t('pages.home.index.no_groups', default: 'Nessun gruppo attivo') %>
+          </p>
+        <% else %>
+          <div class="divide-y divide-base-content/10">
+            <% @most_active_groups.each do |group| %>
+              <div class="py-2 flex items-center gap-3">
+                <div class="avatar placeholder">
+                  <div class="bg-accent text-accent-content w-8 h-8 flex items-center justify-center">
+                    <span class="text-xs font-bold"><%= group.name.first(2).upcase %></span>
+                  </div>
+                </div>
+                <div class="flex-1 min-w-0">
+                  <%= link_to group.name, group_path(group), class: 'font-bold text-sm hover:text-primary truncate block' %>
+                </div>
+              </div>
+            <% end %>
+          </div>
+        <% end %>
+      </div>
+    </div>
+
+    <%# Upcoming events %>
+    <div class="bg-base-100 border-2 border-base-content/15">
+      <div class="p-4 border-b-2 border-base-content/15 flex items-center justify-between">
+        <div class="flex items-center gap-3">
+          <div class="bg-warning/10 text-warning w-8 h-8 flex items-center justify-center">
+            <i class="fa-solid fa-calendar-days"></i>
+          </div>
+          <h2 class="font-bold text-sm"><%= t('pages.home.index.next_events', default: 'Prossimi eventi') %></h2>
+        </div>
+        <%= link_to t('pages.home.index.show_events', default: 'Vedi tutti'), events_path, class: 'text-xs text-primary font-bold hover:underline' %>
+      </div>
+      <div class="p-4">
+        <% if @events.empty? %>
+          <p class="text-sm text-base-content/40 py-2 text-center">
+            <%= t('pages.home.index.no_events', default: 'Nessun evento in programma') %>
+          </p>
+        <% else %>
+          <div class="divide-y divide-base-content/10">
+            <% @events.each do |event| %>
+              <div class="py-2 flex items-start gap-3">
+                <div class="bg-warning/10 text-warning w-8 h-8 flex items-center justify-center shrink-0">
+                  <i class="fa-solid fa-calendar-day text-sm"></i>
+                </div>
+                <div class="flex-1 min-w-0">
+                  <%= link_to event.title, event_path(event), class: 'font-bold text-sm hover:text-primary block truncate' %>
+                  <div class="text-[11px] text-base-content/40">
+                    <i class="fa-regular fa-clock mr-1"></i>
+                    <%= l event.starttime, format: :short rescue event.starttime %>
+                  </div>
+                </div>
+              </div>
+            <% end %>
+          </div>
+        <% end %>
+      </div>
+    </div>
+
+    <%# Tags cloud %>
+    <div class="bg-base-100 border-2 border-base-content/15">
+      <div class="p-4 border-b-2 border-base-content/15 flex items-center justify-between">
+        <div class="flex items-center gap-3">
+          <div class="bg-info/10 text-info w-8 h-8 flex items-center justify-center">
+            <i class="fa-solid fa-tags"></i>
+          </div>
+          <h2 class="font-bold text-sm"><%= t('pages.home.index.most_used_tags', default: 'Tag piu usati') %></h2>
+        </div>
+        <%= link_to t('pages.home.index.show_tags', default: 'Vedi tutti'), tags_path, class: 'text-xs text-primary font-bold hover:underline' %>
+      </div>
+      <div class="p-4">
+        <% if @tags.empty? %>
+          <p class="text-sm text-base-content/40 py-2 text-center">
+            <%= t('pages.home.index.no_tags', default: 'Nessun tag al momento') %>
+          </p>
+        <% else %>
+          <div class="flex flex-wrap gap-1.5">
+            <% @tags.each do |tag| %>
+              <%= link_to tag.text, tag_path(tag.text), class: 'badge badge-primary badge-sm font-bold hover:badge-secondary' %>
+            <% end %>
+          </div>
+        <% end %>
+      </div>
+    </div>
+
+    <%# CTA for guests %>
+    <% unless user_signed_in? %>
+      <div class="bg-base-100 border-2 border-base-content/15">
+        <div class="p-4 border-b-2 border-base-content/15 flex items-center gap-3">
+          <div class="bg-primary/10 text-primary w-8 h-8 flex items-center justify-center">
+            <i class="fa-solid fa-user-plus"></i>
+          </div>
+          <h2 class="font-bold text-sm"><%= t('pages.home.index.join_us', default: 'Unisciti a noi') %></h2>
+        </div>
+        <div class="p-4 space-y-2">
+          <p class="text-sm text-base-content/60 mb-3">
+            <%= t('pages.home.index.join_description', default: 'Registrati per partecipare alle proposte e unirti ai gruppi') %>
+          </p>
+          <%= link_to new_user_registration_path, class: 'btn btn-primary font-bold w-full' do %>
+            <i class="fa-solid fa-user-plus mr-1"></i> <%= t('pages.home.index.register', default: 'Registrati') %>
+          <% end %>
+          <%= link_to new_user_session_path, class: 'btn btn-outline font-bold w-full' do %>
+            <i class="fa-solid fa-right-to-bracket mr-1"></i> <%= t('pages.home.index.login', default: 'Accedi') %>
+          <% end %>
+        </div>
+      </div>
+    <% end %>
+
+  </div>
 </div>

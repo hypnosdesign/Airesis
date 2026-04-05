@@ -1,10 +1,41 @@
 <% @page_title = t("pages.password.title") %>
 
-<div class="card bg-base-200 p-4">
-  <h2><%= @page_title %></h2>
-  <%= simple_form_for(@user, url: user_password_path, html: { data: { turbo_method: :post } }) do |f| %>
-    <%= f.input :email, required: true, label: t('activerecord.attributes.user.email') %>
-    <%= f.button :button, t("pages.password.submit"), class: 'btn btn-primary' %>
-  <% end %>
-  <%= render partial: 'devise/shared/links' %>
-</div>
+<main class="flex-1 flex items-center justify-center px-4 py-12">
+  <div class="flex w-full max-w-5xl bg-base-100 shadow-xl overflow-hidden">
+
+    <%# — Left: illustration — %>
+    <div class="hidden lg:flex flex-1 bg-primary/10 items-center justify-center p-12">
+      <div class="text-center">
+        <i class="fa-solid fa-key text-[120px] text-primary/30"></i>
+        <h2 class="text-2xl font-bold text-primary mt-6"><%= t('pages.password.illustration_title', default: 'Password dimenticata?') %></h2>
+        <p class="text-base-content/50 mt-2 max-w-xs mx-auto"><%= t('pages.password.illustration_desc', default: 'Nessun problema. Ti invieremo un link per reimpostarla.') %></p>
+      </div>
+    </div>
+
+    <%# — Right: form — %>
+    <div class="flex-1 p-8 sm:p-12 lg:p-16">
+      <h1 class="text-3xl font-extrabold mb-2"><%= @page_title %></h1>
+      <p class="text-base-content/50 mb-8"><%= t('pages.password.subtitle', default: 'Inserisci la tua email e ti invieremo le istruzioni per reimpostare la password.') %></p>
+
+      <%= simple_form_for(@user, url: user_password_path, html: { class: 'space-y-5', data: { turbo_method: :post } }) do |f| %>
+        <fieldset class="fieldset">
+          <label class="fieldset-label font-medium"><%= t('activerecord.attributes.user.email') %></label>
+          <%= f.input_field :email, required: true, placeholder: 'nome@esempio.it',
+              class: 'input input-bordered w-full' %>
+        </fieldset>
+
+        <button type="submit" class="btn btn-primary w-full font-bold text-base mt-2">
+          <i class="fa-solid fa-paper-plane mr-2"></i>
+          <%= t("pages.password.submit") %>
+        </button>
+      <% end %>
+
+      <div class="divider text-sm text-base-content/40 mt-8"></div>
+
+      <div class="text-center space-y-2">
+        <%= render partial: 'devise/shared/links' %>
+      </div>
+    </div>
+
+  </div>
+</main>

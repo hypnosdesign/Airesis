@@ -8,38 +8,48 @@
   <% end %>
 <% end %>
 
-<%= render layout: "layouts/page_title", locals: { title: @page_head } do %>
-<% end %>
+<%# ===== HERO BANNER ===== %>
+<div class="bg-primary text-primary-content p-6 lg:p-8 mb-6 border-2 border-base-content/15 relative overflow-hidden">
+  <div class="relative z-10">
+    <h1 class="text-2xl lg:text-3xl font-extrabold mb-2"><%= @page_head %></h1>
+    <p class="text-sm text-primary-content/70">
+      <% if @group %>
+        <%= t('pages.proposals.index.group_proposals_description', group: @group.name) rescue "#{@group.name} - proposte" %>
+      <% else %>
+        <%= t('pages.proposals.index.proposals_description') rescue 'Esplora le proposte della community' %>
+      <% end %>
+    </p>
+  </div>
+  <i class="fa-solid fa-scroll absolute -right-4 -bottom-4 text-[120px] text-primary-content/10 rotate-12"></i>
+</div>
 
-<div class="clear-both" style="clear:both"></div>
+<%# ===== TAB NAVIGATION ===== %>
+<div class="mb-6">
+  <div role="tablist" class="flex flex-col md:flex-row w-full border-2 border-base-content/15 bg-base-100">
+    <% tabs = [
+      { label: t('pages.proposals.index.debate_title', count: @in_valutation_count), state: ProposalState::TAB_DEBATE, icon: 'fa-solid fa-comments' },
+      { label: t('pages.proposals.index.voting_title', count: @in_votation_count), state: ProposalState::TAB_VOTATION, icon: 'fa-solid fa-check-to-slot' },
+      { label: t('pages.proposals.index.accepted_title', count: @accepted_count), state: ProposalState::TAB_VOTED, icon: 'fa-solid fa-circle-check' },
+      { label: t('pages.proposals.index.revision_title', count: @revision_count), state: ProposalState::TAB_REVISION, icon: 'fa-solid fa-rotate' }
+    ] %>
+    <% tabs.each_with_index do |tab, i| %>
+      <% active = @search.proposal_state_tab == tab[:state] %>
+      <%= link_to current_url(state: tab[:state]),
+                  role: "tab",
+                  class: "flex-1 flex items-center justify-center gap-2 py-3 px-4 text-sm font-bold transition-colors #{i > 0 ? 'border-t md:border-t-0 md:border-l border-base-content/15' : ''} #{active ? 'bg-primary text-primary-content cursor-default' : 'text-base-content/60 hover:bg-base-200 hover:text-base-content'}" do %>
+        <i class="<%= tab[:icon] %>"></i>
+        <span><%= tab[:label] %></span>
+      <% end %>
+    <% end %>
+  </div>
+</div>
 
-<ul class="flex flex-col md:flex-row w-full mb-8 overflow-hidden border-2 border-base-300">
-  <li class="flex-1">
-    <%= link_to t('pages.proposals.index.debate_title', count: @in_valutation_count),
-                current_url(state: ProposalState::TAB_DEBATE),
-                class: "block text-center py-3 px-4 font-medium transition-colors #{@search.proposal_state_tab == ProposalState::TAB_DEBATE ? 'bg-primary text-primary-content cursor-default' : 'bg-base-100 text-base-content hover:bg-base-200'}" %>
-  </li>
-  <li class="flex-1 border-t md:border-t-0 md:border-l border-base-300">
-    <%= link_to t('pages.proposals.index.voting_title', count: @in_votation_count),
-                current_url(state: ProposalState::TAB_VOTATION),
-                class: "block text-center py-3 px-4 font-medium transition-colors #{@search.proposal_state_tab == ProposalState::TAB_VOTATION ? 'bg-primary text-primary-content cursor-default' : 'bg-base-100 text-base-content hover:bg-base-200'}" %>
-  </li>
-  <li class="flex-1 border-t md:border-t-0 md:border-l border-base-300">
-    <%= link_to t('pages.proposals.index.accepted_title', count: @accepted_count),
-                current_url(state: ProposalState::TAB_VOTED),
-                class: "block text-center py-3 px-4 font-medium transition-colors #{@search.proposal_state_tab == ProposalState::TAB_VOTED ? 'bg-primary text-primary-content cursor-default' : 'bg-base-100 text-base-content hover:bg-base-200'}" %>
-  </li>
-  <li class="flex-1 border-t md:border-t-0 md:border-l border-base-300">
-    <%= link_to t('pages.proposals.index.revision_title', count: @revision_count),
-                current_url(state: ProposalState::TAB_REVISION),
-                class: "block text-center py-3 px-4 font-medium transition-colors #{@search.proposal_state_tab == ProposalState::TAB_REVISION ? 'bg-primary text-primary-content cursor-default' : 'bg-base-100 text-base-content hover:bg-base-200'}" %>
-  </li>
-</ul>
-
+<%# ===== PROPOSAL LIST ===== %>
 <div class="content" data-proposals-list="true">
   <%= render partial: 'tab_list', locals: { proposals: @proposals } %>
 </div>
 
+<%# ===== LEFT PANEL ===== %>
 <% content_for :left_panel do %>
   <%= render 'left_panel_index' %>
 <% end %>

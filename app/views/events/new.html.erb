@@ -1,3 +1,12 @@
-<div class="card bg-base-200 p-4">
+<%# — Hero Banner — %>
+<div class="bg-primary text-primary-content p-6 lg:p-8 mb-6 border-2 border-base-content/15 relative overflow-hidden">
+  <i class="fa-solid fa-calendar-plus absolute right-6 top-1/2 -translate-y-1/2 text-[120px] opacity-10"></i>
+  <div class="relative z-10">
+    <h1 class="text-3xl lg:text-4xl font-extrabold"><%= @page_title %></h1>
+    <p class="text-primary-content/60 mt-1"><%= t('pages.events.new.subtitle', default: 'Compila i dettagli per creare un nuovo evento.') %></p>
+  </div>
+</div>
+
+<div class="bg-base-100 border-2 border-base-content/15 p-6">
   <%= render 'wizard' %>
 </div>

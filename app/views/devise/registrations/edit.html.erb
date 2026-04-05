@@ -1,55 +1,110 @@
 <% @page_title = t('pages.registration.edit_title') rescue "Edit #{resource_name.to_s.humanize}" %>
 
-<div class="card bg-base-100 shadow-lg max-w-md mx-auto mt-8 p-8">
-  <h2 class="text-2xl font-bold mb-6">Edit <%= resource_name.to_s.humanize %></h2>
+<%# — Hero Banner — %>
+<div class="bg-primary text-primary-content p-6 lg:p-8 mb-6 border-2 border-base-content/15 relative overflow-hidden">
+  <i class="fa-solid fa-user-gear absolute right-6 top-1/2 -translate-y-1/2 text-[120px] opacity-10"></i>
+  <div class="relative z-10">
+    <h1 class="text-3xl lg:text-4xl font-extrabold"><%= @page_title %></h1>
+    <p class="text-primary-content/60 mt-1"><%= t('pages.registration.edit_subtitle', default: 'Gestisci il tuo profilo, la password e le impostazioni del tuo account.') %></p>
+  </div>
+</div>
 
-  <%= form_for(resource, as: resource_name, url: registration_path(resource_name), html: { data: { turbo_method: :put }, class: 'flex flex-col gap-4' }) do |f| %>
-    <% if resource.errors.any? %>
-      <div role="alert" class="alert alert-error">
-        <ul class="list-disc list-inside text-sm">
-          <% resource.errors.full_messages.each do |msg| %>
-            <li><%= msg %></li>
-          <% end %>
-        </ul>
-      </div>
-    <% end %>
-
-    <div class="form-control">
-      <%= f.label :email, class: 'label' do %><span class="label-text">Email</span><% end %>
-      <%= f.email_field :email, class: 'input input-bordered w-full' %>
-    </div>
-
-    <div class="form-control">
-      <%= f.label :password, class: 'label' do %><span class="label-text">Password</span><% end %>
-      <p class="text-xs opacity-60 mb-1">(leave blank if you don't want to change it)</p>
-      <%= f.password_field :password, class: 'input input-bordered w-full' %>
-    </div>
-
-    <div class="form-control">
-      <%= f.label :password_confirmation, class: 'label' do %><span class="label-text">Password confirmation</span><% end %>
-      <%= f.password_field :password_confirmation, class: 'input input-bordered w-full' %>
-    </div>
-
-    <div class="form-control">
-      <%= f.label :current_password, class: 'label' do %><span class="label-text">Current password</span><% end %>
-      <p class="text-xs opacity-60 mb-1">(we need your current password to confirm your changes)</p>
-      <%= f.password_field :current_password, class: 'input input-bordered w-full' %>
-    </div>
-
-    <div class="mt-4">
-      <%= f.submit "Update", class: 'btn btn-primary w-full' %>
+<%= form_for(resource, as: resource_name, url: registration_path(resource_name), html: { data: { turbo_method: :put } }) do |f| %>
+  <% if resource.errors.any? %>
+    <div role="alert" class="alert alert-error mb-6 border-2 border-base-content/15">
+      <i class="fa-solid fa-circle-exclamation"></i>
+      <ul class="list-disc list-inside text-sm">
+        <% resource.errors.full_messages.each do |msg| %>
+          <li><%= msg %></li>
+        <% end %>
+      </ul>
     </div>
   <% end %>
 
-  <div class="divider mt-6"></div>
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
 
-  <div class="text-center">
-    <h3 class="text-lg font-semibold mb-2">Cancel my account</h3>
-    <p class="text-sm opacity-60 mb-4">Unhappy?</p>
-    <%= link_to "Cancel my account", registration_path(resource_name), data: { turbo_confirm: "Are you sure?", turbo_method: :delete }, class: 'btn btn-error btn-outline btn-sm' %>
+    <%# — Profile Section — %>
+    <div class="bg-base-100 border-2 border-base-content/15 p-6">
+      <div class="flex items-center gap-3 mb-6">
+        <div class="bg-primary/10 text-primary p-2">
+          <i class="fa-solid fa-user"></i>
+        </div>
+        <div>
+          <h2 class="font-bold text-lg"><%= t('pages.registration.profile_section', default: 'Profilo') %></h2>
+          <p class="text-[11px] text-base-content/40"><%= t('pages.registration.profile_desc', default: 'Le tue informazioni di base.') %></p>
+        </div>
+      </div>
+
+      <fieldset class="fieldset mb-4">
+        <label class="fieldset-label font-medium">Email</label>
+        <%= f.email_field :email, class: 'input input-bordered w-full' %>
+      </fieldset>
+    </div>
+
+    <%# — Password Section — %>
+    <div class="bg-base-100 border-2 border-base-content/15 p-6">
+      <div class="flex items-center gap-3 mb-6">
+        <div class="bg-secondary/10 text-secondary p-2">
+          <i class="fa-solid fa-lock"></i>
+        </div>
+        <div>
+          <h2 class="font-bold text-lg"><%= t('pages.registration.password_section', default: 'Password') %></h2>
+          <p class="text-[11px] text-base-content/40"><%= t('pages.registration.password_desc', default: 'Lascia vuoto se non vuoi cambiarla.') %></p>
+        </div>
+      </div>
+
+      <fieldset class="fieldset mb-4">
+        <label class="fieldset-label font-medium"><%= t('pages.registration.new_password', default: 'Nuova password') %></label>
+        <%= f.password_field :password, class: 'input input-bordered w-full' %>
+      </fieldset>
+
+      <fieldset class="fieldset">
+        <label class="fieldset-label font-medium"><%= t('pages.registration.confirm_password', default: 'Conferma password') %></label>
+        <%= f.password_field :password_confirmation, class: 'input input-bordered w-full' %>
+      </fieldset>
+    </div>
   </div>
 
-  <div class="mt-4 text-center">
-    <%= link_to "Back", :back, class: 'link link-hover text-primary text-sm' %>
+  <%# — Current Password + Submit — %>
+  <div class="bg-base-100 border-2 border-base-content/15 p-6 mb-6">
+    <div class="flex items-center gap-3 mb-6">
+      <div class="bg-warning/10 text-warning p-2">
+        <i class="fa-solid fa-shield-halved"></i>
+      </div>
+      <div>
+        <h2 class="font-bold text-lg"><%= t('pages.registration.confirm_section', default: 'Conferma modifiche') %></h2>
+        <p class="text-[11px] text-base-content/40"><%= t('pages.registration.confirm_desc', default: 'Inserisci la password attuale per salvare le modifiche.') %></p>
+      </div>
+    </div>
+
+    <div class="max-w-md">
+      <fieldset class="fieldset mb-4">
+        <label class="fieldset-label font-medium"><%= t('pages.registration.current_password', default: 'Password attuale') %></label>
+        <%= f.password_field :current_password, class: 'input input-bordered w-full' %>
+      </fieldset>
+
+      <%= f.submit t('buttons.save', default: 'Salva'), class: 'btn btn-primary font-bold w-full' %>
+    </div>
   </div>
+<% end %>
+
+<%# — Danger Zone — %>
+<div class="bg-base-100 border-2 border-error/30 p-6">
+  <div class="flex items-center gap-3 mb-4">
+    <div class="bg-error/10 text-error p-2">
+      <i class="fa-solid fa-triangle-exclamation"></i>
+    </div>
+    <div>
+      <h2 class="font-bold text-lg text-error"><%= t('pages.registration.danger_zone', default: 'Zona pericolosa') %></h2>
+      <p class="text-[11px] text-base-content/40"><%= t('pages.registration.danger_desc', default: 'Questa azione e irreversibile. Il tuo account sara eliminato permanentemente.') %></p>
+    </div>
+  </div>
+  <%= link_to registration_path(resource_name), data: { turbo_confirm: t('pages.registration.cancel_confirm', default: 'Sei sicuro? Questa azione non puo essere annullata.'), turbo_method: :delete }, class: 'btn btn-outline btn-error font-bold' do %>
+    <i class="fa-solid fa-trash mr-1"></i>
+    <%= t('pages.registration.cancel_account', default: 'Elimina il mio account') %>
+  <% end %>
+</div>
+
+<div class="mt-6">
+  <%= link_to t('buttons.back', default: 'Indietro'), :back, class: 'btn btn-outline font-bold' %>
 </div>

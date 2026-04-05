@@ -1,38 +1,35 @@
-<li>
-  <div class="groupListContainer" data-id="<%= group.id %>">
-    <div class="inner card bg-base-200 p-4">
-      <div class="flex flex-wrap">
-        <div class="groupUserImage w-1/4">
-          <%= link_to (group.group_image_tag nil), group_url(group), title: group.name %>
-        </div>
-        <div class="groupName w-3/4">
-          <h3>
-            <%= link_to group.name, group_url(group), title: group.name %>
-            <div class="title_fade"></div>
-          </h3>
-          <div class="group_tag_desc">
-            <%= group.description %>
-            <div class="fade_out"></div>
-          </div>
-        </div>
+<li class="list-none">
+  <div class="bg-base-100 border-2 border-base-content/15 p-4 h-full flex flex-col" data-id="<%= group.id %>">
+    <div class="flex items-start gap-4 mb-3">
+      <div class="shrink-0">
+        <%= link_to (group.group_image_tag nil), group_url(group), title: group.name %>
       </div>
-      <div class="group_bottom flex flex-wrap">
-        <div class="groupDescription w-1/4">
-          <%= image_tag 'group_participants.png', title: t('pages.groups.index.participants_number'), data: {qtip: ''} %>
-          <span class="count"><%= group.group_participations_count %></span>
-        </div>
-        <div class="groupDescription w-1/4">
-          <%= link_to (image_tag 'group_proposals.png'), group_proposals_url(group), title: t('pages.groups.index.proposals_number'), data: {qtip: ''} %>
-          <span class="count"><%= group.proposals_count %></span>
-        </div>
-        <div class="groupDescription w-1/4">
-          <%= link_to (image_tag 'group_events.png'), group_events_url(group), title: t('pages.groups.index.events_number'), data: {qtip: ''} %>
-          <span class="count"><%= group.next_events.size %></span>
-        </div>
-        <div class="territoryDescription w-1/4">
-          <%= link_to group.interest_border.territory.description, groups_url(interest_border: group.interest_border.as_json[:id]) %>
-          <div class="territory_fade"></div>
-        </div>
+      <div class="min-w-0">
+        <h3 class="font-bold text-sm leading-tight mb-1">
+          <%= link_to group.name, group_url(group), title: group.name, class: 'hover:underline' %>
+        </h3>
+        <p class="text-[11px] text-base-content/40 line-clamp-2"><%= strip_tags(group.description.to_s).truncate(120) %></p>
+      </div>
+    </div>
+    <div class="mt-auto flex items-center gap-3 pt-3 border-t border-base-content/10">
+      <div class="flex items-center gap-1" title="<%= t('pages.groups.index.participants_number') %>">
+        <i class="fa-solid fa-users text-primary text-[10px]"></i>
+        <span class="text-[11px] font-bold"><%= group.group_participations_count %></span>
+      </div>
+      <div class="flex items-center gap-1" title="<%= t('pages.groups.index.proposals_number') %>">
+        <%= link_to group_proposals_url(group), class: 'flex items-center gap-1' do %>
+          <i class="fa-solid fa-file-lines text-secondary text-[10px]"></i>
+          <span class="text-[11px] font-bold"><%= group.proposals_count %></span>
+        <% end %>
+      </div>
+      <div class="flex items-center gap-1" title="<%= t('pages.groups.index.events_number') %>">
+        <%= link_to group_events_url(group), class: 'flex items-center gap-1' do %>
+          <i class="fa-solid fa-calendar text-accent text-[10px]"></i>
+          <span class="text-[11px] font-bold"><%= group.next_events.size %></span>
+        <% end %>
+      </div>
+      <div class="ml-auto">
+        <%= link_to group.interest_border.territory.description, groups_url(interest_border: group.interest_border.as_json[:id]), class: 'text-[10px] text-base-content/40 hover:underline truncate max-w-[120px] block' %>
       </div>
     </div>
   </div>

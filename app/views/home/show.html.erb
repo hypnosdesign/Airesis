@@ -1,21 +1,340 @@
 <% @extend = true %>
-<div class="homecont">
-  <ul class="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-4">
-    <li>
-      <%= render partial: "home/portlets/proposals", layout: "layouts/portlet" %>
-    </li>
-    <li>
-      <%= render partial: "home/portlets/votation", layout: "layouts/portlet" %>
-    </li>
-    <li>
-      <%= render partial: "home/portlets/topics", layout: "layouts/portlet" %>
-    </li>
-    <li>
-      <%= render partial: "home/portlets/territory", layout: "layouts/portlet" %>
-    </li>
-  </ul>
+
+<%# ===== HERO BANNER ===== %>
+<div class="bg-primary text-primary-content p-6 lg:p-8 mb-6 border-2 border-base-content/15 relative overflow-hidden">
+  <div class="relative z-10">
+    <h1 class="text-2xl lg:text-3xl font-bold mb-1">
+      <%= t('pages.home.show.welcome_back', name: current_user.name, default: "Bentornato, #{current_user.name}!") %>
+    </h1>
+    <p class="text-primary-content/70 text-sm">
+      <%= t('pages.home.show.dashboard_subtitle', default: 'Ecco cosa succede nella tua community') %>
+    </p>
+  </div>
+  <i class="fa-solid fa-house-chimney absolute -right-4 -bottom-4 text-[120px] text-primary-content/5"></i>
 </div>
 
+<%# ===== STATS ROW ===== %>
+<%
+  user_proposals = Proposal.home_portlet(current_user)
+  voting_proposals = Proposal.votation_portlet(current_user)
+  user_groups = current_user.groups
+  user_topics = @user.viewed_topics.order('created_at desc').limit(10)
+%>
+<div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
+  <div class="bg-base-100 p-4 flex items-center gap-4 border-2 border-base-content/15">
+    <div class="bg-primary/10 text-primary w-10 h-10 flex items-center justify-center">
+      <i class="fa-solid fa-file-lines text-lg"></i>
+    </div>
+    <div>
+      <div class="text-2xl font-bold"><%= user_proposals.size %></div>
+      <div class="text-[11px] text-base-content/40 uppercase tracking-wider font-bold"><%= t('pages.home.show.your_proposals', default: 'Le tue proposte') %></div>
+    </div>
+  </div>
+  <div class="bg-base-100 p-4 flex items-center gap-4 border-2 border-base-content/15">
+    <div class="bg-warning/10 text-warning w-10 h-10 flex items-center justify-center">
+      <i class="fa-solid fa-check-to-slot text-lg"></i>
+    </div>
+    <div>
+      <div class="text-2xl font-bold"><%= voting_proposals.size %></div>
+      <div class="text-[11px] text-base-content/40 uppercase tracking-wider font-bold"><%= t('pages.home.show.proposals_now_voting', default: 'In votazione') %></div>
+    </div>
+  </div>
+  <div class="bg-base-100 p-4 flex items-center gap-4 border-2 border-base-content/15">
+    <div class="bg-accent/10 text-accent w-10 h-10 flex items-center justify-center">
+      <i class="fa-solid fa-users text-lg"></i>
+    </div>
+    <div>
+      <div class="text-2xl font-bold"><%= user_groups.size %></div>
+      <div class="text-[11px] text-base-content/40 uppercase tracking-wider font-bold"><%= t('pages.groups.index.groups_list', default: 'I tuoi gruppi') %></div>
+    </div>
+  </div>
+</div>
+
+<%# ===== MAIN GRID ===== %>
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+
+  <%# LEFT: 2 columns - proposals + voting %>
+  <div class="lg:col-span-2 space-y-6">
+
+    <%# Proposals in voting (urgent) %>
+    <div class="bg-base-100 border-2 border-base-content/15">
+      <div class="p-4 border-b-2 border-base-content/15 flex items-center justify-between">
+        <div class="flex items-center gap-3">
+          <div class="bg-warning/10 text-warning w-8 h-8 flex items-center justify-center">
+            <i class="fa-solid fa-check-to-slot"></i>
+          </div>
+          <div>
+            <h2 class="font-bold text-sm"><%= t('pages.home.show.proposals_now_voting', default: 'Proposte in votazione') %></h2>
+            <p class="text-[11px] text-base-content/40"><%= t('pages.home.show.voting_subtitle', default: 'Esprimi il tuo voto su queste proposte') %></p>
+          </div>
+        </div>
+        <%= link_to t('pages.home.show.see_all', default: 'Vedi tutte'), proposals_path(state: 'voting'), class: 'text-xs text-primary font-bold hover:underline' %>
+      </div>
+      <div class="p-4">
+        <% if voting_proposals.empty? %>
+          <p class="text-sm text-base-content/40 py-4 text-center">
+            <i class="fa-solid fa-inbox mr-1"></i>
+            <%= t('pages.home.show.no_proposals_voting', default: 'Nessuna proposta in votazione al momento') %>
+          </p>
+        <% else %>
+          <div class="divide-y divide-base-content/10">
+            <% voting_proposals.each do |proposal| %>
+              <div class="py-3 flex items-start gap-3">
+                <div class="bg-warning/10 text-warning w-8 h-8 flex items-center justify-center shrink-0 mt-0.5">
+                  <%= proposal_group_image_tag(proposal) %>
+                </div>
+                <div class="flex-1 min-w-0">
+                  <div class="font-bold text-sm">
+                    <%= link_to_proposal proposal, class: 'hover:text-primary' %>
+                  </div>
+                  <% unless proposal.is_petition? %>
+                    <% mustache_proposal = proposal_for_mustache(proposal) %>
+                    <% if mustache_proposal['voting_or_voted?'] %>
+                      <%= render 'proposals/new_vote_bar', mustache_proposal %>
+                    <% end %>
+                  <% end %>
+                  <% unless proposal.supporting_groups.empty? %>
+                    <div class="flex items-center gap-1 mt-1">
+                      <% proposal.supporting_groups.each do |group| %>
+                        <span class="badge badge-primary badge-sm font-bold"><%= group.name %></span>
+                      <% end %>
+                    </div>
+                  <% end %>
+                </div>
+              </div>
+            <% end %>
+          </div>
+        <% end %>
+      </div>
+    </div>
+
+    <%# Your proposals %>
+    <div class="bg-base-100 border-2 border-base-content/15">
+      <div class="p-4 border-b-2 border-base-content/15 flex items-center justify-between">
+        <div class="flex items-center gap-3">
+          <div class="bg-primary/10 text-primary w-8 h-8 flex items-center justify-center">
+            <i class="fa-solid fa-file-lines"></i>
+          </div>
+          <div>
+            <h2 class="font-bold text-sm"><%= t('pages.home.show.your_proposals', default: 'Le tue proposte') %></h2>
+            <p class="text-[11px] text-base-content/40"><%= t('pages.home.show.proposals_subtitle', default: 'Proposte a cui stai partecipando') %></p>
+          </div>
+        </div>
+        <%= link_to t('pages.home.show.see_all', default: 'Vedi tutte'), proposals_path, class: 'text-xs text-primary font-bold hover:underline' %>
+      </div>
+      <div class="p-4">
+        <% if user_proposals.empty? %>
+          <p class="text-sm text-base-content/40 py-4 text-center">
+            <i class="fa-solid fa-inbox mr-1"></i>
+            <%= t('pages.home.show.no_proposals', default: 'Non stai partecipando a nessuna proposta') %>
+          </p>
+        <% else %>
+          <div class="divide-y divide-base-content/10">
+            <% user_proposals.each do |proposal| %>
+              <div class="py-3 flex items-start gap-3">
+                <div class="bg-base-200 w-8 h-8 flex items-center justify-center shrink-0 mt-0.5">
+                  <%= proposal_group_image_tag(proposal) %>
+                </div>
+                <div class="flex-1 min-w-0">
+                  <div class="font-bold text-sm">
+                    <% if current_user %>
+                      <%= user_valutation_image(current_user, proposal) %>
+                    <% end %>
+                    <%= link_to_proposal proposal, style: (proposal.rejected? ? 'text-decoration: line-through;' : ''), title: (proposal.rejected? ? 'Rifiutata' : nil), class: 'hover:text-primary' %>
+                  </div>
+                  <% unless proposal.is_petition? %>
+                    <% mustache_proposal = proposal_for_mustache(proposal) %>
+                    <% if mustache_proposal['voting_or_voted?'] %>
+                      <%= render 'proposals/new_vote_bar', mustache_proposal %>
+                    <% else %>
+                      <%= render 'proposals/new_rank_bar', mustache_proposal %>
+                    <% end %>
+                  <% end %>
+                  <% if current_user %>
+                    <% count = proposal.alerts_count.to_i %>
+                    <% if count > 0 %>
+                      <%= link_to proposal, class: "badge badge-warning badge-sm font-bold", data: { load: true, proposal_id: proposal.id } do %>
+                        <i class="fa-solid fa-bell mr-1"></i> <%= count %>
+                      <% end %>
+                    <% end %>
+                  <% end %>
+                  <% unless proposal.supporting_groups.empty? %>
+                    <div class="flex items-center gap-1 mt-1">
+                      <% proposal.supporting_groups.each do |group| %>
+                        <span class="badge badge-secondary badge-sm font-bold"><%= group.name %></span>
+                      <% end %>
+                    </div>
+                  <% end %>
+                </div>
+              </div>
+            <% end %>
+          </div>
+        <% end %>
+      </div>
+    </div>
+
+    <%# Recent topics %>
+    <div class="bg-base-100 border-2 border-base-content/15">
+      <div class="p-4 border-b-2 border-base-content/15 flex items-center justify-between">
+        <div class="flex items-center gap-3">
+          <div class="bg-secondary/10 text-secondary w-8 h-8 flex items-center justify-center">
+            <i class="fa-solid fa-comments"></i>
+          </div>
+          <div>
+            <h2 class="font-bold text-sm"><%= t('home.portlets.topics.title', default: 'Discussioni recenti') %></h2>
+            <p class="text-[11px] text-base-content/40"><%= t('home.portlets.topics.subtitle', default: 'Le ultime discussioni che hai seguito') %></p>
+          </div>
+        </div>
+      </div>
+      <div class="p-4">
+        <% if user_topics.empty? %>
+          <p class="text-sm text-base-content/40 py-4 text-center">
+            <i class="fa-solid fa-inbox mr-1"></i>
+            <%= t('home.portlets.topics.empty', default: 'Nessuna discussione recente') %>
+          </p>
+        <% else %>
+          <div class="divide-y divide-base-content/10">
+            <% user_topics.each do |topic| %>
+              <div class="py-3">
+                <%= render partial: 'frm/topics/mini_topic', locals: { topic: topic } %>
+              </div>
+            <% end %>
+          </div>
+        <% end %>
+      </div>
+    </div>
+  </div>
+
+  <%# RIGHT SIDEBAR %>
+  <div class="space-y-6">
+
+    <%# User profile card %>
+    <div class="bg-base-100 border-2 border-base-content/15">
+      <div class="p-4 flex items-center gap-3">
+        <div class="avatar placeholder">
+          <div class="bg-primary text-primary-content w-12 h-12 flex items-center justify-center">
+            <span class="text-lg font-bold"><%= current_user.name.first(2).upcase %></span>
+          </div>
+        </div>
+        <div>
+          <div class="font-bold"><%= current_user.fullname %></div>
+          <div class="text-[11px] text-base-content/40"><%= current_user.email %></div>
+        </div>
+      </div>
+      <div class="px-4 pb-4 flex gap-2">
+        <%= link_to current_user, class: 'btn btn-outline btn-sm font-bold flex-1' do %>
+          <i class="fa-solid fa-gear mr-1"></i> <%= t('pages.header.menu.preferences', default: 'Profilo') %>
+        <% end %>
+        <% if current_user.blog %>
+          <%= link_to current_user.blog, class: 'btn btn-outline btn-sm font-bold flex-1' do %>
+            <i class="fa-solid fa-pencil mr-1"></i> <%= t('pages.header.menu.my_blog', default: 'Blog') %>
+          <% end %>
+        <% end %>
+      </div>
+    </div>
+
+    <%# User groups %>
+    <div class="bg-base-100 border-2 border-base-content/15">
+      <div class="p-4 border-b-2 border-base-content/15 flex items-center justify-between">
+        <div class="flex items-center gap-3">
+          <div class="bg-accent/10 text-accent w-8 h-8 flex items-center justify-center">
+            <i class="fa-solid fa-users"></i>
+          </div>
+          <h2 class="font-bold text-sm"><%= t('pages.groups.index.groups_list', default: 'I tuoi gruppi') %></h2>
+        </div>
+        <%= link_to t('pages.home.show.see_all', default: 'Vedi tutti'), groups_path, class: 'text-xs text-primary font-bold hover:underline' %>
+      </div>
+      <div class="p-4">
+        <% if user_groups.empty? %>
+          <p class="text-sm text-base-content/40 py-2 text-center">
+            <%= raw t('pages.groups.index.no_groups_yet', name: (link_to t('group', default: 'gruppo'), groups_path, class: 'text-primary font-bold hover:underline')) %>
+          </p>
+        <% else %>
+          <div class="divide-y divide-base-content/10">
+            <% user_groups.each do |group| %>
+              <div class="py-2 flex items-center gap-3">
+                <div class="avatar placeholder">
+                  <div class="bg-accent text-accent-content w-8 h-8 flex items-center justify-center">
+                    <% if group.respond_to?(:group_image_tag) && group.image.present? rescue false %>
+                      <%= group.group_image_tag(24) %>
+                    <% else %>
+                      <span class="text-xs font-bold"><%= group.name.first(2).upcase %></span>
+                    <% end %>
+                  </div>
+                </div>
+                <div class="flex-1 min-w-0">
+                  <%= link_to group.name, group_url(group), class: 'font-bold text-sm hover:text-primary truncate block' %>
+                </div>
+              </div>
+            <% end %>
+          </div>
+        <% end %>
+      </div>
+    </div>
+
+    <%# Territory map %>
+    <div class="bg-base-100 border-2 border-base-content/15">
+      <div class="p-4 border-b-2 border-base-content/15 flex items-center gap-3">
+        <div class="bg-info/10 text-info w-8 h-8 flex items-center justify-center">
+          <i class="fa-solid fa-map-location-dot"></i>
+        </div>
+        <h2 class="font-bold text-sm"><%= t('pages.home.show.your_territory', default: 'Il tuo territorio') %></h2>
+      </div>
+      <div class="p-4">
+        <div id="territory_map" class="w-full h-[240px] bg-base-200 border-2 border-base-content/15"></div>
+
+        <% @ib = current_user.interest_borders.first %>
+        <% if !@ib %>
+          <% @place_string = "Italia" %>
+        <% elsif @ib.territory_type == 'Municipality' %>
+          <% @place_string = "#{@ib.territory.description}, #{@ib.territory.province.description}, Italia" %>
+        <% elsif @ib.territory_type == 'Province' %>
+          <% @place_string = "#{@ib.territory.description}, Italia" %>
+        <% elsif @ib.territory_type == 'Region' %>
+          <% @place_string = "#{@ib.territory.description}, Italia" %>
+        <% end %>
+
+        <script type="text/javascript">
+          (function() {
+            var interestBorderPlace = "<%= @place_string %>";
+            var geocoder = new google.maps.Geocoder();
+            var myOptions = { center: new google.maps.LatLng(-34.397, 150.644), zoom: 8, mapTypeId: google.maps.MapTypeId.ROADMAP };
+            var map = new google.maps.Map(document.getElementById('territory_map'), myOptions);
+            geocoder.geocode({'address': interestBorderPlace}, function (results, status) {
+              if (status == google.maps.GeocoderStatus.OK) {
+                map.setCenter(results[0].geometry.location);
+                map.fitBounds(results[0].geometry.bounds);
+              } else {
+                console.error("Geocode was not successful for the following reason: " + status);
+              }
+            });
+          })();
+        </script>
+      </div>
+    </div>
+
+    <%# Quick actions %>
+    <div class="bg-base-100 border-2 border-base-content/15">
+      <div class="p-4 border-b-2 border-base-content/15 flex items-center gap-3">
+        <div class="bg-primary/10 text-primary w-8 h-8 flex items-center justify-center">
+          <i class="fa-solid fa-bolt"></i>
+        </div>
+        <h2 class="font-bold text-sm"><%= t('pages.home.show.quick_actions', default: 'Azioni rapide') %></h2>
+      </div>
+      <div class="p-4 space-y-2">
+        <%= link_to new_proposal_path, class: 'btn btn-primary font-bold w-full' do %>
+          <i class="fa-solid fa-plus mr-1"></i> <%= t('pages.proposals.index.new_proposal', default: 'Nuova proposta') %>
+        <% end %>
+        <%= link_to open_space_path, class: 'btn btn-outline font-bold w-full' do %>
+          <i class="fa-solid fa-globe mr-1"></i> <%= t('pages.open_space.layout.title', default: 'Open Space') %>
+        <% end %>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<%# Keep the left panel for the sidebar layout %>
 <%= content_for :left_panel do %>
   <%= render partial: 'users/user_groups_panel' %>
 <% end %>
