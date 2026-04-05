@@ -80,7 +80,7 @@
   </div>
 <% end %>
 
-<a class="close-">&times;</a>
+<button class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2" data-action="click->modal#close">&times;</button>
 
 <% if @event.place %>
   <% _place_js = "EventsEdit.placeDefined = true; EventsEdit.latitudeOriginal = #{@event.place.latitude_original}; EventsEdit.longitudeOriginal = #{@event.place.longitude_original}; EventsEdit.latitudeCenter = #{@event.place.latitude_center}; EventsEdit.longitudeCenter = #{@event.place.longitude_center}; EventsEdit.zoom = #{@event.place.zoom}; " %>
