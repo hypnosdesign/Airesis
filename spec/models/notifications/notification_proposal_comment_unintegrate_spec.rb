@@ -28,13 +28,13 @@ RSpec.describe NotificationProposalCommentUnintegrate, type: :model, emails: tru
     paragraph = section.paragraphs.first
     content = Faker::Lorem.paragraph
     params = { sections_attributes: {
-      '0' => { id: section.id,
-               paragraphs_attributes: {
-                 '0' => { id: paragraph.id,
-                          content: content,
-                          content_dirty: content }
-               } }
-    },
+                 '0' => { id: section.id,
+                          paragraphs_attributes: {
+                            '0' => { id: paragraph.id,
+                                     content: content,
+                                     content_dirty: content }
+                          } }
+               },
                integrated_contributes_ids_list: comment.id.to_s }
 
     proposal.current_user_id = user.id
