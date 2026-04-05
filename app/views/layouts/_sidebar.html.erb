@@ -20,7 +20,7 @@
       </li>
       <% if current_user %>
         <li>
-          <%= link_to user_private_messages_path(current_user), class: "text-base-content/60 hover:bg-base-200 hover:text-base-content is-drawer-close:tooltip is-drawer-close:tooltip-right is-drawer-close:justify-center", "data-tip": t('pages.sidebar.messages', default: 'Messaggi') do %>
+          <%= link_to home_path, class: "text-base-content/60 hover:bg-base-200 hover:text-base-content is-drawer-close:tooltip is-drawer-close:tooltip-right is-drawer-close:justify-center", "data-tip": t('pages.sidebar.messages', default: 'Messaggi') do %>
             <i class="fa-solid fa-envelope w-6 text-center text-lg"></i>
             <span class="is-drawer-close:hidden"><%= t('pages.sidebar.messages', default: 'Messaggi') %></span>
           <% end %>
