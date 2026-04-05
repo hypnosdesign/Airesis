@@ -210,7 +210,7 @@ RSpec.describe BestQuorum, type: :model, seeds: true do
     end
 
     it 'does not raise when called with force_end' do
-      proposal, q = proposal_and_quorum
+      _, q = proposal_and_quorum
       next unless q.is_a?(BestQuorum)
 
       expect { q.check_phase(true) }.not_to raise_error

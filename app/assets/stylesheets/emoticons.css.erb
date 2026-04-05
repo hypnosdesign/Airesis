@@ -1,0 +1,60 @@
+@font-face {
+  font-family: 'emoticons';
+  src: url('<%= asset_path('emoticons.eot') %>');
+  src: url('<%= asset_path('emoticons.eot') %>#iefix') format('embedded-opentype'),
+       url('<%= asset_path('emoticons.ttf') %>') format('truetype'),
+       url('<%= asset_path('emoticons.woff') %>') format('woff'),
+       url('<%= asset_path('emoticons.svg') %>#emoticons') format('svg');
+  font-weight: normal;
+  font-style: normal;
+}
+
+[class^="icon-"], [class*=" icon-"] {
+  font-family: 'emoticons' !important;
+  speak: none;
+  font-style: normal;
+  font-weight: normal;
+  font-variant: normal;
+  font-size: 1.5rem;
+  text-transform: none;
+  line-height: 1;
+  margin-right: 1rem;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+[class|='icon-smile'] {
+  color: #02af01;
+}
+[class|='icon-smile']:hover {
+  color: #02af01;
+  text-decoration: none;
+}
+.icon-smile-change:hover:before { content: "\e901"; }
+.icon-smile-change:before       { content: "\e900"; }
+.icon-smile:before              { content: "\e900"; }
+.icon-smile-full:before         { content: "\e901"; }
+
+[class|='icon-sad'] {
+  color: #EF0909;
+}
+[class|='icon-sad']:hover {
+  color: #EF0909;
+  text-decoration: none;
+}
+.icon-sad-change:hover:before { content: "\e903"; }
+.icon-sad-change:before       { content: "\e902"; }
+.icon-sad:before              { content: "\e902"; }
+.icon-sad-full:before         { content: "\e903"; }
+
+[class|='icon-baffled'] {
+  color: #A1A1A1;
+}
+[class|='icon-baffled']:hover {
+  color: #A1A1A1;
+  text-decoration: none;
+}
+.icon-baffled-change:hover:before { content: "\e905"; }
+.icon-baffled-change:before       { content: "\e904"; }
+.icon-baffled:before              { content: "\e904"; }
+.icon-baffled-full:before         { content: "\e905"; }

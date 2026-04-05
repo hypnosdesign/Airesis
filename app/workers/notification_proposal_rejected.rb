@@ -3,7 +3,7 @@ class NotificationProposalRejected < NotificationSender
     @proposal = Proposal.find(proposal_id)
     @trackable = @proposal
     group = @proposal.group
-    group_area = @proposal.group_area
+    @proposal.group_area
 
     data = { proposal_id: @proposal.id, title: @proposal.title, extension: 'rejected' }
     data['group'] = group.name if group

@@ -134,7 +134,5 @@ class Event < ApplicationRecord
   end
 
   def remove_scheduled_tasks
-    # Resque.remove_delayed(EventsWorker, {action: EventsWorker::STARTVOTATION, event_id: self.id}) TODO remove job
-    # Resque.remove_delayed(EventsWorker, {action: EventsWorker::ENDVOTATION, event_id: self.id}) TODO remove job
   end
 end

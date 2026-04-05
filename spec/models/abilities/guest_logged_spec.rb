@@ -12,7 +12,7 @@ RSpec.describe 'Guest and Logged abilities', type: :model, seeds: true do
     let(:ability) { Ability.new(nil) }
 
     it 'can read public events' do
-      event = create(:meeting_event, user: user, private: false) rescue nil
+      create(:meeting_event, user: user, private: false) rescue nil
       expect(ability).to be_able_to(:read, Event.new(private: false))
     end
 

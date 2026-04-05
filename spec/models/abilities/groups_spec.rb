@@ -34,7 +34,7 @@ RSpec.describe 'Group abilities', type: :model, seeds: true do
     let(:member_ability) { Ability.new(member) }
 
     it 'admin can index group participations' do
-      participation = GroupParticipation.find_by(user: admin_user, group: group)
+      GroupParticipation.find_by(user: admin_user, group: group)
       expect(admin_ability).to be_able_to(:index, GroupParticipation)
     end
 

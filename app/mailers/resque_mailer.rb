@@ -44,7 +44,7 @@ class ResqueMailer < ApplicationMailer
     I18n.locale = @user.locale.key || :'en-EU'
     @data = @alert.data
     to_id = @data[:to_id]
-    subject_id = @data[:subject]
+    @data[:subject]
     subject = @alert.email_subject
     template_name = TEMPLATES[@alert.notification.notification_type_id] || 'notification'
     if to_id

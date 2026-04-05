@@ -27,7 +27,7 @@ RSpec.describe Blog do
 
   it 'retrieves last post correctly' do
     blog = create(:blog)
-    posts = create_list(:blog_post, 3, blog: blog)
+    create_list(:blog_post, 3, blog: blog)
     expect(blog.last_post).to eq BlogPost.last
   end
 

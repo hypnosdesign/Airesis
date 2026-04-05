@@ -8,7 +8,7 @@
     <%= render collection: @blog_posts, partial: 'blog_post' %>
   <% end %>
   <div class="blogPages mt-4">
-    <%= paginate @blog_posts %>
+    <%= pagy_nav(@pagy) if @pagy.pages > 1 %>
   </div>
 <% end %>
 

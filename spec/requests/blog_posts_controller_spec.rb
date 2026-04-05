@@ -50,7 +50,7 @@ RSpec.describe BlogPostsController, seeds: true do
     end
 
     it 'returns a response when user has a blog' do
-      blog = create(:blog, user: user)
+      create(:blog, user: user)
       sign_in user
       get new_blog_post_path
       expect([200, 302, 403, 500]).to include(response.status)

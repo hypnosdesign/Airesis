@@ -10,7 +10,7 @@ class DocumentsController < ApplicationController
   end
 
   def view
-    url = params[:url]
+    params[:url]
     group_id = params[:url][%r{/private/elfinder/([^/]*)/(.*)}, 1]
     @group = Group.find(group_id)
 

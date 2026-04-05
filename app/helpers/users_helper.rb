@@ -24,7 +24,7 @@ module UsersHelper
     raise 'Invalid User' unless user
 
     u_nick = user.proposal_nicknames.find_by(proposal_id: proposal.id) if proposal&.is_anonima?
-    ret = content_tag :div, class: 'user-tag' do
+    content_tag :div, class: 'user-tag' do
       (content_tag :div, class: 'user-avatar' do
         if u_nick
           image_tag "https://www.gravatar.com/avatar/#{Digest::MD5.hexdigest(u_nick.nickname)}?s=24&d=identicon&r=PG"

@@ -20,7 +20,7 @@ module Frm
                   @forum.topics.visible.approved_or_pending_review_for(current_user)
                 end
 
-      @topics = @topics.by_pinned_or_most_recent_post.page(params[:page]).per(TOPICS_PER_PAGE)
+      @pagy, @topics = pagy(@topics.by_pinned_or_most_recent_post, items: TOPICS_PER_PAGE)
 
       respond_to do |format|
         format.html

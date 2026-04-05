@@ -105,9 +105,6 @@ class OldQuorum < Quorum
         end
 
         # remove the timer if is still there
-        if minutes
-          # Resque.remove_delayed(ProposalsWorker, {action: ProposalsWorker::ENDTIME, proposal_id: proposal.id}) #TODO remove jobs
-        end
         proposal.save
 
       elsif proposal.rank < bad_score # if we have not passed the debate quorum abandon it
@@ -132,7 +129,7 @@ class OldQuorum < Quorum
         vs = SchulzeBasic.do votesstring, num_solutions
         solutions_sorted = proposal.solutions.sort_by(&:id) # order the solutions by the id (as the plugin output the results)
         solutions_sorted.each_with_index do |c, i|
-          c.schulze_score = vs.ranks[i].to_i # save the result in the solution
+          c.schulze_score = vs.ranking[i].to_i # save the result in the solution
           c.save!
         end
         proposal.proposal_state_id = ProposalState::ACCEPTED
@@ -142,7 +139,7 @@ class OldQuorum < Quorum
       positive = vote_data.positive
       negative = vote_data.negative
       neutral = vote_data.neutral
-      votes = positive + negative + neutral
+      positive + negative + neutral
       if positive > negative # se ha avuto più voti positivi allora diventa ACCETTATA
         proposal.proposal_state_id = ProposalState::ACCEPTED
       elsif positive <= negative # se ne ha di più negativi allora diventa RESPINTA
@@ -183,7 +180,7 @@ class OldQuorum < Quorum
   protected
 
   def min_participants_pop
-    count = 1
+    1
     if percentage
       count = if group
                 (percentage.to_f * 0.01 * group.scoped_participants(:participate_proposals).count)
@@ -195,8 +192,8 @@ class OldQuorum < Quorum
   end
 
   def explanation_pop
-    conditions = []
-    ret = ''
+    []
+    ''
     ret = if assigned? # explain a quorum assigned to a proposal
             if proposal_life.present? || proposal.abandoned?
               terminated_explanation_pop

@@ -147,7 +147,7 @@ RSpec.describe GeocodeUser, type: :worker, seeds: true do
   end
 
   it 'does nothing when user does not exist' do
-    worker = described_class.new
+    described_class.new
     # GeocodeUser calls geocode on nil if user not found; skip gracefully
     expect(User.find_by(id: 0)).to be_nil
   end

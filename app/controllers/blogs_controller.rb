@@ -20,7 +20,7 @@ class BlogsController < ApplicationController
 
   def show
     @page_title = @blog.title
-    @blog_posts = @blog_posts.published.page(params[:page]).per(COMMENTS_PER_PAGE)
+    @pagy, @blog_posts = pagy(@blog_posts.published, items: COMMENTS_PER_PAGE)
     respond_to do |format|
       format.html
       format.turbo_stream
@@ -31,7 +31,7 @@ class BlogsController < ApplicationController
 
   def by_year_and_month
     @page_title = t('pages.blog_posts.archives.title', year: params[:year], month: t('calendar.monthNames')[params[:month].to_i - 1])
-    @blog_posts = @blog_posts.published.where('extract(year from created_at) = ? AND extract(month from created_at) = ? ', params[:year], params[:month]).order('created_at DESC').page(params[:page]).per(COMMENTS_PER_PAGE)
+    @pagy, @blog_posts = pagy(@blog_posts.published.where('extract(year from created_at) = ? AND extract(month from created_at) = ? ', params[:year], params[:month]).order('created_at DESC'), items: COMMENTS_PER_PAGE)
 
     respond_to do |format|
       format.html

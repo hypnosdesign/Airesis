@@ -38,7 +38,7 @@ RSpec.describe NotificationProposalCommentUnintegrate, type: :model, emails: tru
                integrated_contributes_ids_list: comment.id.to_s }
 
     proposal.current_user_id = user.id
-    saved = proposal.update(params)
+    proposal.update(params)
 
     proposal.reload
     comment.reload

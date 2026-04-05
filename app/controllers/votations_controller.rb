@@ -66,7 +66,7 @@ Vote errors: #{@proposal.vote.errors.details}")
         schulz.count += 1
         schulz.save!
       else
-        schulz = @proposal.schulze_votes.build(preferences: votestring, count: 1)
+        @proposal.schulze_votes.build(preferences: votestring, count: 1)
       end
       vote = @proposal.user_votes.build(user_id: current_user.id)
       vote.vote_schulze = votestring unless @proposal.secret_vote
@@ -77,7 +77,7 @@ Vote errors: #{@proposal.vote.errors.details}")
       format.turbo_stream { render 'votations/vote_schulze' }
       format.html { render action: :show }
     end
-  rescue StandardError => e
+  rescue StandardError
     respond_to do |format|
       flash[:error] = t('errors.messages.votation')
       format.turbo_stream { render 'votations/errors/vote_error' }

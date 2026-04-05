@@ -13,7 +13,7 @@
 <%= turbo_include_tags %>
 
 <%= yield :elfinder_assets %>
-<%= javascript_include_tag Ckeditor.cdn_url %>
+<%= javascript_include_tag Ckeditor.cdn_url if content_for?(:ckeditor) %>
 <%= csrf_meta_tag %>
 
 <%= render 'layouts/favicons' %>

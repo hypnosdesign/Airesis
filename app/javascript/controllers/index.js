@@ -30,3 +30,6 @@ application.register("noise-manager", NoiseManagerController)
 
 import ToggleController from "./toggle_controller"
 application.register("toggle", ToggleController)
+
+import CookieConsentController from "./cookie_consent_controller"
+application.register("cookie-consent", CookieConsentController)

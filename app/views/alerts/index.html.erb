@@ -37,10 +37,11 @@
 <% end %>
 
 <script type="text/javascript">
-  $.ajax({
-    data: '',
-    dataType: 'script',
-    type: 'POST',
-    url: "/alerts/check_all"
-  });
+  document.addEventListener('turbo:load', () => {
+    const token = document.querySelector('meta[name="csrf-token"]')?.content;
+    fetch('/alerts/check_all', {
+      method: 'POST',
+      headers: { 'X-CSRF-Token': token || '' }
+    });
+  }, { once: true });
 </script>

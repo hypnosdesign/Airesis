@@ -95,7 +95,7 @@ RSpec.describe StepsHelper, type: :helper, seeds: true do
     end
 
     it 'returns true for step index 2 when user has group participations' do
-      group = create(:group, current_user_id: user.id)
+      create(:group, current_user_id: user.id)
       allow(step).to receive(:index).and_return(2)
       result = helper.welcome_steps(step, user)
       expect(result).to be true

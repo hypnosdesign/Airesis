@@ -26,6 +26,6 @@ class ProposalType < ApplicationRecord
     joins = "join proposals on proposals.proposal_type_id = proposal_types.id
                             join group_proposals on proposals.id = group_proposals.proposal_id"
     conditions = " group_proposals.group_id = #{group.id} and proposals.private = 't'"
-    types = ProposalType.joins(joins).where(conditions).group(ProposalType.column_names.map { |col| "#{ProposalType.table_name}.#{col}" }.join(','))
+    ProposalType.joins(joins).where(conditions).group(ProposalType.column_names.map { |col| "#{ProposalType.table_name}.#{col}" }.join(','))
   end
 end

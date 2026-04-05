@@ -9,6 +9,6 @@
     <%= render partial: "group_participation_results" %>
   <% end %>
 <% end %>
-<% unless @group_participations.total_pages > @group_participations.current_page %>
+<% unless @pagy.next %>
   <%= turbo_stream.remove "loading_results" %>
 <% end %>
