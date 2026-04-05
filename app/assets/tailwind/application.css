@@ -10,6 +10,25 @@
 }
 
 /* ============================
+   Global form overrides
+   ============================ */
+
+/* All checkboxes get DaisyUI styling */
+input[type="checkbox"] {
+  @apply checkbox checkbox-primary;
+}
+
+/* All radio buttons get DaisyUI styling */
+input[type="radio"] {
+  @apply radio radio-primary;
+}
+
+/* SimpleForm boolean wrapper: label + checkbox inline */
+.form-control-error input[type="checkbox"] {
+  @apply checkbox-error;
+}
+
+/* ============================
    Trix Editor — DaisyUI theme
    ============================ */
 
