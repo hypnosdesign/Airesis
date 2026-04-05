@@ -23,7 +23,7 @@ Repo originale: https://github.com/coorasse/airesis (branch `develop`)
 |----------------|-------------------|-----------------|---------------------|
 | Ruby           | 2.7.5 (EOL)       | **3.4.4** ✓     | 3.4.x               |
 | Rails          | 6.0.3.1 (EOL)     | **8.1.3** ✓     | 8.1.x               |
-| PostgreSQL     | qualsiasi         | 14-alpine ✓     | 14+                 |
+| PostgreSQL     | qualsiasi         | **17-alpine** ✓ | 17+                 |
 | Redis          | qualsiasi         | **rimosso** ✓   | non necessario      |
 | Sidekiq        | 6.1.2             | **rimosso** ✓   | Solid Queue (Rails 8 nativo) |
 | Devise         | 4.7.1             | **5.0.3** ✓     | 5.x                 |
@@ -101,7 +101,7 @@ docker compose up
 
 Servizi:
 - `airesis` — app Rails (porta 3000). Nota: `NODE_OPTIONS=--openssl-legacy-provider` ancora nel docker-compose (legacy Webpack, da rimuovere in Fase 4-R)
-- `db` — PostgreSQL 14 (porta 5433, user `postgres`, trust auth)
+- `db` — PostgreSQL 17 (porta 5433, user `postgres`, trust auth)
 - `solid_queue` — Solid Queue worker (porta nessuna, DB-backed)
 
 Comandi utili:
