@@ -1,7 +1,1 @@
 <div id="fb-root" data-user-like-url="<%= user_likes_url %>" data-app-id="<%= ENV['FACEBOOK_APP_ID'] %>" data-locale="<%= I18n.locale.to_s.gsub('-','_') %>"></div>
-
-<%= render '/layouts/top_menu' %>
-
-<% if current_user %>
-  <%= turbo_stream_from "notifications_#{current_user.id}" %>
-<% end %>

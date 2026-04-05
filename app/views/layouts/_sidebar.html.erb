@@ -1,0 +1,88 @@
+<div class="sidebar-nav flex min-h-full flex-col bg-base-100 border-r-2 border-base-content/15 is-drawer-close:w-[4.5rem] is-drawer-open:w-64 transition-all duration-200">
+
+  <%# Logo %>
+  <%= link_to root_path, class: "flex items-center gap-3 px-4 min-h-16 border-b-2 border-base-content/10 is-drawer-close:justify-center is-drawer-close:px-0" do %>
+    <div class="w-9 h-9 bg-primary flex items-center justify-center shrink-0">
+      <i class="fa-solid fa-landmark text-primary-content text-base"></i>
+    </div>
+    <span class="font-extrabold text-lg tracking-tight is-drawer-close:hidden"><%= APP_SHORT_NAME %></span>
+  <% end %>
+
+  <%# Nav %>
+  <div class="px-2 pt-5">
+    <p class="text-[9px] font-bold text-base-content/30 uppercase tracking-widest mb-2 px-3 is-drawer-close:hidden"><%= t('pages.sidebar.overview', default: 'Panoramica') %></p>
+    <ul class="menu w-full gap-0.5">
+      <li>
+        <%= link_to home_path, class: "#{current_page?(home_path) || current_page?(root_path) ? 'bg-primary text-primary-content font-semibold' : 'text-base-content/60 hover:bg-base-200 hover:text-base-content'} is-drawer-close:tooltip is-drawer-close:tooltip-right is-drawer-close:justify-center", "data-tip": "Dashboard" do %>
+          <i class="fa-solid fa-gauge w-6 text-center text-lg"></i>
+          <span class="is-drawer-close:hidden">Dashboard</span>
+        <% end %>
+      </li>
+      <% if current_user %>
+        <li>
+          <%= link_to user_private_messages_path(current_user), class: "text-base-content/60 hover:bg-base-200 hover:text-base-content is-drawer-close:tooltip is-drawer-close:tooltip-right is-drawer-close:justify-center", "data-tip": t('pages.sidebar.messages', default: 'Messaggi') do %>
+            <i class="fa-solid fa-envelope w-6 text-center text-lg"></i>
+            <span class="is-drawer-close:hidden"><%= t('pages.sidebar.messages', default: 'Messaggi') %></span>
+          <% end %>
+        </li>
+      <% end %>
+      <li>
+        <%= link_to proposals_path, class: "#{controller_name == 'proposals' ? 'bg-primary text-primary-content font-semibold' : 'text-base-content/60 hover:bg-base-200 hover:text-base-content'} is-drawer-close:tooltip is-drawer-close:tooltip-right is-drawer-close:justify-center", "data-tip": t('pages.sidebar.proposals', default: 'Proposte') do %>
+          <i class="fa-solid fa-file-lines w-6 text-center text-lg"></i>
+          <span class="is-drawer-close:hidden"><%= t('pages.sidebar.proposals', default: 'Proposte') %></span>
+        <% end %>
+      </li>
+      <li>
+        <%= link_to groups_path, class: "#{controller_name == 'groups' ? 'bg-primary text-primary-content font-semibold' : 'text-base-content/60 hover:bg-base-200 hover:text-base-content'} is-drawer-close:tooltip is-drawer-close:tooltip-right is-drawer-close:justify-center", "data-tip": t('pages.sidebar.groups', default: 'Gruppi') do %>
+          <i class="fa-solid fa-users w-6 text-center text-lg"></i>
+          <span class="is-drawer-close:hidden"><%= t('pages.sidebar.groups', default: 'Gruppi') %></span>
+        <% end %>
+      </li>
+      <li>
+        <%= link_to events_path, class: "#{controller_name == 'events' ? 'bg-primary text-primary-content font-semibold' : 'text-base-content/60 hover:bg-base-200 hover:text-base-content'} is-drawer-close:tooltip is-drawer-close:tooltip-right is-drawer-close:justify-center", "data-tip": t('pages.sidebar.events', default: 'Eventi') do %>
+          <i class="fa-solid fa-calendar w-6 text-center text-lg"></i>
+          <span class="is-drawer-close:hidden"><%= t('pages.sidebar.events', default: 'Eventi') %></span>
+        <% end %>
+      </li>
+      <li>
+        <%= link_to open_space_path, class: "#{current_page?(open_space_path) ? 'bg-primary text-primary-content font-semibold' : 'text-base-content/60 hover:bg-base-200 hover:text-base-content'} is-drawer-close:tooltip is-drawer-close:tooltip-right is-drawer-close:justify-center", "data-tip": t('open_space') do %>
+          <i class="fa-solid fa-earth-americas w-6 text-center text-lg"></i>
+          <span class="is-drawer-close:hidden"><%= t('open_space') %></span>
+        <% end %>
+      </li>
+    </ul>
+  </div>
+
+  <%# Bottom %>
+  <div class="mt-auto px-2 pb-4 pt-4 border-t-2 border-base-content/10">
+    <ul class="menu w-full gap-0.5">
+      <% if current_user %>
+        <li>
+          <%= link_to user_path(current_user), class: "text-base-content/60 hover:bg-base-200 is-drawer-close:tooltip is-drawer-close:tooltip-right is-drawer-close:justify-center", "data-tip": t('pages.sidebar.settings', default: 'Impostazioni') do %>
+            <i class="fa-solid fa-gear w-6 text-center text-lg"></i>
+            <span class="is-drawer-close:hidden"><%= t('pages.sidebar.settings', default: 'Impostazioni') %></span>
+          <% end %>
+        </li>
+        <li>
+          <%= link_to destroy_user_session_path, data: { turbo_method: :delete }, class: "text-error hover:bg-error/10 is-drawer-close:tooltip is-drawer-close:tooltip-right is-drawer-close:justify-center", "data-tip": t('pages.header.menu.logout') do %>
+            <i class="fa-solid fa-right-from-bracket w-6 text-center text-lg"></i>
+            <span class="is-drawer-close:hidden"><%= t('pages.header.menu.logout') %></span>
+          <% end %>
+        </li>
+      <% else %>
+        <li>
+          <%= link_to new_user_session_path, class: "text-base-content/60 hover:bg-base-200 is-drawer-close:tooltip is-drawer-close:tooltip-right is-drawer-close:justify-center", "data-tip": t('pages.header.login') do %>
+            <i class="fa-solid fa-right-to-bracket w-6 text-center text-lg"></i>
+            <span class="is-drawer-close:hidden"><%= t('pages.header.login') %></span>
+          <% end %>
+        </li>
+        <li>
+          <%= link_to new_registration_path(:user), class: "text-primary hover:bg-primary/10 is-drawer-close:tooltip is-drawer-close:tooltip-right is-drawer-close:justify-center", "data-tip": t('pages.header.menu.registration_button') do %>
+            <i class="fa-solid fa-user-plus w-6 text-center text-lg"></i>
+            <span class="is-drawer-close:hidden"><%= t('pages.header.menu.registration_button') %></span>
+          <% end %>
+        </li>
+      <% end %>
+    </ul>
+  </div>
+</div>
