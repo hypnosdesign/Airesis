@@ -1,0 +1,6 @@
+<%= turbo_stream.replace "eventNewComment" do %>
+  <div id="eventNewComment">
+    <%= render partial: "event_comments/new_event_comment", locals: { event_comment: @event.event_comments.new } %>
+  </div>
+<% end %>
+<%= render partial: "layouts/flash_stream" %>

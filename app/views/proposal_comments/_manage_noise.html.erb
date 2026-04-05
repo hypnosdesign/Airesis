@@ -1,0 +1,42 @@
+<h2><%= t('.title') %></h2>
+<div class="flex flex-wrap w-full">
+  <div class="flex flex-wrap">
+    <div class="w-full">
+      <div class="alert alert-info">
+        <%= t('.help') %>
+      </div>
+    </div>
+    <div class="w-full sm:w-1/2">
+      <h4><%= t('pages.proposals.manage_noise.available') %></h4>
+    </div>
+    <div class="w-full sm:w-1/2">
+      <h4><%= t('pages.proposals.manage_noise.removed') %></h4>
+    </div>
+    <div class="w-full sm:w-1/2">
+      <div id="active" class="noise-sortable" data-noise-manager-target="activeList">
+        <% @proposal.contributes.unintegrated.removable.each do |contribute| %>
+          <div class="noise_element" data-id="<%= contribute.id %>">
+            <%= parsed_content(contribute, @proposal.is_anonima?) %>
+          </div>
+        <% end %>
+      </div>
+    </div>
+    <div class="w-full sm:w-1/2">
+      <div id="inactive" class="noise-sortable" data-noise-manager-target="inactiveList">
+        <% @proposal.contributes.noise.each do |contribute| %>
+          <div class="noise_element" data-id="<%= contribute.id %>">
+            <%= parsed_content(contribute, @proposal.is_anonima?) %>
+          </div>
+        <% end %>
+      </div>
+    </div>
+  </div>
+</div>
+<%= form_for 'comments', url: mark_noise_proposal_proposal_comments_path(@proposal.id),
+    data: { turbo_method: :post, controller: 'noise-manager', action: 'submit->noise-manager#collectIds' } do |f| %>
+  <%= f.hidden_field 'active', data: { 'noise-manager-target': 'activeField' } %>
+  <%= f.hidden_field 'inactive', data: { 'noise-manager-target': 'inactiveField' } %>
+  <%= link_to t('buttons.cancel'), '#', class: 'btn', data: { action: 'click->modal#close' } %>
+  <%= link_to t('buttons.go_back'), :back, class: 'btn', data: {back: ''} %>
+  <%= f.submit t('buttons.save'), class: 'btn btn-primary', data: {disable_with: t('loading')} %>
+<% end %>

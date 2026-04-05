@@ -18,7 +18,7 @@ RSpec.describe 'devise/passwords#create', :js do
   end
 
   it "can't retrieve password if blocked" do
-    user.update_columns(blocked: true) # TODO: move block method in user class
+    user.update_columns(blocked: true)
     visit new_user_password_path
     fill_in I18n.t('activerecord.attributes.user.email'), with: user.email.upcase
     click_button I18n.t('pages.password.submit')

@@ -1,0 +1,9 @@
+<% if @event.proposal_id.present? %>
+  <%= turbo_stream.replace "wait_date_header_container" do %>
+    <%= render partial: "proposals/wait_date_header", locals: { proposal: @proposal } %>
+  <% end %>
+<% end %>
+<%= turbo_stream.replace "create_event_dialog" do %>
+  <div id="create_event_dialog"></div>
+<% end %>
+<%= render partial: "layouts/flash_stream" %>

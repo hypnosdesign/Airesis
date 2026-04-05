@@ -1,9 +1,0 @@
-- if current_user
-  - if @blocked_alerts
-    = link_to unlock_proposal_blocked_proposal_alerts_path(@proposal), method: :post, remote: true, class: 'btn', data: {disable_with: t('loading')} do
-      i.fa-solid.fa-bell
-      = t('pages.proposals.show.enable_alerts')
-  - else
-    = link_to block_proposal_blocked_proposal_alerts_path(@proposal), method: :post, remote: true, class: 'btn', data: {disable_with: t('loading')} do
-      i.fa-solid.fa-bell-slash
-      = t('pages.proposals.show.disable_alerts')

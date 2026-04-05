@@ -9,7 +9,7 @@ class ProposalRevisionsController < ApplicationController
   def index
     respond_to do |format|
       format.html
-      format.js
+      format.turbo_stream
     end
   end
 

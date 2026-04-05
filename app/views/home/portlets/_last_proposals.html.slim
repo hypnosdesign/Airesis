@@ -1,7 +1,0 @@
-.title.clearfix
-  span.left
-    = t('pages.home.index.last_proposals')
-  = link_to t('.proceed_to_proposals'), proposals_path, class: 'btn right'
-- unless @proposals.empty?
-  .scrollable
-    = render partial: 'proposals/mini_proposal', collection: @proposals, as: 'proposal'

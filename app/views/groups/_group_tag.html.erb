@@ -1,0 +1,39 @@
+<li>
+  <div class="groupListContainer" data-id="<%= group.id %>">
+    <div class="inner card bg-base-200 p-4">
+      <div class="flex flex-wrap">
+        <div class="groupUserImage w-1/4">
+          <%= link_to (group.group_image_tag nil), group_url(group), title: group.name %>
+        </div>
+        <div class="groupName w-3/4">
+          <h3>
+            <%= link_to group.name, group_url(group), title: group.name %>
+            <div class="title_fade"></div>
+          </h3>
+          <div class="group_tag_desc">
+            <%= group.description %>
+            <div class="fade_out"></div>
+          </div>
+        </div>
+      </div>
+      <div class="group_bottom flex flex-wrap">
+        <div class="groupDescription w-1/4">
+          <%= image_tag 'group_participants.png', title: t('pages.groups.index.participants_number'), data: {qtip: ''} %>
+          <span class="count"><%= group.group_participations_count %></span>
+        </div>
+        <div class="groupDescription w-1/4">
+          <%= link_to (image_tag 'group_proposals.png'), group_proposals_url(group), title: t('pages.groups.index.proposals_number'), data: {qtip: ''} %>
+          <span class="count"><%= group.proposals_count %></span>
+        </div>
+        <div class="groupDescription w-1/4">
+          <%= link_to (image_tag 'group_events.png'), group_events_url(group), title: t('pages.groups.index.events_number'), data: {qtip: ''} %>
+          <span class="count"><%= group.next_events.size %></span>
+        </div>
+        <div class="territoryDescription w-1/4">
+          <%= link_to group.interest_border.territory.description, groups_url(interest_border: group.interest_border.as_json[:id]) %>
+          <div class="territory_fade"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</li>

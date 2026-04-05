@@ -1,4 +1,4 @@
-class CountCreatedProposals
+class CountCreatedProposals < ApplicationJob
   def perform(*_args)
     start = (Time.zone.now - 1.day).utc.at_beginning_of_day
     fin = Time.now.utc.at_beginning_of_day

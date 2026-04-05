@@ -1,0 +1,140 @@
+<% if @proposal.is_petition? %>
+  <% if @proposal.voting? %>
+    <div class="card bg-base-200 p-3 mb-2">
+      <p class="text-sm">
+        <span class="font-semibold">Signs</span>
+        <span class="float-right"><%= @proposal.vote.number %>/<%= @proposal.signatures %></span>
+      </p>
+      <progress class="progress progress-success w-full" value="<%= [(@proposal.vote.number.to_f / @proposal.signatures.to_f) * 100, 100].min %>" max="100"></progress>
+      <% if can? :vote, @proposal %>
+        <%= form_for 'data', url: votation_vote_path(proposal_id: @proposal.id), data: { turbo_method: :put } do |f| %>
+          <%= f.text_area 'comment', placeholder: 'Share your thought', class: 'textarea textarea-bordered w-full mb-2' %>
+          <%= f.submit 'Sign the petition', class: 'btn btn-primary w-full', disable_with: t('loading') %>
+        <% end %>
+      <% elsif current_user && (vote = UserVote.find_by_proposal_id_and_user_id(@proposal.id, current_user.id)) %>
+        <p class="text-success font-semibold">You signed this petition</p>
+      <% end %>
+    </div>
+  <% end %>
+<% else %>
+  <div id="rankleftpanel" class="card bg-base-200 p-3 mb-2">
+    <div class="points">
+      <%= render partial: 'proposals/points_left_panel' %>
+    </div>
+    <div class="rank">
+      <%= render partial: 'proposals/rank_left_panel' %>
+    </div>
+    <div class="space-y-2 mt-2">
+      <% if signed_in? %>
+        <% if @proposal.proposal_revisions.count > 0 || @proposal.abandoned? %>
+          <%= link_to proposal_proposal_revisions_url(@proposal), class: 'btn btn-sm w-full', data: { disable_with: t('loading') }, id: "history" do %>
+            <i class="fa-solid fa-file-lines"></i> <%= t('pages.proposals.show.history_button') %>
+          <% end %>
+        <% end %>
+        <% if params[:action] == 'show' %>
+          <% if @proposal.vote %>
+            <%= link_to vote_results_proposal_url(@proposal), class: 'btn btn-sm w-full results-button' do %>
+              <%= t('pages.proposals.show.votation_results') %>
+            <% end %>
+          <% end %>
+          <%= link_to url_for_proposal(@proposal, format: :pdf), target: '_blank', class: 'btn btn-sm w-full' do %>
+            <i class="fa-solid fa-file-pdf"></i> <%= t('pages.proposals.show.export_pdf') %>
+          <% end %>
+        <% else %>
+          <%= link_to t('pages.proposal_histories.index.back_to_proposal'), @group ? group_proposal_url(@group, @proposal) : proposal_url(@proposal), class: 'btn btn-sm btn-primary w-full' %>
+        <% end %>
+      <% end %>
+    </div>
+  </div>
+<% end %>
+
+<div class="block-alerts mb-2">
+  <%= render partial: 'blocked_proposal_alerts/block_alerts_panel' %>
+</div>
+
+<div id="dates" class="card bg-base-200 p-3 mb-2 text-center">
+  <%= render partial: 'proposals/dates' %>
+</div>
+
+<div class="nickname_container mb-2">
+  <%= render 'proposals/nickname_panel' %>
+</div>
+
+<% if @proposal.abandoned? %>
+  <div class="card bg-base-200 p-3 mb-2">
+    <h4 class="font-semibold mb-2"><%= t('pages.proposals.show.old_editors_title') %></h4>
+    <div id="old_authors_list">
+      <%= render partial: 'proposals/old_authors_list_panel' %>
+    </div>
+  </div>
+<% else %>
+  <div class="card bg-base-200 p-3 mb-2">
+    <h4 class="font-semibold mb-2"><%= t('pages.proposals.show.editors_title') %></h4>
+    <div class="authors_list">
+      <%= render partial: 'proposals/authors_list_panel' %>
+    </div>
+    <% if signed_in? && @proposal.in_valutation? %>
+      <div class="available-author mt-2">
+        <%= render partial: 'proposals/available_author' %>
+      </div>
+      <div class="available_authors_button mt-2">
+        <%= render partial: 'proposals/available_authors_button' %>
+      </div>
+    <% end %>
+  </div>
+<% end %>
+
+<% if ::Configuration.proposal_support && !@proposal.private %>
+  <div class="support_left_panel_container mb-2">
+    <%= render partial: 'proposals/support_left_panel' %>
+  </div>
+<% end %>
+
+<% unless @proposal.interest_borders.empty? %>
+  <div class="card bg-base-200 p-3 mb-2">
+    <h4 class="font-semibold mb-2"><%= t('pages.proposals.show.geographic_boundaries_title') %></h4>
+    <div class="flex flex-wrap gap-1">
+      <% @proposal.interest_borders.each do |ib| %>
+        <span class="badge badge-outline"><%= ib.description %></span>
+      <% end %>
+    </div>
+  </div>
+<% end %>
+
+<% if ::Configuration.proposal_categories %>
+  <div class="card bg-base-200 p-3 mb-2">
+    <h4 class="font-semibold mb-2"><%= t('pages.proposals.show.category_title') %></h4>
+    <div class="flex items-center gap-2">
+      <%= link_to image_tag("proposal_categories/#{@proposal.category.name}_s.png", alt: @proposal.category.description, style: "width:22px"), @group ? group_proposals_url(@group, { category: @proposal.category.id }) : proposals_url(category: @proposal.category.id) %>
+      <%= link_to @proposal.category.description, @group ? group_proposals_url(@group, { category: @proposal.category.id }) : proposals_url(category: @proposal.category.id), class: 'link link-hover' %>
+    </div>
+  </div>
+<% end %>
+
+<div class="card bg-base-200 p-3 mb-2">
+  <h4 class="font-semibold mb-2"><%= t('pages.proposals.show.model_title') %></h4>
+  <div class="flex items-center gap-2">
+    <%= link_to image_tag("proposal_types/#{@proposal.proposal_type.name.downcase}_ico.png", alt: @proposal.proposal_type.description, title: @proposal.proposal_type.description, style: "width:22px"), @group ? group_proposals_url(@group, { type: @proposal.proposal_type.id }) : proposals_url(type: @proposal.proposal_type.id) %>
+    <%= link_to @proposal.proposal_type.description, @group ? group_proposals_url(@group, { type: @proposal.proposal_type.id }) : proposals_url(type: @proposal.proposal_type.id), class: 'link link-hover' %>
+  </div>
+</div>
+
+<% if @proposal.in_group_area? %>
+  <div class="card bg-base-200 p-3 mb-2">
+    <h4 class="font-semibold mb-2"><%= t('pages.proposals.show.group_area') %></h4>
+    <%= link_to @proposal.presentation_areas.first.name, group_proposals_url(@group, { group_area_id: @proposal.presentation_areas.first.id }), class: 'link link-hover' %>
+  </div>
+<% end %>
+
+<% unless @proposal.tags.empty? || !::Configuration.folksonomy %>
+  <div class="card bg-base-200 p-3 mb-2">
+    <h4 class="font-semibold mb-2"><%= t('pages.proposals.show.tags_title') %></h4>
+    <div class="flex flex-wrap gap-1">
+      <% @proposal.tags.each do |tag| %>
+        <%= link_to tag.text, tag_path(tag.text), class: 'badge badge-outline' %>
+      <% end %>
+    </div>
+  </div>
+<% end %>
+
+<%= render 'proposals/closest_proposals' %>

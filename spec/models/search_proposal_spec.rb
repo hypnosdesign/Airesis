@@ -13,7 +13,7 @@ RSpec.describe SearchProposal, type: :model, search: true do
       group = create(:group)
       user = create(:user)
       create_participation(user, group)
-      group_proposals = create_list(:group_proposal, 2, groups: [group])
+      create_list(:group_proposal, 2, groups: [group])
     end
 
     it 'returns all public proposals' do
@@ -108,7 +108,7 @@ RSpec.describe SearchProposal, type: :model, search: true do
 
     context 'order by end date of quorum' do
       it 'sorts results by the end date of the quorum' do
-        users = create_list(:user, 3)
+        create_list(:user, 3)
         hello_world = create(:proposal, title: 'hello world', quorum: create(:best_quorum, days_m: 2))
         my_best_hello = create(:proposal, title: 'my best hello', quorum: create(:best_quorum, days_m: 3))
         hello = create(:proposal, title: 'hello', quorum: create(:best_quorum, days_m: 1))
@@ -138,7 +138,7 @@ RSpec.describe SearchProposal, type: :model, search: true do
 
   describe 'group proposals' do
     it 'filters out public proposals not supported by the group and proposals from my other groups' do
-      public_proposals = create_list(:proposal, 2)
+      create_list(:proposal, 2)
       group = create(:group)
       another_group = create(:group)
       user = create(:user)
@@ -161,7 +161,7 @@ RSpec.describe SearchProposal, type: :model, search: true do
       user = create(:user)
       group = create(:group, current_user_id: user.id)
       proposal1 = create(:public_proposal, title: 'bella giornata', current_user_id: user.id)
-      proposal3 = create(:group_proposal, title: 'questo gruppo è un INFERNO! riorganizziamolo!!!!', current_user_id: user.id, group_proposals: [GroupProposal.new(group: group)], visible_outside: false)
+      create(:group_proposal, title: 'questo gruppo è un INFERNO! riorganizziamolo!!!!', current_user_id: user.id, group_proposals: [GroupProposal.new(group: group)], visible_outside: false)
       search_proposal = described_class.new
       search_proposal.proposal_state_tab = ProposalState::TAB_DEBATE
       expect(search_proposal.results.to_a).to match_array [proposal1]
@@ -170,8 +170,8 @@ RSpec.describe SearchProposal, type: :model, search: true do
     it "can't retrieve public proposals if specifies a group, and can't see group's proposals if not signed in" do
       user = create(:user)
       group = create(:group, current_user_id: user.id)
-      proposal1 = create(:public_proposal, title: 'bella giornata', current_user_id: user.id)
-      proposal3 = create(:group_proposal,
+      create(:public_proposal, title: 'bella giornata', current_user_id: user.id)
+      create(:group_proposal,
                          title: 'questo gruppo è un INFERNO! riorganizziamolo!!!!',
                          current_user_id: user.id,
                          group_proposals: [GroupProposal.new(group: group)],
@@ -186,7 +186,7 @@ RSpec.describe SearchProposal, type: :model, search: true do
     it "can't retrieve public proposals if specify a group, and can see group's proposals if signed in and is group admin" do
       user = create(:user)
       group = create(:group, current_user_id: user.id)
-      proposal1 = create(:public_proposal, title: 'bella giornata', current_user_id: user.id)
+      create(:public_proposal, title: 'bella giornata', current_user_id: user.id)
       proposal3 = create(:group_proposal,
                          title: 'questo gruppo è un INFERNO! riorganizziamolo!!!!',
                          current_user_id: user.id,
@@ -217,7 +217,7 @@ RSpec.describe SearchProposal, type: :model, search: true do
       bologna = create(:municipality, description: 'Bologna')
       modena = create(:municipality, description: 'Modena')
       bologna_proposals = create_list(:proposal, 2, interest_borders_tkn: InterestBorder.to_key(bologna))
-      modena_proposals = create_list(:proposal, 2, interest_borders_tkn: InterestBorder.to_key(modena))
+      create_list(:proposal, 2, interest_borders_tkn: InterestBorder.to_key(modena))
 
       search_proposal = described_class.new
       search_proposal.proposal_state_tab = ProposalState::TAB_DEBATE
@@ -347,7 +347,7 @@ RSpec.describe SearchProposal, type: :model, search: true do
     end
 
     it 'does not retrieve anything with a wrong title' do
-      proposal2 = create(:public_proposal, title: 'una giornata da inferno', current_user_id: user.id)
+      create(:public_proposal, title: 'una giornata da inferno', current_user_id: user.id)
       search_proposal = described_class.new
       search_proposal.add_tags_and_title(nil, 'rappresentative')
       expect(search_proposal.similar).to eq([])
@@ -370,9 +370,9 @@ RSpec.describe SearchProposal, type: :model, search: true do
     end
 
     it "can't retrieve public proposals if specifies a group, and can't see group's proposals if not signed in" do
-      hell_day = create(:public_proposal, title: 'una giornata da inferno', current_user_id: user.id)
+      create(:public_proposal, title: 'una giornata da inferno', current_user_id: user.id)
       group = create(:group, current_user_id: user.id)
-      hell_group = create(:group_proposal, title: 'questo gruppo è un INFERNO! riorganizziamolo!!!!',
+      create(:group_proposal, title: 'questo gruppo è un INFERNO! riorganizziamolo!!!!',
                                            current_user_id: user.id,
                                            groups: [group], visible_outside: false)
       search_proposal = described_class.new
@@ -382,7 +382,7 @@ RSpec.describe SearchProposal, type: :model, search: true do
     end
 
     it "can't retrieve public proposals if specify a group, and can see group's proposals if signed in and is group admin" do
-      proposal2 = create(:public_proposal, title: 'una giornata da inferno', current_user_id: user.id)
+      create(:public_proposal, title: 'una giornata da inferno', current_user_id: user.id)
       group = create(:group, current_user_id: user.id)
       proposal3 = create(:group_proposal, title: 'questo gruppo è un INFERNO! riorganizziamolo!!!!', current_user_id: user.id, group_proposals: [GroupProposal.new(group: group)], visible_outside: false)
 

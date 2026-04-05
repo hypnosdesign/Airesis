@@ -1,4 +1,4 @@
-# TODO: refactor and use cancan
+
 module Frm
   class PostsController < Frm::ApplicationController
     load_and_authorize_resource :forum, class: 'Frm::Forum', through: :group

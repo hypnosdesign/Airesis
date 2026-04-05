@@ -1,5 +1,0 @@
-| var container_ = $('
-#vote_results_container.reveal-modal[data-reveal]
-| '); container_.html("
-=j render(partial: @proposal.is_schulze? ? 'schulze_vote_results' : 'vote_results')
-| "); $('body').append(container_); airesis_reveal(container_, false); $('.results-button').click(function (e) { container_.foundation().foundation('reveal', 'open'); e.preventDefault(); return false; }); 

@@ -4,5 +4,32 @@
 
 import { application } from "./application"
 
-import HelloController from "./hello_controller"
-application.register("hello", HelloController)
+import AutosubmitController from "./autosubmit_controller"
+application.register("autosubmit", AutosubmitController)
+
+import CountdownController from "./countdown_controller"
+application.register("countdown", CountdownController)
+
+import FlashController from "./flash_controller"
+application.register("flash", FlashController)
+
+import InfiniteScrollController from "./infinite_scroll_controller"
+application.register("infinite-scroll", InfiniteScrollController)
+
+import ModalController from "./modal_controller"
+application.register("modal", ModalController)
+
+import ThemeController from "./theme_controller"
+application.register("theme", ThemeController)
+
+import NestedFormController from "./nested_form_controller"
+application.register("nested-form", NestedFormController)
+
+import NoiseManagerController from "./noise_manager_controller"
+application.register("noise-manager", NoiseManagerController)
+
+import ToggleController from "./toggle_controller"
+application.register("toggle", ToggleController)
+
+import CookieConsentController from "./cookie_consent_controller"
+application.register("cookie-consent", CookieConsentController)

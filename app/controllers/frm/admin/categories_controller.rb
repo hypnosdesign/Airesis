@@ -5,87 +5,65 @@ module Frm
 
       def index; end
 
-      def new; end
+      def new
+        respond_to do |format|
+          format.turbo_stream
+          format.html
+        end
+      end
 
       def create
         if @category.save
           @categories = @group.categories
-          create_successful
+          flash[:notice] = t('frm.admin.category.created')
+          respond_to do |format|
+            format.turbo_stream
+            format.html { redirect_to group_frm_admin_categories_url(@group) }
+          end
         else
-          create_failed
+          flash.now.alert = t('frm.admin.category.not_created')
+          render action: :new, status: :unprocessable_entity
+        end
+      end
+
+      def edit
+        respond_to do |format|
+          format.turbo_stream
+          format.html
         end
       end
 
       def update
         if @category.update(category_params)
           @categories = @group.categories
-          update_successful
+          flash[:notice] = t('frm.admin.category.updated')
+          respond_to do |format|
+            format.turbo_stream
+            format.html { redirect_to group_frm_admin_categories_url(@group) }
+          end
         else
-          update_failed
+          flash.now.alert = t('frm.admin.category.not_updated')
+          respond_to do |format|
+            format.turbo_stream { render :edit }
+            format.html { render action: :edit, status: :unprocessable_entity }
+          end
         end
       end
 
       def destroy
         @category.destroy
         @categories = @group.categories
-        destroy_successful
+        flash[:notice] = t('frm.admin.category.deleted')
+        respond_to do |format|
+          format.turbo_stream
+          format.html { redirect_to group_frm_admin_categories_url(@group) }
+        end
       end
 
       protected
 
       def category_params
         params.require(:frm_category).permit(:name, :visible_outside, :tags_list)
-      end
-
-      private
-
-      def create_successful
-        flash[:notice] = t('frm.admin.category.created')
-        respond_to do |format|
-          format.html do
-            redirect_to group_frm_admin_categories_url(@group)
-          end
-          format.js
-        end
-      end
-
-      def create_failed
-        flash.now.alert = t('frm.admin.category.not_created')
-        render action: :new
-      end
-
-      def destroy_successful
-        flash[:notice] = t('frm.admin.category.deleted')
-        respond_to do |format|
-          format.html do
-            redirect_to group_frm_admin_categories_url(@group)
-          end
-          format.js
-        end
-      end
-
-      def update_successful
-        flash[:notice] = t('frm.admin.category.updated')
-        respond_to do |format|
-          format.html do
-            redirect_to group_frm_admin_categories_url(@group)
-          end
-          format.js
-        end
-      end
-
-      def update_failed
-        flash.now.alert = t('frm.admin.category.not_updated')
-        respond_to do |format|
-          format.html do
-            render action: :edit
-          end
-          format.js do
-            render :update do |page|
-              page.replace_html 'category_container', partial: 'edit', locals: { remote: true }
-            end
-          end
-        end
       end
     end
   end

@@ -1,0 +1,19 @@
+<% @page_title = t('frm.forum.title') %>
+
+<div class="breadcrumbs text-sm mb-4">
+  <ul>
+    <li><%= link_to t('pages.groups.administration_panel.forum'), group_frm_admin_root_url(@group) %></li>
+    <li><%= link_to t('frm.admin.forum.index'), group_frm_admin_forums_url(@group) %></li>
+    <li><%= t("frm.forum.new") %></li>
+  </ul>
+</div>
+
+<h2 class="text-xl font-bold mb-4"><%= t("frm.forum.new") %></h2>
+
+<%= simple_form_for @forum, url: group_frm_admin_forums_url(@group) do |f| %>
+  <%= render partial: 'form', locals: { f: f } %>
+<% end %>
+
+<% content_for :left_panel do %>
+  <%= render partial: 'groups/administration_panel' %>
+<% end %>

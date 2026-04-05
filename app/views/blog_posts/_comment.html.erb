@@ -1,0 +1,22 @@
+<div id="comment<%= comment.id %>" class="blogComment card bg-base-200 p-4 mb-2" data-comment-id="<%= comment.id %>" <%= 'data-collapsed' if comment.collapsed %>>
+  <div class="blog-comment-image flex items-center gap-2 mb-2">
+    <%= avatar(comment.user, size: 20) %>
+    <span class="blogPoster font-semibold">
+      <%= link_to_user comment.user %>
+    </span>
+  </div>
+  <div class="blog-comment-content mb-2">
+    <%= raw auto_link((h(comment.body)).gsub(/\n/, '<br/>'), html: { target: '_blank' }, sanitize: false) { |text| truncate(text, length: 15) } %>
+  </div>
+  <div class="blog-comment-footer text-sm text-base-content/60">
+    <div title="<%= l comment.created_at %>">
+      <%= time_in_words comment.created_at %>
+      <% if can? :destroy, comment %>
+        <div style="float:right">
+          <%= link_to t('pages.blog_posts.comment.delete_button'), [@blog, @blog_post, comment], data: { turbo_method: :delete, turbo_confirm: t('pages.proposals.show.delete_contribute_confirmation') }, class: "deleteCommentLink btn btn-ghost btn-xs" %>
+        </div>
+      <% end %>
+    </div>
+  </div>
+  <div style="clear:both;"></div>
+</div>

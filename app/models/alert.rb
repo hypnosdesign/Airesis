@@ -18,7 +18,7 @@ class Alert < ApplicationRecord
   before_create :continue?
 
   after_commit :send_email, on: :create
-  after_commit :private_pub, on: :create
+  after_commit :broadcast_notification, on: :create
   after_commit :complete_alert_job, on: :create
 
   def alert_job
@@ -38,7 +38,7 @@ class Alert < ApplicationRecord
   def email_subject
     group = data[:group]
     subject = group ? "[#{group}] " : ''
-    subject += I18n.t(notification.email_subject_interpolation, **data)
+    subject + I18n.t(notification.email_subject_interpolation, **data)
   end
 
   def message
@@ -55,16 +55,16 @@ class Alert < ApplicationRecord
 
   def accumulate
     increase_count! # increase the count in the alert
-    if email_job.present? && email_job.sidekiq_job.present? # an email is in queue?
+    if email_job.present? && email_job.scheduled_in_queue? # an email is in queue?
       email_job.accumulate # requeue it on new daly
     else # alert is sent, email is sent, but alert is not read yet, just send a new email for the previous (accumulated) alert
       send_email(true)
     end
-    private_pub
+    broadcast_notification
   end
 
   def increase_count!
-    properties_will_change! # TODO: bugfix on Rails 4. to remove when patched
+    properties_will_change!
     count = properties['count'] ? properties['count'].to_i : 1
     properties['count'] = count + 1
     save!
@@ -113,14 +113,19 @@ class Alert < ApplicationRecord
 
     delay = notification.notification_type.email_delay
     delay += notification.notification_type.alert_delay if add_alert_delay
-    jid = EmailsWorker.perform_in(delay.minutes, id)
-    EmailJob.create(alert: self, jid: jid)
+    job = EmailsWorker.set(wait: delay.minutes).perform_later(id)
+    EmailJob.create(alert: self, jid: job.job_id)
   end
 
-  def private_pub
-    PrivatePub.publish_to("/notifications/#{user.id}", pull: 'hello')
-  rescue StandardError
-    Rails.logger.error 'Error while pushing to PrivatePub'
+  def broadcast_notification
+    Turbo::StreamsChannel.broadcast_replace_to(
+      "notifications_#{user.id}",
+      target: "flash-container",
+      partial: "layouts/flash",
+      locals: { flash: { notice: message } }
+    )
+  rescue StandardError => e
+    Rails.logger.error "Error broadcasting notification: #{e.message}"
   end
 
   def complete_alert_job

@@ -1,0 +1,17 @@
+<% @page_title = t('pages.passwords.edit.title') %>
+<div class="card bg-base-200 p-4">
+  <h2><%= @page_title %></h2>
+
+  <%= simple_form_for(@user, url: user_password_path, html: { data: { turbo_method: :put } }) do |f| %>
+    <%= render partial: 'fragments/error_messages', locals: { resource: resource } %>
+
+    <%= f.hidden_field :reset_password_token %>
+    <%= f.input :password, label: t('pages.password.edit.new_password'), required: true %>
+    <%= f.input :password_confirmation,
+                label: t('pages.password.edit.confirm_password'), required: true,
+                input_html: { data: { fv_identical_field: 'user[password]', fv_identical: true } } %>
+    <%= f.submit t('pages.password.edit.confirm_button'), class: 'btn btn-primary' %>
+  <% end %>
+
+  <%= render partial: 'devise/shared/links' %>
+</div>

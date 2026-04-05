@@ -1,0 +1,13 @@
+<nav class="breadcrumbs text-sm">
+  <ul>
+    <li><%= link_to t('pages.groups.administration_panel.permissions'), group_participation_roles_path(@group) %></li>
+    <li class="current"><%= @page_title %></li>
+  </ul>
+</nav>
+<h2><%= @page_title %></h2>
+<div class="card bg-base-200 p-4">
+  <%= render partial: 'participation_roles/form', locals: {button_name: t('buttons.create')} %>
+</div>
+<% content_for :left_panel do %>
+  <%= render partial: 'groups/administration_panel' %>
+<% end %>

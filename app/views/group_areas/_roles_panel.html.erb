@@ -1,0 +1,34 @@
+<div id="roles_panel_container">
+  <% @group_area.area_roles.each_with_index do |role, idx| %>
+    <div class="collapse collapse-arrow bg-base-200 mb-2 border border-base-300">
+      <input type="radio" name="area-roles-accordion" <%= 'checked' if idx == 0 %> />
+      <div class="collapse-title font-medium">
+        <%= role.name %>
+        <% if role.id == @group_area.area_role_id %>
+          <span class="badge badge-sm badge-primary ml-2">default</span>
+        <% end %>
+      </div>
+      <div class="collapse-content">
+        <div class="flex gap-2 mb-4 justify-end">
+          <%= link_to edit_group_group_area_area_role_url(@group, @group_area, role), class: 'btn btn-sm' do %>
+            <i class="fa-solid fa-pencil"></i>
+            <%= t('buttons.edit') %>
+          <% end %>
+          <%= link_to [@group, @group_area, role], data: { turbo_method: :delete, turbo_confirm: t('pages.groups.edit_permissions.confirm_role_deletion') }, class: 'btn btn-sm btn-error' do %>
+            <i class="fa-regular fa-trash-can"></i>
+            <%= t('buttons.delete') %>
+          <% end %>
+        </div>
+        <h4 class="font-semibold mb-2"><%= role.description %></h4>
+        <%= simple_form_for [@group, @group_area, role] do |f| %>
+          <input type="hidden" name="no_refresh" value="1">
+          <%= f.input :view_proposals, label: I18n.t('db.group_actions.view_proposals.description'), input_html: { data: { area_action_abilitation: '' } } %>
+          <%= f.input :participate_proposals, label: I18n.t('db.group_actions.participate_proposals.description'), input_html: { data: { area_action_abilitation: '' } } %>
+          <%= f.input :vote_proposals, label: I18n.t('db.group_actions.vote_proposals.description'), input_html: { data: { area_action_abilitation: '' } } %>
+          <%= f.input :insert_proposals, label: I18n.t('db.group_actions.insert_proposals.description'), input_html: { data: { area_action_abilitation: '' } } %>
+          <%= f.input :choose_date_proposals, label: I18n.t('db.group_actions.choose_date_proposals.description'), input_html: { data: { area_action_abilitation: '' } } %>
+        <% end %>
+      </div>
+    </div>
+  <% end %>
+</div>

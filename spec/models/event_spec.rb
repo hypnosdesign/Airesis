@@ -136,4 +136,121 @@ RSpec.describe Event do
       expect(ical_event.dtend).to eq event.ics_endtime
     end
   end
+
+  describe '#duration' do
+    it 'returns the difference between endtime and starttime' do
+      event = build(:event, starttime: 1.day.from_now, endtime: 3.days.from_now)
+      expect(event.duration).to be_within(1.second).of(2.days)
+    end
+  end
+
+  describe '#past?' do
+    it 'returns true when endtime is in the past' do
+      event = build(:event, starttime: 3.days.ago, endtime: 1.day.ago)
+      expect(event.past?).to be true
+    end
+
+    it 'returns false when endtime is in the future' do
+      event = build(:event, starttime: 1.day.from_now, endtime: 3.days.from_now)
+      expect(event.past?).to be false
+    end
+  end
+
+  describe '#now?' do
+    it 'returns true when current time is between starttime and endtime' do
+      event = build(:event, starttime: 1.day.ago, endtime: 1.day.from_now)
+      expect(event.now?).to be true
+    end
+
+    it 'returns false when event has not started' do
+      event = build(:event, starttime: 1.day.from_now, endtime: 3.days.from_now)
+      expect(event.now?).to be false
+    end
+  end
+
+  describe '#not_started?' do
+    it 'returns true when starttime is in the future' do
+      event = build(:event, starttime: 1.day.from_now, endtime: 3.days.from_now)
+      expect(event.not_started?).to be true
+    end
+
+    it 'returns false when starttime is in the past' do
+      event = build(:event, starttime: 1.day.ago, endtime: 1.day.from_now)
+      expect(event.not_started?).to be false
+    end
+  end
+
+  describe '#votation?' do
+    it 'returns true for votation events' do
+      event = build(:vote_event)
+      expect(event.votation?).to be true
+    end
+
+    it 'returns false for meeting events' do
+      event = build(:meeting_event)
+      expect(event.votation?).to be false
+    end
+  end
+
+  describe '#meeting?' do
+    it 'returns true for meeting events' do
+      event = build(:meeting_event)
+      expect(event.meeting?).to be true
+    end
+
+    it 'returns false for votation events' do
+      event = build(:vote_event)
+      expect(event.meeting?).to be false
+    end
+  end
+
+  describe '#to_param' do
+    it 'returns a SEO-friendly URL parameter with id and title' do
+      event = create(:meeting_event, title: 'Hello World Event')
+      expect(event.to_param).to include(event.id.to_s)
+      expect(event.to_param).to include('hello-world-event')
+    end
+  end
+
+  describe '#valid_dates?' do
+    it 'returns true when starttime is before endtime' do
+      event = build(:event, starttime: 1.day.from_now, endtime: 3.days.from_now)
+      expect(event.valid_dates?).to be true
+    end
+
+    it 'returns false when starttime equals endtime' do
+      t = 1.day.from_now
+      event = build(:event, starttime: t, endtime: t)
+      expect(event.valid_dates?).to be false
+    end
+  end
+
+  describe '#formatted_starttime' do
+    it 'returns a localized string' do
+      event = create(:meeting_event)
+      expect(event.formatted_starttime).to be_a(String)
+    end
+  end
+
+  describe '#formatted_endtime' do
+    it 'returns a localized string' do
+      event = create(:meeting_event)
+      expect(event.formatted_endtime).to be_a(String)
+    end
+  end
+
+  describe '#organizer_id' do
+    it 'returns the group id from meeting_organizations' do
+      event = create(:meeting_event)
+      expect(event.organizer_id).to be_nil # no meeting organization by default
+    end
+  end
+
+  describe '#set_all_day_time' do
+    it 'sets starttime to beginning of day when all_day is true' do
+      event = build(:event, all_day: true, starttime: Time.zone.now.change(hour: 14), endtime: 1.day.from_now)
+      event.valid?
+      expect(event.starttime).to eq(event.starttime.beginning_of_day)
+    end
+  end
 end

@@ -1,0 +1,46 @@
+<div class="card bg-base-200 p-4">
+  <%= simple_form_for [@group, @group_area], validate: true, remote: request.xhr? do |e| %>
+    <%= e.input :name %>
+    <%= e.input :description, as: :text %>
+    <%= e.submit t('buttons.update'), class: 'btn btn-primary', data: {disable_with: t('saving')} %>
+  <% end %>
+</div>
+<h1><%= t('pages.groups.edit_work_areas.manage.manage_roles_in_area', area: @group_area.name) %></h1>
+<div id="roles_panel_container">
+  <%= render partial: 'group_areas/roles_panel' %>
+</div>
+<br>
+<%= link_to new_group_group_area_area_role_url(@group, @group_area), data: {disable_with: t('loading')}, class: 'btn btn-primary' do %>
+  <i class="fa-solid fa-plus"></i>
+  <%= t('pages.groups.edit_permissions.new_role') %>
+<% end %>
+<hr>
+<div id="roles_table_container">
+  <%= render partial: 'group_areas/user_roles_panel' %>
+</div>
+<script type="text/javascript">
+  document.addEventListener('click', function(e) {
+    var el = e.target.closest('[data-area-action-abilitation]');
+    if (el) el.closest('form').submit();
+  });
+  var csrf = document.querySelector('meta[name="csrf-token"]');
+  var csrfToken = csrf ? csrf.content : '';
+  document.querySelectorAll('.user_role_changer').forEach(function(select) {
+    var username = select.parentElement.previousElementSibling ? select.parentElement.previousElementSibling.textContent : '';
+    var userId = select.dataset.user_id;
+    var prevVal = select.value;
+    var prevLabel = select.options[select.selectedIndex].text;
+    select.addEventListener('change', function() {
+      var curVal = select.value;
+      var curLabel = select.options[select.selectedIndex].text;
+      if (confirm("<%= t('pages.groups.edit_permissions.confirm_role_change1') %> " + username + " <%= t('pages.groups.edit_permissions.confirm_role_change2') %> " + prevLabel + " <%= t('pages.groups.edit_permissions.confirm_role_change3') %> " + curLabel + ". <%= t('pages.groups.edit_permissions.confirm_role_change4') %>")) {
+        prevVal = curVal; prevLabel = curLabel;
+        fetch("<%= change_permissions_group_group_area_area_roles_url(@group, @group_area) %>", {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/x-www-form-urlencoded', 'X-CSRF-Token': csrfToken, 'Accept': 'text/vnd.turbo-stream.html' },
+          body: 'user_id=' + userId + '&id=' + curVal + '&group_id=<%= @group.id %>'
+        }).then(function(r) { return r.text(); }).then(function(html) { Turbo.renderStreamMessage(html); });
+      } else { select.value = prevVal; }
+    });
+  });
+</script>

@@ -7,13 +7,11 @@ require 'active_storage_validations'
 
 Bundler.require(*Rails.groups)
 
-# TODO: renenable token authenticable
-
 module Airesis
   class Application < Rails::Application
     config.encoding = 'utf-8'
     config.coding = 'utf-8'
-    config.load_defaults 7.1
+    config.load_defaults 8.1
 
     # Configure sensitive parameters which will be filtered from the log file.
     config.filter_parameters += [:password]
@@ -55,7 +53,7 @@ module Airesis
                                                          abbr width id class style data-cke-realelement cellspacing
                                                          cellpadding border target]
 
-    config.active_job.queue_adapter = :sidekiq
+    config.active_job.queue_adapter = :solid_queue
 
     config.action_mailer.delivery_method = :smtp
 

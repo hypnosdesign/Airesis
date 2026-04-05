@@ -1,0 +1,7 @@
+<%= turbo_stream.replace "group_members_container" do %>
+  <%= render "frm/admin/mods/group_members" %>
+<% end %>
+<%= turbo_stream.replace "add_member_form" do %>
+  <%= render "frm/admin/mods/add_form" %>
+<% end %>
+<%= render partial: "layouts/flash_stream" %>

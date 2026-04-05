@@ -1,0 +1,5 @@
+<%= turbo_stream.replace "replies_container_#{@proposal_comment.id}" do %>
+  <div id="replies_container_<%= @proposal_comment.id %>">
+    <%= render partial: "proposal_comments/reply", collection: @replies, as: :reply %>
+  </div>
+<% end %>

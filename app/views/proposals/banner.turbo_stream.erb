@@ -1,0 +1,5 @@
+<%= turbo_stream.replace "airesis_p_#{@proposal.id}" do %>
+  <div id="airesis_p_<%= @proposal.id %>">
+    <iframe src="<%= banner_proposal_url(@proposal) %>" style="border:0; width:100%; height:200px;"></iframe>
+  </div>
+<% end %>

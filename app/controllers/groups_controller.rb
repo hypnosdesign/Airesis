@@ -24,10 +24,10 @@ class GroupsController < ApplicationController
 
     params[:interest_border] ||= InterestBorder.to_key(current_domain.territory)
 
-    @groups = Group.look(params)
+    @pagy, @groups = pagy(Group.look(params), items: 30)
     respond_to do |format|
       format.html
-      format.js do
+      format.turbo_stream do
         @disable_per_page = true
       end
     end
@@ -45,11 +45,11 @@ class GroupsController < ApplicationController
           return
         end
         @page_title = @group.name
-        @group_posts = @group_posts.page(params[:page]).per(COMMENTS_PER_PAGE)
+        @pagy, @group_posts = pagy(@group_posts, items: COMMENTS_PER_PAGE)
         load_page_data
       end
-      format.js do
-        @group_posts = @group_posts.page(params[:page]).per(COMMENTS_PER_PAGE)
+      format.turbo_stream do
+        @pagy, @group_posts = pagy(@group_posts, items: COMMENTS_PER_PAGE)
       end
       format.atom
       format.json
@@ -62,8 +62,8 @@ class GroupsController < ApplicationController
                    where(' extract(year from blog_posts.created_at) = ? AND extract(month from blog_posts.created_at) = ? ', params[:year], params[:month]).
                    order('post_publishings.featured desc, published_at DESC').
                    select('post_publishings.*, published_at').
-                   distinct.
-                   page(params[:page]).per(COMMENTS_PER_PAGE)
+                   distinct
+    @pagy, @group_posts = pagy(@group_posts, items: COMMENTS_PER_PAGE)
 
     respond_to do |format|
       format.html do
@@ -71,7 +71,7 @@ class GroupsController < ApplicationController
         load_page_data
         render 'show'
       end
-      format.js do
+      format.turbo_stream do
         render 'show'
       end
       format.json { render 'show' }
@@ -85,7 +85,7 @@ class GroupsController < ApplicationController
                 select('COUNT(*) AS posts, extract(month from blog_posts.created_at) AS MONTH, extract(year from blog_posts.created_at) AS YEAR').
                 group('MONTH, YEAR').
                 order(Arel.sql('YEAR desc, extract(month from blog_posts.created_at) desc'))
-    # TODO: slow query. remove eager loading
+
     @last_topics = @group.topics.
                    accessible_by(Ability.new(current_user)).
                    includes(:views, :forum).order('frm_topics.created_at desc').limit(10)
@@ -115,7 +115,7 @@ class GroupsController < ApplicationController
     else
       respond_to do |format|
         format.html { render :new }
-        format.js { render 'layouts/active_record_error', locals: { object: @group } }
+        format.turbo_stream { render partial: 'layouts/flash_stream', status: :unprocessable_entity }
       end
     end
   end
@@ -214,7 +214,6 @@ class GroupsController < ApplicationController
 
     if @group.request_by_portavoce?
       part = @group.group_participations.build(user: @request.user, acceptor: current_user, participation_role: @group.default_participation_role)
-
       @request.group_participation_request_status_id = 3
     else
       @request.group_participation_request_status_id = 2
@@ -222,22 +221,12 @@ class GroupsController < ApplicationController
     saved = part.save && @request.save
     if saved
       flash[:notice] = @group.request_by_portavoce? ? t('info.group_participations.status_accepted') : t('info.group_participations.status_voting')
-      respond_to do |format|
-        format.html { redirect_to group_url(@group) }
-        format.js
-      end
     else
       flash[:error] = t('error.group_participations.error_saving')
-      respond_to do |format|
-        format.html do
-          redirect_to group_url(@group)
-        end
-        format.js do
-          render :update do |page|
-            page.replace_html ' flash_messages ', partial: 'layouts/flash', locals: { flash: flash }
-          end
-        end
-      end
+    end
+    respond_to do |format|
+      format.turbo_stream
+      format.html { redirect_to group_url(@group) }
     end
   end
 
@@ -247,42 +236,22 @@ class GroupsController < ApplicationController
     if !@request
       flash[:error] = t('error.group_participations.request_not_found')
       respond_to do |format|
-        format.html do
-          redirect_to group_url(@group)
-        end
-        format.js do
-          render :update do |page|
-            page.replace_html ' flash_messages ', partial: 'layouts/flash', locals: { flash: flash }
-          end
-        end
+        format.turbo_stream { render partial: 'layouts/flash_stream' }
+        format.html { redirect_to group_url(@group) }
       end
     else
       @request.group_participation_request_status_id = @group.request_by_portavoce? ? 4 : 2
       saved = @request.save
       if !saved
         flash[:error] = t('error.group_participations.error_saving')
-        respond_to do |format|
-          format.html do
-            redirect_to group_url(@group)
-          end
-          format.js do
-            render :update do |page|
-              page.replace_html ' flash_messages ', partial: 'layouts/flash', locals: { flash: flash }
-            end
-          end
-        end
       else
-        flash[:notice] = if @group.request_by_portavoce?
-                           t('info.group_participations.status_declined')
-                         else
-                           t('info.group_participations.status_voting')
-                         end
-        respond_to do |format|
-          format.html do
-            redirect_to group_url(@group)
-          end
-          format.js
-        end
+        flash[:notice] = @group.request_by_portavoce? ?
+          t('info.group_participations.status_declined') :
+          t('info.group_participations.status_voting')
+      end
+      respond_to do |format|
+        format.turbo_stream
+        format.html { redirect_to group_url(@group) }
       end
     end
   end
@@ -294,11 +263,10 @@ class GroupsController < ApplicationController
       flash[:notice] = advanced_option ?
         t('info.quorums.can_modify_advanced_proposals_settings') :
         t('info.quorums.cannot_modify_advanced_proposals_settings')
-      render 'layouts/success'
     else
       flash[:error] = t('error.quorums.advanced_proposals_settings')
-      render 'layouts/error'
     end
+    respond_to_group_setting
   end
 
   def change_default_anonima
@@ -308,11 +276,10 @@ class GroupsController < ApplicationController
       flash[:notice] = default_anonima ?
         t('info.quorums.anonymous_proposals') :
         t('info.quorums.non_anonymous_proposals')
-      render 'layouts/success'
     else
       flash[:error] = t('error.quorums.advanced_proposals_settings')
-      render 'layouts/error'
     end
+    respond_to_group_setting
   end
 
   def change_default_visible_outside
@@ -322,11 +289,10 @@ class GroupsController < ApplicationController
       flash[:notice] = default_visible_outside ?
         t('info.quorums.public_proposals') :
         t('info.quorums.private_proposals')
-      render 'layouts/success'
     else
       flash[:error] = t('error.quorums.advanced_proposals_settings')
-      render 'layouts/error'
     end
+    respond_to_group_setting
   end
 
   def change_default_secret_vote
@@ -336,14 +302,18 @@ class GroupsController < ApplicationController
       flash[:notice] = default_secret_vote ?
         t('info.quorums.secret_vote') :
         t('info.quorums.non_secret_vote')
-      render 'layouts/success'
     else
       flash[:error] = t('error.quorums.advanced_proposals_settings')
-      render 'layouts/error'
     end
+    respond_to_group_setting
   end
 
-  def reload_storage_size; end
+  def reload_storage_size
+    respond_to do |format|
+      format.turbo_stream
+      format.html
+    end
+  end
 
   def enable_areas
     @group.update_attribute(:enable_areas, true)
@@ -356,14 +326,15 @@ class GroupsController < ApplicationController
     @publishing = @group.post_publishings.find_by(blog_post_id: params[:post_id])
     @publishing.destroy
     flash[:notice] = t('info.groups.post_removed')
-  rescue Exception => e
     respond_to do |format|
-      flash[:error] = t('error.groups.post_removed')
-      format.js do
-        render :update do |page|
-          page.replace_html ' flash_messages ', partial: 'layouts/flash', locals: { flash: flash }
-        end
-      end
+      format.turbo_stream
+      format.html { redirect_back fallback_location: group_path(@group) }
+    end
+  rescue StandardError
+    flash[:error] = t('error.groups.post_removed')
+    respond_to do |format|
+      format.turbo_stream { render partial: 'layouts/flash_stream' }
+      format.html { redirect_back fallback_location: group_path(@group) }
     end
   end
 
@@ -371,14 +342,28 @@ class GroupsController < ApplicationController
     publishing = @group.post_publishings.find_by(blog_post_id: params[:post_id])
     publishing.update(featured: !publishing.featured)
     flash[:notice] = t("info.groups.post_featured.#{publishing.featured}")
+    respond_to do |format|
+      format.turbo_stream
+      format.html { redirect_back fallback_location: group_path(@group) }
+    end
   end
 
-  # retrieve the list of permission for the current user in the group
   def permissions_list
     @participation_role = @group.group_participations.find_by(user_id: current_user.id).participation_role
+    respond_to do |format|
+      format.turbo_stream
+      format.html
+    end
   end
 
   protected
+
+  def respond_to_group_setting
+    respond_to do |format|
+      format.turbo_stream { render partial: 'layouts/flash_stream' }
+      format.html { redirect_back fallback_location: edit_group_path(@group) }
+    end
+  end
 
   def load_group
     @group = Group.friendly.find(params[:id])

@@ -1,6 +1,6 @@
 inherit_from: .rubocop_todo.yml
 
-require:
+plugins:
   - rubocop-performance
   - rubocop-rails
   - rubocop-rspec
@@ -29,15 +29,11 @@ RSpec/DescribeClass:
 RSpec/LetSetup:
   Enabled: false
 
-# TODO: re-enable
 RSpec/ExpectInHook:
   Enabled: false
 
-Capybara/CurrentPathExpectation:
-  Enabled: false
 
 Layout/LineLength:
-#  Max: 120
   Exclude:
     - config/locales/plurals.rb
 
@@ -53,4 +49,3 @@ AllCops:
     - 'tmp/**/*'
     - 'db/**/*'
     - 'vendor/**/*'
-    - 'node_modules/**/*'

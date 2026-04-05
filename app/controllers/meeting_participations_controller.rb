@@ -12,7 +12,7 @@ class MeetingParticipationsController < ApplicationController
         format.html do
           redirect_to event_path(params[:event_id])
         end
-        format.js
+        format.turbo_stream
       end
     else
       flash[:error] = t('error.event_answer')

@@ -19,7 +19,7 @@ RSpec.describe NotificationProposalVoteClosed, type: :model, emails: true, notif
   end
 
   it 'sends notifications when vote closes on an accepted proposal' do
-    described_class.perform_async(proposal.id)
+    described_class.perform_later(proposal.id)
     expect(described_class.jobs.size).to eq 1
     described_class.drain
     AlertsWorker.drain
@@ -31,7 +31,7 @@ RSpec.describe NotificationProposalVoteClosed, type: :model, emails: true, notif
   end
 
   it 'sends notifications when vote closes on a rejected proposal' do
-    described_class.perform_async(proposal.id)
+    described_class.perform_later(proposal.id)
     described_class.drain
     AlertsWorker.drain
     EmailsWorker.drain
@@ -42,7 +42,7 @@ RSpec.describe NotificationProposalVoteClosed, type: :model, emails: true, notif
   end
 
   it 'includes group name in notification data' do
-    described_class.perform_async(proposal.id)
+    described_class.perform_later(proposal.id)
     described_class.drain
     AlertsWorker.drain
 

@@ -1,0 +1,125 @@
+<div class="card bg-base-200 p-4 mb-4">
+  <div class="image-container text-center mb-4">
+    <%= avatar(@user, size: 120) %>
+    <% if @user == current_user %>
+      <div class="caption mt-2">
+        <a class="link"><%= t('pages.users.show.edit_image') %></a>
+      </div>
+    <% end %>
+  </div>
+
+  <% if ::Configuration::user_messages %>
+    <div class="mb-4">
+      <%= link_to show_message_user_path(@user), class: 'btn btn-sm disable' do %>
+        <i class="fa-solid fa-envelope"></i>
+        <%= t('pages.users.show.send_message_button') %>
+      <% end %>
+    </div>
+  <% end %>
+</div>
+
+<div class="card bg-base-200 p-4 mb-4">
+  <h2 class="text-xl font-bold mb-2">
+    <%= t('pages.users.show.profile_info') %>
+    <%= t('pages.users.show.profile_info_unconfirmed') unless @user.confirmed? %>
+  </h2>
+
+  <div id="name_profile" class="profile_element flex gap-2 mb-2 p-2 hover:bg-base-300 rounded cursor-pointer">
+    <h2 class="label_profile font-semibold"><%= t('pages.users.show.name_label') %>: </h2>
+    <div class="info_profile"><%= h @user.name %></div>
+  </div>
+
+  <div id="surname_profile" class="profile_element flex gap-2 mb-2 p-2 hover:bg-base-300 rounded cursor-pointer">
+    <h2 class="label_profile font-semibold"><%= t('pages.users.show.surname_label') %>: </h2>
+    <div class="info_profile"><%= h @user.surname %></div>
+  </div>
+
+  <% if current_user == @user %>
+    <div id="email_profile" class="profile_element flex gap-2 mb-2 p-2 hover:bg-base-300 rounded cursor-pointer">
+      <h2 class="label_profile font-semibold"><%= t('pages.users.show.email_label') %>: </h2>
+      <div class="info_profile">
+        <%= @user.email %>
+        <% if @user.unconfirmed_email %>
+          <span class="text-base-content/60">(<%= @user.unconfirmed_email %> <%= t('pages.users.show.to_be_confirmed') %>)</span>
+        <% end %>
+      </div>
+    </div>
+
+    <div id="password_profile" class="profile_element flex gap-2 mb-2 p-2 hover:bg-base-300 rounded cursor-pointer">
+      <h2 class="label_profile font-semibold"><%= t('pages.users.show.password_label') %>: </h2>
+      <div class="info_profile"> ***** </div>
+    </div>
+  <% end %>
+
+  <% if @user.show_urls && ::Configuration::socialnetwork_active %>
+    <% if @user.has_provider?(Authentication::FACEBOOK) %>
+      <div id="facebook_profile" class="profile_element_no_click flex gap-2 mb-2 p-2">
+        <h2 class="label_profile font-semibold"><%= t('pages.users.show.facebook_url_label') %>: </h2>
+        <div class="info_profile">
+          <%= link_to @user.facebook_page_url, @user.facebook_page_url, target: '_blank' if @user.facebook_page_url.present? %>
+        </div>
+      </div>
+    <% end %>
+    <% if @user.has_provider?(Authentication::GOOGLE) && @user.google_page_url.present? %>
+      <div id="google_profile" class="profile_element_no_click flex gap-2 mb-2 p-2">
+        <h2 class="label_profile font-semibold"><%= t('pages.users.show.google_url_label') %>: </h2>
+        <div class="info_profile">
+          <%= link_to(@user.google_page_url, @user.google_page_url, target: '_blank', rel: 'author') %>
+        </div>
+      </div>
+    <% end %>
+    <% if @user.has_provider?(Authentication::TWITTER) && @user.twitter_page_url.present? %>
+      <div id="twitter_profile" class="profile_element_no_click flex gap-2 mb-2 p-2">
+        <h2 class="label_profile font-semibold"><%= t('pages.users.show.twitter_url') %>: </h2>
+        <div class="info_profile">
+          <%= link_to @user.twitter_page_url, @user.twitter_page_url, target: '_blank' %>
+        </div>
+      </div>
+    <% end %>
+  <% end %>
+
+  <div id="confirmed_at_profile" class="profile_element_no_click flex gap-2 mb-2 p-2">
+    <h2 class="label_profile font-semibold"><%= t('pages.users.show.registered_from') %>: </h2>
+    <div class="info_profile"><%= l(@user.confirmed? ? @user.confirmed_at : @user.created_at) %></div>
+  </div>
+</div>
+
+<% if current_user == @user %>
+  <dialog id="img_modal" class="modal">
+    <div class="modal-box">
+      <%= simple_form_for @user do |f| %>
+        <div class="flex flex-wrap">
+          <div class="w-full lg:w-1/2">
+            <h2 class="text-lg font-bold mb-2"><%= t('pages.users.show.load_image') %></h2>
+            <div class="alert alert-info mb-4">
+              <p><%= t('pages.users.show.max_file_size') %></p>
+            </div>
+            <%= f.input :avatar, required: true, input_html: { accepted: 'image/jpeg,image/png', data: { fv_trigger: 'change', fv_file: true, fv_file_maxsize: UPLOAD_LIMIT_IMAGES } } %>
+            <a href="#" class="btn" onclick="document.getElementById('img_modal').close(); return false;"><%= t('buttons.cancel') %></a>
+            <%= f.submit t('buttons.save'), class: 'btn btn-primary' %>
+          </div>
+        </div>
+      <% end %>
+      <form method="dialog"><button class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2">&times;</button></form>
+    </div>
+  </dialog>
+
+  <script>
+    document.getElementById('name_profile').addEventListener('click', function () { document.getElementById('name_modal').showModal(); });
+    document.getElementById('surname_profile').addEventListener('click', function () { document.getElementById('surname_modal').showModal(); });
+    document.getElementById('email_profile').addEventListener('click', function () { document.getElementById('email_modal').showModal(); });
+    <% if params[:insert_email] %>
+      document.getElementById('email_profile').click();
+    <% end %>
+    document.getElementById('password_profile').addEventListener('click', function () { document.getElementById('password_modal').showModal(); });
+    document.querySelector('.image-container div a').addEventListener('click', function () { document.getElementById('img_modal').showModal(); });
+    document.querySelectorAll('.profile_element').forEach(function (el) { el.style.cursor = 'pointer'; });
+  </script>
+<% else %>
+  <script>
+    document.querySelectorAll('.profile_element').forEach(function (el) {
+      el.classList.add('profile_element_no_click');
+      el.classList.remove('profile_element');
+    });
+  </script>
+<% end %>

@@ -1,0 +1,26 @@
+<% nickname = current_user ? current_user.proposal_nicknames.find_by(proposal_id: @proposal.id) : nil %>
+<% if @proposal_comment.is_reply? %>
+  <%= turbo_stream.append "replies_#{@proposal_comment.parent_proposal_comment_id}" do %>
+    <%= render partial: "proposal_comments/content", locals: { comment: @proposal_comment, proposal_nickname: nickname } %>
+  <% end %>
+<% else %>
+  <%= turbo_stream.prepend "proposalCommentsContainer" do %>
+    <%= render partial: "proposal_comments/content", locals: { comment: @proposal_comment, proposal_nickname: nickname } %>
+  <% end %>
+  <%= turbo_stream.replace "proposalNewComment" do %>
+    <div id="proposalNewComment">
+      <%= form_for [@proposal, ProposalComment.new] do |f| %>
+        <p>
+          <%= f.label :content do %>
+            <%= t('pages.proposals.show.add_contribute') %>
+          <% end %>
+          <%= f.text_area :content, rows: 10, cols: 70, class: 'textarea textarea-bordered w-full' %>
+        </p>
+        <p>
+          <%= f.submit t('pages.proposals.show.send_contribute_button'), class: 'btn btn-success mt-2' %>
+        </p>
+      <% end %>
+    </div>
+  <% end %>
+<% end %>
+<%= render partial: "layouts/flash_stream" %>

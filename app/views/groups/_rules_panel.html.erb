@@ -1,0 +1,22 @@
+<dialog id="rules_modal" class="modal" data-controller="modal" data-modal-open-on-connect-value="false" data-modal-remove-on-close-value="false">
+  <div class="modal-box shadow-brutal border-2 border-base-content max-w-2xl max-h-[80vh] overflow-y-auto">
+    <button class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2" data-action="click->modal#close">&times;</button>
+    <h2 class="text-xl font-bold mb-4"><%= t('pages.groups.show.rules_button') %></h2>
+    <% if @group.rule_book && !@group.rule_book.empty? %>
+      <%= @group.rule_book %>
+    <% else %>
+      <div><%= t('pages.groups.show.rule_book_html') %></div>
+      <ul>
+        <li>Participation:</li>
+        <% if @group.request_by_vote? %>
+          <%= t('pages.groups.show.request_by_vote_rules') %>
+        <% elsif @group.request_by_portavoce? %>
+          <%= t('pages.groups.show.request_by_spokesman_rules') %>
+        <% end %>
+      </ul>
+    <% end %>
+  </div>
+  <form method="dialog" class="modal-backdrop" data-action="click->modal#backdropClose">
+    <button>close</button>
+  </form>
+</dialog>

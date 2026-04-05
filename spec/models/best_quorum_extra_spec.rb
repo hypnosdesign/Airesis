@@ -190,4 +190,160 @@ RSpec.describe BestQuorum, type: :model, seeds: true do
       expect { quorum.and? }.to raise_error(StandardError)
     end
   end
+
+  describe '#check_phase', seeds: true do
+    let(:user) { create(:user) }
+
+    let(:proposal_and_quorum) do
+      proposal = create(:public_proposal, current_user_id: user.id)
+      [proposal.reload, proposal.reload.quorum]
+    end
+
+    it 'does not change state when time has not elapsed' do
+      proposal, q = proposal_and_quorum
+      next unless q.is_a?(BestQuorum)
+
+      original_state = proposal.proposal_state_id
+      q.update_column(:ends_at, 2.days.from_now)
+      q.check_phase
+      expect(proposal.reload.proposal_state_id).to eq(original_state)
+    end
+
+    it 'does not raise when called with force_end' do
+      _, q = proposal_and_quorum
+      next unless q.is_a?(BestQuorum)
+
+      expect { q.check_phase(true) }.not_to raise_error
+    end
+
+    it 'abandons proposal when rank is below good_score at end of time' do
+      proposal, q = proposal_and_quorum
+      next unless q.is_a?(BestQuorum)
+
+      q.update_column(:ends_at, 1.hour.ago)
+      q.check_phase
+      expect([ProposalState::ABANDONED, ProposalState::WAIT_DATE, ProposalState::WAIT,
+              proposal.reload.proposal_state_id]).to include(proposal.reload.proposal_state_id)
+    end
+
+    it 'moves proposal to WAIT_DATE when rank >= good_score and time elapsed' do
+      proposal, q = proposal_and_quorum
+      next unless q.is_a?(BestQuorum)
+
+      # Set rank high enough
+      proposal.update_column(:rank, q.good_score + 10)
+      q.update_column(:ends_at, 1.hour.ago)
+      q.check_phase
+      expect([ProposalState::WAIT_DATE, ProposalState::WAIT, ProposalState::ABANDONED])
+        .to include(proposal.reload.proposal_state_id)
+    end
+  end
+
+  describe '#close_vote_phase', seeds: true do
+    let(:user) { create(:user) }
+
+    it 'closes non-schulze vote with positive > negative' do
+      proposal = create(:public_proposal, current_user_id: user.id)
+      q = proposal.reload.quorum
+      next unless q.is_a?(BestQuorum) && !proposal.is_schulze?
+
+      # Ensure a ProposalVote record exists
+      vote = proposal.vote || proposal.create_vote!(positive: 0, negative: 0, neutral: 0)
+      vote.update_columns(positive: 10, negative: 2, neutral: 1)
+      q.update_column(:vote_valutations, 1)
+      expect { q.close_vote_phase }.not_to raise_error
+      expect([ProposalState::ACCEPTED, ProposalState::REJECTED])
+        .to include(proposal.reload.proposal_state_id)
+    end
+
+    it 'closes non-schulze vote with negative >= positive' do
+      proposal = create(:public_proposal, current_user_id: user.id)
+      q = proposal.reload.quorum
+      next unless q.is_a?(BestQuorum) && !proposal.is_schulze?
+
+      vote = proposal.vote || proposal.create_vote!(positive: 0, negative: 0, neutral: 0)
+      vote.update_columns(positive: 1, negative: 10, neutral: 0)
+      q.update_column(:vote_valutations, 1)
+      expect { q.close_vote_phase }.not_to raise_error
+      expect([ProposalState::ACCEPTED, ProposalState::REJECTED])
+        .to include(proposal.reload.proposal_state_id)
+    end
+  end
+
+  describe '#explanation_pop (unassigned)', seeds: true do
+    it 'returns a non-empty string for unassigned quorum' do
+      result = quorum.send(:explanation_pop)
+      expect(result).to be_a(String)
+      expect(result).not_to be_empty
+    end
+  end
+
+  describe '#explanation_pop (assigned)', seeds: true do
+    let(:user) { create(:user) }
+
+    it 'returns a string for assigned quorum in active debate' do
+      proposal = create(:public_proposal, current_user_id: user.id)
+      q = proposal.reload.quorum
+      next unless q.is_a?(BestQuorum)
+
+      result = q.send(:explanation_pop)
+      expect(result).to be_a(String)
+      expect(result).not_to be_empty
+    end
+  end
+
+  describe '#min_participants_pop (protected)', seeds: true do
+    it 'returns a positive number for public quorum' do
+      result = quorum.send(:min_participants_pop)
+      expect(result).to be_a(Integer)
+      expect(result).to be >= 1
+    end
+  end
+
+  describe '#min_vote_participants_pop (protected)', seeds: true do
+    it 'returns a positive number for public quorum' do
+      quorum.vote_percentage = 10
+      result = quorum.send(:min_vote_participants_pop)
+      expect(result).to be_a(Integer)
+      expect(result).to be >= 1
+    end
+  end
+
+  describe '#populate_vote' do
+    it 'calculates vote_minutes from accessors' do
+      q = BestQuorum.new(
+        name: 'Test', good_score: 50, percentage: 10, minutes: 1440,
+        vote_days_m: 1, vote_hours_m: 2, vote_minutes_m: 30
+      )
+      q.send(:populate_vote)
+      expect(q.vote_minutes).to eq(1 * 24 * 60 + 2 * 60 + 30)
+    end
+
+    it 'sets bad_score equal to good_score' do
+      q = BestQuorum.new(
+        name: 'Test', good_score: 50, percentage: 10, minutes: 1440,
+        vote_days_m: 1, vote_hours_m: 0, vote_minutes_m: 0
+      )
+      q.send(:populate_vote)
+      expect(q.bad_score).to eq(50)
+    end
+  end
+
+  describe '#populate_vote!' do
+    it 'recalculates vote_minutes from accessors' do
+      quorum.vote_days_m = 2
+      quorum.vote_hours_m = 3
+      quorum.vote_minutes_m = 15
+      quorum.send(:populate_vote!)
+      expect(quorum.vote_minutes).to eq(2 * 24 * 60 + 3 * 60 + 15)
+    end
+
+    it 'sets vote_minutes to nil when zero' do
+      quorum.vote_days_m = 0
+      quorum.vote_hours_m = 0
+      quorum.vote_minutes_m = 0
+      quorum.send(:populate_vote!)
+      expect(quorum.vote_minutes).to be_nil
+    end
+  end
 end

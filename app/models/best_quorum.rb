@@ -84,7 +84,7 @@ class BestQuorum < Quorum
       end
       left.upcase
     else
-      'STALLED' # TODO: i18n
+      I18n.t('models.quorum.stalled', default: 'STALLED')
     end
   end
 
@@ -92,7 +92,7 @@ class BestQuorum < Quorum
   def vote_time
     case t_vote_minutes
     when 'f'
-      'free' # TODO: I18n
+      I18n.t('models.quorum.free', default: 'free')
     when 's'
       min = vote_minutes if vote_minutes
 
@@ -154,11 +154,9 @@ class BestQuorum < Quorum
         proposal.vote_period = @event
       else
         proposal.proposal_state_id = ProposalState::WAIT_DATE # we passed the debate, we are now waiting for someone to choose the vote date
-        NotificationProposalReadyForVote.perform_async(proposal.id)
+        NotificationProposalReadyForVote.perform_later(proposal.id)
       end
       proposal.save
-      # remove the timer if is still there
-      # Resque.remove_delayed(ProposalsWorker, {action: ProposalsWorker::ENDTIME, proposal_id: proposal.id}) if minutes #TODO remove job
     else
       proposal.abandon
     end
@@ -178,7 +176,7 @@ class BestQuorum < Quorum
         vs = SchulzeBasic.do votesstring, num_solutions
         solutions_sorted = proposal.solutions.sort_by(&:id) # order the solutions by the id (as the plugin output the results)
         solutions_sorted.each_with_index do |c, i|
-          c.schulze_score = vs.ranks[i].to_i # save the result in the solution
+          c.schulze_score = vs.ranking[i].to_i # save the result in the solution
           c.save!
         end
         votes = proposal.schulze_votes.sum(:count)
@@ -197,7 +195,7 @@ class BestQuorum < Quorum
                                    end
     end
     proposal.save!
-    NotificationProposalVoteClosed.perform_async(proposal.id)
+    NotificationProposalVoteClosed.perform_later(proposal.id)
   end
 
   def has_bad_score?
@@ -208,7 +206,7 @@ class BestQuorum < Quorum
     minimum = [Time.zone.now, ends_at].min
     minimum = ((minimum - started_at) / 60)
     percentagetime = minimum.to_f / minutes
-    percentagetime *= 100
+    percentagetime * 100
   end
 
   protected
@@ -216,7 +214,7 @@ class BestQuorum < Quorum
   def min_participants_pop
     percentage_f = percentage.to_f
     count = if group
-              percentage_f * 0.01 * group.scoped_participants(:participate_proposals).count # TODO: group areas
+              percentage_f * 0.01 * group.scoped_participants(:participate_proposals).count
             else
               percentage_f * 0.001 * User.count
             end
@@ -226,7 +224,7 @@ class BestQuorum < Quorum
   def min_vote_participants_pop
     vote_percentage_f = vote_percentage.to_f
     count = if group
-              vote_percentage_f * 0.01 * group.scoped_participants(:vote_proposals).count # TODO: group areas
+              vote_percentage_f * 0.01 * group.scoped_participants(:vote_proposals).count
             else
               vote_percentage_f * 0.001 * User.count
             end
@@ -234,8 +232,8 @@ class BestQuorum < Quorum
   end
 
   def explanation_pop
-    conditions = []
-    ret = ''
+    []
+    ''
     ret = if assigned? # explain a quorum assigned to a proposal
             if proposal_life.present? || proposal.abandoned?
               terminated_explanation_pop
@@ -250,10 +248,10 @@ class BestQuorum < Quorum
     ret.html_safe
   end
 
-  # TODO: we need to refactor this part of code but at least now is more clear
+
   # explain a quorum when assigned to a proposal in it's current state
   def assigned_explanation_pop
-    ret = ''
+    ''
     time = "<b>#{self.time}</b> "
     time += I18n.t('models.quorum.until_date', date: I18n.l(ends_at))
     ret = I18n.translate('models.quorum.time_condition_1', time: time) # display the time left for discussion
@@ -265,7 +263,7 @@ class BestQuorum < Quorum
 
   # explain a quorum in a proposal that has terminated her life cycle
   def terminated_explanation_pop
-    ret = ''
+    ''
     time = "<b>#{self.time(true)}</b> " # show total time if the quorum is terminated
     time += I18n.t('models.quorum.until_date', date: I18n.l(ends_at))
     ret = I18n.translate('models.quorum.time_condition_1_past', time: time) # display the time left for discussion
@@ -277,7 +275,7 @@ class BestQuorum < Quorum
 
   # explain a non assigned quorum
   def unassigned_explanation_pop
-    ret = ''
+    ''
     time = "<b>#{self.time}</b> "
     ret = I18n.translate('models.quorum.time_condition_1', time: time) # display the time left for discussion
     ret += '<br/>'

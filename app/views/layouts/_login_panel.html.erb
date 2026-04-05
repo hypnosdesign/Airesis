@@ -1,0 +1,49 @@
+<dialog id="login_modal" class="modal">
+  <div class="modal-box bg-base-100">
+    <form method="dialog">
+      <button class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2">✕</button>
+    </form>
+
+    <h3 class="font-bold text-2xl mb-6"><%= t('pages.header.login') %></h3>
+
+    <% if ::Configuration.socialnetwork_active %>
+      <div class="flex flex-col gap-2 mb-6">
+        <%= link_to_ip t('pages.top_panel.facebook_login'), :facebook, 'facebook' %>
+        <%= link_to_ip t('pages.top_panel.google_login'), :google_oauth2, 'google' %>
+        <%= link_to_ip t('pages.top_panel.twitter_login'), :twitter, 'twitter' %>
+      </div>
+    <% end %>
+
+    <%= simple_form_for User.new, url: user_session_path, html: { class: 'flex flex-col gap-4', id: 'login_user' } do |f| %>
+      <%= f.input :email, label: false, required: true,
+                  placeholder: t('activerecord.attributes.user.email'),
+                  input_html: { class: 'input input-bordered w-full' },
+                  autocomplete: :off %>
+
+      <%= f.input :password, label: false, required: true,
+                  placeholder: t('activerecord.attributes.user.password'),
+                  input_html: { class: 'input input-bordered w-full' } %>
+
+      <div class="form-control">
+        <%= f.label :remember_me, class: 'label cursor-pointer justify-start gap-2' do %>
+          <%= f.check_box :remember_me, class: 'checkbox checkbox-primary' %>
+          <span class="label-text"><%= t('pages.header.menu.remember_me') %></span>
+        <% end %>
+      </div>
+
+      <div class="modal-action mt-0">
+        <%= button_tag(type: 'submit', class: 'btn btn-primary w-full') do %>
+          <i class="fa-solid fa-key mr-2"></i>
+          <%= t('pages.header.menu.login_button') %>
+        <% end %>
+      </div>
+    <% end %>
+
+    <div class="divider mt-6"></div>
+
+    <div class="flex flex-col gap-2 text-sm items-center">
+      <%= link_to t('pages.header.menu.forgot_password_button'), new_password_path(resource_name), class: 'link link-hover text-primary' %>
+      <%= link_to t('pages.header.menu.resend_email_button'), new_confirmation_path(resource_name), class: 'link link-hover text-primary' %>
+    </div>
+  </div>
+</dialog>

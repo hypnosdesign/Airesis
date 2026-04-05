@@ -1,0 +1,19 @@
+<% if @pagy.next %>
+  <div id="more_groups" class="loading_groups">
+    <span>
+      <%= link_to t('pages.groups.index.show_more'), current_url(page: @pagy.next) %>
+    </span>
+  </div>
+  <div id="loading_groups" class="loading_groups" style="display:none">
+    <div class="waitDiv">
+      <%= image_tag "facebook-loader.gif", alt: "loading..." %>
+    </div>
+  </div>
+  <script>
+    document.querySelector('#more_groups a').addEventListener('click', function () {
+      document.getElementById('more_groups').style.display = 'none';
+      document.getElementById('loading_groups').style.display = '';
+      return true;
+    });
+  </script>
+<% end %>

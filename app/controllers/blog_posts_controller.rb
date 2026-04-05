@@ -21,11 +21,11 @@ class BlogPostsController < ApplicationController
     if @blog || @group
       redirect_to(@blog || @group)
     else
-      @blog_posts = @blog_posts.published.order(published_at: :desc).page(params[:page]).per(COMMENTS_PER_PAGE)
+      @pagy, @blog_posts = pagy(@blog_posts.published.order(published_at: :desc), items: COMMENTS_PER_PAGE)
       @page_title = t('pages.blog_posts.index.title', app_short_name: APP_SHORT_NAME)
       respond_to do |format|
         format.html
-        format.js
+        format.turbo_stream
       end
     end
   end
@@ -33,7 +33,7 @@ class BlogPostsController < ApplicationController
   def drafts
     @page_title = t('pages.blog_posts.drafts.title', blog: @blog.title)
     @user = @blog.user
-    @blog_posts = @blog_posts.drafts.order(updated_at: :desc).page(params[:page]).per(COMMENTS_PER_PAGE)
+    @pagy, @blog_posts = pagy(@blog_posts.drafts.order(updated_at: :desc), items: COMMENTS_PER_PAGE)
 
     respond_to do |format|
       format.html
@@ -45,10 +45,10 @@ class BlogPostsController < ApplicationController
     @blog_url = @group ? group_blog_post_url(@group, @blog_post) : blog_blog_post_url(@blog, @blog_post)
     @user = @blog_post.user
     @blog_comment = @blog_post.blog_comments.new
-    @blog_comments = @blog_post.blog_comments.includes(user: [:image]).order('created_at DESC').page(params[:page]).per(COMMENTS_PER_PAGE)
+    @pagy, @blog_comments = pagy(@blog_post.blog_comments.includes(user: [:image]).order('created_at DESC'), items: COMMENTS_PER_PAGE)
     respond_to do |format|
       format.html
-      format.js
+      format.turbo_stream
     end
   end
 

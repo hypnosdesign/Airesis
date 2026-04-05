@@ -6,9 +6,9 @@ class UserLikesController < ApplicationController
     @user_like.user_id = current_user.id
     respond_to do |format|
       if @user_like.save
-        format.js { render nothing: true, status: 200 }
+        format.js { head :ok }
       else
-        format.js { render nothing: true, status: 500 }
+        format.js { head :internal_server_error }
       end
     end
   end
@@ -18,7 +18,7 @@ class UserLikesController < ApplicationController
     @user_like.destroy
 
     respond_to do |format|
-      format.js { render nothing: true, status: 200 }
+      format.js { head :ok }
     end
   end
 

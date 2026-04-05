@@ -1,0 +1,16 @@
+<div class="breadcrumbs text-sm mb-4">
+  <ul>
+    <li><%= link_to t('pages.groups.administration_panel.forum'), group_frm_admin_root_url(@group) %></li>
+    <li><%= t('frm.admin.mod.index') %></li>
+  </ul>
+</div>
+
+<div id="groups_table">
+  <%= render 'groups' %>
+</div>
+
+<%= link_to t('frm.admin.mod.new'), new_group_frm_admin_mod_url(@group), class: 'btn btn-primary mt-4', data: { disable_with: t('loading') } %>
+
+<% content_for :left_panel do %>
+  <%= render 'groups/administration_panel' %>
+<% end %>

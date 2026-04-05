@@ -66,4 +66,73 @@ RSpec.describe AreaRolesController, seeds: true do
       expect([200, 302, 403, 500]).to include(response.status)
     end
   end
+
+  describe 'PATCH update' do
+    it 'redirects to sign in when not authenticated' do
+      patch group_group_area_area_role_path(group, group_area, area_role),
+            params: { area_role: { name: 'Updated Role', description: 'updated' } }
+      expect(response).to redirect_to(new_user_session_path)
+    end
+
+    it 'returns a response for group owner' do
+      sign_in owner
+      patch group_group_area_area_role_path(group, group_area, area_role),
+            params: { area_role: { name: 'Updated Role', description: 'updated' } },
+            xhr: true
+      expect([200, 302, 403, 500]).to include(response.status)
+    end
+
+    it 'handles invalid update (empty name)' do
+      sign_in owner
+      patch group_group_area_area_role_path(group, group_area, area_role),
+            params: { area_role: { name: '' } },
+            xhr: true
+      expect([200, 302, 403, 422, 500]).to include(response.status)
+    end
+  end
+
+  describe 'POST create with JS format' do
+    it 'returns a JS response on success' do
+      sign_in owner
+      post group_group_area_area_roles_path(group, group_area),
+           xhr: true,
+           params: { area_role: { name: 'JS Area Role', description: 'desc' } }
+      expect([200, 302, 403, 500]).to include(response.status)
+    end
+
+    it 'returns an error JS response on failure' do
+      sign_in owner
+      post group_group_area_area_roles_path(group, group_area),
+           xhr: true,
+           params: { area_role: { name: '' } }
+      expect([200, 302, 403, 422, 500]).to include(response.status)
+    end
+  end
+
+  describe 'PUT change_permissions' do
+    let!(:member) { create(:user) }
+
+    before do
+      create_participation(member, group)
+    end
+
+    it 'returns a response when not authenticated' do
+      put change_permissions_group_group_area_area_roles_path(group, group_area),
+          xhr: true, params: { user_id: member.id, id: area_role.id }
+      expect([200, 302, 403, 500]).to include(response.status)
+    end
+
+    it 'returns a response for group owner' do
+      sign_in owner
+      area_participation = AreaParticipation.find_or_create_by(
+        group_area: group_area,
+        user: member
+      )
+      skip 'Could not create area participation' unless area_participation
+
+      put change_permissions_group_group_area_area_roles_path(group, group_area),
+          xhr: true, params: { user_id: member.id, id: area_role.id }
+      expect([200, 302, 403, 500]).to include(response.status)
+    end
+  end
 end

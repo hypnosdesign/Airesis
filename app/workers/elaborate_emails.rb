@@ -1,4 +1,4 @@
-class ElaborateEmails
+class ElaborateEmails < ApplicationJob
   def perform(*_args)
     ReceivedEmail.where(read: false).each do |email|
       email.update!(read: true)

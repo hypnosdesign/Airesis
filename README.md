@@ -1,154 +1,201 @@
 # Airesis - The Social Network for E-Democracy
 
-[![Build Status](https://semaphoreci.com/api/v1/coorasse/airesis/branches/develop/badge.svg)](https://semaphoreci.com/coorasse/airesis)
+The first open source web application for eDemocracy.
 
-The first open source web application for eDemocracy
+Airesis is a platform for participatory democracy that allows citizens, groups, and organizations to create proposals, discuss them in forums and blogs, organize events, and make collective decisions using the Schulze voting method.
 
-## Summary
+> **Current version: 6.0.0** — Rails 8.1.3 · Ruby 3.4.4 · Tailwind v4 + DaisyUI 5 · Hotwire (Turbo + Stimulus)
+>
+> This is a fork of the original [Airesis](https://github.com/coorasse/airesis) project by Alessandro Rodi, which is no longer maintained. The modernization effort (v4 → v6) is carried out by **Mattia Piano**.
 
-This innovative tool for participatory democracy puts the citizens at the center, as the main actors, 
-and finally allows them to be active in the decisions of their territory.
+---
 
-Users can view their own territory and listen to the voices and messages that come directly 
-from other citizens or groups present.
+## Modernization changelog (v4 → v6)
 
-The groups will be able to get in touch with the citizens, support the proposals and create events 
-in the area.
+This project underwent a comprehensive modernization starting from a legacy Rails 6.0 / Ruby 2.7 codebase. Below is a summary of every phase, so that new contributors can understand the current state and the decisions behind it.
 
-Everything fully integrated with all major social networks and the ability to communicate through e-mail 
-the proposals.
+### Phase 1 — Working environment (v4 baseline)
 
-Users who wish to participate in the activities of groups can also sign up and follow the discussions 
-on the forums.
+- Fixed Dockerfile (Ruby 2.7.5, Node 18, Yarn, system dependencies)
+- Updated `docker-compose.yml` to v3.8 format (PostgreSQL 14, Redis 7)
+- Created `config/application.yml` for development
+- Loaded database schema (133 tables), verified HTTP 200 response
 
-But what really makes Airesis a platform for edemocracy?
-The first thing is a totally innovative mechanism for the construction of proposals, where finally 
-the contributions and the minds of the users will be able to merge and make it possible to write 
-proposals in a shared way.
+### Phase 2 — Rails upgrade (6.0 → 7.1)
 
-Airesis allows users to have a better ranking on the basis of how they work and contribute to the proposals but at the same time allows a true comparison on the topics and content while maintaining the anonymity of users during the construction of the proposals.
+| Step | Upgrade | Key changes |
+|------|---------|-------------|
+| 1 | Rails 6.0 → **6.1** | `paper_trail` 10→14, `bullet` 6→8, `bootsnap` 1.4→1.23. Renamed `default_role` to avoid AR conflict. |
+| 2 | Rails 6.1 → **7.0** | `devise` 4→5, `cancancan` 3.1→3.6, `rails_admin` 2→3, `simple_form` 5.0→5.4. Zeitwerk exclusions for `lib/rails_admin/`. |
+| 3 | Rails 7.0 → **7.1** | `load_defaults 7.1`. Lazy `I18n.t()` in models. Added missing locale keys. Sprockets stubs for rails_admin. |
+| 4 | Ruby 2.7.5 → **3.2.8** | `pg` 1.2→1.6, `paper_trail` 14→17, added `matrix` gem. Updated debuggers and dev tools. |
+| 5 | Sentry migration | Replaced `sentry-raven` with `sentry-ruby` + `sentry-rails` 6.5. |
 
-Each time a user participates in a proposal will be overshadowed his real name, so as to ensure that the discussions will focus on the texts and the value of what is written rather than who wrote it.
+### Phase 3 — Deprecated gems
 
-A system for evaluating the contributions and proposals totally new will automatically identify the users who write better and those who write worse by allowing them to write and evaluate better within the system.
+| Gem removed | Replaced with |
+|-------------|---------------|
+| **Paperclip** | Active Storage (`has_one_attached`) + `active_storage_validations` |
+| **coffee-rails** | 36 `.coffee` files converted to ES6+ |
+| **Webpacker 5.x** | `jsbundling-rails` + esbuild |
 
-Finally, an implementation of the method schulze will always hold genuine elections within groups or to choose the best among the proposals.
+### Phase 4 — Frontend modernization
 
-Absolutely simple and intuitive interface will allow everyone in a short time, to find all the information they want.
+- **Tailwind v4 + DaisyUI 5** installed as primary CSS framework
+- **All 500+ views** converted from Slim/Foundation to ERB + Tailwind/DaisyUI classes
+- `slim-rails` gem removed (zero `.slim` files remaining)
+- **Font Awesome** 4.7 → 6.x (`font-awesome-sass`)
+- **Turbolinks** removed, replaced by **Turbo** (Hotwire)
+- **Stimulus controllers**: `theme` (dark/light), `flash` (toast), `modal`, `countdown`, `infinite_scroll`, `toggle`, `autosubmit`
 
-## Reference website
+### Phase 4-R — Frontend remediation (legacy cleanup)
 
-* [www.airesis.eu](https://www.airesis.eu)
-* [www.airesis.it](https://www.airesis.it)
+- Discovered that the layout did not load legacy Sprockets JS — 349 JS files and Foundation CSS were dead code
+- **Removed**: 349 legacy JS files (57,892 LOC), 39 legacy CSS/SCSS files
+- **Gems disabled**: `foundation-rails`, `jquery-rails`, `private_pub`, `select2-rails`, `mustache-js-rails`, `uri-js-rails`, `uglifier`
+- Asset pipeline consolidated: Sprockets for images only, esbuild for JS, Tailwind for CSS
 
+### Phase 5 — Code quality
+
+- **`User` model refactored** into 7 concerns: `Authenticatable`, `Proposable`, `Groupable`, `Socializable`, `Forumable`, `Notificationable`, `Profileable` (from 700+ lines to ~100 core lines)
+- **Test coverage**: 32% → **80%** (1498 examples, 0 failures)
+  - Added request specs for 12+ controllers with zero coverage
+  - Added model, helper, and mailer specs
+  - SimpleCov minimum set to 80%
+
+### Phase 6 — Stack upgrade (7.1 → 8.1, Ruby 3.4)
+
+| Step | Upgrade | Key changes |
+|------|---------|-------------|
+| 1 | Rails 7.1 → **7.2** | `enable_reloading` config, positional `enum` syntax, removed `check_pending!` |
+| 2 | Rails 7.2 → **8.1.3** | Removed `simple_token_authentication` → `has_secure_token` (Rails native). `render text:` → `render plain:`, `render nothing:` → `head :ok`. |
+| 3 | Ruby 3.2 → **3.4.4** | Bundler 2.5.23. `matrix` gem still required. |
+| 4 | Sidekiq + Redis → **Solid Queue + Solid Cable** | 37 Sidekiq workers converted to ActiveJob. Redis service removed. DB-backed queues. |
+
+### Phase 7 — Hotwire completion (v6.0.0)
+
+- **136 `.js.erb` → 0**: all converted to `.turbo_stream.erb` (109 templates)
+- **jQuery eliminated**: `jquery_shim.js` removed, 45 views converted to vanilla JS
+- **rails-ujs removed**: `remote: true` / `method:` → Turbo data attributes (85 files)
+- **Action Cable**: Warden/Devise connection, real-time ProposalComment broadcasts
+- **`private_pub` (Faye)** fully replaced by Action Cable + Turbo Streams
+
+### Version history
+
+| Version | Milestone |
+|---------|-----------|
+| 4.x | Original codebase (Rails 6.0, Ruby 2.7, jQuery, Foundation 5, Slim, Sidekiq) |
+| 5.0.0 | Rails 8.1.3, Ruby 3.4.4, 80% test coverage, Solid Queue |
+| **6.0.0** | Zero jQuery, zero `.js.erb`, 100% Hotwire, Action Cable, 7 Stimulus controllers |
+
+---
+
+## Stack
+
+| Component | Version |
+|-----------|---------|
+| Ruby | 3.4.4 |
+| Rails | 8.1.3 |
+| PostgreSQL | 14+ |
+| Job queue | Solid Queue (DB-backed, no Redis) |
+| WebSocket | Action Cable + Solid Cable |
+| CSS | Tailwind v4 + DaisyUI 5 |
+| JS bundler | esbuild (`jsbundling-rails`) |
+| JS framework | Hotwire (Turbo + Stimulus) |
+| Auth | Devise 5 + OmniAuth |
+| Authorization | CanCanCan 3 |
+| Voting | Schulze method (`vote-schulze`) |
+| Search | `pg_search` |
+| Pagination | Pagy |
+| Forms | SimpleForm (DaisyUI wrapper) |
+| Admin | rails_admin 3 |
+| Icons | Font Awesome 6 (`font-awesome-sass`) |
+| Monitoring | Sentry (`sentry-rails` 6.5) |
+
+---
 
 ## Installation and Setup
 
-You can install Airesis to run locally on your machine, 
-or if you prefer using [Docker containers](#Docker) for a quick and easy setup.
+### Requirements
 
-#### Requirements
-* PostgreSQL >= 9 with the hstore extension enabled.
-* Redis in order to execute Sidekiq and all background jobs.
+- PostgreSQL 14+ with `hstore` extension enabled
+- Node.js 18+ and Yarn (for JS bundling)
+
+### Docker (recommended)
+
+```bash
+# First time setup
+cp config/application.example.yml config/application.yml
+docker compose up
+docker compose run --rm airesis bundle exec rails db:create db:schema:load
+```
+
+```bash
+# Day-to-day development
+docker compose up
+```
+
+Services:
+- `airesis` — Rails app (port 3000)
+- `db` — PostgreSQL 14 (port 5433)
+- `solid_queue` — background job worker
+
+### Useful commands
+
+```bash
+# Run migrations
+docker compose run --rm airesis bundle exec rails db:migrate
+
+# Compile assets
+docker compose run --rm airesis bundle exec rails assets:precompile
+
+# Run tests
+docker compose run --rm -e RAILS_ENV=test airesis bundle exec rspec
+
+# Run tests excluding system specs (no Selenium in container)
+docker compose run --rm -e RAILS_ENV=test airesis bundle exec rspec --exclude-pattern "**/system/**/*_spec.rb"
+```
 
 ### Local installation
 
-1. Download the project
-```
+```bash
 git clone https://github.com/airesis/airesis.git
 cd airesis
-```
-2. Install the libraries
-```
-bundle
-```
-3. Configure environment variables (such as PayPal, Google Maps API, etc.), run
-```
+bundle install
 cp config/application.example.yml config/application.yml
-```
-then edit the `.yml` file and set your custom values
-4. Bootstrap the database, populating it with initial data (be advised: it needs ~ 5 minutes)
-```    
-bundle exec rake db:setup
-```
-5. Run Airesis
-```
+# Edit config/application.yml with your values
+bundle exec rails db:setup
 bundle exec rails s
 ```
-7. run Sidekiq
+
+In a separate terminal, start Solid Queue:
+```bash
+bundle exec rails solid_queue:start
 ```
-bundle exec sidekiq
+
+### Seeding test data
+
+```bash
+bundle exec rake airesis:seed:more:public_proposals[10]    # 10 fake proposals + users
+bundle exec rake airesis:seed:more:votable_proposals[5]     # 5 proposals in voting phase
+bundle exec rake airesis:seed:more:clear_proposals          # destroy all proposals
 ```
 
-Done! You have now a working version of Airesis!
-
-#### Foreman
-If you want to run all processes in a single command you can use Foreman
-```
-bundle exec foreman start
-```
-and it will take care of running everything for you.
-
-#### Mailman
-Users can reply in the forum by email. Run
-```
-ruby script/mailman_server.rb
-```
-in background to receive emails and create forum posts from them.
-
-## Docker
-
-See [Docker README](DOCKER_README.md)
-
-## Seeding more data
-
-
-You'll probably need some fake data in your development environment to test stuff.
-These scripts are available:
-
-    bundle exec rake airesis:seed:more:public_proposals[number]
-
-Will generate `number` fake proposals in public open space and `number` new users (one for each proposal)
-
-    bundle exec rake airesis:seed:more:votable_proposals[number]
-
-Will generate `number` fake proposals in public open space in vote for the next three days and `number` new users (one for each proposal)
-
-    bundle exec rake airesis:seed:more:clear_proposals
-
-Destroy all the proposals in the database
-
-To generate other fake data look at `spec/factories` folder.
+See `spec/factories` for additional factory definitions.
 
 ## Environment variables
 
-Look at `application.example.yml` for a detailed explanation of each environment variable.
+See `config/application.example.yml` for a detailed explanation. Managed via [Figaro](https://github.com/laserlemon/figaro).
 
 ## I18n
 
-I18n is managed in a separate gem.
-See https://github.com/airesis/airesis_i18n to contribute.
-Contribute on Crowdin to the Translation of the project
+Translations are managed in a separate gem: [airesis_i18n](https://github.com/airesis/airesis_i18n).
 
-## What else should I know? What are we working on right now?
+## Authors
 
-We want to take out everything which is related to our installation and make it easier to install.
-
-Our main goal is to make it even more simple and usable for everybody!
-
-## The author
-
-![Alessandro Rodi](http://www.gravatar.com/avatar/32d80da41830a6e6c1bb3eb977537e3e)
-
-Alessandro Rodi (coorasse@gmail.com)
+- **Mattia Piano** — current maintainer (fork, modernization v4 → v6)
+- **Alessandro Rodi** (coorasse@gmail.com) — original author (project no longer maintained)
 
 ## License
 
-This software is released under AGPL .
-
-For the terms of the license can be found in the LICENSE file available within the project.
-
-Anyone which installs the application and is required to comply with the terms of the license and to incorporate 
-in the footer of the website the following statement:
-
-`Powered by <a href="https://www.airesis.eu"> Airesis - The Social Network for eDemocracy </a>`
+AGPL — see [LICENSE](LICENSE) for details.

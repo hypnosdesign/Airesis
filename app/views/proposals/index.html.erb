@@ -1,0 +1,51 @@
+<% @extend = true %>
+<% if @group %>
+  <% @meta_description = CGI::escapeHTML(@group.description) %>
+  <% content_for :head do %>
+    <meta property="og:title" content="<%= @group.name %>">
+    <meta property="og:type" content="airesis:group">
+    <meta property="og:image" content="<%= @group.image.attached? ? url_for(@group.image) : asset_url('gruppo-anonimo.png') %>">
+  <% end %>
+<% end %>
+
+<%= render layout: "layouts/page_title", locals: { title: @page_head } do %>
+<% end %>
+
+<div class="clear-both" style="clear:both"></div>
+
+<ul class="flex flex-col md:flex-row w-full mb-8 overflow-hidden border-2 border-base-300">
+  <li class="flex-1">
+    <%= link_to t('pages.proposals.index.debate_title', count: @in_valutation_count),
+                current_url(state: ProposalState::TAB_DEBATE),
+                class: "block text-center py-3 px-4 font-medium transition-colors #{@search.proposal_state_tab == ProposalState::TAB_DEBATE ? 'bg-primary text-primary-content cursor-default' : 'bg-base-100 text-base-content hover:bg-base-200'}" %>
+  </li>
+  <li class="flex-1 border-t md:border-t-0 md:border-l border-base-300">
+    <%= link_to t('pages.proposals.index.voting_title', count: @in_votation_count),
+                current_url(state: ProposalState::TAB_VOTATION),
+                class: "block text-center py-3 px-4 font-medium transition-colors #{@search.proposal_state_tab == ProposalState::TAB_VOTATION ? 'bg-primary text-primary-content cursor-default' : 'bg-base-100 text-base-content hover:bg-base-200'}" %>
+  </li>
+  <li class="flex-1 border-t md:border-t-0 md:border-l border-base-300">
+    <%= link_to t('pages.proposals.index.accepted_title', count: @accepted_count),
+                current_url(state: ProposalState::TAB_VOTED),
+                class: "block text-center py-3 px-4 font-medium transition-colors #{@search.proposal_state_tab == ProposalState::TAB_VOTED ? 'bg-primary text-primary-content cursor-default' : 'bg-base-100 text-base-content hover:bg-base-200'}" %>
+  </li>
+  <li class="flex-1 border-t md:border-t-0 md:border-l border-base-300">
+    <%= link_to t('pages.proposals.index.revision_title', count: @revision_count),
+                current_url(state: ProposalState::TAB_REVISION),
+                class: "block text-center py-3 px-4 font-medium transition-colors #{@search.proposal_state_tab == ProposalState::TAB_REVISION ? 'bg-primary text-primary-content cursor-default' : 'bg-base-100 text-base-content hover:bg-base-200'}" %>
+  </li>
+</ul>
+
+<div class="content" data-proposals-list="true">
+  <%= render partial: 'tab_list', locals: { proposals: @proposals } %>
+</div>
+
+<% content_for :left_panel do %>
+  <%= render 'left_panel_index' %>
+<% end %>
+
+<% if params[:time] %>
+  <script>
+    ProposalsIndex.timeFilter = <%= raw params[:time].to_json %>;
+  </script>
+<% end %>

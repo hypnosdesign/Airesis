@@ -10,6 +10,10 @@ class ProposalLivesController < ApplicationController
 
   def show
     @life = @proposal.proposal_lives.find(params[:id])
+    respond_to do |format|
+      format.turbo_stream
+      format.html
+    end
   end
 
   protected

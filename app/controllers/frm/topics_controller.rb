@@ -9,7 +9,7 @@ module Frm
       if find_topic
         flash[:warn] = t('info.topic.hidden') if @topic.hidden
         register_view(@topic, current_user)
-        @posts = find_posts(@topic).page(params[:page]).per(TOPICS_PER_PAGE)
+        @pagy, @posts = pagy(find_posts(@topic), items: TOPICS_PER_PAGE)
       end
     end
 
@@ -77,24 +77,16 @@ module Frm
     def subscribe_successful
       flash[:notice] = t('frm.topic.subscribed')
       respond_to do |format|
-        format.html do
-          redirect_to group_forum_topic_url(@group, @topic.forum, @topic)
-        end
-        format.js do
-          render 'subscribe'
-        end
+        format.turbo_stream { render 'subscribe' }
+        format.html { redirect_to group_forum_topic_url(@group, @topic.forum, @topic) }
       end
     end
 
     def unsubscribe_successful
       flash[:notice] = t('frm.topic.unsubscribed')
       respond_to do |format|
-        format.html do
-          redirect_to group_forum_topic_url(@group, @topic.forum, @topic)
-        end
-        format.js do
-          render 'subscribe'
-        end
+        format.turbo_stream { render 'subscribe' }
+        format.html { redirect_to group_forum_topic_url(@group, @topic.forum, @topic) }
       end
     end
 

@@ -1,0 +1,22 @@
+<li>
+  <div class="card bg-base-200 p-4">
+    <div class="image rounded-lg overflow-hidden mb-2" style="background: url('<%= blog.user.user_image_url(120, force_size: false) %>'); background-size: cover; height: 120px;"></div>
+    <div class="info mb-2">
+      <div class="name font-bold">
+        <%= link_to (blog.title.to_s != '' ? blog.title : 'No title'), blog, title: blog.title %>
+      </div>
+    </div>
+    <div class="bottom text-sm">
+      <div><%= link_to_user blog.user, full_name: true %></div>
+      <div>
+        <%= t('pages.blogs.index.blog_subtitle', posts: blog.blog_posts.count, comments: blog.comments.count) %>
+        <% if can? :edit, blog %>
+          <%= link_to t('buttons.edit'), edit_blog_path(blog), class: 'btn btn-xs' %>
+        <% end %>
+        <% if can? :destroy, blog %>
+          <%= link_to t('buttons.delete'), blog, data: { turbo_confirm: 'Sei sicuro di voler eliminare questo blog?', turbo_method: :delete }, class: 'btn btn-xs btn-error' %>
+        <% end %>
+      </div>
+    </div>
+  </div>
+</li>

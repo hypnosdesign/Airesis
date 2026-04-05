@@ -1,0 +1,21 @@
+<% if signed_in? && @my_nickname && @proposal.is_anonima? %>
+  <div class="card bg-base-200 p-4">
+    <h4>
+      <i class="fa-solid fa-circle-info nickname-panel"></i>
+      <%= t('pages.proposals.show.your_nickname_is') %>
+    </h4>
+    <div class="mycont clearfix">
+      <%= user_tag(current_user, @proposal) %>
+    </div>
+    <div class="regenerate_nickname">
+      <% if can? :update, @my_nickname %>
+        <%= link_to t('pages.proposals.show.regenerate_nickname'), proposal_nickname_path(@my_nickname), data: { turbo_method: :put }, class: 'btn', style: 'display: inline-block' %>
+        <div>
+          <%= '(puoi farlo ancora per ' %>
+          <span class="change_nick"></span>
+          <%= ')' %>
+        </div>
+      <% end %>
+    </div>
+  </div>
+<% end %>

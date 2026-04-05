@@ -1,0 +1,66 @@
+<dialog id="language" class="modal">
+  <div class="modal-box bg-base-100 max-w-3xl">
+    <form method="dialog">
+      <button class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2">✕</button>
+    </form>
+
+    <div class="tabs tabs-border mb-4">
+      <input type="radio" name="lang_tabs" class="tab" aria-label="Europe" checked>
+      <div class="tab-content p-4">
+        <ul class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+          <li><%= flag_for('Europe', 'en-EU') %></li>
+          <li><%= flag_for('France', 'fr-FR') %></li>
+          <li><%= flag_for('Hungary', 'hu-HU') %></li>
+          <li><%= flag_for('Italy', 'it-IT') %></li>
+          <li><%= flag_for('Deutschland', 'de-DE') %></li>
+          <li><%= flag_for('România', 'ro-RO') %></li>
+          <li><%= flag_for('España', 'es-ES') %></li>
+          <li><%= flag_for('Portugal', 'pt-PT') %></li>
+          <li><%= flag_for('Greece', 'el-GR') %></li>
+          <li><%= flag_for('United Kingdom', 'en-GB') %></li>
+          <li><%= flag_for('Ireland', 'en-IE') %></li>
+          <li><%= flag_for('Serbia (Cyrillic)', 'sr-SP') %></li>
+          <li><%= flag_for('Serbia (Latin)', 'sr-CS') %></li>
+          <li><%= flag_for('Serbo-Croatian', 'sh-HR') %></li>
+          <li><%= flag_for('Bosnian', 'bs-BA') %></li>
+          <li><%= flag_for('Montenegrin (Latin)', 'me-ME') %></li>
+          <li><%= flag_for('Russia', 'ru-RU') %></li>
+        </ul>
+      </div>
+
+      <input type="radio" name="lang_tabs" class="tab" aria-label="America">
+      <div class="tab-content p-4">
+        <ul class="grid grid-cols-2 md:grid-cols-3 gap-4">
+          <li><%= flag_for('USA', 'en-US') %></li>
+          <li><%= flag_for('Brasil', 'pt-BR') %></li>
+          <li><%= flag_for('Ecuador', 'es-EC') %></li>
+          <li><%= flag_for('Chile', 'es-CL') %></li>
+          <li><%= flag_for('Argentina', 'es-AR') %></li>
+        </ul>
+      </div>
+
+      <input type="radio" name="lang_tabs" class="tab" aria-label="Asia">
+      <div class="tab-content p-4">
+        <ul class="grid grid-cols-2 md:grid-cols-3 gap-4">
+          <li><%= flag_for('Indonesia', 'id-ID') %></li>
+          <li><%= flag_for('中国', 'zh-TW') %></li>
+        </ul>
+      </div>
+
+      <input type="radio" name="lang_tabs" class="tab" aria-label="Africa">
+      <div class="tab-content p-4">
+        <ul class="grid grid-cols-2 md:grid-cols-3 gap-4">
+          <li><%= flag_for('South Africa', 'en-ZA') %></li>
+        </ul>
+      </div>
+
+      <input type="radio" name="lang_tabs" class="tab" aria-label="Oceania">
+      <div class="tab-content p-4">
+        <ul class="grid grid-cols-2 md:grid-cols-3 gap-4">
+          <li><%= flag_for('Australia', 'en-AU') %></li>
+          <li><%= flag_for('New Zealand', 'en-NZ') %></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</dialog>

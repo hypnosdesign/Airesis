@@ -1,0 +1,7 @@
+<%= turbo_stream.replace "choose_votation" do %>
+  <div id="choose_votation">
+    <% if !@group || (can? :create_date, @group) %>
+      <%= render "/quorums/dates" %>
+    <% end %>
+  </div>
+<% end %>

@@ -7,20 +7,30 @@ class AreaRolesController < ApplicationController
   load_and_authorize_resource :group_area, through: :group
   load_and_authorize_resource through: :group_area
 
-  def new; end
+  def new
+    respond_to do |format|
+      format.turbo_stream
+      format.html
+    end
+  end
 
-  def edit; end
+  def edit
+    respond_to do |format|
+      format.turbo_stream
+      format.html
+    end
+  end
 
   def create
     respond_to do |format|
       if @area_role.save
         flash[:notice] = t('info.participation_roles.role_created')
+        format.turbo_stream
         format.html { redirect_to [@group, @group_area] }
-        format.js
       else
         flash[:error] = t('error.participation_roles.role_created')
+        format.turbo_stream { render partial: 'layouts/flash_stream', status: :unprocessable_entity }
         format.html { render action: :new }
-        format.js { render 'layouts/active_record_error', locals: { object: @area_role } }
       end
     end
   end
@@ -28,10 +38,15 @@ class AreaRolesController < ApplicationController
   def update
     if @area_role.update(area_role_params)
       flash[:notice] = t('info.participation_roles.role_updated')
-    else
       respond_to do |format|
-        flash[:error] = t('error.participation_roles.role_updated')
-        format.js { render 'layouts/success' }
+        format.turbo_stream
+        format.html { redirect_back fallback_location: group_group_area_path(@group, @group_area) }
+      end
+    else
+      flash[:error] = t('error.participation_roles.role_updated')
+      respond_to do |format|
+        format.turbo_stream { render partial: 'layouts/flash_stream', status: :unprocessable_entity }
+        format.html { redirect_back fallback_location: group_group_area_path(@group, @group_area) }
       end
     end
   end
@@ -39,6 +54,10 @@ class AreaRolesController < ApplicationController
   def destroy
     @area_role.destroy
     flash[:notice] = t('info.participation_roles.role_deleted')
+    respond_to do |format|
+      format.turbo_stream
+      format.html { redirect_back fallback_location: group_group_area_path(@group, @group_area) }
+    end
   end
 
   def change_permissions
@@ -47,7 +66,8 @@ class AreaRolesController < ApplicationController
     gp.save!
     flash[:notice] = t('info.participation_roles.role_changed')
     respond_to do |format|
-      format.js { render 'layouts/success' }
+      format.turbo_stream { render partial: 'layouts/flash_stream' }
+      format.html { redirect_back fallback_location: group_group_area_path(@group, @group_area) }
     end
   end
 

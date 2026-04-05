@@ -10,8 +10,8 @@ module Api
                                          :groups,
                                          :users,
                                          :quorum,
-                                         sections: :paragraphs, solutions: { sections: :paragraphs }).
-                     page(params[:page]).per(20)
+                                         sections: :paragraphs, solutions: { sections: :paragraphs })
+        @pagy, @proposals = pagy(@proposals, items: 20)
       end
 
       def show; end

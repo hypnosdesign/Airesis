@@ -1,0 +1,13 @@
+<%= turbo_stream.replace "permissions_list_modal" do %>
+  <dialog id="permissions_list_modal" data-controller="modal" class="modal">
+    <div class="modal-box shadow-brutal border-2 border-base-content max-w-3xl">
+      <%= render "permissions_list_panel" %>
+      <div class="modal-action">
+        <button class="btn" data-action="click->modal#close"><%= t("buttons.close") %></button>
+      </div>
+    </div>
+    <form method="dialog" class="modal-backdrop" data-action="click->modal#backdropClose">
+      <button>close</button>
+    </form>
+  </dialog>
+<% end %>

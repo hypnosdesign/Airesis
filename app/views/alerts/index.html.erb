@@ -1,0 +1,47 @@
+<div class="card bg-base-200 p-4">
+  <h1 class="text-xl font-bold mb-4"><%= t('pages.alerts.index.new_not_read') %></h1>
+  <ul class="list-disc pl-4 mb-4">
+    <% if @new_alerts.any? %>
+      <% @new_alerts.each do |alert| %>
+        <li>
+          <%= link_to calculate_alert_path(alert) do %>
+            <%= alert.created_at.strftime("%d/%m/%Y %H:%M") %> - <%= raw alert.message %>
+          <% end %>
+        </li>
+      <% end %>
+    <% else %>
+      <b><%= t('pages.alerts.index.no_new') %></b>
+    <% end %>
+  </ul>
+
+  <h1 class="text-xl font-bold mb-4"><%= t('pages.alerts.index.old_not_read') %></h1>
+  <ul class="list-disc pl-4">
+    <% if @old_alerts.any? %>
+      <% @old_alerts.each do |alert| %>
+        <li>
+          <%= link_to calculate_alert_path(alert) do %>
+            <%= alert.created_at.strftime("%d/%m/%Y %H:%M") %> - <%= raw alert.message %>
+          <% end %>
+        </li>
+      <% end %>
+    <% else %>
+      <b><%= t('pages.alerts.index.no_old') %></b>
+    <% end %>
+  </ul>
+</div>
+
+<% content_for :left_panel do %>
+  <% if current_user %>
+    <%= render partial: 'users/preferences_panel' %>
+  <% end %>
+<% end %>
+
+<script type="text/javascript">
+  document.addEventListener('turbo:load', () => {
+    const token = document.querySelector('meta[name="csrf-token"]')?.content;
+    fetch('/alerts/check_all', {
+      method: 'POST',
+      headers: { 'X-CSRF-Token': token || '' }
+    });
+  }, { once: true });
+</script>

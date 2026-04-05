@@ -1,0 +1,9 @@
+<h2 class="text-xl font-bold mb-4"><%= @page_title %></h2>
+
+<%= simple_form_for @frm_mod, url: group_frm_admin_mods_url(@group) do |f| %>
+  <%= f.input :name %>
+  <div class="flex gap-2 mt-4">
+    <%= link_to t('buttons.cancel'), '#', class: 'btn', data: { action: "click->modal#close" } %>
+    <%= f.submit class: "btn btn-primary", data: { disable_with: t('loading') } %>
+  </div>
+<% end %>

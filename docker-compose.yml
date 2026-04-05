@@ -6,7 +6,6 @@ services:
     command: bundle exec rails s -b 0.0.0.0 --pid /tmp/server.pid
     environment:
       - DATABASE_URL=postgresql://postgres@db
-      - REDIS_URL=redis://redis:6379
       - RAILS_ENV=development
       - NODE_OPTIONS=--openssl-legacy-provider
     volumes:
@@ -14,9 +13,26 @@ services:
       - node_modules:/usr/src/app/node_modules
     depends_on:
       - db
-      - redis
     ports:
       - "3000:3000"
+
+  solid_queue:
+    build: .
+    command: bundle exec rails solid_queue:start
+    environment:
+      - DATABASE_URL=postgresql://postgres@db
+      - RAILS_ENV=development
+    depends_on:
+      - db
+    volumes:
+      - .:/usr/src/app
+      - node_modules:/usr/src/app/node_modules
+
+  mailpit:
+    image: axllent/mailpit
+    ports:
+      - "8025:8025"
+      - "1025:1025"
 
   db:
     image: postgres:14-alpine
@@ -26,24 +42,6 @@ services:
       - airesisDB:/var/lib/postgresql/data
     ports:
       - "5433:5432"
-
-  redis:
-    image: redis:7-alpine
-
-  sidekiq:
-    build: .
-    command: bundle exec sidekiq
-    environment:
-      - DATABASE_URL=postgresql://postgres@db
-      - REDIS_URL=redis://redis:6379
-      - RAILS_ENV=development
-      - NODE_OPTIONS=--openssl-legacy-provider
-    depends_on:
-      - db
-      - redis
-    volumes:
-      - .:/usr/src/app
-      - node_modules:/usr/src/app/node_modules
 
 volumes:
   airesisDB:

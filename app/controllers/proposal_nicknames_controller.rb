@@ -19,7 +19,7 @@ class ProposalNicknamesController < ApplicationController
     flash[:notice] = "Nickname cambiato in #{@nickname}"
     respond_to do |format|
       format.html { redirect_to redirect_url(@proposal) }
-      format.js
+      format.turbo_stream
     end
   end
 

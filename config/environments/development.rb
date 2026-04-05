@@ -1,5 +1,5 @@
 Rails.application.configure do
-  config.cache_classes = false
+  config.enable_reloading = true
 
   config.eager_load = false
   config.log_level = :debug
@@ -27,12 +27,7 @@ Rails.application.configure do
   config.action_mailer.perform_caching = false
   config.action_mailer.raise_delivery_errors = false
   # Print deprecation notices to the Rails logger
-  config.active_support.deprecation = :log
-
-  # Only use best-standards-support built into browsers
-  config.action_dispatch.best_standards_support = :builtin
-
-  config.active_support.deprecation = :log
+  config.active_support.report_deprecations = true
   # Raise an error on page load if there are pending migrations
   config.active_record.migration_error = :page_load
   config.active_record.verbose_query_logs = true
@@ -46,7 +41,8 @@ Rails.application.configure do
   config.i18n.raise_on_missing_translations = true
 
   config.action_mailer.perform_deliveries = true
-  config.action_mailer.delivery_method = :letter_opener
+  config.action_mailer.delivery_method = :smtp
+  config.action_mailer.smtp_settings = { address: 'mailpit', port: 1025 }
 end
 
 Rails.application.default_url_options = Rails.application.config.action_mailer.default_url_options

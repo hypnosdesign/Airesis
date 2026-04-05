@@ -1,0 +1,14 @@
+<% if params[:back] %>
+  <%= turbo_stream.replace "results_container" do %>
+    <div id="results_container">
+      <%= render partial: "group_participation_results" %>
+    </div>
+  <% end %>
+<% else %>
+  <%= turbo_stream.append "results_container" do %>
+    <%= render partial: "group_participation_results" %>
+  <% end %>
+<% end %>
+<% unless @pagy.next %>
+  <%= turbo_stream.remove "loading_results" %>
+<% end %>

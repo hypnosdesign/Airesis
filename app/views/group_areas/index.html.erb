@@ -1,0 +1,37 @@
+<nav class="breadcrumbs text-sm">
+  <ul>
+    <li class="current">All working areas</li>
+  </ul>
+</nav>
+<%= render layout: "layouts/page_title", locals: {title: t('pages.groups.edit_work_areas.manage_group_areas')} do %>
+  <%= link_to new_group_group_area_url(@group, manage: true), class: "btn" do %>
+    <i class="fa-solid fa-plus"></i>
+    <%= t('pages.groups.edit_work_areas.manage.new_area') %>
+  <% end %>
+<% end %>
+<div id="new_group_area_container"></div>
+<%= t('pages.groups.edit_work_areas.manage.list_title') %>
+<div id="group_areas_container">
+  <%= render partial: 'group_areas_list' %>
+</div>
+<div id="edit_group_area_container"></div>
+<% content_for :left_panel do %>
+  <%= render partial: 'groups/administration_panel' %>
+<% end %>
+<script type="text/javascript">
+  var csrf = document.querySelector('meta[name="csrf-token"]');
+  var csrfToken = csrf ? csrf.content : '';
+  document.addEventListener('click', function(e) {
+    var el = e.target.closest('[data-change-area-participation]');
+    if (!el) return;
+    var gaId = el.dataset.group_area_id, uid = el.dataset.user_id;
+    var url = "/groups/<%= @group.id %>/group_areas/" + gaId + "/area_participations";
+    var method = el.checked ? 'POST' : 'DELETE';
+    if (!el.checked) url += '/-1';
+    fetch(url, {
+      method: method,
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded', 'X-CSRF-Token': csrfToken, 'Accept': 'text/vnd.turbo-stream.html' },
+      body: 'area_participation%5Buser_id%5D=' + uid
+    }).then(function(r) { return r.text(); }).then(function(html) { Turbo.renderStreamMessage(html); });
+  });
+</script>

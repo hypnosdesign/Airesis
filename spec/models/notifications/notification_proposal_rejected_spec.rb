@@ -14,7 +14,7 @@ RSpec.describe NotificationProposalRejected, type: :model, emails: true, notific
       u
     end
 
-    described_class.perform_async(proposal.id)
+    described_class.perform_later(proposal.id)
     expect(described_class.jobs.size).to eq 1
     described_class.drain
     AlertsWorker.drain
@@ -35,7 +35,7 @@ RSpec.describe NotificationProposalRejected, type: :model, emails: true, notific
     group = create(:group, current_user_id: user.id)
     proposal = create(:group_proposal, current_user_id: user.id, group_proposals: [GroupProposal.new(group: group)])
 
-    described_class.perform_async(proposal.id)
+    described_class.perform_later(proposal.id)
     described_class.drain
     AlertsWorker.drain
 

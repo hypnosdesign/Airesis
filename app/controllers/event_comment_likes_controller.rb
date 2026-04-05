@@ -10,13 +10,17 @@ class EventCommentLikesController < ApplicationController
     @event_comment.likers << current_user
     @event_comment.save!
     respond_to do |format|
-      format.js { render 'layouts/success' }
+      format.turbo_stream { render partial: 'layouts/flash_stream' }
+      format.html { redirect_back fallback_location: event_path(@event_comment.event) }
     end
   end
 
   def delete
     @event_comment_like.destroy
-    format.js { render 'layouts/success' }
+    respond_to do |format|
+      format.turbo_stream { render partial: 'layouts/flash_stream' }
+      format.html { redirect_back fallback_location: event_path(@event_comment.event) }
+    end
   end
 
   private

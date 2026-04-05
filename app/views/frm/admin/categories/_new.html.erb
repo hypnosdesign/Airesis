@@ -1,0 +1,11 @@
+<h2 class="text-xl font-bold mb-4"><%= t('new', scope: 'frm.admin.category') %></h2>
+
+<%= simple_form_for @category, url: group_frm_admin_categories_url(@group) do |f| %>
+  <%= f.input :name %>
+  <%= f.input :tags_list %>
+  <%= f.input :visible_outside, inline_label: true %>
+  <div class="flex gap-2 mt-4">
+    <%= link_to t('buttons.cancel'), '#', class: 'btn', data: { action: "click->modal#close" } %>
+    <%= f.submit class: "btn btn-primary" %>
+  </div>
+<% end %>

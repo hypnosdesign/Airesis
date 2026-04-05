@@ -1,0 +1,121 @@
+<h2><%= @page_title %></h2>
+
+<div id="create_event">
+  <%= simple_form_for @group.present? ? [@group, @event] : @event, remote: request.xhr?, data: {disable_form_validator: ''} do |f| %>
+    <div class="legend">
+      <div class="title">
+        <%= t('pages.events.new.step_2') %>
+      </div>
+    </div>
+
+    <div class="step root root">
+      <div class="flex flex-wrap">
+        <div class="w-full">
+          <%= f.input :title %>
+        </div>
+      </div>
+      <div class="flex flex-wrap">
+        <div class="w-full">
+          <%= f.input :description, rows: 4, cols: 30 %>
+        </div>
+      </div>
+      <% if @event.votation? %>
+        <%= f.hidden_field :private %>
+      <% else %>
+        <div class="flex flex-wrap">
+          <div class="w-full">
+            <%= f.label :private do %>
+              <%= f.check_box :private, title: t('pages.events.new.private_tooltip') %>
+              <%= t('activerecord.attributes.event.private') %>
+            <% end %>
+          </div>
+        </div>
+      <% end %>
+      <%= f.hidden_field :proposal_id %>
+      <%= f.hidden_field :event_type_id %>
+    </div>
+
+    <div class="legend">
+      <div class="title">
+        <%= t('pages.events.new.step_3') %>
+      </div>
+    </div>
+
+    <div class="step">
+      <div class="flex flex-wrap">
+        <div class="w-full lg:w-1/2">
+          <%= f.input :starttime, as: :datetimepicker, input_html: { value: (l @event.starttime, format: :datetimepicker) } %>
+        </div>
+      </div>
+      <div class="flex flex-wrap">
+        <div class="w-full lg:w-1/2">
+          <%= f.input :endtime, as: :datetimepicker, input_html: { value: (l @event.endtime, format: :datetimepicker) } %>
+        </div>
+      </div>
+      <div class="flex flex-wrap">
+        <div class="w-full lg:w-4/12">
+          <%= f.label :all_day do %>
+            <%= f.check_box :all_day %>
+            <%= t('activerecord.attributes.event.all_day') %>
+          <% end %>
+        </div>
+      </div>
+      <div class="flex flex-wrap" style="display:none">
+        <div class="w-full lg:w-4/12">
+          <%= f.label :period %>
+          <%= f.select :period, Event::REPEATS, {}, onchange: "showPeriodAndFrequency(this.value);", disabled: true, title: "Opzione non ancora disponibile" %>
+        </div>
+      </div>
+      <div class="flex flex-wrap" style="display:none">
+        <div class="w-full lg:w-4/12">
+          <%= f.label :frequency %>
+          <%= f.select :frequency, (1..30).to_a %>
+          <span id="period"></span>
+        </div>
+      </div>
+    </div>
+
+    <% unless @event.votation? %>
+      <div class="legend last">
+        <div class="title">
+          <%= t('pages.events.new.step_4') %>
+        </div>
+      </div>
+
+      <div class="step">
+        <%= f.simple_fields_for :meeting do |m| %>
+          <%= m.simple_fields_for :place do |p| %>
+            <div id="luogo">
+              <div class="flex flex-wrap">
+                <div class="w-full lg:w-1/2">
+                  <%= p.input :municipality_id, as: :select, input_html: { style: 'width:100%', data: { cities: '' } } %>
+                </div>
+              </div>
+              <div class="flex flex-wrap">
+                <div class="w-full lg:w-8/12">
+                  <%= p.input :address %>
+                </div>
+                <div class="w-full lg:w-2/12">
+                  <%= image_tag 'gloading.gif', class: 'loading_place' %>
+                </div>
+                <div class="w-full lg:w-2/12"></div>
+              </div>
+              <div class="flex flex-wrap">
+                <%= p.hidden_field :latitude_original %>
+                <%= p.hidden_field :longitude_original %>
+                <%= p.hidden_field :latitude_center %>
+                <%= p.hidden_field :longitude_center %>
+                <%= p.hidden_field :zoom %>
+              </div>
+            </div>
+            <div id="create_map_canvas" class="map-canvas"></div>
+          <% end %>
+        <% end %>
+      </div>
+    <% end %>
+  <% end %>
+</div>
+
+<script type="text/javascript">
+  EventsEdit.votation = <%= @event.votation? %>;
+</script>

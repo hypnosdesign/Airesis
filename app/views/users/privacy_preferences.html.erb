@@ -1,0 +1,133 @@
+<% @page_title = t('pages.user.privacy') %>
+
+<%= render layout: "layouts/page_title", locals: { title: t('pages.user.privacy') } do %>
+  <div class="card bg-base-200 p-4 mb-4">
+    <h2 class="text-lg font-bold mb-2"><%= t('pages.users.privacy_preferences.options') %></h2>
+    <div class="flex flex-col gap-2">
+      <label class="tooltips flex items-center gap-2">
+        <%= check_box :user, :show_tooltips, value: current_user.show_tooltips, onclick: "return change_show_tooltips(this);" %>
+        <%= t('pages.users.privacy_preferences.tooltips') %>
+      </label>
+      <% if ::Configuration::socialnetwork_active %>
+        <label class="show_urls flex items-center gap-2">
+          <%= check_box :user, :show_urls, value: current_user.show_urls, onclick: "return change_show_urls(this);" %>
+          <%= t('pages.users.privacy_preferences.show_urls') %>
+        </label>
+      <% end %>
+      <% if ::Configuration::user_messages %>
+        <label class="messages flex items-center gap-2">
+          <%= check_box :user, :receive_messages, value: current_user.receive_messages, onclick: "return change_receive_messages(this);" %>
+          <%= t('pages.users.privacy_preferences.private_messages') %>
+        </label>
+      <% end %>
+      <% if ::Configuration.rotp %>
+        <h2 class="text-lg font-bold mt-4 mb-2"><%= t('pages.users.privacy_preferences.rotp_title') %></h2>
+        <label class="rotp flex items-center gap-2">
+          <%= check_box :user, :rotp_enabled, value: current_user.rotp_enabled, onclick: "return change_rotp_enabled(this);" %>
+          <%= t('pages.users.privacy_preferences.rotp') %>
+        </label>
+        <div id="rotp_container">
+          <%= render 'users/rotp_code' %>
+        </div>
+      <% end %>
+    </div>
+  </div>
+
+  <div class="card bg-base-200 p-4 mb-4">
+    <h2 class="text-lg font-bold mb-2"><%= t('pages.users.privacy_preferences.mail_language') %></h2>
+    <div class="email_locale mb-4">
+      <%= select_tag 'locale', options_for_select(SysLocale.all.collect { |p| [I18n.t("db.sys_locales.#{p.key}.description"), p.id] }, selected: current_user.sys_locale_id), class: 'select select-bordered' %>
+    </div>
+    <h2 class="text-lg font-bold mb-2"><%= t('pages.users.privacy_preferences.time_zone') %></h2>
+    <div class="time_zone">
+      <%= select_tag 'time_zone', options_for_select(ActiveSupport::TimeZone.all.collect { |p| [p, p.name] }, selected: current_user.time_zone), class: 'select select-bordered' %>
+    </div>
+  </div>
+
+  <div class="card bg-base-200 p-4 mb-4">
+    <% if ::Configuration::socialnetwork_active %>
+      <h2 class="text-lg font-bold mb-2"><%= t('pages.users.privacy_preferences.join_accounts') %></h2>
+      <h5 class="mb-4"><%= raw t('pages.users.privacy_preferences.join_accounts_description', app_short_name: APP_SHORT_NAME) %></h5>
+      <% authentications = current_user.authentications %>
+      <% alreadyproviders = current_user.authentications.pluck(:provider) %>
+      <% if alreadyproviders.size == 3 %>
+        <p><%= t('pages.users.privacy_preferences.joined_all') %></p>
+      <% end %>
+      <div class="providers flex flex-col gap-2 mb-4">
+        <% unless alreadyproviders.include? Authentication::FACEBOOK %>
+          <%= link_to omniauth_authorize_path(:user, :facebook), class: 'btn btn-sm' do %>
+            <i class="fa-brands fa-facebook fa-social"></i>
+            <%= t('pages.users.privacy_preferences.join_facebook') %>
+          <% end %>
+        <% end %>
+        <% unless alreadyproviders.include? Authentication::GOOGLE %>
+          <%= link_to omniauth_authorize_path(:user, :google_oauth2), class: 'btn btn-sm' do %>
+            <i class="fa-brands fa-google fa-social"></i>
+            <%= t('pages.users.privacy_preferences.join_google') %>
+          <% end %>
+        <% end %>
+        <% unless alreadyproviders.include? Authentication::TWITTER %>
+          <%= link_to omniauth_authorize_path(:user, :twitter), class: 'btn btn-sm' do %>
+            <i class="fa-brands fa-twitter fa-social"></i>
+            <%= t('pages.users.privacy_preferences.join_twitter') %>
+          <% end %>
+        <% end %>
+      </div>
+      <% if alreadyproviders.size > 0 %>
+        <h2 class="text-lg font-bold mb-2"><%= t('pages.users.privacy_preferences.providers_list') %>:</h2>
+        <% authentications.each do |authentication| %>
+          <div class="flex items-center gap-2 mb-2">
+            <% if authentication.provider == Authentication::FACEBOOK %>
+              <i class="fa-brands fa-facebook fa-social"></i> Facebook
+            <% elsif authentication.provider == Authentication::GOOGLE %>
+              <i class="fa-brands fa-google fa-social"></i> Google
+            <% elsif authentication.provider == Authentication::TWITTER %>
+              <i class="fa-brands fa-twitter fa-social"></i> Twitter
+            <% end %>
+            <% if @user.email %>
+              <%= link_to t('buttons.detach'), [@user, authentication], data: { turbo_method: :delete, turbo_confirm: t('confirm_detach') }, class: 'btn btn-sm btn-error' %>
+            <% else %>
+              <%= link_to t('buttons.detach'), '#', data: { detach_disabled: true }, class: 'btn btn-sm btn-disabled' %>
+            <% end %>
+          </div>
+        <% end %>
+      <% end %>
+    <% end %>
+  </div>
+<% end %>
+
+<% if can?(:change_rotp_enabled, current_user) %>
+  <% _rotp_js = "var confirm_msg = el.checked ? \"#{j t('pages.users.privacy_preferences.rotp_confirm_enable')}\" : '#{j t('pages.users.privacy_preferences.rotp_confirm_disable')}'; if (!confirm(confirm_msg)) { return false; } postPreference('/users/change_rotp_enabled', { active: el.checked ? 'true' : 'false' }); " %>
+<% else %>
+  <% _rotp_js = "alert('Per abilitare il Token di sicurezza devi inserire un\\'indirizzo email valido'); return false; " %>
+<% end %>
+
+<script type="text/javascript">
+  document.querySelectorAll('a[data-detach-disabled]').forEach(function(el) {
+    el.addEventListener('click', function(e) { alert('<%= j raw t('alert_detach') %>'); e.preventDefault(); });
+  });
+  function postPreference(url, data) {
+    var csrf = document.querySelector('meta[name="csrf-token"]');
+    fetch(url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded', 'X-CSRF-Token': csrf ? csrf.content : '', 'Accept': 'text/vnd.turbo-stream.html' },
+      body: new URLSearchParams(data).toString()
+    }).then(function(r) { return r.text(); }).then(function(html) { Turbo.renderStreamMessage(html); });
+  }
+  function change_show_tooltips(el) { postPreference("/users/change_show_tooltips", { active: el.checked ? "true" : "false" }); }
+  function change_show_urls(el) { postPreference("/users/change_show_urls", { active: el.checked ? "true" : "false" }); }
+  function change_receive_messages(el) { postPreference("/users/change_receive_messages", { active: el.checked ? "true" : "false" }); }
+  function change_rotp_enabled(el) {
+    <%= raw _rotp_js %>
+  }
+  var localeEl = document.getElementById('locale');
+  if (localeEl) localeEl.addEventListener('change', function() { postPreference("/users/change_locale", { locale: this.value }); });
+  var tzEl = document.getElementById('time_zone');
+  if (tzEl) tzEl.addEventListener('change', function() { postPreference("/users/change_time_zone", { time_zone: this.value }); });
+</script>
+
+<% content_for :left_panel do %>
+  <% if current_user %>
+    <%= render partial: 'users/preferences_panel' %>
+  <% end %>
+<% end %>

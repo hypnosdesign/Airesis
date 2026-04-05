@@ -1,0 +1,10 @@
+<%= turbo_stream.replace "participation_role_modal" do %>
+  <dialog id="participation_role_modal" data-controller="modal" class="modal">
+    <div class="modal-box shadow-brutal border-2 border-base-content max-w-3xl">
+      <%= render partial: "participation_roles/form", locals: { button_name: t("buttons.create") } %>
+    </div>
+    <form method="dialog" class="modal-backdrop" data-action="click->modal#backdropClose">
+      <button>close</button>
+    </form>
+  </dialog>
+<% end %>

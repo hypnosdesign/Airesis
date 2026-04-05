@@ -14,7 +14,7 @@ Devise.setup do |config|
 
   config.stretches = Rails.env.test? ? 1 : 10
 
-  # TODO
+
   # config.pepper = ENV['DEVISE_PEPPER_KEY']
 
   config.reconfirmable = true

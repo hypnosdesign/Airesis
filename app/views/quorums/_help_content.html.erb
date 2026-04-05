@@ -1,0 +1,40 @@
+<div class="right_panel">
+  <div id="whatis" class="quorum_section">
+    <%= t('models.quorum.help_content.description_html') %>
+  </div>
+  <% @quorums.each do |quorum| %>
+    <div id="quorum_<%= quorum.id %>" class="quorum_section">
+      <div class="card bg-base-200 p-4 mb-4">
+        <h3 class="text-lg font-bold mb-2"><%= quorum.name %></h3>
+        <p class="mb-2"><%= quorum.description %></p>
+        <p class="mb-2"><%= quorum.explanation %></p>
+        <ul class="list-disc pl-4">
+          <li>
+            <span class="text-base-content/60"><%= t('models.quorum.help_content.time_discussion') %></span>
+            <b><%= quorum.time(true) %></b>
+          </li>
+          <li>
+            <span class="text-base-content/60"><%= t('models.quorum.help_content.participants') %></span>
+            <b><%= quorum.percentage ? quorum.min_participants : t('models.quorum.help_content.not_specified') %></b>
+          </li>
+          <li>
+            <span class="text-base-content/60"><%= t('models.quorum.help_content.good_score') %></span>
+            <b><%= quorum.good_score %>%</b>
+          </li>
+          <li>
+            <span class="text-base-content/60"><%= t('models.quorum.help_content.time_vote') %></span>
+            <b><%= quorum.vote_time %></b>
+          </li>
+          <li>
+            <span class="text-base-content/60"><%= t('models.quorum.help_content.participants_vote') %></span>
+            <b><%= quorum.vote_percentage ? quorum.min_vote_participants : t('models.quorum.help_content.not_specified') %></b>
+          </li>
+          <li>
+            <span class="text-base-content/60"><%= t('models.quorum.help_content.vote_good_score') %></span>
+            <b><%= quorum.vote_good_score %>%</b>
+          </li>
+        </ul>
+      </div>
+    </div>
+  <% end %>
+</div>

@@ -1,0 +1,14 @@
+<% content_for :left_panel do %>
+  <%= render partial: 'help_menu' %>
+<% end %>
+
+<%= render partial: 'help_content' %>
+
+<script>
+  function showSection(id) {
+    document.querySelectorAll('.quorum_section').forEach(function (el) { el.style.display = 'none'; });
+    document.getElementById(id).style.display = '';
+  }
+  document.querySelectorAll('.quorum_section').forEach(function (el) { el.style.display = 'none'; });
+  document.getElementById('whatis').style.display = '';
+</script>

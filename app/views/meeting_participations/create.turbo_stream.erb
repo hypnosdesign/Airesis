@@ -1,0 +1,11 @@
+<%= turbo_stream.replace "participation_panel_container" do %>
+  <div id="participation_panel_container" class="participation_panel_container">
+    <%= render partial: "events/participation_panel", locals: { event: @event } %>
+  </div>
+<% end %>
+<%= turbo_stream.replace "participants_container" do %>
+  <div id="participants_container" class="participants_container">
+    <%= render partial: "events/meeting_responses", locals: { event: @event } %>
+  </div>
+<% end %>
+<%= render partial: "layouts/flash_stream" %>
