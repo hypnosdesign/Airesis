@@ -1,5 +1,4 @@
 # look at application.example.yml for an explanation of variables
-# TODO: move specific model configuration variables in models
 # maximum date for repeating events
 END_TIME = Date.parse('1 Jan, 2016').to_time
 CONTRIBUTE_MAX_LENGTH = (ENV['CONTRIBUTE_MAX_LENGTH'] || 2000).to_i
@@ -29,7 +28,7 @@ NEWSLETTER_FACEBOOK_URL = ENV['NEWSLETTER_FACEBOOK_URL'] # your facebook oage
 NEWSLETTER_PREFERENCES_URL = ENV['NEWSLETTER_PREFERENCES_URL'] # subscribers management url
 NEWSLETTER_LOGO_PATH = 'logo120.png'.freeze # path to your logo asset
 
-NEWSLETTER_HOME_URL = ENV['NEWSLETTER_HOME_URL'] # TODO: to remove and replace with SITE
+NEWSLETTER_HOME_URL = ENV['NEWSLETTER_HOME_URL']
 APP_SHORT_NAME = ENV['APP_SHORT_NAME'] # your app name
 APP_LONG_NAME = ENV['APP_LONG_NAME'] # your app name
 

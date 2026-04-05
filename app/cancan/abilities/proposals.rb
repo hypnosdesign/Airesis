@@ -35,7 +35,7 @@ module Abilities
     def proposal_comment_permissions(user)
       can :unintegrate, ProposalComment, user: { id: user.id }, integrated: true
 
-      # TODO: better check for manage_noise and mark noise permissions
+
       can %i[index list edit_list left_list show_all_replies manage_noise mark_noise], ProposalComment
       can %i[show history report], ProposalComment, user_id: user.id
       can %i[show history report], ProposalComment,
@@ -79,10 +79,10 @@ module Abilities
       # can see proposals in groups in which has permission, not belonging to any area
       can :read, Proposal, group_proposals: { group: can_do_on_group(user, :view_proposals) }
 
-      # TODO: slows down performances on proposals lists.
+
       # needs to be reactivated to enable group areas.
       # but can't see proposals in presentation areas. it will be allowed in next condition
-      # TODO o it for lists as well. create a scope.
+
       cannot :read, Proposal, private: true, visible_outside: false, area_private: true
 
       # can see proposals in group areas in which has permission

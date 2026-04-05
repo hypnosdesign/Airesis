@@ -4,7 +4,7 @@ class ElfinderController < ApplicationController
   before_action :load_group
 
   def elfinder
-    # TODO: disabled and put in readonly mode
+
     @can_manage = false
     # @can_manage = can? :manage_documents, @group
 

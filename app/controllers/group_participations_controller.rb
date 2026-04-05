@@ -33,7 +33,7 @@ class GroupParticipationsController < ApplicationController
   end
 
   # changes the role of a user
-  # TODO: move from here and put in group_participations#update
+
   def change_user_permission
     @group_participation = @group.group_participations.find(params[:id])
     @group_participation.participation_role = ParticipationRole.find(params[:participation_role_id])
@@ -47,7 +47,7 @@ class GroupParticipationsController < ApplicationController
   end
 
   # send a massive email to all users
-  # TODO: protect
+
   def send_email
     ids = params[:message][:receiver_ids]
     subject = params[:message][:subject]
@@ -61,7 +61,7 @@ class GroupParticipationsController < ApplicationController
   end
 
   # destroy all selected participations
-  # TODO: check permissions
+
   def destroy_all
     ids = params[:destroy][:ids].split(',')
     GroupParticipation.transaction do

@@ -5,9 +5,17 @@ module CanCan
         if override_scope
           @model_class.where(nil).merge(override_scope)
         elsif @model_class.respond_to?(:where) && @model_class.respond_to?(:joins)
-          build_relation(eager_load, conditions)
+          relation = @model_class.where(conditions || {})
+          if joins.present?
+            relation = if eager_load
+                         relation.includes(joins).references(joins)
+                       else
+                         relation.left_joins(joins).distinct
+                       end
+          end
+          relation
         else
-          @model_class.all(conditions: conditions, joins: joins)
+          @model_class.all
         end
       end
     end

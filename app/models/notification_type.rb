@@ -33,7 +33,6 @@ class NotificationType < ApplicationRecord
     I18n.t("db.#{self.class.class_name.tableize}.#{name}.description")
   end
 
-  # TODO
   def destroyable
     []
   end

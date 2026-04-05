@@ -64,7 +64,7 @@ class Alert < ApplicationRecord
   end
 
   def increase_count!
-    properties_will_change! # TODO: bugfix on Rails 4. to remove when patched
+    properties_will_change!
     count = properties['count'] ? properties['count'].to_i : 1
     properties['count'] = count + 1
     save!

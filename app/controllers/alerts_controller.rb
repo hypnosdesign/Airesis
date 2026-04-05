@@ -51,8 +51,8 @@ class AlertsController < ApplicationController
       format.js { head :ok }
     end
   rescue Exception => e
-    @title = 'Impossibile recuperare la notifica' # TODO: I18n
-    @message = "Probabilmente hai più di un account su Airesis e non sei autenticato con quello a cui è destinata la notifica<br/>Esci ed entra con l'account corretto."
+    @title = t('error.alerts.not_found_title', default: 'Alert not found')
+    @message = t('error.alerts.not_found_message', default: 'The notification could not be found. You may be logged in with the wrong account.')
     render template: '/errors/404', status: 404, layout: true
   end
 

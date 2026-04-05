@@ -153,7 +153,7 @@ RSpec.describe 'check user permissions on proposals', :js, search: true, seeds: 
         visit proposals_path
         expect(page).not_to have_content proposal.title
 
-        # TODO: test for participants in the area
+
       end
 
       it 'is displayed in the group list only if you are logged in and have the permission to see it', :aggregate_failures do
@@ -208,7 +208,7 @@ RSpec.describe 'check user permissions on proposals', :js, search: true, seeds: 
 
         logout user
 
-        # TODO: test for participants in the area
+
       end
     end
   end

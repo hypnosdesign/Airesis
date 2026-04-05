@@ -84,7 +84,7 @@ class BestQuorum < Quorum
       end
       left.upcase
     else
-      'STALLED' # TODO: i18n
+      I18n.t('models.quorum.stalled', default: 'STALLED')
     end
   end
 
@@ -92,7 +92,7 @@ class BestQuorum < Quorum
   def vote_time
     case t_vote_minutes
     when 'f'
-      'free' # TODO: I18n
+      I18n.t('models.quorum.free', default: 'free')
     when 's'
       min = vote_minutes if vote_minutes
 
@@ -216,7 +216,7 @@ class BestQuorum < Quorum
   def min_participants_pop
     percentage_f = percentage.to_f
     count = if group
-              percentage_f * 0.01 * group.scoped_participants(:participate_proposals).count # TODO: group areas
+              percentage_f * 0.01 * group.scoped_participants(:participate_proposals).count
             else
               percentage_f * 0.001 * User.count
             end
@@ -226,7 +226,7 @@ class BestQuorum < Quorum
   def min_vote_participants_pop
     vote_percentage_f = vote_percentage.to_f
     count = if group
-              vote_percentage_f * 0.01 * group.scoped_participants(:vote_proposals).count # TODO: group areas
+              vote_percentage_f * 0.01 * group.scoped_participants(:vote_proposals).count
             else
               vote_percentage_f * 0.001 * User.count
             end
@@ -250,7 +250,7 @@ class BestQuorum < Quorum
     ret.html_safe
   end
 
-  # TODO: we need to refactor this part of code but at least now is more clear
+
   # explain a quorum when assigned to a proposal in it's current state
   def assigned_explanation_pop
     ret = ''

@@ -2,7 +2,7 @@ class AlertJob < ApplicationRecord
   belongs_to :trackable, polymorphic: true
   belongs_to :notification_type
   belongs_to :user
-  # TODO: why is this optional?
+
   belongs_to :alert, optional: true
 
   validates :trackable, presence: true

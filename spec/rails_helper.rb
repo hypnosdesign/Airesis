@@ -68,9 +68,9 @@ RSpec.configure do |config|
           next if /Blocked attempt to show a 'beforeunload' confirmation panel/.match?(error.message)
           next if /connect.facebook.net/.match?(error.message)
 
-          # TODO: should not happen
+
           next if /Cannot read property 'getSelectedElement' of null/.match?(error.message)
-          # TODO: should not happen
+
           next if /FormValidation.Framework.Bootstrap/.match?(error.message)
 
           expect(error.level).not_to eq('SEVERE'), error.message

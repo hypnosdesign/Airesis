@@ -2,5 +2,4 @@
 
 # Specify a serializer for the signed and encrypted cookie jars.
 # Valid options are :json, :marshal, and :hybrid.
-# TODO: migrate to :json
 Rails.application.config.action_dispatch.cookies_serializer = :json

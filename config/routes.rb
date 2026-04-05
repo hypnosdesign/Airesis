@@ -111,7 +111,7 @@ Rails.application.routes.draw do
   resources :alerts do
     member do
       get :check
-      get :check_alert # TODO: remove in one year from 08-05-2014
+      get :check_alert
     end
 
     collection do

@@ -4,7 +4,7 @@ RSpec.configure do |config|
   end
 
   config.before do
-    # TODO: these should not be needed.
+
     # Use count checks to make seed loading idempotent (safe for rspec-retry within same transaction)
     load Rails.root.join('db/seeds/data/notification_types.rb') if NotificationType.count.zero?
     load Rails.root.join('db/seeds/data/proposal_types.rb') if ProposalType.count.zero?
@@ -29,7 +29,7 @@ RSpec.configure do |config|
     load_database
   end
 
-  # TODO: remove
+
   def load_municipalities
     create(:municipality, :bologna)
   end

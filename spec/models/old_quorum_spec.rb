@@ -118,13 +118,13 @@ RSpec.describe OldQuorum, type: :model, seeds: true do
     it 'returns IN STALLO when ends_at is nil and no valutations' do
       quorum.ends_at = nil
       quorum.valutations = nil
-      expect(quorum.time_left).to eq 'IN STALLO'
+      expect(quorum.time_left).to eq 'STALLED'
     end
 
     it 'returns IN STALLO when ends_at is in the past and no valutations' do
       quorum.ends_at = 1.hour.ago
       quorum.valutations = nil
-      expect(quorum.time_left).to eq 'IN STALLO'
+      expect(quorum.time_left).to eq 'STALLED'
     end
 
     it 'returns a string when less than 1 minute left' do
@@ -132,7 +132,7 @@ RSpec.describe OldQuorum, type: :model, seeds: true do
       quorum.valutations = nil
       result = quorum.time_left
       expect(result).to be_a(String)
-      expect(result).not_to eq 'IN STALLO'
+      expect(result).not_to eq 'STALLED'
     end
 
     it 'returns a string when less than 1 hour left' do
@@ -140,7 +140,7 @@ RSpec.describe OldQuorum, type: :model, seeds: true do
       quorum.valutations = nil
       result = quorum.time_left
       expect(result).to be_a(String)
-      expect(result).not_to eq 'IN STALLO'
+      expect(result).not_to eq 'STALLED'
     end
 
     it 'returns a string when less than 24 hours left' do
@@ -148,7 +148,7 @@ RSpec.describe OldQuorum, type: :model, seeds: true do
       quorum.valutations = nil
       result = quorum.time_left
       expect(result).to be_a(String)
-      expect(result).not_to eq 'IN STALLO'
+      expect(result).not_to eq 'STALLED'
     end
 
     it 'returns a string in days when more than 24 hours left' do
@@ -156,7 +156,7 @@ RSpec.describe OldQuorum, type: :model, seeds: true do
       quorum.valutations = nil
       result = quorum.time_left
       expect(result).to be_a(String)
-      expect(result).not_to eq 'IN STALLO'
+      expect(result).not_to eq 'STALLED'
     end
   end
 
