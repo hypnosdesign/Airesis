@@ -69,7 +69,7 @@ module Admin
       ProposalsWorker.set(wait: 15.seconds).perform_later( 'proposal_id' => 1)
       flash[:notice] = 'Test avviato'
       redirect_to admin_panel_path
-    rescue Exception => e
+    rescue StandardError => e
       puts e.backtrace
     end
 

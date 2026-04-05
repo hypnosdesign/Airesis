@@ -13,11 +13,12 @@ import { Controller } from "@hotwired/stimulus"
 //   </dialog>
 export default class extends Controller {
   static values = {
-    removeOnClose: { type: Boolean, default: true }
+    removeOnClose: { type: Boolean, default: true },
+    openOnConnect: { type: Boolean, default: true }
   }
 
   connect() {
-    if (this.element.tagName === "DIALOG" && !this.element.open) {
+    if (this.element.tagName === "DIALOG" && !this.element.open && this.openOnConnectValue) {
       this.element.showModal()
     }
     this.element.addEventListener("close", this._onClose)

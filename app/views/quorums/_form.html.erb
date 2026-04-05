@@ -108,7 +108,7 @@
   </div>
 
   <div class="w-full flex gap-2 mt-4">
-    <%= link_to t('buttons.cancel'), '#', class: 'btn', data: { 'reveal-close' => '' } %>
+    <%= link_to t('buttons.cancel'), '#', class: 'btn', data: { action: 'click->modal#close' } %>
     <%= link_to t('buttons.go_back'), :back, class: 'btn', data: { back: '' } %>
     <%= e.button :button, class: 'btn btn-primary' do %>
       <i class="fa-solid fa-floppy-disk"></i>
@@ -116,8 +116,6 @@
     <% end %>
   </div>
 <% end %>
-
-<a class="close-">&times;</a>
 
 <script type="text/javascript">
   function update_participants(value) {

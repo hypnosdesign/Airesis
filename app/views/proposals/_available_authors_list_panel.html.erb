@@ -11,7 +11,7 @@
         <%= avatar(user, size: 24) %>
       </div>
     <% end %>
-    <%= link_to t('buttons.cancel'), '#', class: 'btn', data: { 'reveal-close' => '' } %>
+    <%= link_to t('buttons.cancel'), '#', class: 'btn', data: { action: 'click->modal#close' } %>
     <%= link_to t('buttons.go_back'), :back, class: 'btn', data: { back: '' } %>
     <%= f.submit t('buttons.save'), class: 'btn btn-primary', data: { disable_with: t('loading') } %>
   <% end %>

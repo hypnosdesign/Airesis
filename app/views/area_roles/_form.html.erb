@@ -2,7 +2,7 @@
 <%= simple_form_for [@group, @group_area, @area_role], remote: remote do |f| %>
   <%= f.input :name %>
   <%= f.input :description, as: :text unless @group_area.area_role_id == @area_role.id %>
-  <%= link_to t('buttons.cancel'), '#', class: 'btn', data: {'reveal-close' => ''} %>
+  <%= link_to t('buttons.cancel'), '#', class: 'btn', data: { action: 'click->modal#close' } %>
   <%= link_to t('buttons.go_back'), :back, class: 'btn', data: {back: ''} %>
   <%= f.submit button_name, class: 'btn btn-primary' %>
 <% end %>

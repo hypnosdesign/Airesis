@@ -325,7 +325,7 @@ class ProposalsController < ApplicationController
       @proposal.reload
     end
     flash[:notice] = t('info.proposal.authors_added')
-  rescue Exception => e
+  rescue StandardError => e
     flash[:error] = t('errors.proposal.authors_added')
     respond_to do |format|
       format.turbo_stream { render partial: 'layouts/flash_stream' }
@@ -386,7 +386,7 @@ class ProposalsController < ApplicationController
       format.turbo_stream { render 'rank' }
       format.html { redirect_back(fallback_location: proposal_path(@proposal)) }
     end
-  rescue Exception => e
+  rescue StandardError => e
     log_error(e)
     flash[:error] = I18n.t('error.proposals.proposal_rank')
     respond_to do |format|

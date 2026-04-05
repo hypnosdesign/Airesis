@@ -4,7 +4,7 @@
       <%= f.label t('buttons.search'), t('pages.blogs.index.search_with_query') %>
     </div>
     <div class="flex-1">
-      <%= text_field_tag :search, params[:search], title: t('pages.blogs.index.find_title'), class: 'input input-bordered w-full' %>
+      <%= text_field_tag :search, params[:search], title: t('pages.blogs.index.find_title'), class: 'input input-bordered w-full', minlength: 2 %>
     </div>
     <div class="flex items-center gap-2">
       <div class="search_words">
@@ -18,7 +18,7 @@
       <%= text_field_tag :interest_border, params[:interest_border], title: t('pages.groups.index.find_title'), data: { pre: [InterestBorder.key_to_json(params[:interest_border])] }, class: 'input input-bordered w-full' %>
     </div>
     <div class="w-full">
-      <%= f.button onclick: 'return checkCharacters();', class: 'btn btn-primary', data: { disable_with: t('loading') } do %>
+      <%= f.button class: 'btn btn-primary', data: { disable_with: t('loading') } do %>
         <i class="fa-solid fa-search"></i>
         <%= t('buttons.search') %>
       <% end %>

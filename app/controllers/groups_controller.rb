@@ -330,7 +330,7 @@ class GroupsController < ApplicationController
       format.turbo_stream
       format.html { redirect_back fallback_location: group_path(@group) }
     end
-  rescue Exception => e
+  rescue StandardError => e
     flash[:error] = t('error.groups.post_removed')
     respond_to do |format|
       format.turbo_stream { render partial: 'layouts/flash_stream' }

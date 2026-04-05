@@ -6,7 +6,7 @@
     <%= e.input :default_role_name %>
   <% end %>
   <input type="hidden" name="manage" value="<%= params[:manage] %>"/>
-  <%= link_to t('buttons.cancel'), '#', class: 'btn', data: {'reveal-close' => ''} %>
+  <%= link_to t('buttons.cancel'), '#', class: 'btn', data: { action: 'click->modal#close' } %>
   <%= link_to t('buttons.go_back'), :back, class: 'btn', data: {back: ''} %>
   <%= e.submit t('buttons.create'), class: 'btn btn-primary', data: {disable_with: t('saving')} %>
 <% end %>

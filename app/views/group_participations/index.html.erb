@@ -33,23 +33,27 @@
         <div class="w-full lg:w-1/2">
           <div class="card bg-base-200 p-4">
             <h2><%= t('pages.groups.participations.operations_on_user') %></h2>
-            <%= link_to '#', class: 'btn invite-button', data: { 'reveal-id' => 'email_panel' } do %>
+            <%= link_to '#', class: 'btn invite-button', onclick: "document.getElementById('email_panel').showModal(); return false;" do %>
               <i class="fa-solid fa-envelope"></i>
               <%= t('pages.groups.participations.send_email') %>
             <% end %>
-            <div id="email_panel" class="small">
-              <h2><%= t('pages.users.send_message.massive_email') %></h2>
-              <%= simple_form_for 'message', url: send_email_group_group_participations_path(@group), data: { turbo_method: :post } do |e| %>
-                <%= e.input 'subject', label: t('pages.users.send_message.subject_label') %>
-                <%= e.input 'body', as: :text, label: t('pages.users.send_message.body_label'), input_html: { rows: 10 } %>
-                <%= e.hidden_field 'receiver_ids', value: @unscoped_group_participations.map { |p| p.user_id }.join(',') %>
-                <a class="btn" href="#" onclick="document.getElementById('email_panel').close();return false;">
-                  <%= t('buttons.cancel') %>
-                </a>
-                <%= e.submit t('buttons.send'), class: 'btn btn-primary', data: { disable_with: t('sending') } %>
-              <% end %>
-              <a class="close-">&times;</a>
-            </div>
+            <dialog id="email_panel" class="modal" data-controller="modal" data-modal-open-on-connect-value="false" data-modal-remove-on-close-value="false">
+              <div class="modal-box">
+                <h2 class="text-xl font-bold mb-4"><%= t('pages.users.send_message.massive_email') %></h2>
+                <%= simple_form_for 'message', url: send_email_group_group_participations_path(@group), data: { turbo_method: :post } do |e| %>
+                  <%= e.input 'subject', label: t('pages.users.send_message.subject_label') %>
+                  <%= e.input 'body', as: :text, label: t('pages.users.send_message.body_label'), input_html: { rows: 10 } %>
+                  <%= e.hidden_field 'receiver_ids', value: @unscoped_group_participations.map { |p| p.user_id }.join(',') %>
+                  <div class="flex gap-2 mt-4">
+                    <%= link_to t('buttons.cancel'), '#', class: 'btn', data: { action: 'click->modal#close' } %>
+                    <%= e.submit t('buttons.send'), class: 'btn btn-primary', data: { disable_with: t('sending') } %>
+                  </div>
+                <% end %>
+              </div>
+              <form method="dialog" class="modal-backdrop" data-action="click->modal#backdropClose">
+                <button>close</button>
+              </form>
+            </dialog>
             <%= form_for 'destroy', url: destroy_all_group_group_participations_path(@group), data: { turbo_method: :post }, html: { style: 'display:inline;' } do |e| %>
               <%= e.hidden_field 'ids', value: @unscoped_group_participations.map { |p| p.id }.join(',') %>
               <%= link_to '#', class: 'btn', id: 'remove_all' do %>

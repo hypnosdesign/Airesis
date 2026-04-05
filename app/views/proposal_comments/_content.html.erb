@@ -2,30 +2,32 @@
 
 <div>
   <div class="baloon_header">
-    <a href="#" class="right report_contribute hidden_link" data-dropdown="commentdropdown<%= comment.id %>">
-    <ul class="f-dropdown" id="commentdropdown<%= comment.id %>" data-dropdown-content>
-    <% if can? :update, comment %>
-      <li>
-        <%= link_to t('pages.proposals.update_comment'), edit_proposal_proposal_comment_path(@proposal, comment),
-                    class: "editCommentLink menu_item", data: {edit_contribute: comment.id} %>
-      </li>
-    <% end %>
-    <% if comment.versions.length > 0 %>
-      <li>
-        <%= link_to t('pages.proposals.history_comment'), history_proposal_proposal_comment_path(@proposal, comment),
-                    class: "historyCommentLink menu_item", data: {history_contribute: comment.id} %>
-      </li>
-    <% end %>
-    <li>
-      <a href="#" data-report-contribute="<%= comment.id %>">
-      <%= t('buttons.report') %>
-    </li>
-    <% if can? :destroy, comment %>
-      <li>
-        <%= link_to t('pages.proposals.delete_comment'), [@proposal, comment], data: { turbo_method: :delete , turbo_confirm: t('pages.proposals.show.delete_contribute_confirmation')},
-                    class: "deleteCommentLink menu_item" %>
-      </li>
-    <% end %>
+    <div class="dropdown dropdown-end float-right">
+      <button tabindex="0" class="btn btn-ghost btn-xs"><i class="fa-solid fa-ellipsis-vertical"></i></button>
+      <ul tabindex="0" class="dropdown-content menu bg-base-200 rounded-box shadow z-10 p-2 w-40">
+        <% if can? :update, comment %>
+          <li>
+            <%= link_to t('pages.proposals.update_comment'), edit_proposal_proposal_comment_path(@proposal, comment),
+                        class: "editCommentLink menu_item", data: {edit_contribute: comment.id} %>
+          </li>
+        <% end %>
+        <% if comment.versions.length > 0 %>
+          <li>
+            <%= link_to t('pages.proposals.history_comment'), history_proposal_proposal_comment_path(@proposal, comment),
+                        class: "historyCommentLink menu_item", data: {history_contribute: comment.id} %>
+          </li>
+        <% end %>
+        <li>
+          <a href="#" data-report-contribute="<%= comment.id %>"><%= t('buttons.report') %></a>
+        </li>
+        <% if can? :destroy, comment %>
+          <li>
+            <%= link_to t('pages.proposals.delete_comment'), [@proposal, comment], data: { turbo_method: :delete, turbo_confirm: t('pages.proposals.show.delete_contribute_confirmation')},
+                        class: "deleteCommentLink menu_item" %>
+          </li>
+        <% end %>
+      </ul>
+    </div>
   </div>
   <div class="baloon-content">
     <%= parsed_content(comment, @proposal.is_anonima?) %>
@@ -43,6 +45,7 @@
     <% end %>
   </div>
   <div id="rankingpanelcontainer<%= comment.id %>" class="rankingpanelcontainer">
-  <%= render partial: 'proposal_comments/ranking_panel', locals: {comment: comment} %>
+    <%= render partial: 'proposal_comments/ranking_panel', locals: {comment: comment} %>
+  </div>
+  <div style="clear:both;"></div>
 </div>
-<div style="clear:both;"></div>
