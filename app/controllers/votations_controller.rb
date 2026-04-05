@@ -77,7 +77,7 @@ Vote errors: #{@proposal.vote.errors.details}")
       format.turbo_stream { render 'votations/vote_schulze' }
       format.html { render action: :show }
     end
-  rescue Exception => e
+  rescue StandardError => e
     respond_to do |format|
       flash[:error] = t('errors.messages.votation')
       format.turbo_stream { render 'votations/errors/vote_error' }

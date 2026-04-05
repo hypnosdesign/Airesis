@@ -1,6 +1,6 @@
 <%= cache "solution_#{I18n.locale}_#{@proposal.proposal_type.name.downcase}" do %>
   <% solution = @proposal.build_solution %>
-  <div class="solution_main card bg-base-200 p-4">
+  <div class="solution_main card bg-base-200 p-4" data-controller="nested-form">
     <%= fields_for :proposals, Proposal.new do |p| %>
       <%= p.fields_for :solutions, solution do |sol| %>
         <h3>
@@ -14,14 +14,14 @@
           </div>
         </h3>
         <span class="remove_sol_button">
-          <a href="#" onclick="ProposalsEdit.removeSolution(this,false);return false;">
+          <a href="#" data-action="click->nested-form#remove">
             <%= t('pages.proposals.edit.remove_solution') %>
           </a>
         </span>
         <div class="sol_content">
           <div class="solutions_column" data-solution_id="">
             <%= sol.hidden_field :seq %>
-            <%= sol.check_box '_destroy', style: 'display:none' %>
+            <%= sol.check_box '_destroy', style: 'display:none', data: { 'nested-form-target': 'destroy' } %>
             <% solution.sections.each_with_index do |section, j| %>
               <%= sol.hidden_field :seq %>
               <%= sol.check_box '_destroy', style: 'display:none' %>

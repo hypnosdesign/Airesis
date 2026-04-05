@@ -52,51 +52,6 @@
   <%= subscribe_to proposal_path(@proposal) %>
 <% end %>
 
-<script>
-  Airesis.show_comment_id = <%= params[:comment_id] || 'null' %>;
-  Airesis.show_section_id = <%= params[:section_id] || 'null' %>;
-  Airesis.i18n.proposals.vote = {
-    positive: <%= VoteType::POSITIVE %>,
-    neutral: <%= VoteType::NEUTRAL %>,
-    negative: <%= VoteType::NEGATIVE %>,
-    confirm_positive: '<%= j raw t('pages.votations.show.confirm_positive', name: @proposal.title) %>',
-    confirm_neutral: '<%= j raw t('pages.votations.show.confirm_neutral', name: @proposal.title) %>',
-    confirm_negative: '<%= j raw t('pages.votations.show.confirm_negative', name: @proposal.title) %>'
-  };
-  Airesis.can_participate = <%= can? :participate, @proposal %>;
-
-  <% if signed_in? %>
-    Airesis.image_tag = '<%= j avatar(current_user, size: 32) %>';
-    Airesis.resource_viewable = true;
-  <% end %>
-
-  ProposalsShow.voting = <%= @proposal.voting? %>;
-  ProposalsShow.voted = <%= @proposal.voted? %>;
-  ProposalsShow.abandoned = <%= @proposal.abandoned? %>;
-  ProposalsShow.contributesUrl = '<%= j list_proposal_proposal_comments_url(@proposal) %>';
-  ProposalsShow.rightListUrl = '<%= j left_list_proposal_proposal_comments_url(@proposal) %>';
-  ProposalsShow.proposalId = <%= @proposal.id %>;
-  ProposalsShow.openShare = '<%= params[:share] %>';
-  ProposalsShow.nicknames = <%= json_nicknames @proposal %>;
-  ProposalsShow.contributeMaxLength = <%= CONTRIBUTE_MAX_LENGTH %>;
-  ProposalsShow.times = {
-    created_at: <%= @proposal.created_at.to_i %>,
-    updated_at: <%= @proposal.updated_at.to_i %>,
-    descriptions: {}
-  };
-
-  <% if @proposal.quorum.present? && @proposal.quorum.ends_at.present? %>
-    ProposalsShow.times.ends_at = <%= @proposal.quorum.ends_at.to_i %>;
-    ProposalsShow.times.descriptions.ends_at = '<%= j l @proposal.quorum.ends_at %>';
-  <% end %>
-
-  <% if @proposal.vote_period.present? %>
-    ProposalsShow.times.vote_ends_at = <%= @proposal.vote_period.endtime.to_i %>;
-    ProposalsShow.times.descriptions.vote_ends_at = '<%= j l @proposal.vote_period.endtime if @proposal.voting? %>';
-  <% end %>
-
-</script>
-
 <% content_for :left_panel do %>
   <%= render 'proposals/left_panel' %>
 <% end %>

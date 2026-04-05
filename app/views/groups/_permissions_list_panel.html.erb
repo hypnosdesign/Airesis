@@ -5,18 +5,9 @@
   </ul>
 <% else %>
   <% if @group.enable_areas && current_user.scoped_areas(@group).count > 0 %>
-    <dl id="permission-tabs" class="tabs" data-tab>
-      <dd class="active">
-        <%= link_to t('pages.users.show.group_level_permission_title'), '#group_id' %>
-      </dd>
-      <% current_user.scoped_areas(@group).each do |area| %>
-        <dd>
-          <%= link_to area.name, "#area_#{area.id}" %>
-        </dd>
-      <% end %>
-    </dl>
-    <div class="tabs-content">
-      <div id="group_id" class="content active">
+    <div role="tablist" class="tabs tabs-bordered">
+      <input type="radio" name="perm_tabs" role="tab" class="tab" aria-label="<%= t('pages.users.show.group_level_permission_title') %>" checked />
+      <div role="tabpanel" class="tab-content p-4">
         <strong><%= t('pages.users.show.what_can_i_do') %></strong>
         <ul>
           <li><%= GroupAction::LIST.select { |action| @participation_role[action] }.map { |a| I18n.t("db.group_actions.#{a}.description") }.join('</li><li>').html_safe %></li>
@@ -28,7 +19,8 @@
       </div>
       <% current_user.scoped_areas(@group).each do |area| %>
         <% area_role = area.area_participations.find_by(user_id: current_user.id).area_role %>
-        <div class="content" id="area_<%= area.id %>">
+        <input type="radio" name="perm_tabs" role="tab" class="tab" aria-label="<%= area.name %>" />
+        <div role="tabpanel" class="tab-content p-4">
           <strong><%= t('pages.users.show.what_can_i_do') %></strong>
           <ul>
             <li><%= DEFAULT_AREA_ACTIONS.select { |action| area_role[action] }.map { |a| I18n.t("db.group_actions.#{a}.description") }.join('</li><li>').html_safe %></li>

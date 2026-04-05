@@ -89,7 +89,7 @@ class UsersController < ApplicationController
     current_user.save!
     flash[:notice] = params[:active] == 'true' ? t('info.user.tooltips_enabled') : t('info.user.tooltips_disabled')
     respond_to_preference
-  rescue Exception => e
+  rescue StandardError => e
     flash[:error] = t('error.setting_preferences')
     respond_to_preference
   end
@@ -99,7 +99,7 @@ class UsersController < ApplicationController
     current_user.save!
     flash[:notice] = params[:active] == 'true' ? t('info.user.url_shown') : t('info.user.url_hidden')
     respond_to_preference
-  rescue Exception => e
+  rescue StandardError => e
     flash[:error] = t('error.setting_preferences')
     respond_to_preference
   end
@@ -113,7 +113,7 @@ class UsersController < ApplicationController
                        t('info.private_messages_inactive')
                      end
     respond_to_preference
-  rescue Exception => e
+  rescue StandardError => e
     flash[:error] = t('error.setting_preferences')
     respond_to_preference
   end
@@ -123,7 +123,7 @@ class UsersController < ApplicationController
     current_user.save!
     flash[:notice] = t('info.locale_changed')
     respond_to_preference
-  rescue Exception => e
+  rescue StandardError => e
     flash[:error] = t('error.setting_preferences')
     respond_to_preference
   end
@@ -133,7 +133,7 @@ class UsersController < ApplicationController
     current_user.save!
     flash[:notice] = t('info.user.time_zone_changed')
     respond_to_preference
-  rescue Exception => e
+  rescue StandardError => e
     flash[:error] = t('error.setting_preferences')
     respond_to_preference
   end
@@ -152,7 +152,7 @@ class UsersController < ApplicationController
       format.turbo_stream
       format.html { redirect_back fallback_location: root_path }
     end
-  rescue Exception => e
+  rescue StandardError => e
     flash[:error] = t('error.setting_preferences')
     respond_to_preference
   end

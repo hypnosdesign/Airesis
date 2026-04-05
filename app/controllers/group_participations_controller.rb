@@ -77,7 +77,7 @@ class GroupParticipationsController < ApplicationController
       end
     end
     flash[:notice] = t('info.participations_destroyed')
-  rescue Exception => e
+  rescue StandardError => e
     flash[:error] = t('error.participations_destroyed')
   ensure
     respond_to do |format|

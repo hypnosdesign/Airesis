@@ -3,7 +3,7 @@
   <%= f.input :emails_list, as: :string %>
   <%= f.input :testo, as: :text, placeholder: t('pages.groups.invite_your_friends.text_to_send') %>
   <%= f.hidden_field :group_id %>
-  <%= link_to t('buttons.cancel'), '#', class: 'btn', data: { reveal_close: '' } %>
+  <%= link_to t('buttons.cancel'), '#', class: 'btn', data: { action: 'click->modal#close' } %>
   <%= link_to t('buttons.go_back'), :back, class: 'btn', data: { back: '' } %>
   <%= f.button :button, class: "btn btn-primary" do %>
     <i class="fa-solid fa-envelope"></i>

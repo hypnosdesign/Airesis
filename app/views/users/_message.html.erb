@@ -13,7 +13,7 @@
       </p>
     </div>
     <div class="w-full flex gap-2">
-      <%= link_to t('buttons.cancel'), '#', class: 'btn', data: { 'reveal-close' => '' } %>
+      <%= link_to t('buttons.cancel'), '#', class: 'btn', data: { action: 'click->modal#close' } %>
       <%= link_to t('buttons.go_back'), :back, class: 'btn', data: { back: '' } %>
       <%= e.button :button, class: 'btn btn-primary' do %>
         <i class="fa-solid fa-envelope"></i>

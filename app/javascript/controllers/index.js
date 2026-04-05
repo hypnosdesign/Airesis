@@ -22,5 +22,11 @@ application.register("modal", ModalController)
 import ThemeController from "./theme_controller"
 application.register("theme", ThemeController)
 
+import NestedFormController from "./nested_form_controller"
+application.register("nested-form", NestedFormController)
+
+import NoiseManagerController from "./noise_manager_controller"
+application.register("noise-manager", NoiseManagerController)
+
 import ToggleController from "./toggle_controller"
 application.register("toggle", ToggleController)

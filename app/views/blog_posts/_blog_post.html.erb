@@ -1,9 +1,10 @@
 <div class="blogPost card bg-base-200 p-4 mb-4" id="blogPost<%= blog_post.id %>">
   <% if can? :update, blog_post %>
-    <div class="hidden_link dropdown dropdown-end" data-dropdown="drop<%= blog_post.id %>">
-      <ul id="drop<%= blog_post.id %>" class="dropdown-content menu bg-base-300 rounded-box shadow-lg z-10 p-2" data-dropdown-content>
+    <div class="dropdown dropdown-end float-right">
+      <button tabindex="0" class="btn btn-ghost btn-xs"><i class="fa-solid fa-ellipsis-vertical"></i></button>
+      <ul tabindex="0" class="dropdown-content menu bg-base-300 rounded-box shadow-lg z-10 p-2 w-40">
         <li><%= link_to t('pages.blog_posts.edit_button'), edit_blog_blog_post_path(blog_post.blog, blog_post), class: 'menu_item' %></li>
-        <li><%= link_to t('pages.blog_posts.delete_button'), blog_blog_post_path(blog_post.blog, blog_post), data: { turbo_method: :delete }, class: 'menu_item', data: { turbo_confirm: "Sei sicuro di voler cancellare il post '#{blog_post.title}'. Esso scomparirà sia dall bacheca del gruppo che dal tuo blog personale e non sarà più possibile recuperarlo." } %></li>
+        <li><%= link_to t('pages.blog_posts.delete_button'), blog_blog_post_path(blog_post.blog, blog_post), data: { turbo_method: :delete, turbo_confirm: "Sei sicuro di voler cancellare il post '#{blog_post.title}'. Esso scomparirà sia dall bacheca del gruppo che dal tuo blog personale e non sarà più possibile recuperarlo." }, class: 'menu_item' %></li>
       </ul>
     </div>
   <% end %>

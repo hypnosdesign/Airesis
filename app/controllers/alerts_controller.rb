@@ -50,7 +50,7 @@ class AlertsController < ApplicationController
       format.html { redirect_to calculate_alert_path(@alert) }
       format.js { head :ok }
     end
-  rescue Exception => e
+  rescue StandardError => e
     @title = t('error.alerts.not_found_title', default: 'Alert not found')
     @message = t('error.alerts.not_found_message', default: 'The notification could not be found. You may be logged in with the wrong account.')
     render template: '/errors/404', status: 404, layout: true

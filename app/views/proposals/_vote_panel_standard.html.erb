@@ -7,7 +7,7 @@
     <br>
     <%= f.text_field 'token', maxlength: 6 %>
   <% end %>
-  <ul class="button-group even-3">
+  <ul class="flex gap-2">
     <li>
       <%= link_to t('pages.votations.show.vote_positive'), '#', class: "votegreen votebutton btn btn-success", title: t('pages.votations.show.vote_positive'), data: { vote_type: VoteType::POSITIVE } %>
     </li>

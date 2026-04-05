@@ -1,22 +1,26 @@
 <% if @group %>
-  <%= link_to '#', class: "historyButton btn", data: { 'reveal-id' => "regenerate_container" } do %>
+  <%= link_to '#', class: "historyButton btn", onclick: "document.getElementById('regenerate_container').showModal(); return false;" do %>
     <i class="fa-solid fa-rotate-left"></i>
     <%= t('proposals.regenerate_button') %>
   <% end %>
 <% else %>
-  <%= link_to '#', class: "historyButton btn", data: { 'reveal-id' => "regenerate_container" } do %>
+  <%= link_to '#', class: "historyButton btn", onclick: "document.getElementById('regenerate_container').showModal(); return false;" do %>
     <i class="fa-solid fa-rotate-left"></i>
     <%= t('proposals.regenerate_button') %>
   <% end %>
 <% end %>
-<div id="regenerate_container" class="">
-  <h2><%= t('pages.proposals.show.new_quorum_title') %></h2>
-  <%= simple_form_for @proposal, url: (@group ? regenerate_group_proposal_path(@group, @proposal) : regenerate_proposal_path(@proposal)) do |f| %>
-    <%= render partial: '/proposal_types/quorum_choice', locals: { f: f } %>
-    <a class="btn" href="#" onclick="var d=document.getElementById('regenerate_container');if(d&&d.close)d.close();return false;">
-      <%= t('buttons.cancel') %>
-    </a>
-    <%= f.submit t('pages.proposals.show.back_debate_button'), class: 'btn btn-primary', data: { disable_with: t('loading') } %>
-  <% end %>
-  <a class="close-">&times;</a>
-</div>
+<dialog id="regenerate_container" class="modal" data-controller="modal" data-modal-open-on-connect-value="false" data-modal-remove-on-close-value="false">
+  <div class="modal-box">
+    <h2 class="text-xl font-bold mb-4"><%= t('pages.proposals.show.new_quorum_title') %></h2>
+    <%= simple_form_for @proposal, url: (@group ? regenerate_group_proposal_path(@group, @proposal) : regenerate_proposal_path(@proposal)) do |f| %>
+      <%= render partial: '/proposal_types/quorum_choice', locals: { f: f } %>
+      <div class="flex gap-2 mt-4">
+        <%= link_to t('buttons.cancel'), '#', class: 'btn', data: { action: 'click->modal#close' } %>
+        <%= f.submit t('pages.proposals.show.back_debate_button'), class: 'btn btn-primary', data: { disable_with: t('loading') } %>
+      </div>
+    <% end %>
+  </div>
+  <form method="dialog" class="modal-backdrop" data-action="click->modal#backdropClose">
+    <button>close</button>
+  </form>
+</dialog>
