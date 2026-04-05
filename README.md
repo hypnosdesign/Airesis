@@ -96,7 +96,7 @@ This project underwent a comprehensive modernization starting from a legacy Rail
 |-----------|---------|
 | Ruby | 3.4.4 |
 | Rails | 8.1.3 |
-| PostgreSQL | 14+ |
+| PostgreSQL | 17+ |
 | Job queue | Solid Queue (DB-backed, no Redis) |
 | WebSocket | Action Cable + Solid Cable |
 | CSS | Tailwind v4 + DaisyUI 5 |
@@ -118,7 +118,7 @@ This project underwent a comprehensive modernization starting from a legacy Rail
 
 ### Requirements
 
-- PostgreSQL 14+ with `hstore` extension enabled
+- PostgreSQL 17+ with `hstore` extension enabled
 - Node.js 18+ and Yarn (for JS bundling)
 
 ### Docker (recommended)
@@ -137,7 +137,7 @@ docker compose up
 
 Services:
 - `airesis` — Rails app (port 3000)
-- `db` — PostgreSQL 14 (port 5433)
+- `db` — PostgreSQL 17 (port 5433)
 - `solid_queue` — background job worker
 
 ### Useful commands
