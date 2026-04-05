@@ -1,26 +1,48 @@
 <% @page_title = t('pages.registration.title') %>
 
-<div class="min-h-screen bg-base-200 flex items-center justify-center py-12 px-4">
-  <div class="card bg-base-100 shadow-brutal border-2 border-base-content w-full max-w-lg">
-    <div class="card-body gap-4">
+<div class="min-h-[calc(100vh-8rem)] flex items-center justify-center py-8 px-4">
+  <div class="w-full max-w-5xl bg-base-100 border-2 border-base-content shadow-brutal flex flex-col lg:flex-row overflow-hidden">
 
-      <h1 class="text-2xl font-bold"><%= t('pages.registration.title') %></h1>
+    <%# — Left: form — %>
+    <div class="lg:w-1/2 p-8 sm:p-12 flex flex-col justify-center">
 
-      <%# Social login providers %>
+      <h1 class="text-3xl font-extrabold mb-8"><%= t('pages.registration.title') %></h1>
+
+      <%# Social login %>
       <% if ::Configuration.socialnetwork_active %>
-        <div class="flex flex-col sm:flex-row gap-3">
-          <%= link_to_ip t('pages.top_panel.facebook_login'), :facebook, 'facebook' %>
-          <%= link_to_ip t('pages.top_panel.google_login'), :google_oauth2, 'google' %>
-          <%= link_to_ip t('pages.top_panel.twitter_login'), :twitter, 'twitter' %>
+        <div class="flex flex-col gap-3">
+          <%= link_to omniauth_authorize_path(:user, :google_oauth2),
+              class: 'btn btn-outline border-2 gap-3 w-full justify-center font-semibold' do %>
+            <svg class="w-5 h-5" viewBox="0 0 533.5 544.3">
+              <path d="M533.5 278.4c0-18.5-1.5-37.1-4.7-55.3H272.1v104.8h147c-6.1 33.8-25.7 63.7-54.4 82.7v68h87.7c51.5-47.4 81.1-117.4 81.1-200.2z" fill="#4285f4"/>
+              <path d="M272.1 544.3c73.4 0 135.3-24.1 180.4-65.7l-87.7-68c-24.4 16.6-55.9 26-92.6 26-71 0-131.2-47.9-152.8-112.3H28.9v70.1c46.2 91.9 140.3 149.9 243.2 149.9z" fill="#34a853"/>
+              <path d="M119.3 324.3c-11.4-33.8-11.4-70.4 0-104.2V150H28.9c-38.6 76.9-38.6 167.5 0 244.4l90.4-70.1z" fill="#fbbc04"/>
+              <path d="M272.1 107.7c38.8-.6 76.3 14 104.4 40.8l77.7-77.7C405 24.6 339.7-.8 272.1 0 169.2 0 75.1 58 28.9 150l90.4 70.1c21.5-64.5 81.8-112.4 152.8-112.4z" fill="#ea4335"/>
+            </svg>
+            <%= t('pages.top_panel.google_login') %>
+          <% end %>
+
+          <%= link_to omniauth_authorize_path(:user, :facebook),
+              class: 'btn btn-outline border-2 gap-3 w-full justify-center font-semibold' do %>
+            <i class="fa-brands fa-facebook text-lg text-[#1877F2]"></i>
+            <%= t('pages.top_panel.facebook_login') %>
+          <% end %>
+
+          <%= link_to omniauth_authorize_path(:user, :twitter),
+              class: 'btn btn-outline border-2 gap-3 w-full justify-center font-semibold' do %>
+            <i class="fa-brands fa-twitter text-lg text-[#1DA1F2]"></i>
+            <%= t('pages.top_panel.twitter_login') %>
+          <% end %>
         </div>
-        <div class="divider text-sm"><%= t('words.or') %></div>
+
+        <div class="divider text-sm font-medium my-6"><%= t('words.or') %></div>
       <% end %>
 
       <%# Validation errors %>
       <% if resource.errors.any? %>
-        <div role="alert" class="alert alert-error">
+        <div role="alert" class="alert alert-error mb-4">
           <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z" />
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/>
           </svg>
           <ul class="list-disc list-inside text-sm">
             <% resource.errors.full_messages.each do |msg| %>
@@ -30,29 +52,22 @@
         </div>
       <% end %>
 
-      <%= form_with model: resource, url: registration_path(resource_name), data: { turbo: false } do |f| %>
+      <%= form_with model: resource, url: registration_path(resource_name), data: { turbo: false }, class: 'flex flex-col gap-4' do |f| %>
 
         <%# Email %>
         <div class="form-control">
-          <%= f.label :email, class: 'label font-semibold' %>
-          <%= f.email_field :email, required: true, autocomplete: 'email',
+          <%= f.label :email, class: 'label font-semibold text-sm' %>
+          <%= f.email_field :email, required: true, autocomplete: 'email', placeholder: 'name@example.com',
               class: "input input-bordered w-full #{resource.errors[:email].any? ? 'input-error' : ''}" %>
           <% resource.errors[:email].each do |err| %>
             <p class="text-error text-xs mt-1"><%= err %></p>
           <% end %>
         </div>
 
-        <%# Email confirmed notice %>
-        <% if resource.email && params[:action] == 'new' %>
-          <div role="alert" class="alert alert-success text-sm">
-            <%= t('pages.registration.email_confirmed') %>
-          </div>
-        <% end %>
-
         <%# Password %>
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div class="form-control">
-            <%= f.label :password, t('pages.registration.choose_password'), class: 'label font-semibold' %>
+            <%= f.label :password, t('pages.registration.choose_password'), class: 'label font-semibold text-sm' %>
             <%= f.password_field :password, required: true, autocomplete: 'new-password',
                 class: "input input-bordered w-full #{resource.errors[:password].any? ? 'input-error' : ''}" %>
             <% resource.errors[:password].each do |err| %>
@@ -60,7 +75,7 @@
             <% end %>
           </div>
           <div class="form-control">
-            <%= f.label :password_confirmation, t('pages.registration.confirm_password'), class: 'label font-semibold' %>
+            <%= f.label :password_confirmation, t('pages.registration.confirm_password'), class: 'label font-semibold text-sm' %>
             <%= f.password_field :password_confirmation, required: true, autocomplete: 'new-password',
                 class: "input input-bordered w-full #{resource.errors[:password_confirmation].any? ? 'input-error' : ''}" %>
             <% resource.errors[:password_confirmation].each do |err| %>
@@ -72,7 +87,7 @@
         <%# Name / Surname %>
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div class="form-control">
-            <%= f.label :name, class: 'label font-semibold' %>
+            <%= f.label :name, class: 'label font-semibold text-sm' %>
             <%= f.text_field :name, required: true,
                 class: "input input-bordered w-full #{resource.errors[:name].any? ? 'input-error' : ''}" %>
             <% resource.errors[:name].each do |err| %>
@@ -80,7 +95,7 @@
             <% end %>
           </div>
           <div class="form-control">
-            <%= f.label :surname, class: 'label font-semibold' %>
+            <%= f.label :surname, class: 'label font-semibold text-sm' %>
             <%= f.text_field :surname,
                 class: "input input-bordered w-full #{resource.errors[:surname].any? ? 'input-error' : ''}" %>
             <% resource.errors[:surname].each do |err| %>
@@ -89,51 +104,105 @@
           </div>
         </div>
 
-        <%# EULA %>
-        <div class="form-control gap-2">
-          <div class="bg-base-200 rounded p-3 max-h-36 overflow-y-auto text-sm border border-base-300">
-            <%= render 'devise/registrations/eula' %>
-          </div>
+        <%# EULA checkbox + modal %>
+        <div class="form-control">
           <label class="flex items-start gap-2 cursor-pointer">
             <%= f.check_box :accept_conditions, class: "checkbox checkbox-primary mt-0.5 shrink-0 #{resource.errors[:accept_conditions].any? ? 'checkbox-error' : ''}" %>
-            <span class="text-sm"><%= t('pages.registration.accept_conditions') %> <span class="text-error">*</span></span>
+            <span class="text-sm">
+              <%= t('pages.registration.accept_conditions') %> <span class="text-error">*</span>
+              <button type="button" class="link link-primary text-sm" onclick="document.getElementById('reg_eula_modal').showModal()">
+                (<%= t('words.read') %>)
+              </button>
+            </span>
           </label>
           <% resource.errors[:accept_conditions].each do |err| %>
-            <p class="text-error text-xs"><%= err %></p>
+            <p class="text-error text-xs mt-1"><%= err %></p>
           <% end %>
         </div>
 
-        <%# Privacy %>
-        <div class="form-control gap-2">
-          <div class="bg-base-200 rounded p-3 max-h-36 overflow-y-auto text-sm border border-base-300">
-            <%= render 'devise/registrations/privacy' %>
-          </div>
+        <%# Privacy checkbox + modal %>
+        <div class="form-control">
           <label class="flex items-start gap-2 cursor-pointer">
             <%= f.check_box :accept_privacy, class: "checkbox checkbox-primary mt-0.5 shrink-0 #{resource.errors[:accept_privacy].any? ? 'checkbox-error' : ''}" %>
-            <span class="text-sm"><%= t('pages.registration.accept_privacy') %> <span class="text-error">*</span></span>
+            <span class="text-sm">
+              <%= t('pages.registration.accept_privacy') %> <span class="text-error">*</span>
+              <button type="button" class="link link-primary text-sm" onclick="document.getElementById('reg_privacy_modal').showModal()">
+                (<%= t('words.read') %>)
+              </button>
+            </span>
           </label>
           <% resource.errors[:accept_privacy].each do |err| %>
-            <p class="text-error text-xs"><%= err %></p>
+            <p class="text-error text-xs mt-1"><%= err %></p>
           <% end %>
         </div>
 
         <%= f.hidden_field :sys_locale_id %>
 
         <% if ::Configuration.recaptcha %>
-          <div>
-            <%= recaptcha_tags display: { 'theme' => 'clean' } %>
-          </div>
+          <div><%= recaptcha_tags display: { 'theme' => 'clean' } %></div>
         <% end %>
 
         <div class="form-control mt-2">
-          <%= f.submit t('pages.registration.register_button'), class: 'btn btn-primary w-full' %>
+          <%= f.submit t('pages.registration.register_button'), class: 'btn btn-primary w-full text-base font-semibold' %>
         </div>
 
         <p class="text-center text-sm text-base-content/70">
-          <%= link_to t('pages.top_panel.login'), new_user_session_path, class: 'link link-primary' %>
+          <%= t('pages.registration.already_have_account', default: 'Hai gi&agrave; un account?').html_safe %>
+          <%= link_to t('pages.top_panel.login'), new_user_session_path, class: 'link link-primary font-semibold' %>
         </p>
-
       <% end %>
+    </div>
+
+    <%# — Right: illustration — %>
+    <div class="hidden lg:flex lg:w-1/2 bg-primary/10 items-center justify-center p-12">
+      <div class="text-center">
+        <svg class="w-64 h-64 mx-auto text-primary opacity-80" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="0.8" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+          <circle cx="9" cy="7" r="4"/>
+          <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
+          <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+        </svg>
+        <h2 class="text-2xl font-bold mt-6 text-base-content"><%= APP_SHORT_NAME %></h2>
+        <p class="text-base-content/60 mt-2 max-w-xs mx-auto"><%= t('pages.landing.payoff', default: 'La piattaforma per la democrazia partecipativa') %></p>
+      </div>
     </div>
   </div>
 </div>
+
+<%# — EULA Modal — %>
+<dialog id="reg_eula_modal" class="modal">
+  <div class="modal-box max-w-2xl border-2 border-base-content shadow-brutal-lg max-h-[80vh]">
+    <form method="dialog">
+      <button class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2">✕</button>
+    </form>
+    <h3 class="font-bold text-xl mb-4"><%= t('pages.registration.conditions_title', default: 'Termini di Servizio') %></h3>
+    <div class="overflow-y-auto max-h-[60vh] text-sm leading-relaxed prose prose-sm">
+      <%= render 'devise/registrations/eula' %>
+    </div>
+    <div class="modal-action">
+      <form method="dialog">
+        <button class="btn btn-primary"><%= t('words.close', default: 'Chiudi') %></button>
+      </form>
+    </div>
+  </div>
+  <form method="dialog" class="modal-backdrop"><button>close</button></form>
+</dialog>
+
+<%# — Privacy Modal — %>
+<dialog id="reg_privacy_modal" class="modal">
+  <div class="modal-box max-w-2xl border-2 border-base-content shadow-brutal-lg max-h-[80vh]">
+    <form method="dialog">
+      <button class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2">✕</button>
+    </form>
+    <h3 class="font-bold text-xl mb-4"><%= t('pages.registration.privacy_title', default: 'Privacy Policy') %></h3>
+    <div class="overflow-y-auto max-h-[60vh] text-sm leading-relaxed prose prose-sm">
+      <%= render 'devise/registrations/privacy' %>
+    </div>
+    <div class="modal-action">
+      <form method="dialog">
+        <button class="btn btn-primary"><%= t('words.close', default: 'Chiudi') %></button>
+      </form>
+    </div>
+  </div>
+  <form method="dialog" class="modal-backdrop"><button>close</button></form>
+</dialog>
