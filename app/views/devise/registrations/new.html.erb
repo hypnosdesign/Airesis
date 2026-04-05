@@ -111,7 +111,7 @@
             <span class="text-sm">
               <%= t('pages.registration.accept_conditions') %> <span class="text-error">*</span>
               <button type="button" class="link link-primary text-sm" onclick="document.getElementById('reg_eula_modal').showModal()">
-                (<%= t('words.read') %>)
+                (<%= t('words.read', default: 'leggi') %>)
               </button>
             </span>
           </label>
@@ -127,7 +127,7 @@
             <span class="text-sm">
               <%= t('pages.registration.accept_privacy') %> <span class="text-error">*</span>
               <button type="button" class="link link-primary text-sm" onclick="document.getElementById('reg_privacy_modal').showModal()">
-                (<%= t('words.read') %>)
+                (<%= t('words.read', default: 'leggi') %>)
               </button>
             </span>
           </label>
