@@ -1,3 +1,13 @@
-<div class="card">
-  <%= render "proposal_types/form" %>
+<% @page_title = @title %>
+
+<%# Hero %>
+<div class="bg-primary text-primary-content p-6 lg:p-8 mb-6 border-2 border-base-content/15 relative overflow-hidden">
+  <div class="relative z-10 max-w-xl">
+    <p class="text-[11px] font-bold tracking-widest text-primary-content/50 uppercase mb-3"><%= t('pages.sidebar.proposals', default: 'Proposte') %></p>
+    <h1 class="text-2xl lg:text-3xl font-extrabold leading-tight mb-2"><%= @title %></h1>
+    <p class="text-primary-content/60 text-sm"><%= t('pages.proposals.new.step_1_title', app_short_name: APP_SHORT_NAME) %></p>
+  </div>
+  <i class="fa-solid fa-file-lines absolute right-6 lg:right-12 top-1/2 -translate-y-1/2 text-[7rem] lg:text-[9rem] text-primary-content/[0.06] hidden md:block"></i>
 </div>
+
+<%= render "proposal_types/form" %>
