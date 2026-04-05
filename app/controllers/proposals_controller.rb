@@ -239,7 +239,7 @@ class ProposalsController < ApplicationController
       respond_to do |format|
         flash.now[:notice] = I18n.t('info.proposal.proposal_updated')
         format.html do
-          if params[:subaction] == 'save'
+          if params[:commit_exit]
             redirect_to @group ? group_proposal_url(@group, @proposal) : @proposal
           else
             @proposal.reload

@@ -1,5 +1,14 @@
-<%= turbo_stream.replace "comment_content_#{@proposal_comment.id}" do %>
-  <div id="comment_content_<%= @proposal_comment.id %>">
-    <%= render partial: "proposal_comments/edit_form", locals: { comment: @proposal_comment } %>
+<%= turbo_stream.replace "comment_#{@proposal_comment.id}" do %>
+  <div id="comment_<%= @proposal_comment.id %>" class="bg-warning/10 border-2 border-warning p-5 mb-3" style="box-shadow: 3px 3px 0 oklch(var(--n));">
+    <h4 class="font-semibold mb-3"><i class="fa-solid fa-pencil"></i> <%= t('pages.proposals.update_comment') %></h4>
+    <%= form_for [@proposal, @proposal_comment] do |f| %>
+      <div class="space-y-3">
+        <%= f.text_area :content, rows: 5, class: 'textarea textarea-bordered w-full' %>
+        <div class="flex gap-2">
+          <%= f.submit t('buttons.save'), class: 'btn btn-primary btn-sm' %>
+          <%= link_to t('buttons.cancel'), proposal_path(@proposal), class: 'btn btn-ghost btn-sm' %>
+        </div>
+      </div>
+    <% end %>
   </div>
 <% end %>

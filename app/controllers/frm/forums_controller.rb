@@ -30,10 +30,6 @@ module Frm
 
     private
 
-    # def check_permissions
-    #  raise CanCan::AccessDenied unless @group.participants.include? current_user
-    # end
-
     def register_view
       @forum.register_view_by(current_user)
     end

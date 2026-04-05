@@ -1,6 +1,5 @@
-<%= turbo_stream.replace "comment_content_#{@proposal_comment.id}" do %>
-  <div id="comment_content_<%= @proposal_comment.id %>">
-    <%= render partial: "proposal_comments/comment_body", locals: { comment: @proposal_comment } %>
-  </div>
+<% nickname = current_user ? current_user.proposal_nicknames.find_by(proposal_id: @proposal.id) : nil %>
+<%= turbo_stream.replace "comment_#{@proposal_comment.id}" do %>
+  <%= render partial: "proposal_comments/content", locals: { comment: @proposal_comment, proposal_nickname: nickname } %>
 <% end %>
 <%= render partial: "layouts/flash_stream" %>

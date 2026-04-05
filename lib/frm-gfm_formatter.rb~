@@ -1,3 +1,0 @@
-require 'frm/formatters/redcarpet_gfm'
-
-Forem.formatter = Forem::Formatters::RedcarpetGfm

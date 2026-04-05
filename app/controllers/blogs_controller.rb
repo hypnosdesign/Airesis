@@ -25,7 +25,6 @@ class BlogsController < ApplicationController
       format.html
       format.turbo_stream
       format.atom
-      format.turbo_streamon
     end
   end
 

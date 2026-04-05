@@ -1,51 +1,70 @@
-<div class="baloon-triangle contribute"></div>
+<div id="comment_<%= comment.id %>" class="bg-base-100 border-2 border-neutral p-5 mb-3" style="box-shadow: 3px 3px 0 oklch(var(--n));">
+  <%# Header: autore + data + menu %>
+  <div class="flex items-center justify-between mb-3">
+    <div class="flex items-center gap-3">
+      <div class="w-8 h-8 bg-primary text-primary-content flex items-center justify-center font-bold text-sm border border-neutral">
+        <%= comment.user.name[0].upcase %>
+      </div>
+      <div>
+        <% who = if proposal_nickname && @proposal.is_anonima? && comment.user != current_user
+                   proposal_nickname.nickname
+                 else
+                   link_to_user(comment.user, content_text: comment.user.fullname, class: 'font-semibold link link-hover')
+                 end %>
+        <span class="font-semibold text-sm"><%= raw who %></span>
+        <span class="text-xs text-base-content/50 ml-2">
+          <i class="fa-regular fa-clock"></i>
+          <%= time_ago_in_words(comment.updated_at || comment.created_at) %> fa
+        </span>
+        <% if comment.created_at != comment.updated_at %>
+          <span class="text-xs text-base-content/40 italic ml-1">(modificato)</span>
+        <% end %>
+      </div>
+    </div>
 
-<div>
-  <div class="baloon_header">
-    <div class="dropdown dropdown-end float-right">
-      <button tabindex="0" class="btn btn-ghost btn-xs"><i class="fa-solid fa-ellipsis-vertical"></i></button>
-      <ul tabindex="0" class="dropdown-content menu bg-base-200 rounded-box shadow z-10 p-2 w-40">
+    <%# Menu azioni %>
+    <div class="dropdown dropdown-end">
+      <button tabindex="0" class="btn btn-ghost btn-xs">
+        <i class="fa-solid fa-ellipsis-vertical"></i>
+      </button>
+      <ul tabindex="0" class="dropdown-content menu bg-base-200 shadow-lg border border-neutral z-20 p-2 w-44">
         <% if can? :update, comment %>
           <li>
-            <%= link_to t('pages.proposals.update_comment'), edit_proposal_proposal_comment_path(@proposal, comment),
-                        class: "editCommentLink menu_item", data: {edit_contribute: comment.id} %>
+            <%= link_to edit_proposal_proposal_comment_path(@proposal, comment, format: :turbo_stream), class: "text-sm", data: { turbo_prefetch: false, turbo_stream: true } do %>
+              <i class="fa-solid fa-pencil"></i> <%= t('pages.proposals.update_comment') %>
+            <% end %>
           </li>
         <% end %>
         <% if comment.versions.length > 0 %>
           <li>
-            <%= link_to t('pages.proposals.history_comment'), history_proposal_proposal_comment_path(@proposal, comment),
-                        class: "historyCommentLink menu_item", data: {history_contribute: comment.id} %>
+            <%= link_to history_proposal_proposal_comment_path(@proposal, comment, format: :turbo_stream), class: "text-sm", data: { turbo_prefetch: false, turbo_stream: true } do %>
+              <i class="fa-solid fa-clock-rotate-left"></i> <%= t('pages.proposals.history_comment', default: 'History') %>
+            <% end %>
           </li>
         <% end %>
         <li>
-          <a href="#" data-report-contribute="<%= comment.id %>"><%= t('buttons.report') %></a>
+          <a href="#" data-report-contribute="<%= comment.id %>" class="text-sm">
+            <i class="fa-solid fa-flag"></i> <%= t('buttons.report') %>
+          </a>
         </li>
         <% if can? :destroy, comment %>
           <li>
-            <%= link_to t('pages.proposals.delete_comment'), [@proposal, comment], data: { turbo_method: :delete, turbo_confirm: t('pages.proposals.show.delete_contribute_confirmation')},
-                        class: "deleteCommentLink menu_item" %>
+            <%= link_to [@proposal, comment], data: { turbo_method: :delete, turbo_confirm: t('pages.proposals.show.delete_contribute_confirmation') }, class: "text-sm text-error" do %>
+              <i class="fa-regular fa-trash-can"></i> <%= t('pages.proposals.delete_comment') %>
+            <% end %>
           </li>
         <% end %>
       </ul>
     </div>
   </div>
-  <div class="baloon-content">
+
+  <%# Contenuto %>
+  <div class="prose max-w-none text-base-content/80 mb-3">
     <%= parsed_content(comment, @proposal.is_anonima?) %>
   </div>
-  <div class="baloon-footer" title="<%= l(comment.updated_at || comment.created_at) %>">
-    <% who = (proposal_nickname && @proposal.is_anonima? && !(comment.user == current_user)) ?
-                proposal_nickname.nickname :
-                (link_to_user comment.user, content_text: comment.user.fullname + ((proposal_nickname && @proposal.is_anonima?) ?
-                                                  (' (' + proposal_nickname.nickname + ')') :
-                                                  '')) %>
-    <% if comment.created_at == comment.updated_at %>
-      <%= raw t('pages.proposals.show.comment_inserted_by', when: time_in_words(comment.created_at), who: who) %>
-    <% else %>
-      <%= raw t('pages.proposals.show.comment_updated_by', when: time_in_words(comment.updated_at), who: who) %>
-    <% end %>
+
+  <%# Footer: ranking %>
+  <div id="rankingpanelcontainer<%= comment.id %>" class="flex items-center gap-4 pt-3 border-t border-base-300">
+    <%= render partial: 'proposal_comments/ranking_panel', locals: { comment: comment } %>
   </div>
-  <div id="rankingpanelcontainer<%= comment.id %>" class="rankingpanelcontainer">
-    <%= render partial: 'proposal_comments/ranking_panel', locals: {comment: comment} %>
-  </div>
-  <div style="clear:both;"></div>
 </div>
