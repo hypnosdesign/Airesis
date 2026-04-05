@@ -80,11 +80,6 @@ class ApplicationController < ActionController::Base
     @step = get_next_step(current_user) if current_user && !Rails.env.test?
   end
 
-  def ckeditor_filebrowser_scope(options = {})
-    options = { assetable_id: current_user.id, assetable_type: 'User' }.merge(options)
-    super
-  end
-
   def load_group
     @group = Group.friendly.find(params[:group_id]) if params[:group_id].present?
   end

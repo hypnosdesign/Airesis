@@ -3,7 +3,7 @@
 </div>
 
 <div class="card bg-base-200 p-4 mb-4">
-  <%= @newsletter.body.html_safe %>
+  <%= sanitize @newsletter.body %>
 </div>
 
 <%= link_to t('buttons.edit'), edit_admin_newsletter_path, class: 'btn btn-primary mb-4' %>

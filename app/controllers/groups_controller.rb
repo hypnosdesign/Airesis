@@ -24,7 +24,7 @@ class GroupsController < ApplicationController
 
     params[:interest_border] ||= InterestBorder.to_key(current_domain.territory)
 
-    @groups = Group.look(params)
+    @pagy, @groups = pagy(Group.look(params), items: 30)
     respond_to do |format|
       format.html
       format.turbo_stream do

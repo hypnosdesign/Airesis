@@ -11,8 +11,6 @@ Rails.application.routes.draw do
 
   resources :proposal_nicknames, only: [:update]
 
-  mount Ckeditor::Engine => '/ckeditor'
-
   get 'home' => 'home#show'
   get 'landing' => 'home#landing'
   get 'public' => 'home#public', as: :open_space

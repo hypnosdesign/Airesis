@@ -17,7 +17,6 @@ module Abilities
       merge Abilities::Events.new(user)
       merge Abilities::Forums.new(user)
 
-      ckeditor_permissions(user)
     end
 
     def user_profile_permissions(user)
@@ -29,12 +28,6 @@ module Abilities
       can :destroy, Authentication do |authentication|
         user == authentication.user && user.email
       end
-    end
-
-    def ckeditor_permissions(user)
-      can :access, :ckeditor # needed to access Ckeditor filebrowser
-      can %i[read create destroy], Ckeditor::Picture, assetable_id: user.id
-      can %i[read create destroy], Ckeditor::AttachmentFile, assetable_id: user.id
     end
 
     def user_message_permissions(user)

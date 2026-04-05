@@ -48,9 +48,9 @@ RSpec.describe Group do
     let(:province) { municipality.province }
     let(:groups) do
       [create(:group, num_participants: 1, name: 'rodi alessandro title'),
-       create(:group, num_participants: 2, description: 'alessandro rodi description'),
+       create(:group, num_participants: 2, name: 'alessandro rodi description'),
        create(:group, num_participants: 2, tags_list: 'rodi'),
-       create(:group, num_participants: 3, description: 'rodi'),
+       create(:group, num_participants: 3, name: 'rodi brief'),
        create(:group, num_participants: 2, tags_list: 'rodi,world',
                       interest_border_tkn: InterestBorder.to_key(municipality)),
        create(:group, num_participants: 5, tags_list: 'ciao,rodi',
@@ -70,15 +70,15 @@ RSpec.describe Group do
 
     context 'search by text' do
       it 'returns all groups that match the word' do
-        expect(described_class.look(search: 'rodi')).to eq [groups[0], groups[3], groups[1]]
+        expect(described_class.look(search: 'rodi')).to eq [groups[3], groups[1], groups[0]]
       end
 
       it 'returns all groups that match all the words' do
-        expect(described_class.look(search: 'rodi alessandro')).to eq [groups[0], groups[1]]
+        expect(described_class.look(search: 'rodi alessandro')).to eq [groups[1], groups[0]]
       end
 
       it 'returns all groups that match any of the words' do
-        expect(described_class.look(search: 'title description', and: false)).to eq [groups[0], groups[1]]
+        expect(described_class.look(search: 'title description', and: false)).to eq [groups[1], groups[0]]
       end
     end
 

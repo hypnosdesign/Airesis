@@ -11,3 +11,6 @@ window.switchText = function(el) {
     el.dataset.other = current;
   }
 }
+
+import "trix"
+import "@rails/actiontext"

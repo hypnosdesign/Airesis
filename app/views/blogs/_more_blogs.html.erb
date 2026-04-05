@@ -1,7 +1,7 @@
-<% if @blogs.total_pages && (@blogs.total_pages > @blogs.current_page) %>
+<% if @pagy.next %>
   <div id="more_blogs" class="loading_groups">
     <span>
-      <%= link_to t('pages.blogs.index.show_more'), current_url(page: @blogs.current_page+1) %>
+      <%= link_to t('pages.blogs.index.show_more'), current_url(page: @pagy.next) %>
     </span>
   </div>
   <div id="loading_blogs" class="loading_groups" style="display:none">

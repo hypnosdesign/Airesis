@@ -99,13 +99,10 @@ class SearchProposal < ApplicationRecord
       selected_columns << "#{PgSearch::Configuration.alias('proposals')}.rank"
     end
 
-    # preloading, additional columns and pagination
-    proposals = proposals.
-                select(selected_columns).
-                preload(:proposal_type, :user_votes, :category, :quorum, :groups, :interest_borders).
-                page(page).per(per_page)
-
-    proposals
+    # preloading and additional columns (pagination handled by controller via pagy)
+    proposals.
+      select(selected_columns).
+      preload(:proposal_type, :user_votes, :category, :quorum, :groups, :interest_borders)
   end
 
   def similar
@@ -121,7 +118,7 @@ class SearchProposal < ApplicationRecord
                   where('proposal_supports.group_id = ? or group_proposals.group_id = ?', group_id, group_id)
     end
     proposals.select('proposals.*', "#{PgSearch::Configuration.alias('proposals')}.rank").
-      reorder('proposals.private desc', "#{PgSearch::Configuration.alias('proposals')}.rank desc").page(1).per(10)
+      reorder('proposals.private desc', "#{PgSearch::Configuration.alias('proposals')}.rank desc").limit(10)
   end
 
   def add_tags_and_title(tags, title)

@@ -6,6 +6,7 @@ class BlogPost < ApplicationRecord
   DRAFT = 'D'.freeze
 
   has_paper_trail versions: { class_name: 'BlogPostVersion' }
+  has_rich_text :body
 
   belongs_to :user
   belongs_to :blog, touch: true
@@ -18,7 +19,7 @@ class BlogPost < ApplicationRecord
   has_many :groups, through: :publishings, inverse_of: :blog_posts, class_name: 'Group'
 
   validates :title, presence: true
-  validates :body, presence: true, length: { maximum: 1.megabyte }
+  validates :body, presence: true
 
   scope :published, -> { where(status: [PUBLISHED, RESERVED]).order('published_at DESC') }
   scope :drafts, -> { where(status: DRAFT).order('published_at DESC') }

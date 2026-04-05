@@ -368,7 +368,7 @@ class ProposalsController < ApplicationController
   # query per la ricerca delle proposte
   def query_index
     @search = populate_search
-    @proposals = @search.results
+    @pagy, @proposals = pagy(@search.results, items: @search.per_page || 10)
   end
 
   # valuta una proposta

@@ -10,7 +10,7 @@ class BlogsController < ApplicationController
     @page_title = t('pages.blogs.show.title')
 
     params[:interest_border] ||= InterestBorder.to_key(current_domain.territory)
-    @blogs = Blog.look(params)
+    @pagy, @blogs = pagy(Blog.look(params), items: 30)
 
     respond_to do |format|
       format.html

@@ -1,18 +1,19 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700;800&display=swap');
 @import "tailwindcss";
 @plugin "daisyui" {
   themes: nord --default, night;
 }
 
 @theme {
-  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
-  --shadow-brutal: 4px 4px 0px oklch(0% 0 0 / 20%);
-  --shadow-brutal-lg: 6px 6px 0px oklch(0% 0 0 / 25%);
+  --font-sans: "Sora", ui-sans-serif, system-ui, sans-serif;
+  --shadow-brutal: 4px 4px 0px oklch(var(--n));
+  --shadow-brutal-lg: 8px 8px 0px oklch(var(--n));
 }
 
 /*
- * Neobrutalismo: angoli netti, bordi spessi, ombre solide.
+ * Neobrutalismo: angoli netti, bordi spessi, ombre solide piene.
  * Sovrascrive i radius e border dei temi nord/night.
+ * Colori ombre: neutral del tema (zero trasparenza).
  */
 :root, [data-theme] {
   --radius-selector: 0rem;
@@ -23,41 +24,42 @@
   --noise: 0;
 }
 
-/* Ombre solide neobrutaliste (no blur) */
+/* Ombre solide neobrutaliste — piene, zero blur, zero trasparenza */
 .shadow-brutal {
-  box-shadow: 4px 4px 0px oklch(0% 0 0 / 20%);
+  box-shadow: 4px 4px 0px oklch(var(--n));
 }
 
 .shadow-brutal-lg {
-  box-shadow: 6px 6px 0px oklch(0% 0 0 / 25%);
+  box-shadow: 8px 8px 0px oklch(var(--n));
 }
 
-[data-theme="night"] .shadow-brutal,
-[data-theme="night"] .shadow-brutal-lg {
-  box-shadow: 4px 4px 0px oklch(100% 0 0 / 10%);
-}
-
-/* Card e modal con bordo netto e ombra solida */
+/* Card e modal con bordo netto e ombra solida piena */
 .card {
-  border: 2px solid oklch(0% 0 0 / 10%);
-  box-shadow: 4px 4px 0px oklch(0% 0 0 / 15%);
-}
-
-[data-theme="night"] .card {
-  border-color: oklch(100% 0 0 / 10%);
-  box-shadow: 4px 4px 0px oklch(0% 0 0 / 40%);
+  border: 2px solid oklch(var(--n));
+  box-shadow: 4px 4px 0px oklch(var(--n));
 }
 
 .modal-box {
-  border: 2px solid oklch(0% 0 0 / 15%);
-  box-shadow: 8px 8px 0px oklch(0% 0 0 / 20%);
+  border: 2px solid oklch(var(--n));
+  box-shadow: 8px 8px 0px oklch(var(--n));
 }
 
-[data-theme="night"] .modal-box {
-  border-color: oklch(100% 0 0 / 15%);
-  box-shadow: 8px 8px 0px oklch(0% 0 0 / 50%);
+/* Hover "schiaccia" — pattern universale neobrutalista */
+.btn {
+  box-shadow: 3px 3px 0px oklch(var(--n));
+  transition: all 0.2s ease;
 }
 
-/* Utility helpers (minimal, non-Foundation) */
+.btn:hover {
+  transform: translate(2px, 2px);
+  box-shadow: 0 0 0 oklch(var(--n));
+}
+
+.btn:active {
+  transform: translate(3px, 3px);
+  box-shadow: none;
+}
+
+/* Utility helpers */
 .clearboth { clear: both; }
 .hide { display: none; }

@@ -1,9 +1,11 @@
-<% content_for :ckeditor %>
 <%= simple_form_for [@blog, @blog_post], html: { multipart: true } do |f| %>
   <div class="editBlogPost">
     <%= f.error_notification %>
     <%= f.input :title, style: 'width:80%' %>
-    <%= f.input :body, as: :ckeditor, required: true, input_html: { ckeditor: { toolbar: 'blog', language: I18n.locale } } %>
+    <div class="form-control mb-4">
+      <%= f.label :body, class: "label" %>
+      <%= f.rich_text_area :body, class: "trix-content w-full" %>
+    </div>
     <%= f.input :tags_list, label: t('pages.groups.new.tags.title') %>
 
     <%= f.label :status %>
