@@ -255,11 +255,7 @@
               <div class="py-2 flex items-center gap-3">
                 <div class="avatar placeholder">
                   <div class="bg-accent text-accent-content w-8 h-8 flex items-center justify-center">
-                    <% if group.respond_to?(:group_image_tag) && group.image.present? rescue false %>
-                      <%= group.group_image_tag(24) %>
-                    <% else %>
-                      <span class="text-xs font-bold"><%= group.name.first(2).upcase %></span>
-                    <% end %>
+                    <span class="text-xs font-bold"><%= group.name.first(2).upcase %></span>
                   </div>
                 </div>
                 <div class="flex-1 min-w-0">
