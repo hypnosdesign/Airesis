@@ -62,6 +62,3 @@
   <% end %>
 <% end %>
 
-<script type="text/javascript">
-  EventsIndex.newEventUrl = '<%= j raw new_event_url(group_id: @group.try(:id), models: true) %>'; EventsIndex.newEventUrlClick = '<%= j raw new_event_url(group_id: @group.try(:id)) %>'; EventsIndex.eventsUrl = '<%= @group ? group_events_url(@group) : events_url %>'; EventsIndex.autoOpen = <%= params[:new_event] == 'true' %>; EventsIndex.autoOpenUrl = '<%= j raw new_event_url(group_id: @group.try(:id), event_type_id: params[:event_type_id]) %>'; EventsIndex.loadingFragment = '<%= j render("fragments/loading") %>'; EventsIndex.defaultEventType = <%= EventType::MEETING %>; EventsIndex.calendarI18n = { firstDay: <%= t('calendar.firstDay') %>, monthNames: <%= raw t('calendar.monthNames') %>, monthNamesShort: <%= raw t('calendar.monthNamesShort') %>, dayNames: <%= raw t('calendar.dayNames') %>, dayNamesShort: <%= raw t('calendar.dayNamesShort') %>, timeFormat: '<%= raw t('calendar.eventsFormat') %>', buttonText: { prevYear: "<span class='fc-text-arrow'>&laquo;</span>", nextYear: "<span class='fc-text-arrow'>&raquo;</span>", today: '<%= t('calendar.today') %>', month: '<%= t('calendar.month') %>', week: '<%= t('calendar.week') %>', day: '<%= t('calendar.day') %>' } }; EventsIndex.createEvent = <%= @group ? (can? :create_event, @group) : is_admin? %>;
-</script>
