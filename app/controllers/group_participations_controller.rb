@@ -12,11 +12,11 @@ class GroupParticipationsController < ApplicationController
     @page_title = t('pages.group_participations.index.title')
     @search_participant = @group.search_participants.build(search_participant_params)
     @unscoped_group_participations = @search_participant.results
-    @group_participations = @unscoped_group_participations.page(params[:page]).per(GroupParticipation::PER_PAGE)
+    @pagy, @group_participations = pagy(@unscoped_group_participations, items: GroupParticipation::PER_PAGE)
 
     respond_to do |format|
       format.html
-      format.js
+      format.turbo_stream
       format.json
       format.csv { send_data build_csv }
     end
@@ -33,7 +33,7 @@ class GroupParticipationsController < ApplicationController
   end
 
   # changes the role of a user
-  # TODO: move from here and put in group_participations#update
+
   def change_user_permission
     @group_participation = @group.group_participations.find(params[:id])
     @group_participation.participation_role = ParticipationRole.find(params[:participation_role_id])
@@ -41,22 +41,27 @@ class GroupParticipationsController < ApplicationController
     @group_participation.save!
     flash[:notice] = t('info.participation_roles.role_changed')
     respond_to do |format|
-      format.js { render partial: 'layouts/messages' }
+      format.turbo_stream { render partial: 'layouts/flash_stream' }
+      format.html { redirect_back fallback_location: group_path(@group) }
     end
   end
 
   # send a massive email to all users
-  # TODO: protect
+
   def send_email
     ids = params[:message][:receiver_ids]
     subject = params[:message][:subject]
     body = params[:message][:body]
     ResqueMailer.massive_email(current_user.id, ids, @group.id, subject, body).deliver_later
     flash[:notice] = t('info.message_sent')
+    respond_to do |format|
+      format.turbo_stream { render partial: 'layouts/flash_stream' }
+      format.html { redirect_back fallback_location: group_path(@group) }
+    end
   end
 
   # destroy all selected participations
-  # TODO: check permissions
+
   def destroy_all
     ids = params[:destroy][:ids].split(',')
     GroupParticipation.transaction do
@@ -72,14 +77,12 @@ class GroupParticipationsController < ApplicationController
       end
     end
     flash[:notice] = t('info.participations_destroyed')
-  rescue Exception => e
-    flash[:notice] = t('error.participations_destroyed')
+  rescue StandardError
+    flash[:error] = t('error.participations_destroyed')
+  ensure
     respond_to do |format|
-      format.js do
-        render :update do |page|
-          page.replace_html 'flash_messages', partial: 'layouts/flash', locals: { flash: flash }
-        end
-      end
+      format.turbo_stream { render partial: 'layouts/flash_stream' }
+      format.html { redirect_back fallback_location: group_path(@group) }
     end
   end
 

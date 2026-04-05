@@ -1,0 +1,48 @@
+<%= content_for :head do %>
+  <%= auto_discovery_link_tag(:atom, blog_url(@blog, format: 'atom')) %>
+<% end %>
+
+<% javascript 'endless_page' %>
+
+<%= render layout: "layouts/page_title", locals: { title: @blog.title } do %>
+  <% if @blog_posts.size == 0 && !params[:page] %>
+    <div class="blogPost card bg-base-200 p-4">
+      <h3 class="text-lg font-bold"><%= t('pages.blogs.show.no_posts') %></h3>
+      <p><%= t('pages.blogs.show.no_posts_long') %></p>
+    </div>
+  <% else %>
+    <% if @tag %>
+      <h3 class="text-lg mb-2">
+        <%= t('pages.blogs.show.tag') %>: <%= @tag %>
+      </h3>
+    <% end %>
+    <div id="blogPostContainer">
+      <%= render collection: @blog_posts, partial: 'blog_posts/blog_post' %>
+    </div>
+  <% end %>
+  <div id="loading_results">
+    <span><%= t('pages.blogs.show.previous_posts') %></span>
+  </div>
+<% end %>
+
+<script>
+  document.querySelectorAll('.hidden_menu').forEach(function (el) {
+    el.addEventListener('click', function (event) {});
+  });
+  document.documentElement.addEventListener('click', function () {
+    document.querySelectorAll('.hidden_menu').forEach(function (el) { el.style.display = 'none'; });
+    document.querySelectorAll('.hidden_link.visible').forEach(function (el) { el.classList.remove('visible'); });
+  });
+  document.querySelectorAll('.hidden_link').forEach(function (el) {
+    el.addEventListener('click', function (event) {
+      this.classList.add('visible');
+      this.nextElementSibling.style.display = '';
+      event.stopPropagation();
+    });
+  });
+</script>
+
+<% content_for :left_panel do %>
+  <%= render 'blog_posts/admin_links' %>
+  <%= render 'blogs/left_panel' %>
+<% end %>

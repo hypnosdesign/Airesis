@@ -1,0 +1,10 @@
+<%= turbo_stream.replace "geocode_modal" do %>
+  <dialog id="geocode_modal" data-controller="modal" class="modal">
+    <div class="modal-box shadow-brutal border-2 border-base-content max-w-3xl">
+      <%= render "geocode" %>
+    </div>
+    <form method="dialog" class="modal-backdrop" data-action="click->modal#backdropClose">
+      <button>close</button>
+    </form>
+  </dialog>
+<% end %>

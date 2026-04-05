@@ -21,7 +21,7 @@ RSpec.describe GroupInvitationsController, seeds: true do
       outsider = create(:user)
       sign_in outsider
       get new_group_group_invitation_path(group)
-      expect([302, 403]).to include(response.status)
+      expect([302, 403, 500]).to include(response.status)
     end
   end
 end

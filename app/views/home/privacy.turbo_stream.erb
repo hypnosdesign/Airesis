@@ -1,0 +1,14 @@
+<%= turbo_stream.replace "privacy_modal" do %>
+  <dialog id="privacy_modal" data-controller="modal" class="modal">
+    <div class="modal-box shadow-brutal border-2 border-base-content max-w-3xl">
+      <h3 class="text-lg font-bold mb-4"><%= t('words.privacy_policy') %></h3>
+      <%= render partial: "devise/registrations/privacy" %>
+      <div class="modal-action">
+        <button class="btn" data-action="click->modal#close"><%= t('buttons.close') %></button>
+      </div>
+    </div>
+    <form method="dialog" class="modal-backdrop" data-action="click->modal#backdropClose">
+      <button>close</button>
+    </form>
+  </dialog>
+<% end %>

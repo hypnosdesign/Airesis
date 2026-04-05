@@ -31,24 +31,22 @@ class Blog < ApplicationRecord
   end
 
   def self.look(params)
-    search = params[:search]
+    search_term = params[:search]
     tag = params[:tag]
-    page = params[:page] || 1
-    limit = params[:limit] || 30
     interest_border = params[:interest_border]
 
     if tag
       Blog.joins(blog_posts: :tags).
         where(['tags.text = ?', tag]).distinct.
-        order(updated_at: :desc).page(page).per(limit)
+        order(updated_at: :desc)
     else
-      blogs = if search.blank?
+      blogs = if search_term.blank?
                 Blog.order(updated_at: :desc)
               else
-                search(search, !params[:and])
+                search(search_term, !params[:and])
               end
       blogs = blogs.joins(:user).merge(User.by_interest_borders(interest_border)) if interest_border
-      blogs.page(page).per(limit)
+      blogs
     end
   end
 

@@ -25,17 +25,17 @@ class EventsController < ApplicationController
     authorize! :view_data, @group if @group
     @page_title = @event.title
     @event_comment = @event.event_comments.new
-    @event_comments = @event.event_comments.includes(:user).order('created_at DESC').page(params[:page]).per(COMMENTS_PER_PAGE)
+    @pagy, @event_comments = pagy(@event.event_comments.includes(:user).order('created_at DESC'), items: COMMENTS_PER_PAGE)
     respond_to do |format|
       format.html do
         @proposals = @event.proposals.for_list(current_user.try(:id)) if @event.votation?
       end
-      format.js
+      format.turbo_stream
       format.ics do
         calendar = Icalendar::Calendar.new
         calendar.add_event(@event.to_ics)
         calendar.publish
-        render text: calendar.to_ical
+        render plain: calendar.to_ical
       end
     end
   end
@@ -103,23 +103,23 @@ class EventsController < ApplicationController
     end
 
     respond_to do |format|
+      format.turbo_stream
       format.html { redirect_to @group ? group_events_url(@group) : events_url }
-      format.js
     end
-  rescue ActiveRecord::ActiveRecordError => e
+  rescue ActiveRecord::ActiveRecordError
     respond_to do |format|
-      format.js { render 'layouts/active_record_error', locals: { object: @event } }
+      format.turbo_stream { render partial: 'layouts/flash_stream', status: :unprocessable_entity }
     end
   end
 
   def move
     @event.move(params[:minute_delta].to_i, params[:day_delta].to_i, params[:all_day])
-    render nothing: true
+    head :ok
   end
 
   def resize
     @event.resize(params[:minute_delta].to_i, params[:day_delta].to_i)
-    render nothing: true
+    head :ok
   end
 
   def edit; end
@@ -128,13 +128,13 @@ class EventsController < ApplicationController
     if @event.update(event_params)
       flash[:notice] = t('info.events.event_updated')
       respond_to do |format|
+        format.turbo_stream
         format.html { redirect_to @group ? group_event_url(@group, @event) : event_url(@event) }
-        format.js
       end
     else
       respond_to do |format|
+        format.turbo_stream { render partial: 'layouts/flash_stream', status: :unprocessable_entity }
         format.html { render :edit }
-        format.js { render 'layouts/active_record_error', locals: { object: @event } }
       end
     end
   end

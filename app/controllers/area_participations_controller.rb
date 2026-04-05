@@ -15,18 +15,26 @@ class AreaParticipationsController < ApplicationController
   def create
     # part = @group_area.area_participations.new
     # part.user_id = params[:user_id]
-    # TODO: check if the user can be added to the area
+
     @area_participation.area_role_id = @group_area.area_role_id
     if @area_participation.save
       flash[:notice] = t('info.area_participation.create')
     else
       flash[:error] = t('error.area_participation.create')
     end
+    respond_to do |format|
+      format.turbo_stream { render partial: 'layouts/flash_stream' }
+      format.html { redirect_back fallback_location: group_group_area_path(@group, @group_area) }
+    end
   end
 
   def destroy
     @area_participation.destroy
     flash[:notice] = t('info.area_participation.destroy')
+    respond_to do |format|
+      format.turbo_stream { render partial: 'layouts/flash_stream' }
+      format.html { redirect_back fallback_location: group_group_area_path(@group, @group_area) }
+    end
   end
 
   protected

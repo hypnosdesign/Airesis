@@ -25,7 +25,9 @@ module Frm
                        foreign_key: 'reply_to_id',
                        dependent: :nullify
 
-    validates :text, presence: true, length: { maximum: 1.megabyte }
+    has_rich_text :text
+
+    validates :text, presence: true
 
     delegate :forum, to: :topic
 
@@ -137,7 +139,7 @@ module Frm
     end
 
     def approve_user
-      # TODO: disattivato user.update_attribute(:forem_state, "approved") if user && user.forem_state != "approved"
+
     end
 
     def blacklist_user

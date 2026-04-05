@@ -1,5 +1,3 @@
-require 'sidekiq/web'
-
 Rails.application.routes.draw do
   get '/validators/uniqueness/group/', to: 'validators/uniqueness#group'
   get '/validators/uniqueness/user/', to: 'validators/uniqueness#user'
@@ -12,8 +10,6 @@ Rails.application.routes.draw do
   resources :user_likes, only: %i[create destroy]
 
   resources :proposal_nicknames, only: [:update]
-
-  mount Ckeditor::Engine => '/ckeditor'
 
   get 'home' => 'home#show'
   get 'landing' => 'home#landing'
@@ -113,7 +109,7 @@ Rails.application.routes.draw do
   resources :alerts do
     member do
       get :check
-      get :check_alert # TODO: remove in one year from 08-05-2014
+      get :check_alert
     end
 
     collection do
@@ -412,7 +408,7 @@ Rails.application.routes.draw do
         end
       end
       mount RailsAdmin::Engine => '/data', as: 'rails_admin'
-      mount Sidekiq::Web => '/sidekiq'
+      # mount Sidekiq::Web => '/sidekiq' # removed: sidekiq replaced by solid_queue
       get '/', to: 'panel#show', as: 'panel'
       resource :panel, controller: 'panel' do
         get :calculate_rankings

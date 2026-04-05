@@ -1,0 +1,17 @@
+<% unless cookies['cookie_eu_consented'] == 'true' %>
+  <div class="fixed bottom-0 left-0 right-0 z-50 p-4 bg-base-300 border-t border-base-content/20 shadow-lg"
+       data-controller="cookie-consent">
+    <div class="container mx-auto flex flex-col sm:flex-row items-center justify-between gap-3">
+      <p class="text-sm text-base-content">
+        <%= t('cookies_eu.cookies_text') %>
+        <% if defined?(link) && link.present? %>
+          <a href="<%= link %>" class="link link-primary"><%= t('cookies_eu.learn_more') %></a>
+        <% end %>
+      </p>
+      <button class="btn btn-primary btn-sm shrink-0"
+              data-action="click->cookie-consent#accept">
+        <%= t('cookies_eu.ok') %>
+      </button>
+    </div>
+  </div>
+<% end %>

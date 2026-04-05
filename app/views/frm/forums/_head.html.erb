@@ -1,0 +1,41 @@
+<div id="forum">
+  <div class="breadcrumbs text-sm mb-4">
+    <ul>
+      <li><%= link_to t('frm.forum.forums'), group_forums_url(@group) %></li>
+      <li><%= link_to forum.category, group_frm_category_url(@group, forum.category) %></li>
+      <li><%= link_to forum.title, group_forum_url(@group, forum) %></li>
+    </ul>
+  </div>
+
+  <h2 class="text-xl font-bold mb-2"><%= forum.title %></h2>
+
+  <div id="forum_topic_links" class="flex gap-2 mb-4">
+    <% unless @topic.try(:new_record?) %>
+      <% if can? :create_topic, @forum %>
+        <%= link_to new_group_forum_topic_url(@group, forum), class: "btn btn-primary btn-sm disable", data: { disable_with: t('loading') } do %>
+          <i class="fa-solid fa-plus"></i>
+          <%= t('frm.topic.links.new') %>
+        <% end %>
+      <% end %>
+    <% end %>
+  </div>
+
+  <div class="forum_title mb-4">
+    <h2 class="text-base text-base-content/60"><%= forem_format(forum.description) %></h2>
+  </div>
+</div>
+
+<% content_for :left_panel do %>
+  <% if @topic %>
+    <%= link_to group_forum_url(@group, forum), class: "btn btn-sm mb-2" do %>
+      <i class="fa-solid fa-rotate-left"></i>
+      <%= t('frm.topic.links.back_to_topics') %>
+    <% end %>
+  <% end %>
+  <% if can? :moderate, @forum %>
+    <%= link_to group_frm_forum_moderator_tools_url(@group, forum), class: "btn btn-sm" do %>
+      <i class="fa-solid fa-flag"></i>
+      <%= t('frm.forum.moderator_tools') %>
+    <% end %>
+  <% end %>
+<% end %>

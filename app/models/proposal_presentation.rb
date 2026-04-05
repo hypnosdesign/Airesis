@@ -18,6 +18,6 @@ class ProposalPresentation < ApplicationRecord
   end
 
   def send_notifications
-    NotificationProposalPresentationCreate.perform_async(id)
+    NotificationProposalPresentationCreate.perform_later(id)
   end
 end

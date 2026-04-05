@@ -1,8 +1,0 @@
-- unless @proposal.closest(@group.try(:id)).empty?
-  .mybox
-    h4
-      = t('pages.proposals.show.similar_proposals_title')
-  .mycont
-    - @proposal.closest.each do |p|
-      .panel
-        = link_to_proposal p

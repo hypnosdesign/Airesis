@@ -146,7 +146,7 @@ RSpec.describe 'topics', :js do
     end
   end
 
-  # TODO: private forum should not be visible
+
   context 'viewing a topic' do
     it 'is free for all' do
       visit group_forum_topic_path(group, forum, topic)

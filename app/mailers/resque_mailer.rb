@@ -44,11 +44,11 @@ class ResqueMailer < ApplicationMailer
     I18n.locale = @user.locale.key || :'en-EU'
     @data = @alert.data
     to_id = @data[:to_id]
-    subject_id = @data[:subject]
+    @data[:subject]
     subject = @alert.email_subject
     template_name = TEMPLATES[@alert.notification.notification_type_id] || 'notification'
     if to_id
-      mail(to: "discussion+#{to_id}@airesis.it", bcc: @user.email, subject: subject, template_name: template_name) # TODO: extract email
+      mail(to: "discussion+#{to_id}@airesis.it", bcc: @user.email, subject: subject, template_name: template_name)
     else
       mail(to: @user.email, from: ENV['NOREPLY_EMAIL'], subject: subject, template_name: template_name)
     end
@@ -91,7 +91,7 @@ class ResqueMailer < ApplicationMailer
     @group = Group.find(group_id)
     @user = @from
     @to = @group.participants.where('users.id in (?)', to_ids.split(','))
-    mail(bcc: @to.map(&:email), from: ENV['NOREPLY_EMAIL'], reply_to: @from.email, to: 'test@airesis.it', subject: subject) # TODO: extract email
+    mail(bcc: @to.map(&:email), from: ENV['NOREPLY_EMAIL'], reply_to: @from.email, to: 'test@airesis.it', subject: subject)
   end
 
   def publish(newsletter_id, user_id)

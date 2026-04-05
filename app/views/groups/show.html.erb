@@ -1,0 +1,61 @@
+<% @extend = true %>
+<% @meta_description = CGI::escapeHTML(strip_tags @group.description) %>
+
+<% content_for :head do %>
+  <meta content="<%= current_url %>" property="og:url">
+  <meta content="<%= ENV['APP_LONG_NAME'] %>" property="og:site_name">
+  <meta content="<%= ENV['FACEBOOK_APP_ID'] %>" property="fb:app_id">
+  <meta content="<%= @group.name %>" property="og:title">
+  <meta content="airesis:group" property="og:type">
+  <meta content="<%= @group.image.attached? ? url_for(@group.image) : asset_url('gruppo-anonimo.png') %>" property="og:image">
+  <%= auto_discovery_link_tag(:atom, group_url(@group, format: 'atom')) %>
+<% end %>
+
+<% if can? :view_data, @group %>
+  <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+    <div class="lg:col-span-2">
+      <% if params[:action] == 'by_year_and_month' %>
+        <h2 class="text-xl font-bold mb-4"><%= t('pages.groups.archives.page_title', year: params[:year], month: month_long(params[:month])) %></h2>
+      <% else %>
+        <div class="card bg-base-100 p-6 mb-4 prose max-w-none"><%= @group.description %></div>
+      <% end %>
+
+      <div id="posts_container">
+        <% if @group_posts.any? %>
+          <%= render collection: @group_posts, partial: 'blog_posts/group_blog_post', as: 'post_publishing' %>
+        <% else %>
+          <div class="card bg-base-200 p-4">
+            <p><%= t('pages.groups.show.no_blogs_yet') %></p>
+          </div>
+        <% end %>
+      </div>
+
+      <% if @group_posts.size > COMMENTS_PER_PAGE %>
+        <div id="loading_results" class="post_results">
+          <span><%= t('pages.blogs.show.previous_posts') %></span>
+        </div>
+      <% end %>
+    </div>
+
+    <div class="hidden lg:block space-y-4">
+      <% if can? :view_proposal, @group %>
+        <%= render partial: "groups/portlets/proposals", layout: "layouts/portlet" %>
+      <% end %>
+      <%= render partial: "groups/portlets/topics", layout: "layouts/portlet" %>
+      <%= render partial: "groups/portlets/events", layout: "layouts/portlet" %>
+    </div>
+  </div>
+<% end %>
+
+<%= render 'rules_panel' %>
+<%= render 'left_panel' %>
+
+<div id="quorum_modal"></div>
+<div id="quorum_help_modal"></div>
+<div id="permissions_list_modal"></div>
+<div id="invitation_modal"></div>
+<div id="area_role_modal"></div>
+<div id="participation_role_modal"></div>
+<div id="group_area_modal"></div>
+<div id="event_edit_modal"></div>
+<div id="mod_modal"></div>

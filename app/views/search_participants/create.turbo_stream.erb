@@ -1,0 +1,6 @@
+<%= turbo_stream.replace "results_container" do %>
+  <div id="results_container">
+    <%= render "group_participations/group_participation_results" %>
+  </div>
+<% end %>
+<%= render partial: "layouts/flash_stream" %>

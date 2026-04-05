@@ -1,0 +1,10 @@
+<%= turbo_stream.replace "points_panel" do %>
+  <%= render "points_panel" %>
+<% end %>
+<%= turbo_stream.replace "rank_left_panel" do %>
+  <%= render "rank_left_panel" %>
+<% end %>
+<%= turbo_stream.replace "dates_section" do %>
+  <%= render "dates_section" %>
+<% end %>
+<%= render partial: "layouts/flash_stream" %>

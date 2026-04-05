@@ -1,8 +1,8 @@
-class CheckGroups
+class CheckGroups < ApplicationJob
   include ProposalsHelper
   include Rails.application.routes.url_helpers
-  include Sidekiq::Worker
-  sidekiq_options queue: :low_priority
+
+  queue_as :low_priority
 
   def perform(*_args)
     Group.joins(:participants).

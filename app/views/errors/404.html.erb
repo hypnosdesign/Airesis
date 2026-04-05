@@ -1,0 +1,7 @@
+<% @page_title = 'Page not found' %>
+<% @extend = true %>
+<div class="card bg-base-200 p-4 text-center">
+  <h1><%= raw @title || t('error.error_404.title') %></h1>
+  <p><%= raw @message || t('error.error_404.description') %></p>
+  <%= link_to t('buttons.go_back'), :back, class: 'btn btn-primary' %>
+</div>

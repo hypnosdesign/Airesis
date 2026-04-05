@@ -7,6 +7,6 @@ class IntegratedContribute < ApplicationRecord
   protected
 
   def send_notifications
-    NotificationProposalCommentUnintegrate.perform_async(proposal_comment.id)
+    NotificationProposalCommentUnintegrate.perform_later(proposal_comment.id)
   end
 end

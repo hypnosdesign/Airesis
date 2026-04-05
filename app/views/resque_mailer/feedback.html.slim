@@ -1,9 +1,0 @@
-h1
-  | Nuovo feedback ricevuto
-= link_to 'Visualizza immagine', url_for(@feedback.image) if @feedback.image.attached?
-h1
-  | Messaggio:
-= @feedback.message
-h1
-  | Dati aggiuntivi:
-= @feedback.stack

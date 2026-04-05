@@ -1,0 +1,6 @@
+<%= turbo_stream.append "blogPostCommentsContainer" do %>
+  <%= render "blog_posts/comments" %>
+<% end %>
+<% unless @pagy.next %>
+  <%= turbo_stream.remove "loading_results" %>
+<% end %>

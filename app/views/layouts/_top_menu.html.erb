@@ -1,0 +1,80 @@
+<nav class="navbar bg-base-100 shadow-md fixed top-0 left-0 right-0 z-50">
+  <div class="flex-none">
+    <label class="btn btn-ghost btn-circle md:hidden" for="sidebar-drawer">
+      <i class="fa-solid fa-bars text-xl"></i>
+    </label>
+  </div>
+
+  <div class="flex-1 px-2 mx-2">
+    <%= link_to root_path, tabindex: 1, class: "btn btn-ghost text-xl text-primary font-bold" do %>
+      <%= ENV['APP_SHORT_NAME'] %>
+    <% end %>
+  </div>
+
+  <div class="flex-none hidden md:flex gap-4 items-center">
+    <% if current_user %>
+      <%= simple_form_for Search.new, html: { class: 'm-0' } do |f| %>
+        <div class="form-control">
+          <%= f.text_field :q, placeholder: t('placeholder.find'), class: 'input input-bordered input-sm w-48' %>
+        </div>
+      <% end %>
+    <% end %>
+
+    <%= link_to open_space_path, class: 'btn btn-ghost btn-circle tooltip tooltip-bottom', 'data-tip': t('open_space') do %>
+      <i class="fa-solid fa-earth-americas text-xl"></i>
+    <% end %>
+
+    <% if current_user %>
+      <div class="dropdown dropdown-end">
+        <div class="btn btn-ghost text-primary font-semibold" tabindex="0">
+          <i class="fa-solid fa-users mr-1"></i>
+          <%= t('pages.header.groups_title') %>
+        </div>
+        <ul class="menu menu-lg dropdown-content mt-3 z-1 p-2 shadow bg-base-100 w-64" tabindex="0">
+          <% if current_user.groups.empty? %>
+            <li class="px-4 py-2 opacity-50"><%= t('pages.header.no_groups_yet') %></li>
+          <% else %>
+            <% current_user.groups.each do |group| %>
+              <li><%= render partial: 'groups/group_menu_item', locals: { group: group } %></li>
+            <% end %>
+          <% end %>
+          <li class="divider"></li>
+          <li><%= link_to new_group_url do %><i class="fa-solid fa-plus"></i> <%= t('pages.header.open_group') %><% end %></li>
+          <li><%= link_to groups_url do %><i class="fa-solid fa-magnifying-glass"></i> <%= t('pages.header.new_group') %><% end %></li>
+        </ul>
+      </div>
+
+      <%= link_to '#', class: 'btn btn-ghost btn-circle tooltip tooltip-bottom', 'data-tip': "ALERTS", id: "alerts_link" do %>
+        <div class="indicator">
+          <i class="fa-solid fa-bell text-xl"></i>
+          <span class="badge badge-xs badge-primary indicator-item"></span>
+        </div>
+      <% end %>
+
+      <div class="dropdown dropdown-end">
+        <div class="btn btn-ghost btn-circle avatar" tabindex="0">
+          <div class="w-10">
+            <%= avatar(current_user, size: 34, cert: false) %>
+          </div>
+        </div>
+        <ul class="menu menu-sm dropdown-content mt-3 z-1 p-2 shadow bg-base-100 w-52" tabindex="0">
+          <%= render 'layouts/personal_menu' %>
+        </ul>
+      </div>
+
+    <% else %>
+      <%= link_to t('pages.header.login'), '#', tabindex: 0, class: "btn btn-ghost", onclick: "login_modal.showModal()" %>
+      <%= link_to t('pages.header.menu.registration_button'), new_registration_path(resource_name), class: 'btn btn-primary' %>
+    <% end %>
+  </div>
+
+  <div class="flex-none ml-2">
+    <label class="swap swap-rotate btn btn-ghost btn-circle">
+      <input type="checkbox" data-action="change->theme#toggle">
+      <i class="fa-solid fa-sun swap-on fill-current text-xl"></i>
+      <i class="fa-solid fa-moon swap-off fill-current text-xl"></i>
+    </label>
+  </div>
+</nav>
+
+<%= render 'layouts/login_panel' unless signed_in? %>

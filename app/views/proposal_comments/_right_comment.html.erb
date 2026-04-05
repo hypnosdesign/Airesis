@@ -1,0 +1,10 @@
+<i class="fa-solid fa-xmark close-right-section" data-close-section-id="<%= section.id %>"></i>
+<h2><%= t('pages.proposals.show.contributes_list', section: section.title) %></h2>
+<%= form_for [@proposal, ProposalComment.new(section_id: section.id)] do |f| %>
+  <div class="comment-form-comment">
+    <%= f.text_area :content, class: 'blogNewCommentField', rows: 5, cols: 70 %>
+    <%= f.hidden_field :section_id %>
+    <%= hidden_field 'right', true %>
+  </div>
+  <%= f.submit t('pages.proposals.show.send_contribute_button'), class: 'btn btn-success', data: {disable_with: t('sending')}, style: "width: 100px;height:35px;" %>
+<% end %>

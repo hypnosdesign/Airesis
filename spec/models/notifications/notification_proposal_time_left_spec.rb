@@ -20,7 +20,7 @@ RSpec.describe NotificationProposalTimeLeft, type: :model, emails: true, notific
   end
 
   it 'sends notifications to all notification receivers' do
-    described_class.perform_async(proposal.id, '24_hours')
+    described_class.perform_later(proposal.id, '24_hours')
     expect(described_class.jobs.size).to eq 1
     described_class.drain
     AlertsWorker.drain
@@ -32,7 +32,7 @@ RSpec.describe NotificationProposalTimeLeft, type: :model, emails: true, notific
   end
 
   it 'includes the type extension in notification data' do
-    described_class.perform_async(proposal.id, '24_hours')
+    described_class.perform_later(proposal.id, '24_hours')
     described_class.drain
     AlertsWorker.drain
 
@@ -41,7 +41,7 @@ RSpec.describe NotificationProposalTimeLeft, type: :model, emails: true, notific
   end
 
   it 'includes group name in data when proposal belongs to a group' do
-    described_class.perform_async(proposal.id, '24_hours')
+    described_class.perform_later(proposal.id, '24_hours')
     described_class.drain
     AlertsWorker.drain
 
@@ -67,7 +67,7 @@ RSpec.describe NotificationProposalTimeLeftVote, type: :model, emails: true, not
   end
 
   it 'sends notifications to group participants who can vote' do
-    described_class.perform_async(proposal.id, '24_hours_vote')
+    described_class.perform_later(proposal.id, '24_hours_vote')
     expect(described_class.jobs.size).to eq 1
     described_class.drain
     AlertsWorker.drain

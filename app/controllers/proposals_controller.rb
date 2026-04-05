@@ -26,12 +26,12 @@ class ProposalsController < ApplicationController
       authorize! :view_data, @group
 
       unless can? :view_proposal, @group
-        flash.now[:warn] = 'Non hai i permessi per visualizzare le proposte private. Contatta gli amministratori del gruppo.' # TODO: I18n
+        flash.now[:warn] = t('error.proposals.no_permission_to_view', default: 'You do not have permission to view private proposals. Contact the group administrators.')
       end
 
       if params[:group_area_id]
         unless can? :view_proposal, @group_area
-          flash.now[:warn] = 'Non hai i permessi per visualizzare le proposte private. Contatta gli amministratori del gruppo.' # TODO: I18n
+          flash.now[:warn] = t('error.proposals.no_permission_to_view', default: 'You do not have permission to view private proposals. Contact the group administrators.')
         end
       end
     end
@@ -62,7 +62,7 @@ class ProposalsController < ApplicationController
       format.html do
         render 'tab_list', layout: false
       end
-      format.js
+      format.turbo_stream
       format.json
     end
   end
@@ -71,7 +71,7 @@ class ProposalsController < ApplicationController
     authorize! :index, Proposal
     query_index
     respond_to do |format|
-      format.js
+      format.turbo_stream
     end
   end
 
@@ -79,7 +79,7 @@ class ProposalsController < ApplicationController
     @proposal = Proposal.find(params[:id])
     respond_to do |format|
       format.html { render 'banner', layout: false }
-      format.js
+      format.turbo_stream
     end
   end
 
@@ -93,7 +93,7 @@ class ProposalsController < ApplicationController
   def show
     return redirect_to redirect_url(@proposal) if wrong_url?
 
-    @proposal.check_phase # TODO: checks only the state during the debate. this is a security check, so if the background job didn't run we can always fix it/ we should check also for waiting and vote inconsistent phase.
+    @proposal.check_phase
     @proposal.reload
     if @proposal.private # la proposta è interna ad un gruppo
       if @proposal.visible_outside # se è visibile dall'esterno mostra solo un messaggio
@@ -131,8 +131,8 @@ class ProposalsController < ApplicationController
         @blocked_alerts = BlockedProposalAlert.find_by(user_id: current_user.id, proposal_id: @proposal.id) if current_user
         flash.now[:info] = I18n.t('info.proposal.voting') if @proposal.voting?
       end
-      format.js do
-        render nothing: true
+      format.turbo_stream do
+        head :ok
       end
       format.json
       format.pdf do
@@ -148,7 +148,7 @@ class ProposalsController < ApplicationController
       @elapsed = Time.zone.now - max
       if @elapsed < PROPOSALS_TIME_LIMIT
         respond_to do |format|
-          format.js { render 'error_new' }
+          format.turbo_stream { render 'error_new' }
         end
         return
       end
@@ -225,25 +225,21 @@ class ProposalsController < ApplicationController
     @proposal.regenerate(regenerate_proposal_params)
     flash[:notice] = t('info.proposal.back_in_debate')
     respond_to do |format|
+      format.turbo_stream
       format.html do
         redirect_to redirect_url(@proposal)
       end
-      format.js
     end
   end
 
   def update
     @proposal.current_user_id = current_user.id
     if @proposal.update(update_proposal_params)
-      begin
-        PrivatePub.publish_to(proposal_path(@proposal), reload_message)
-      rescue StandardError
-        nil
-      end
+      Turbo::StreamsChannel.broadcast_action_to(@proposal, action: :refresh, target: "")
       respond_to do |format|
         flash.now[:notice] = I18n.t('info.proposal.proposal_updated')
         format.html do
-          if params[:subaction] == 'save'
+          if params[:commit_exit]
             redirect_to @group ? group_proposal_url(@group, @proposal) : @proposal
           else
             @proposal.reload
@@ -297,7 +293,7 @@ class ProposalsController < ApplicationController
 
     respond_to do |format|
       format.html
-      format.js
+      format.turbo_stream
     end
   end
 
@@ -312,7 +308,7 @@ class ProposalsController < ApplicationController
   def available_authors_list
     @available_authors = @proposal.available_user_authors
     respond_to do |format|
-      format.js
+      format.turbo_stream
     end
   end
 
@@ -329,9 +325,12 @@ class ProposalsController < ApplicationController
       @proposal.reload
     end
     flash[:notice] = t('info.proposal.authors_added')
-  rescue Exception => e
+  rescue StandardError
     flash[:error] = t('errors.proposal.authors_added')
-    render 'layouts/error'
+    respond_to do |format|
+      format.turbo_stream { render partial: 'layouts/flash_stream' }
+      format.html { redirect_back fallback_location: proposal_path(@proposal) }
+    end
   end
 
   def vote_results
@@ -357,7 +356,7 @@ class ProposalsController < ApplicationController
 
   # the url is wrong if you try to access a private proposal without indicating the group
   # we redirect you to the corret url
-  # TODO: when there will be more groups we cannot do that anymore
+
   def wrong_url?
     @proposal.private? && !@group
   end
@@ -369,7 +368,7 @@ class ProposalsController < ApplicationController
   # query per la ricerca delle proposte
   def query_index
     @search = populate_search
-    @proposals = @search.results
+    @pagy, @proposals = pagy(@search.results, items: @search.per_page || 10)
   end
 
   # valuta una proposta
@@ -384,15 +383,15 @@ class ProposalsController < ApplicationController
 
     flash[:notice] = I18n.t('info.proposal.rank_recorderd')
     respond_to do |format|
-      format.js { render 'rank' }
+      format.turbo_stream { render 'rank' }
       format.html { redirect_back(fallback_location: proposal_path(@proposal)) }
     end
-  rescue Exception => e
+  rescue StandardError => e
     log_error(e)
     flash[:error] = I18n.t('error.proposals.proposal_rank')
     respond_to do |format|
       format.html { redirect_back(fallback_location: proposal_path(@proposal)) }
-      format.js { render 'proposals/errors/rank' }
+      format.turbo_stream { render 'proposals/errors/rank' }
     end
   end
 
@@ -424,7 +423,7 @@ class ProposalsController < ApplicationController
     flash[:error] = I18n.t('error.proposals.proposal_not_valuating')
     respond_to do |format|
       format.html { redirect_back(fallback_location: proposal_path(@proposal)) }
-      format.js { render 'proposals/errors/rank', layout: false }
+      format.turbo_stream { render 'proposals/errors/rank', layout: false }
     end
   end
 

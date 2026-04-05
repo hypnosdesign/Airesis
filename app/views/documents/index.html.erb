@@ -1,0 +1,15 @@
+<% @extend = true %>
+<% @page_title = t('pages.groups.documents.documents_archive') %>
+<%= render layout: "layouts/page_title", locals: {title: @page_title} do %>
+<% end %>
+
+<div class="flex flex-wrap w-full">
+  <div class="flex flex-wrap">
+    <div id="storage_size_container" class="w-full md:w-1/4 p-2">
+      <%= render partial: 'storage_size' %>
+    </div>
+    <div class="w-full md:w-3/4 p-2">
+      <div id="elfinder"></div>
+    </div>
+  </div>
+</div>

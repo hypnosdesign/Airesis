@@ -1,6 +1,0 @@
-| var event_edit = $('
-#event_edit.reveal-modal.medium[data-reveal]
-| '); event_edit.html("
-=j render 'edit_form'
-| "); airesis_reveal(event_edit); $(event_edit).on('opened.fndtn.reveal', function () { EventsEdit.mapManager.refresh(); }); 
-- content_for :after_page_js do

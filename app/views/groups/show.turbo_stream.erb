@@ -1,0 +1,6 @@
+<%= turbo_stream.append "posts_container" do %>
+  <%= render partial: "blog_posts/group_blog_post", collection: @group_posts, as: "post_publishing" %>
+<% end %>
+<% unless @pagy.next %>
+  <%= turbo_stream.remove "loading_results" %>
+<% end %>

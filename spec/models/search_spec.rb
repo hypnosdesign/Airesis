@@ -5,7 +5,7 @@ RSpec.describe Search do
   let(:groups) do
     [create(:group, name: 'what a group'),
      create(:group, name: 'hello'),
-     create(:group, description: 'hello group')]
+     create(:group, name: 'hello group')]
   end
   let(:proposals) do
     [create(:proposal, title: 'what a proposal'),
@@ -35,7 +35,7 @@ RSpec.describe Search do
       search = described_class.new(user_id: user.id, q: 'hello')
       search.find
 
-      expect(search.groups).to eq [groups[1], groups[2]]
+      expect(search.groups).to eq [groups[2], groups[1]]
       expect(search.proposals).to eq [proposals[1], proposals[2]]
       expect(search.blogs).to eq [blogs[1], blogs[0]]
     end

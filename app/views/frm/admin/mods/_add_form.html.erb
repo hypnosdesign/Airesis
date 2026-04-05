@@ -1,0 +1,11 @@
+<div id="add_member_form">
+<%= form_tag add_group_frm_admin_mod_members_url(@group, @frm_mod) do %>
+  <div class="inputs mb-2">
+    <label><%= t('frm.admin.mods.show.add_a_new_member') %></label>
+    <%= select_tag 'frm_user_id', nil, class: 'select select-bordered' %>
+  </div>
+  <p>
+    <%= submit_tag t('frm.admin.mods.show.add_member'), class: 'btn btn-primary btn-sm', data: { disable_with: t('loading') } %>
+  </p>
+<% end %>
+</div>

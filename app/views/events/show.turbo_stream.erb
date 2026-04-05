@@ -1,0 +1,6 @@
+<%= turbo_stream.append "eventCommentsContainer" do %>
+  <%= render "events/comments" %>
+<% end %>
+<% unless @pagy.next %>
+  <%= turbo_stream.remove "loading_results" %>
+<% end %>

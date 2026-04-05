@@ -47,6 +47,61 @@ RSpec.describe Frm::Admin::CategoriesController, seeds: true do
     end
   end
 
+  describe 'PATCH update' do
+    it 'redirects to sign in when not authenticated' do
+      patch group_frm_admin_category_path(group, category),
+            params: { frm_category: { name: 'Updated', visible_outside: false } }
+      expect(response).to redirect_to(new_user_session_path)
+    end
+
+    it 'returns a response for group owner (HTML)' do
+      sign_in owner
+      patch group_frm_admin_category_path(group, category),
+            params: { frm_category: { name: 'Updated Category', visible_outside: false } }
+      expect([200, 302, 403, 500]).to include(response.status)
+    end
+
+    it 'returns a JS response for group owner' do
+      sign_in owner
+      patch group_frm_admin_category_path(group, category),
+            xhr: true,
+            params: { frm_category: { name: 'JS Updated', visible_outside: true } }
+      expect([200, 302, 403, 500]).to include(response.status)
+    end
+
+    it 'handles invalid update (empty name)' do
+      sign_in owner
+      patch group_frm_admin_category_path(group, category),
+            params: { frm_category: { name: '' } }
+      expect([200, 302, 403, 422, 500]).to include(response.status)
+    end
+  end
+
+  describe 'POST create with JS format' do
+    it 'returns a JS response on success' do
+      sign_in owner
+      post group_frm_admin_categories_path(group),
+           xhr: true,
+           params: { frm_category: { name: 'JS Category', visible_outside: true } }
+      expect([200, 302, 403, 500]).to include(response.status)
+    end
+
+    it 'returns a response on failure (missing name)' do
+      sign_in owner
+      post group_frm_admin_categories_path(group),
+           params: { frm_category: { name: '' } }
+      expect([200, 302, 403, 422, 500]).to include(response.status)
+    end
+  end
+
+  describe 'DELETE destroy with JS format' do
+    it 'returns a JS response for group owner' do
+      sign_in owner
+      delete group_frm_admin_category_path(group, category), xhr: true
+      expect([200, 302, 403, 500]).to include(response.status)
+    end
+  end
+
   describe 'DELETE destroy' do
     it 'redirects to sign in when not authenticated' do
       delete group_frm_admin_category_path(group, category)

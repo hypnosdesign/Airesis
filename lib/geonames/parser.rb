@@ -132,7 +132,7 @@ module Geonames
       @country_code = '2017370'
       @lang = 'en'
 
-      @username = 'coorasse'
+      @username = ENV.fetch('GEONAMES_USERNAME', 'decidiamoci')
 
       @continent_output = "continent = Continent.find_by(description: '#{@continent_name}')"
       @country_output = "state = Country.find_by(description: '#{@country_name}')"
@@ -155,7 +155,7 @@ module Geonames
     end
 
     def fetch(code)
-      JSON.load(open(geoname_url(code))).with_indifferent_access
+      JSON.load(URI.open(geoname_url(code))).with_indifferent_access
     end
 
     def fetch_and_extract(code)
@@ -164,9 +164,9 @@ module Geonames
     end
 
     def extract
-      country_json = fetch(@country_code)
+      fetch(@country_code)
 
-      output = File.open("#{@country_name.downcase.tr(' ', '_')}.rb", 'w') do |f|
+      File.open("#{@country_name.downcase.tr(' ', '_')}.rb", 'w') do |f|
         f.puts @continent_output
         f.puts @country_output
         regions = fetch_and_extract(@country_code)

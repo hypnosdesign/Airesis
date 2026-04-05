@@ -1,0 +1,37 @@
+<div class="card bg-base-200 p-4 mb-4">
+  <h4 class="font-bold mb-2">Recent comments</h4>
+  <div>
+    <% @recent_comments.each do |comment| %>
+      <div class="blog_comment flex items-start gap-2 mb-2">
+        <div class="comment_avatar"><%= avatar(comment.user, size: 40) %></div>
+        <div class="comment_desc">
+          <%= link_to_user comment.user, full_name: true %>
+          on
+          <%= link_to(h(comment.blog_post.title), [@blog, comment.blog_post]) %>
+        </div>
+      </div>
+    <% end %>
+  </div>
+</div>
+
+<div class="card bg-base-200 p-4 mb-4">
+  <h4 class="font-bold mb-2">Recent posts</h4>
+  <div>
+    <% @recent_posts.each do |post| %>
+      <div class="blog_comment mb-1">
+        <%= link_to(h(post.title), [@blog, post]) %>
+      </div>
+    <% end %>
+  </div>
+</div>
+
+<div class="card bg-base-200 p-4 mb-4">
+  <h4 class="font-bold mb-2">Archives</h4>
+  <div>
+    <% @archives.each do |rec| %>
+      <div class="blog_comment mb-1">
+        <%= link_to "#{month_long(rec.month)} #{rec.year.to_i} (#{rec.posts})", posts_by_year_and_month_blog_path(@blog, month: rec.month.to_i, year: rec.year.to_i) %>
+      </div>
+    <% end %>
+  </div>
+</div>

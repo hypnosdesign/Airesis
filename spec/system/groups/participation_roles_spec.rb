@@ -29,13 +29,13 @@ RSpec.describe 'the management of participation roles in a group', :js do
       login_as @user2, scope: :user
     end
 
-    # TODO: do not test in system test but request
+
     it "can't manage participation roles", :ignore_javascript_errors do
       visit group_participation_roles_path(@group)
       expect(page).to have_content(I18n.t('error.error_302.title'))
     end
 
-    # TODO: do not test in system test but request
+
     it "can't create participation roles", :ignore_javascript_errors do
       visit new_group_participation_role_path(@group)
       expect(page).to have_content(I18n.t('error.error_302.title'))
@@ -49,13 +49,13 @@ RSpec.describe 'the management of participation roles in a group', :js do
       login_as @user2, scope: :user
     end
 
-    # TODO: do not test in system test but request
+
     it "can't manage participation roles", :ignore_javascript_errors do
       visit group_participation_roles_path(@group)
       expect(page).to have_content(I18n.t('error.error_302.title'))
     end
 
-    # TODO: do not test in system test but request
+
     it "can't create participation roles", :ignore_javascript_errors do
       visit new_group_participation_role_path(@group)
       expect(page).to have_content(I18n.t('error.error_302.title'))

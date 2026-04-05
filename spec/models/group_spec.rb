@@ -48,9 +48,9 @@ RSpec.describe Group do
     let(:province) { municipality.province }
     let(:groups) do
       [create(:group, num_participants: 1, name: 'rodi alessandro title'),
-       create(:group, num_participants: 2, description: 'alessandro rodi description'),
+       create(:group, num_participants: 2, name: 'alessandro rodi description'),
        create(:group, num_participants: 2, tags_list: 'rodi'),
-       create(:group, num_participants: 3, description: 'rodi'),
+       create(:group, num_participants: 3, name: 'rodi brief'),
        create(:group, num_participants: 2, tags_list: 'rodi,world',
                       interest_border_tkn: InterestBorder.to_key(municipality)),
        create(:group, num_participants: 5, tags_list: 'ciao,rodi',
@@ -70,15 +70,15 @@ RSpec.describe Group do
 
     context 'search by text' do
       it 'returns all groups that match the word' do
-        expect(described_class.look(search: 'rodi')).to eq [groups[0], groups[3], groups[1]]
+        expect(described_class.look(search: 'rodi')).to eq [groups[3], groups[1], groups[0]]
       end
 
       it 'returns all groups that match all the words' do
-        expect(described_class.look(search: 'rodi alessandro')).to eq [groups[0], groups[1]]
+        expect(described_class.look(search: 'rodi alessandro')).to eq [groups[1], groups[0]]
       end
 
       it 'returns all groups that match any of the words' do
-        expect(described_class.look(search: 'title description', and: false)).to eq [groups[0], groups[1]]
+        expect(described_class.look(search: 'title description', and: false)).to eq [groups[1], groups[0]]
       end
     end
 
@@ -126,6 +126,70 @@ RSpec.describe Group do
       create(:proposal, groups: [group_b])
       expect { group_a.destroy }.to change(Proposal, :count).from(3).to(2)
       expect { group_b.destroy }.to change(Proposal, :count).from(2).to(0)
+    end
+  end
+
+  describe '#is_private?' do
+    it 'returns true when group is private' do
+      g = build(:group, private: true)
+      expect(g.is_private?).to be true
+    end
+
+    it 'returns false when group is not private' do
+      g = build(:group, private: false)
+      expect(g.is_private?).to be false
+    end
+  end
+
+  describe '#request_by_portavoce?' do
+    it 'returns true when accept_requests is REQ_BY_PORTAVOCE' do
+      g = build(:group, accept_requests: Group::REQ_BY_PORTAVOCE)
+      expect(g.request_by_portavoce?).to be true
+    end
+  end
+
+  describe '#request_by_vote?' do
+    it 'returns true when accept_requests is REQ_BY_VOTE' do
+      g = build(:group, accept_requests: Group::REQ_BY_VOTE)
+      expect(g.request_by_vote?).to be true
+    end
+  end
+
+  describe '#request_by_both?' do
+    it 'returns true when accept_requests is REQ_BY_BOTH' do
+      g = build(:group, accept_requests: Group::REQ_BY_BOTH)
+      expect(g.request_by_both?).to be true
+    end
+  end
+
+  describe '#scoped_participants' do
+    it 'returns participants who can participate in proposals' do
+      g = create(:group)
+      result = g.scoped_participants(:participate_proposals)
+      expect(result).to respond_to(:each)
+    end
+  end
+
+  describe '.most_active' do
+    it 'returns a list of up to 5 groups' do
+      create_list(:group, 3)
+      result = Group.most_active
+      expect(result.size).to be <= 5
+    end
+  end
+
+  describe '#normalize_blank_values' do
+    it 'sets blank admin_title to nil' do
+      g = build(:group, admin_title: '')
+      g.send(:normalize_blank_values)
+      expect(g.admin_title).to be_nil
+    end
+  end
+
+  describe '#description' do
+    it 'returns html_safe string' do
+      g = create(:group)
+      expect(g.description).to respond_to(:html_safe?)
     end
   end
 end

@@ -1,0 +1,56 @@
+<% content_for :left_panel do %>
+  <nav class="p-2">
+    <ul class="menu menu-lg w-full">
+      <% if @group && @group.id && (can? :view_data, @group) %>
+        <li class="<%= 'bg-base-300' if (controller_name == 'groups' && (['show', 'by_year_and_month'].include? action_name)) || (controller_name == 'blog_posts') %>">
+          <%= link_to @group do %>
+            <i class="fa-solid fa-house"></i> <%= t('pages.groups.layout.home_button') %>
+          <% end %>
+        </li>
+        <li class="<%= 'bg-base-300' if ['proposals', 'proposal_revisions'].include?(controller_name) %>">
+          <%= link_to group_proposals_url(@group) do %>
+            <i class="fa-solid fa-lightbulb"></i> <%= t('pages.groups.layout.proposals_button') %>
+          <% end %>
+        </li>
+        <% if ::Configuration::groups_calendar %>
+          <li class="<%= 'bg-base-300' if controller_name == 'events' %>">
+            <%= link_to group_events_url(@group) do %>
+              <i class="fa-solid fa-calendar"></i> <%= t('pages.groups.layout.calendar') %>
+            <% end %>
+          </li>
+        <% end %>
+        <% if ::Configuration::documents_active && !@group.disable_documents && (can? :view_documents, @group) %>
+          <li class="<%= 'bg-base-300' if controller_name == 'documents' %>">
+            <%= link_to group_documents_url(@group) do %>
+              <i class="fa-regular fa-folder"></i> <%= t('pages.groups.header.documents') %>
+            <% end %>
+          </li>
+        <% end %>
+        <% unless @group.disable_forums %>
+          <li class="<%= 'bg-base-300' if controller_path.start_with?('frm/') && !controller_path.start_with?('frm/admin') %>">
+            <%= link_to group_forums_url(@group) do %>
+              <i class="fa-solid fa-comment"></i> <%= t('pages.groups.header.forums') %>
+            <% end %>
+          </li>
+        <% end %>
+        <% if can? :update, @group %>
+          <li class="<%= 'bg-base-300' if (controller_name == 'groups' && action_name != 'show') || ['group_areas', 'group_participations', 'search_participants', 'quorums'].include?(controller_name) || controller_path.start_with?('frm/admin') %>">
+            <%= link_to edit_group_url(@group) do %>
+              <i class="fa-solid fa-gear"></i> <%= t('pages.groups.header.settings') %>
+            <% end %>
+          </li>
+        <% end %>
+      <% elsif @group %>
+        <li>
+          <%= link_to t('pages.groups.new.title'), new_group_path %>
+        </li>
+      <% else %>
+        <li>
+          <%= link_to t('pages.groups.index.title'), groups_path %>
+        </li>
+      <% end %>
+    </ul>
+  </nav>
+<% end %>
+
+<%= render 'layouts/general' %>

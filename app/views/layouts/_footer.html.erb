@@ -1,0 +1,18 @@
+<footer class="bg-base-200 border-t border-base-300 py-4 mt-auto">
+  <div class="container mx-auto px-4 flex flex-col md:flex-row justify-between items-center gap-2 text-sm text-base-content">
+    <span class="opacity-70">
+      <%= ENV['APP_SHORT_NAME'] %> v<%= AIRESIS_VERSION %> &middot;&nbsp;
+      <a class="link link-hover" href="https://github.com/airesis/airesis" target="_blank">fork di Airesis</a>
+    </span>
+    <div class="flex flex-wrap items-center justify-center gap-x-3 gap-y-1 opacity-70">
+      <%= link_to t('terms_of_service'), terms_path, class: 'link link-hover' %>
+      <%= link_to t('privacy_policy'), privacy_path, class: 'link link-hover' %>
+      <%= link_to t('cookie_policy'), cookie_law_path, class: 'link link-hover' %>
+      <%= link_to t('pages.home.index.whatis'), edemocracy_path, class: 'link link-hover' %>
+      <span class="feedback_space"></span>
+    </div>
+  </div>
+</footer>
+
+<%= render 'layouts/languages' %>
+<%= render 'cookies_eu/consent_banner', link: cookie_law_path unless Rails.env.test? %>

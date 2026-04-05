@@ -1,0 +1,21 @@
+<div class="flex flex-wrap w-full">
+  <div class="w-full">
+    <% @proposal_comment.versions.each do |version| %>
+      <div class="card bg-base-200 p-4" data-version-id="<%= version.id %>" data-version>
+        <span>
+          <%= parsed_content(version.reify, @proposal.is_anonima?) if version.reify %>
+        </span>
+        <div></div>
+        <div class="baloon-footer" title="<%= l(version.created_at) %>">
+          <%= time_in_words(version.created_at) %>
+        </div>
+      </div>
+    <% end %>
+  </div>
+</div>
+<div class="card bg-base-200 p-4" style="display: none;">
+  <span>
+    <%= parsed_content(@proposal_comment, @proposal.is_anonima?) %>
+  </span>
+</div>
+<button class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2" data-action="click->modal#close">&times;</button>

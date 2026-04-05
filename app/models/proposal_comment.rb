@@ -1,7 +1,10 @@
 class ProposalComment < ApplicationRecord
   include ActionView::Helpers::TextHelper
+  include Turbo::Broadcastable
 
   has_paper_trail versions: { class_name: 'ProposalCommentVersion' }, only: [:content], on: %i[update destroy]
+
+  after_destroy_commit -> { broadcast_remove_to proposal, target: "comment_#{id}" }
 
   belongs_to :user, class_name: 'User', inverse_of: :proposal_comments, foreign_key: :user_id
   belongs_to :contribute, class_name: 'ProposalComment', inverse_of: :replies, foreign_key: :parent_proposal_comment_id, optional: true
@@ -67,6 +70,10 @@ class ProposalComment < ApplicationRecord
     parent_proposal_comment_id.nil?
   end
 
+  def is_reply?
+    parent_proposal_comment_id.present?
+  end
+
   def set_paragraph_id
     self.paragraph = Paragraph.where(section_id: section_id).first
   end
@@ -108,11 +115,11 @@ class ProposalComment < ApplicationRecord
   end
 
   def send_email
-    NotificationProposalCommentCreate.perform_async(id)
+    NotificationProposalCommentCreate.perform_later(id)
   end
 
   def send_update_notifications
-    NotificationProposalCommentUpdate.perform_async(id) if previous_changes.include?(:content) && previous_changes[:content].first != previous_changes[:content].last
+    NotificationProposalCommentUpdate.perform_later(id) if previous_changes.include?(:content) && previous_changes[:content].first != previous_changes[:content].last
   end
 
   def generate_nickname

@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-RSpec.describe 'events/show.html.slim' do
+RSpec.describe 'events/show.html.erb' do
   include Devise::Test::ControllerHelpers
 
   context 'votation event' do

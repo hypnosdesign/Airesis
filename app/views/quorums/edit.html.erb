@@ -1,0 +1,14 @@
+<div class="breadcrumbs text-sm mb-4">
+  <ul>
+    <li><%= link_to t('pages.groups.administration_panel.proposals'), group_quorums_url(@group) %></li>
+    <li><%= @quorum.name %></li>
+  </ul>
+</div>
+
+<div class="card bg-base-200 p-4">
+  <%= render(partial: 'quorums/form', locals: { button_name: t('buttons.update') }) %>
+</div>
+
+<% content_for :left_panel do %>
+  <%= render 'groups/administration_panel' %>
+<% end %>

@@ -1,0 +1,5 @@
+<%= turbo_stream.replace "diff_container" do %>
+  <div id="diff_container" class="diffview diffcontainer">
+    <%= render "proposal_history", proposal_revision: @proposal_revision %>
+  </div>
+<% end %>

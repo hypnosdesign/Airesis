@@ -1,7 +1,7 @@
 class GroupArea < ApplicationRecord
   belongs_to :group
 
-  # TODO: is not optional, but it does not exist before validation
+
   belongs_to :default_area_role, class_name: 'AreaRole', foreign_key: :area_role_id, optional: true
 
   has_many :area_participations, -> { order 'id DESC' }, dependent: :destroy

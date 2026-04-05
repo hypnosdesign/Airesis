@@ -1,0 +1,32 @@
+<ul class="grid grid-cols-1 lg:grid-cols-3 gap-4">
+  <% @group_areas.each do |area| %>
+    <li>
+      <div class="card bg-base-200 p-4 group_area" id="group<%= area.id %>">
+        <div>
+          <span class="remove_area_button">
+            <br>
+            <% if can? :destroy, area %>
+              <%= link_to t('buttons.delete'), [@group, area], data: { turbo_method: :delete }, turbo_confirm: t('pages.groups.edit_work_areas.manage.confirm_deletion') %>
+            <% end %>
+          </span>
+        </div>
+        <div class="group_area_name">
+          <%= link_to area.name, edit_group_group_area_url(@group, area) %>
+        </div>
+        <div style="clear:both;"></div>
+        <%= link_to t('pages.groups.edit_quorums.participants'), '#', class: 'btn areas_button', data: {g_id: area.id} %>
+        <div class="areas_list shadow-box">
+          <ul>
+            <% @group_participations.each do |participant| %>
+              <li>
+                <input type="checkbox" data-user_id="<%= participant.id %>" data-group_area_id="<%= area.id %>" data-change-area-participation <% if area.participants.include? participant %> checked='checked' <% end %>>
+                <%= participant.fullname %>
+              </li>
+            <% end %>
+          </ul>
+        </div>
+        <div style="clear:both;"></div>
+      </div>
+    </li>
+  <% end %>
+</ul>

@@ -1,0 +1,21 @@
+<%# Pagy nav — DaisyUI join component styling %>
+<nav class="flex justify-center my-4" aria-label="pagination">
+  <div class="join">
+    <% if pagy.prev %>
+      <%= link_to raw(t('views.pagination.previous')), pagy_url_for(pagy, pagy.prev),
+                  class: 'join-item btn btn-sm', rel: 'prev' %>
+    <% end %>
+    <% pagy.series.each do |item| %>
+      <% if item.is_a?(Integer) %>
+        <%= link_to item, pagy_url_for(pagy, item),
+                    class: "join-item btn btn-sm #{item == pagy.page ? 'btn-active' : ''}" %>
+      <% elsif item == :gap %>
+        <span class="join-item btn btn-sm btn-disabled">…</span>
+      <% end %>
+    <% end %>
+    <% if pagy.next %>
+      <%= link_to raw(t('views.pagination.next')), pagy_url_for(pagy, pagy.next),
+                  class: 'join-item btn btn-sm', rel: 'next' %>
+    <% end %>
+  </div>
+</nav>

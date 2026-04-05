@@ -39,7 +39,7 @@ class Proposal < ApplicationRecord
   has_many :proposal_supports, class_name: 'ProposalSupport', dependent: :destroy
   has_many :supporting_groups, through: :proposal_supports, class_name: 'Group', source: :group
 
-  # TODO: remove both
+
   has_many :proposal_borders, class_name: 'ProposalBorder', dependent: :destroy
   has_many :interest_borders, through: :proposal_borders, class_name: 'InterestBorder'
 
@@ -76,7 +76,7 @@ class Proposal < ApplicationRecord
   # validation
   validates :title, presence: true, uniqueness: true
 
-  validates :quorum, presence: { unless: :is_petition? } # TODO: bug in client_side_validation
+  validates :quorum, presence: { unless: :is_petition? }
 
   validates_with AtLeastOneValidator, associations: [:solutions], unless: :is_petition?
 
@@ -84,7 +84,7 @@ class Proposal < ApplicationRecord
                 :integrated_contributes_ids_list, :topic_id, :votation, :petition_phase, :change_advanced_options,
                 :current_user_id, :interest_borders_tkn
 
-  enum proposal_votation_type_id: { standard: 1, preference: 2, schulze: 3 }, _prefix: true
+  enum :proposal_votation_type_id, { standard: 1, preference: 2, schulze: 3 }, prefix: true
 
   accepts_nested_attributes_for :sections, allow_destroy: true
   accepts_nested_attributes_for :solutions, allow_destroy: true
@@ -115,12 +115,6 @@ class Proposal < ApplicationRecord
   scope :waiting, -> { where(proposal_state_id: ProposalState::WAIT) }
   scope :voting, -> { where(arel_table[:proposal_state_id].eq(ProposalState::VOTING)) }
 
-  scope :not_voted_by, lambda { |user_id|
-    where('proposal_state_id = ? and
-                       proposals.id not in (select proposal_id from user_votes where user_id = ?)',
-          ProposalState::VOTING, user_id)
-  }
-
   # tutte le proposte accettate
   scope :accepted, -> { where(proposal_state_id: ProposalState::ACCEPTED) }
   # tutte le proposte respinte
@@ -136,24 +130,10 @@ class Proposal < ApplicationRecord
   # all proposals visible to not logged users
   scope :visible, -> { where('private = ? or visible_outside = ?', false, true) }
 
-  scope :internal, -> { where(private: true) } # proposte interne ai gruppi
-
   # inconsistent proposals
   scope :invalid_debate_phase, -> { in_valutation.joins(:quorum).where('current_timestamp > quorums.ends_at') }
   scope :invalid_waiting_phase, -> { waiting.joins(:vote_period).where('current_timestamp > events.starttime') }
   scope :invalid_vote_phase, -> { voting.joins(:vote_period).where('current_timestamp > events.endtime') }
-
-  scope :select_alerts_and_rankings, lambda { |user_id|
-    select('proposals.*',
-           Proposal.alerts_count_subquery(user_id).as('alerts_count'),
-           Proposal.ranking_subquery(user_id).as('ranking'))
-  }
-
-  scope :for_list, lambda { |user_id = nil|
-    select_alerts_and_rankings(user_id).
-      includes(:interest_borders, :user_votes, :presentation_areas, :groups,
-               :category, :quorum, :vote_period, :proposal_type)
-  }
 
   scope :by_interest_borders, ->(ib) { where('proposals.derived_interest_borders_tokens @> ARRAY[?]::varchar[]', ib) }
 
@@ -187,7 +167,7 @@ class Proposal < ApplicationRecord
   def self.alerts_count_subquery(user_id)
     alerts = Alert.arel_table
     proposals = Proposal.arel_table
-    alerts_count = alerts.
+    alerts.
                    project('count(*)').
                    where(alerts[:trackable_id].eq(proposals[:id]).
             and(alerts[:trackable_type].eq('Proposal')).
@@ -198,7 +178,7 @@ class Proposal < ApplicationRecord
   def self.ranking_subquery(user_id)
     proposals = Proposal.arel_table
     proposal_rankings = ProposalRanking.arel_table
-    ranking = proposal_rankings.
+    proposal_rankings.
               project(proposal_rankings[:ranking_type_id]).
               where(proposal_rankings[:proposal_id].eq(proposals[:id]).
             and(proposal_rankings[:user_id].eq(user_id)))
@@ -213,10 +193,10 @@ class Proposal < ApplicationRecord
                        alerts_count_subquery(user_id).as('alerts_count'),
                        ranking_subquery(user_id).as('ranking')).
                 where('proposals.private = false or proposals.visible_outside = false').
-                where.not(proposal_type_id: 11) # TODO: petitions excluded
+                where.not(proposal_type_id: 11)
     proposals = proposals.by_interest_borders(InterestBorder.to_key(current_territory)) if current_territory.present?
-    proposals = proposals.order(updated_at: :desc).page(1).per(10)
-    ActiveRecord::Associations::Preloader.new.preload(proposals, %i[quorum groups supporting_groups category])
+    proposals = proposals.order(updated_at: :desc).limit(10)
+    ActiveRecord::Associations::Preloader.new(records: proposals, associations: %i[quorum groups supporting_groups category]).call
     proposals
   end
 
@@ -237,8 +217,8 @@ class Proposal < ApplicationRecord
                 where(proposals[:proposal_type_id].not_eq(petition_id)).
                 where(proposals[:id].in(list_c)).
                 order(updated_at: :desc).to_a
-    ActiveRecord::Associations::Preloader.new.preload(proposals, [:quorum, :category, { users: :image },
-                                                                  :proposal_type, :groups, :supporting_groups])
+    ActiveRecord::Associations::Preloader.new(records: proposals, associations: [:quorum, :category, { users: :image },
+                                                                  :proposal_type, :groups, :supporting_groups]).call
     proposals
   end
 
@@ -256,13 +236,13 @@ class Proposal < ApplicationRecord
 
   def self.votation_portlet(user)
     user_id = user.id
-    proposals = Proposal.arel_table
-    group_proposals = GroupProposal.arel_table
-    group_participations = GroupParticipation.arel_table
-    groups = Group.arel_table
+    Proposal.arel_table
+    GroupProposal.arel_table
+    GroupParticipation.arel_table
+    Group.arel_table
     events = Event.arel_table
     participation_roles = ParticipationRole.arel_table
-    user_votes = UserVote.arel_table
+    UserVote.arel_table
     petition_id = ProposalType.find_by(name: ProposalType::PETITION).id
     alerts_count = alerts_count_subquery(user_id)
     ranking = ranking_subquery(user_id)
@@ -316,9 +296,8 @@ class Proposal < ApplicationRecord
     proposal_type.name == ProposalType::POLL
   end
 
-  # TODO: remove jobs
+
   def remove_scheduled_tasks
-    # Resque.remove_delayed(ProposalsWorker, {action: ProposalsWorker::ENDTIME, proposal_id: self.id})
   end
 
   # return true if the proposal is currently in debate
@@ -382,14 +361,14 @@ class Proposal < ApplicationRecord
 
   # return the group to which belongs the proposal
   # if is in the open space then nil is returned
-  # TODO: if belongs to many groups returns the first. we actually have max 1 group
+
   def group
     groups.first
   end
 
   # return the group_area to which belongs the proposal
   # if is in the open space then nil is returned
-  # TODO: if belongs to many group_areas returns the first. we actually have max 1 group area
+
   def group_area
     presentation_areas.first
   end
@@ -408,9 +387,9 @@ class Proposal < ApplicationRecord
     return User.confirmed.unblocked.count unless private?
 
     if !presentation_areas.empty? # if we are in a working area
-      presentation_areas.first.scoped_participants(:vote_proposals).count # TODO: it can belong to more areas
+      presentation_areas.first.scoped_participants(:vote_proposals).count
     else
-      groups.first.scoped_participants(:vote_proposals).count # TODO: it can belong to more groups
+      groups.first.scoped_participants(:vote_proposals).count
     end
   end
 
@@ -542,7 +521,7 @@ class Proposal < ApplicationRecord
     self.valutations = 0
     self.rank = 0
 
-    NotificationProposalAbandoned.perform_in(1.minute, id, participants.map(&:id))
+    NotificationProposalAbandoned.set(wait: 1.minute).perform_later(id, participants.map(&:id))
     # and authors
     proposal_presentations.destroy_all
 
@@ -551,10 +530,6 @@ class Proposal < ApplicationRecord
 
     save!
 
-    # remove the timer if is still there
-    # if self.minutes #todo remove jobs
-    #  Resque.remove_delayed(ProposalsWorker, {action: ProposalsWorker::ENDTIME, proposal_id: proposal.id})
-    # end
   end
 
   # put the proposal back in debate from abandoned
@@ -570,12 +545,12 @@ class Proposal < ApplicationRecord
     # if the time is fixed we schedule notifications 24h and 1h before the end of debate
     if quorum.time_fixed?
       if quorum.minutes > 1440
-        ProposalsWorker.perform_at(quorum.ends_at - 24.hours,
-                                   'action' => ProposalsWorker::LEFT24, 'proposal_id' => id)
+        ProposalsWorker.set(wait_until: quorum.ends_at - 24.hours)
+                       .perform_later('action' => ProposalsWorker::LEFT24, 'proposal_id' => id)
       end
       if quorum.minutes > 60
-        ProposalsWorker.perform_at(quorum.ends_at - 1.hour,
-                                   'action' => ProposalsWorker::LEFT1, 'proposal_id' => id)
+        ProposalsWorker.set(wait_until: quorum.ends_at - 1.hour)
+                       .perform_later('action' => ProposalsWorker::LEFT1, 'proposal_id' => id)
       end
     end
   end
@@ -585,22 +560,20 @@ class Proposal < ApplicationRecord
 
     self.proposal_state_id = ProposalState::VOTING
     save!
-    unless vote # TODO: non è possibile che esistano già
+    unless vote
       vote_data = ProposalVote.new(proposal_id: id, positive: 0, negative: 0, neutral: 0)
       vote_data.save!
     end
 
-    NotificationProposalVoteStarts.perform_async(id, groups.first.try(:id), presentation_areas.first.try(:id))
+    NotificationProposalVoteStarts.perform_later(id, groups.first.try(:id), presentation_areas.first.try(:id))
 
     if (vote_period.duration / 60) > 1440
-      ProposalsWorker.
-        perform_at(vote_period.endtime - 24.hours,
-                   'action' => ProposalsWorker::LEFT24VOTE, 'proposal_id' => id)
+      ProposalsWorker.set(wait_until: vote_period.endtime - 24.hours)
+                     .perform_later('action' => ProposalsWorker::LEFT24VOTE, 'proposal_id' => id)
     end
     if (vote_period.duration / 60) > 60
-      ProposalsWorker.
-        perform_at(vote_period.endtime - 1.hour,
-                   'action' => ProposalsWorker::LEFT1VOTE, 'proposal_id' => id)
+      ProposalsWorker.set(wait_until: vote_period.endtime - 1.hour)
+                     .perform_later('action' => ProposalsWorker::LEFT1VOTE, 'proposal_id' => id)
     end
   end
 
@@ -718,30 +691,30 @@ class Proposal < ApplicationRecord
     # if the time is fixed we schedule notifications 24h and 1h before the end of debate
     if quorum.time_fixed?
       if quorum.minutes > 1440
-        ProposalsWorker.perform_at(quorum.ends_at - 24.hours,
-                                   'action' => ProposalsWorker::LEFT24, 'proposal_id' => id)
+        ProposalsWorker.set(wait_until: quorum.ends_at - 24.hours)
+                       .perform_later('action' => ProposalsWorker::LEFT24, 'proposal_id' => id)
       end
       if quorum.minutes > 60
-        ProposalsWorker.perform_at(quorum.ends_at - 1.hour,
-                                   'action' => ProposalsWorker::LEFT1, 'proposal_id' => id)
+        ProposalsWorker.set(wait_until: quorum.ends_at - 1.hour)
+                       .perform_later('action' => ProposalsWorker::LEFT1, 'proposal_id' => id)
       end
     end
 
     # end of debate timer
-    ProposalsWorker.perform_at(quorum.ends_at, 'action' => ProposalsWorker::ENDTIME, 'proposal_id' => id) if quorum.minutes
+    ProposalsWorker.set(wait_until: quorum.ends_at).perform_later('action' => ProposalsWorker::ENDTIME, 'proposal_id' => id) if quorum.minutes
 
     # alert users of the new proposal
-    NotificationProposalCreate.perform_async(id)
+    NotificationProposalCreate.perform_later(id)
   end
 
   def send_update_notifications
     if quorum_id_changed? # regenerated
-      ProposalsWorker.perform_at(quorum.ends_at, 'action' => ProposalsWorker::ENDTIME, 'proposal_id' => id)
+      ProposalsWorker.set(wait_until: quorum.ends_at).perform_later('action' => ProposalsWorker::ENDTIME, 'proposal_id' => id)
     elsif current_user_id # updated or set votation date
       if waiting? # someone chose votation date
-        NotificationProposalWaitingForDate.perform_async(id, current_user_id)
+        NotificationProposalWaitingForDate.perform_later(id, current_user_id)
       else # standard update
-        NotificationProposalUpdate.perform_async(current_user_id, id, groups.first.try(:id))
+        NotificationProposalUpdate.perform_later(current_user_id, id, groups.first.try(:id))
       end
     end
   end
@@ -796,7 +769,7 @@ class Proposal < ApplicationRecord
   end
 
   def save_history
-    something = false
+    false
     seq = (proposal_revisions.maximum(:seq) || 0) + 1
     revision = proposal_revisions.build(user_id: update_user_id, valutations: valutations_was, rank: rank_was, seq: seq)
     something_sections = save_sections_history(revision)
@@ -863,7 +836,7 @@ class Proposal < ApplicationRecord
       copy.ends_at = endtime
     end
 
-    # TODO: move quorum build in quorum model
+
     base_valutations = 0
     base_vote_valutations = 0
     if group_area # we have to calculate the number of valutations based on group area participants
@@ -876,7 +849,7 @@ class Proposal < ApplicationRecord
       base_vote_valutations = base_valutations = User.count_active
     end
     copy.valutations = ((quorum.percentage.to_f * base_valutations) / 100).floor
-    # TODO: we must calculate it before votation because there can be new users in the meantime
+
     copy.vote_valutations = ((quorum.vote_percentage.to_f * base_vote_valutations) / 100).floor
 
     # always add 1 and at least 1.

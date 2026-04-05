@@ -27,10 +27,11 @@ class NotificationsController < ApplicationController
     if result
       flash[:notice] = t('info.setting_preferences')
     else
-      respond_to do |format|
-        flash[:error] = t('error.setting_preferences')
-        format.js { render 'layouts/error' }
-      end
+      flash[:error] = t('error.setting_preferences')
+    end
+    respond_to do |format|
+      format.turbo_stream { render partial: 'layouts/flash_stream' }
+      format.html { redirect_back fallback_location: root_path }
     end
   end
 end

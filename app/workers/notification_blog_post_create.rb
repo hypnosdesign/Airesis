@@ -11,7 +11,7 @@ class NotificationBlogPostCreate < NotificationSender
 
     data = { blog_post_id: blog_post.id, user_id: post_user.id }
     notification_a = Notification.create(notification_type_id: 15, url: blog_blog_post_url(blog_post.blog, blog_post), data: data)
-    # TODO: followers are not yet supported
+
     user_followers.each do |user|
       next if (user == post_user) || (sent_users.include? user)
 

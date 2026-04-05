@@ -1,0 +1,64 @@
+<% @page_title = t('.title') %>
+
+<div class="card bg-base-200 p-4 mb-4">
+  <h1 class="text-2xl font-bold mb-4"><%= @page_title %></h1>
+
+  <p class="mb-2"><b><%= t('.last_login') %></b> <span class="info"><%= @user.last_sign_in_at %></span></p>
+  <p class="mb-2"><b><%= t('.integrated_count') %></b> <span class="info"><%= @integrated_count %></span></p>
+  <p class="mb-2"><b><%= t('.spam_count') %></b> <span class="info"><%= @spam_count %></span></p>
+  <p class="mb-2"><b><%= t('.noisy_count') %></b> <span class="info"><%= @noisy_count %></span></p>
+  <p class="mb-2"><b><%= t('.total_count') %></b> <span class="info"><%= @contributes_count %></span></p>
+  <p class="mb-2"><b><%= t('.total_comments_count') %></b> <span class="info"><%= @comments_count %></span></p>
+  <p class="mb-2"><b><%= t('.proposals_editor') %></b> <span class="info"><%= @proposals_count %></span></p>
+  <p class="mb-2"><b><%= t('.proposals_voted') %></b> <span class="info"><%= @voted_count = @user.proposals.voted.count %></span></p>
+  <p class="mb-2"><b><%= t('.average_rank_voted_proposals') %></b> <span class="info"><%= @voted_rank = @user.proposals.accepted.average(:rank).to_f.round(2) %></span></p>
+  <p class="mb-2"><b><%= t('.proposals_accepted_count') %></b> <span class="info"><%= @accepted_count = @user.proposals.accepted.count %></span></p>
+  <p class="mb-2"><b><%= t('.proposals_abandonend_count') %></b> <span class="info"><%= @abandoned_count = @user.proposals.abandoned.count %></span></p>
+
+  <p class="mb-2">
+    <b><%= t('.good_writer') %></b>
+    <span class="info">
+      <progress class="progress progress-primary w-32" value="<%= ((1+((@integrated_count.to_f/@contributes_count.to_f)**(0.5) - (@spam_count.to_f/@comments_count.to_f)**(1.to_f/3.to_f)))/2)*100 %>" max="100"></progress>
+      <%= ((1+((@integrated_count.to_f/@contributes_count.to_f)**(0.5) - (@spam_count.to_f/@comments_count.to_f)**(1.to_f/3.to_f)))/2)*100 %> %
+    </span>
+  </p>
+
+  <p class="mb-2">
+    <b><%= t('.good_proposals_writer') %></b>
+    <span class="info">
+      <progress class="progress progress-primary w-32" value="<%= ((1+(((0.8*@accepted_count)+(0.2*(@voted_count - @abandoned_count)))/(@voted_count+@abandoned_count)))/2)*100 %>" max="100"></progress>
+      <%= ((1+(((0.8*@accepted_count)+(0.2*(@voted_count - @abandoned_count)))/(@voted_count+@abandoned_count)))/2)*100 %> %
+    </span>
+  </p>
+</div>
+
+<% if @user == current_user && @user.user_votes.count > 0 %>
+  <div class="card bg-base-200 p-4">
+    <h2 class="text-xl font-bold mb-2"><%= t('pages.users.show.votations_title') %></h2>
+    <table id="votations_table" class="table">
+      <thead>
+        <th><%= t('pages.users.show.proposal_column') %></th>
+        <th><%= t('pages.users.show.votation_date_column') %></th>
+        <th>vote_sortable</th>
+        <th><%= t('pages.users.show.vote_column') %></th>
+      </thead>
+      <tbody>
+        <% @user.user_votes.includes(:vote_type, proposal: :groups).each do |vote| %>
+          <tr>
+            <td><%= vote.proposal ? (link_to_proposal vote.proposal) : '' %></td>
+            <td><%= l vote.created_at %></td>
+            <td><%= vote.created_at.to_i %></td>
+            <td><%= vote.vote_type ? vote.vote_type.description : t('pages.users.show.secret_vote') %></td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+
+  </div>
+<% end %>
+
+<% content_for :left_panel do %>
+  <% if current_user %>
+    <%= render partial: 'users/preferences_panel' %>
+  <% end %>
+<% end %>

@@ -8,7 +8,7 @@ class ProposalRanking < ApplicationRecord
   scope :positives, -> { where(ranking_type_id: POSITIVE) }
   scope :negatives, -> { where(ranking_type_id: NEGATIVE) }
 
-  enum ranking_type_id: { positive: 1, neutral: 2, negative: 3 }
+  enum :ranking_type_id, { positive: 1, neutral: 2, negative: 3 }
 
   after_save :update_counter_cache
   after_save :check_proposal_state
@@ -30,7 +30,7 @@ class ProposalRanking < ApplicationRecord
   # invia le notifiche quando un utente valuta la proposta
   # le notifiche vengono inviate ai creatori e ai partecipanti alla proposta
   def send_notifications
-    NotificationProposalRankingCreate.perform_async(id)
+    NotificationProposalRankingCreate.perform_later(id)
   end
 
   def check_proposal_state

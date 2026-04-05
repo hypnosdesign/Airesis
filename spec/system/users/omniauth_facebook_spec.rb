@@ -142,7 +142,7 @@ RSpec.describe 'the oauth2 process', :js do
 
     it 'permits to detach FB account' do
       user = create(:user)
-      authentication = create(:authentication, user: user)
+      create(:authentication, user: user)
       login_as user, scope: :user
 
       # visit '/users/auth/facebook/callback'

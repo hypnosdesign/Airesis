@@ -8,14 +8,14 @@ class EventCommentsController < ApplicationController
 
     respond_to do |format|
       if @event_comment.save
-        @event_comments = @event.event_comments.order('created_at DESC').page(params[:page]).per(COMMENTS_PER_PAGE)
+        @pagy, @event_comments = pagy(@event.event_comments.order('created_at DESC'), items: COMMENTS_PER_PAGE)
         @saved = @event_comments.find { |comment| comment.id == @event_comment.id }
         @saved.collapsed = true
         flash[:notice] = t('info.event.comment_added')
-        format.js
+        format.turbo_stream
       else
         flash[:notice] = t('error.event.comment_added')
-        format.js { render 'event_comments/errors/create' }
+        format.turbo_stream { render 'event_comments/errors/create' }
       end
     end
   end
@@ -24,8 +24,8 @@ class EventCommentsController < ApplicationController
     @event_comment.destroy
     flash[:notice] = 'The comment has been deleted'
     respond_to do |format|
-      format.js do
-        @event_comments = @event.event_comments.order('created_at DESC').page(params[:page]).per(COMMENTS_PER_PAGE)
+      format.turbo_stream do
+        @pagy, @event_comments = pagy(@event.event_comments.order('created_at DESC'), items: COMMENTS_PER_PAGE)
       end
     end
   end
@@ -36,7 +36,8 @@ class EventCommentsController < ApplicationController
       @event_comment.likers << current_user
     @event_comment.save!
     respond_to do |format|
-      format.js { render 'layouts/success' }
+      format.turbo_stream { render partial: 'layouts/flash_stream' }
+      format.html { redirect_back fallback_location: event_path(@event) }
     end
   end
 

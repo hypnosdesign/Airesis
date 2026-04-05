@@ -1,0 +1,6 @@
+<%= turbo_stream.append "blogPostContainer" do %>
+  <%= render partial: "blog_posts/blog_post", collection: @blog_posts %>
+<% end %>
+<% unless @pagy.next %>
+  <%= turbo_stream.remove "loading_results" %>
+<% end %>

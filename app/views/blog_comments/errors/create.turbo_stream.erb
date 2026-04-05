@@ -1,0 +1,6 @@
+<%= turbo_stream.replace "blogNewComment" do %>
+  <div id="blogNewComment">
+    <%= render partial: "blog_comments/new_blog_comment", locals: { blog_comment: @blog_comment } %>
+  </div>
+<% end %>
+<%= render partial: "layouts/flash_stream" %>

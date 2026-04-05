@@ -55,7 +55,7 @@ class OldQuorum < Quorum
     if !ret.empty?
       ret.join(or? ? " #{I18n.t('words.or').upcase} " : " #{I18n.t('words.and').upcase} ")
     else
-      'IN STALLO' # TODO: i18n
+      I18n.t('models.quorum.stalled', default: 'STALLED')
     end
   end
 
@@ -101,13 +101,10 @@ class OldQuorum < Quorum
           proposal.vote_period = @event
         else
           proposal.proposal_state_id = ProposalState::WAIT_DATE # we passed the debate, we are now waiting for someone to choose the vote date
-          NotificationProposalReadyForVote.perform_async(proposal.id)
+          NotificationProposalReadyForVote.perform_later(proposal.id)
         end
 
         # remove the timer if is still there
-        if minutes
-          # Resque.remove_delayed(ProposalsWorker, {action: ProposalsWorker::ENDTIME, proposal_id: proposal.id}) #TODO remove jobs
-        end
         proposal.save
 
       elsif proposal.rank < bad_score # if we have not passed the debate quorum abandon it
@@ -132,7 +129,7 @@ class OldQuorum < Quorum
         vs = SchulzeBasic.do votesstring, num_solutions
         solutions_sorted = proposal.solutions.sort_by(&:id) # order the solutions by the id (as the plugin output the results)
         solutions_sorted.each_with_index do |c, i|
-          c.schulze_score = vs.ranks[i].to_i # save the result in the solution
+          c.schulze_score = vs.ranking[i].to_i # save the result in the solution
           c.save!
         end
         proposal.proposal_state_id = ProposalState::ACCEPTED
@@ -142,7 +139,7 @@ class OldQuorum < Quorum
       positive = vote_data.positive
       negative = vote_data.negative
       neutral = vote_data.neutral
-      votes = positive + negative + neutral
+      positive + negative + neutral
       if positive > negative # se ha avuto più voti positivi allora diventa ACCETTATA
         proposal.proposal_state_id = ProposalState::ACCEPTED
       elsif positive <= negative # se ne ha di più negativi allora diventa RESPINTA
@@ -150,7 +147,7 @@ class OldQuorum < Quorum
       end
     end
     proposal.save!
-    NotificationProposalVoteClosed.perform_async(proposal.id)
+    NotificationProposalVoteClosed.perform_later(proposal.id)
   end
 
   def has_bad_score?
@@ -183,10 +180,10 @@ class OldQuorum < Quorum
   protected
 
   def min_participants_pop
-    count = 1
+    1
     if percentage
       count = if group
-                (percentage.to_f * 0.01 * group.scoped_participants(:participate_proposals).count) # TODO: group areas
+                (percentage.to_f * 0.01 * group.scoped_participants(:participate_proposals).count)
               else
                 (percentage.to_f * 0.001 * User.count)
               end
@@ -195,8 +192,8 @@ class OldQuorum < Quorum
   end
 
   def explanation_pop
-    conditions = []
-    ret = ''
+    []
+    ''
     ret = if assigned? # explain a quorum assigned to a proposal
             if proposal_life.present? || proposal.abandoned?
               terminated_explanation_pop
@@ -211,7 +208,7 @@ class OldQuorum < Quorum
     ret.html_safe
   end
 
-  # TODO: we need to refactor this part of code but at least now is more clear
+
   # explain a quorum when assigned to a proposal in it's current state
   def assigned_explanation_pop
     ret = ''

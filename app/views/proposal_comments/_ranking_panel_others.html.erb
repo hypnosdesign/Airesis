@@ -1,0 +1,8 @@
+<div class="flex items-center gap-3 text-sm" id="ranking_panel_<%= comment.id %>">
+  <span class="text-xs text-base-content/50"><%= t('pages.proposals.contribution_valuation') %></span>
+  <div class="flex items-center gap-2">
+    <%= link_to_rankup(@proposal, comment) %>
+    <%= link_to_ranknil(@proposal, comment) %>
+    <%= link_to_rankdown(@proposal, comment) %>
+  </div>
+</div>

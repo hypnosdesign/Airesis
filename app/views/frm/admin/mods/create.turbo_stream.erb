@@ -1,0 +1,7 @@
+<%= turbo_stream.replace "groups_table" do %>
+  <%= render "groups" %>
+<% end %>
+<%= turbo_stream.replace "mod_modal" do %>
+  <div id="mod_modal"></div>
+<% end %>
+<%= render partial: "layouts/flash_stream" %>

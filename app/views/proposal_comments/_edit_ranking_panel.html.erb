@@ -1,0 +1,15 @@
+<span class="rightFloat think">
+  <%= t('pages.proposals.edit.contribution_valuation') %>
+</span>
+<span class="ranking-count">
+  <%= comment.rankings.positives.count %>
+</span>
+<span class="text-xl" title="<%= t('pages.proposals.show.voteup') %>">👍</span>
+<span class="ranking-count">
+  <%= comment.rankings.neutrals.count %>
+</span>
+<span class="text-xl" title="<%= t('pages.proposals.show.votenil') %>">😐</span>
+<span class="ranking-count">
+  <%= comment.rankings.negatives.count %>
+</span>
+<span class="text-xl" title="<%= t('pages.proposals.show.votedown') %>">👎</span>

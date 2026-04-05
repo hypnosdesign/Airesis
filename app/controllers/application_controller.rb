@@ -1,4 +1,5 @@
 class ApplicationController < ActionController::Base
+  include Pagy::Backend
   include StepsHelper
   include ApplicationHelper
   helper :all
@@ -27,7 +28,7 @@ class ApplicationController < ActionController::Base
   helper_method :is_admin?, :is_moderator?, :is_proprietary?, :current_url, :link_to_auth, :age, :is_group_admin?
 
   def configure_permitted_parameters
-    devise_parameter_sanitizer.permit(:sign_up, keys: %i[username email name surname accept_conditions sys_locale_id password])
+    devise_parameter_sanitizer.permit(:sign_up, keys: %i[username email name surname accept_conditions accept_privacy sys_locale_id password])
   end
 
   # redirect all'ultima pagina in cui ero
@@ -74,14 +75,9 @@ class ApplicationController < ActionController::Base
 
   protected
 
-  # TODO: enable this also in tests
+
   def load_tutorial
     @step = get_next_step(current_user) if current_user && !Rails.env.test?
-  end
-
-  def ckeditor_filebrowser_scope(options = {})
-    options = { assetable_id: current_user.id, assetable_type: 'User' }.merge(options)
-    super
   end
 
   def load_group
@@ -92,7 +88,7 @@ class ApplicationController < ActionController::Base
     return unless @blog
 
     @user = @blog.user
-    @blog_posts = @blog.blog_posts.includes(:user, :blog, :tags).page(params[:page]).per(COMMENTS_PER_PAGE)
+    @pagy, @blog_posts = pagy(@blog.blog_posts.includes(:user, :blog, :tags), items: COMMENTS_PER_PAGE)
     @recent_comments = @blog.comments.includes(:blog_post, user: [:image]).order('created_at DESC').limit(10)
     @recent_posts = @blog.blog_posts.published.limit(10)
     @archives = @blog.blog_posts.
@@ -164,12 +160,12 @@ class ApplicationController < ActionController::Base
   def render_error(exception)
     log_error(exception)
     respond_to do |format|
-      format.js do
+      format.turbo_stream do
         flash.now[:error] = "<b>#{t('error.error_500.title')}</b></br>#{t('error.error_500.description')}"
-        render template: 'layouts/error', status: 500, layout: 'application'
+        render partial: 'layouts/flash_stream', status: :internal_server_error
       end
       format.html do
-        render template: '/errors/500.html.erb', status: 500, layout: 'application'
+        render template: 'errors/500', status: :internal_server_error, layout: 'application'
       end
     end
   end
@@ -193,15 +189,15 @@ class ApplicationController < ActionController::Base
   def render_404(exception = nil)
     log_error(exception) if exception
     respond_to do |format|
-      format.js do
+      format.turbo_stream do
         flash.now[:error] = 'Page not available.'
-        render template: '/errors/invalid_locale.js.erb', status: 404, layout: 'application'
+        render partial: 'layouts/flash_stream', status: :not_found
       end
-      format.html { render 'errors/404', status: 404, layout: 'application' }
+      format.html { render 'errors/404', status: :not_found, layout: 'application' }
     end
   end
 
-  # TODO: avoid permit!
+
   def current_url(overwrite = {})
     url_for params.permit!.to_h.merge(overwrite).merge(only_path: false)
   end
@@ -253,11 +249,11 @@ class ApplicationController < ActionController::Base
   # response if you must be an administrator
   def admin_denied
     respond_to do |format|
-      format.js do # se era una chiamata ajax, mostra il messaggio
+      format.turbo_stream do
         flash.now[:error] = t('error.admin_required')
-        render 'layouts/error'
+        render partial: 'layouts/flash_stream', status: :forbidden
       end
-      format.html do # ritorna indietro oppure all'HomePage
+      format.html do
         store_location
         flash[:error] = t('error.admin_required')
         redirect_back(fallback_location: proposals_path)
@@ -272,13 +268,13 @@ class ApplicationController < ActionController::Base
   # response if you do not have permissions to do an action
   def permissions_denied(exception = nil)
     respond_to do |format|
-      format.js do # se era una chiamata ajax, mostra il messaggio
+      format.turbo_stream do
         if current_user
           log_error(exception)
           flash.now[:error] = exception.message
-          render 'layouts/error', status: :forbidden
+          render partial: 'layouts/flash_stream', status: :forbidden
         else
-          render 'layouts/authenticate'
+          redirect_to new_user_session_path
         end
       end
       format.html do # ritorna indietro oppure all'HomePage
@@ -292,7 +288,7 @@ class ApplicationController < ActionController::Base
       end
       format.all do
         log_error(exception)
-        render text: 'Permission denied', status: :forbidden
+        render plain: 'Permission denied', status: :forbidden
       end
     end
   end

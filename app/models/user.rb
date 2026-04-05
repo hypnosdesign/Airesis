@@ -1,7 +1,7 @@
 require 'digest/sha1'
 
 class User < ApplicationRecord
-  acts_as_token_authenticatable
+  has_secure_token :authentication_token
 
   devise :database_authenticatable, :registerable, :confirmable, :omniauthable,
          :blockable, :recoverable, :rememberable, :trackable, :validatable, :traceable
@@ -20,10 +20,10 @@ class User < ApplicationRecord
   validates :name, presence: true, length: { maximum: 50 }, format: { with: AuthenticationModule.name_regex, allow_nil: true }
   validates :surname, length: { maximum: 50 }, format: { with: AuthenticationModule.name_regex, allow_nil: true }
   validates :password, confirmation: true
-  validates :accept_conditions, acceptance: { message: -> { I18n.t('activerecord.errors.messages.TOS') } }
-  validates :accept_privacy, acceptance: { message: -> { I18n.t('activerecord.errors.messages.privacy') } }
+  validates :accept_conditions, acceptance: { message: ->(_obj, _opts) { I18n.t('activerecord.errors.messages.TOS') } }
+  validates :accept_privacy, acceptance: { message: ->(_obj, _opts) { I18n.t('activerecord.errors.messages.privacy') } }
 
-  enum user_type_id: { administrator: 1, moderator: 2, authenticated: 3 }, _prefix: true
+  enum :user_type_id, { administrator: 1, moderator: 2, authenticated: 3 }, prefix: true
 
   # Attachments
   has_one_attached :avatar
@@ -103,6 +103,16 @@ class User < ApplicationRecord
 
   def ability
     @ability ||= Ability.new(self)
+  end
+
+  def ensure_authentication_token!
+    regenerate_authentication_token if authentication_token.blank?
+    save!
+  end
+
+  def reset_authentication_token!
+    regenerate_authentication_token
+    save!
   end
 
   private

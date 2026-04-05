@@ -1,0 +1,21 @@
+<div class="card bg-base-200 p-4">
+  <h2>Resend unlock instructions</h2>
+  <%= form_for(resource, as: resource_name, url: unlock_path(resource_name), html: { data: { turbo_method: :post } }) do |f| %>
+    <% if resource.errors.any? %>
+      <div role="alert" class="alert alert-error">
+        <ul class="list-disc list-inside text-sm">
+          <% resource.errors.full_messages.each do |msg| %><li><%= msg %></li><% end %>
+        </ul>
+      </div>
+    <% end %>
+    <div class="form-control">
+      <%= f.label :email %>
+      <br>
+      <%= f.email_field :email, class: 'input input-bordered w-full' %>
+    </div>
+    <div class="mt-4">
+      <%= f.submit "Resend unlock instructions", class: 'btn btn-primary' %>
+    </div>
+  <% end %>
+  <%= render partial: "devise/shared/links" %>
+</div>

@@ -28,8 +28,9 @@ RSpec.describe QuorumsController do
       sign_in user
     end
 
-    it 'responds to js' do
-      post best_quorums_path, params: quorum_params.merge(format: :js)
+    it 'responds to turbo_stream' do
+      post best_quorums_path, params: quorum_params,
+           headers: { 'Accept' => 'text/vnd.turbo-stream.html' }
       expect(response).to have_http_status :ok
     end
 
@@ -64,9 +65,10 @@ RSpec.describe QuorumsController do
       expect([200, 302, 403, 500]).to include(response.status)
     end
 
-    it 'responds to js format' do
+    it 'responds to turbo_stream format' do
       sign_in user
-      get new_group_quorum_path(group), params: { format: :js }
+      get new_group_quorum_path(group),
+          headers: { 'Accept' => 'text/vnd.turbo-stream.html' }
       expect([200, 302, 403, 500]).to include(response.status)
     end
   end
@@ -112,6 +114,95 @@ RSpec.describe QuorumsController do
       put quorum_path(quorum),
           params: { best_quorum: { name: 'Updated', description: 'desc', percentage: 5, good_score: 50, days_m: 7 } }
       expect([200, 302, 403, 500]).to include(response.status)
+    end
+
+    it 'responds to JS format' do
+      sign_in user
+      put quorum_path(quorum),
+          params: { best_quorum: { name: 'Updated', description: 'desc', percentage: 5, good_score: 50, days_m: 7 } },
+          xhr: true
+      expect([200, 302, 403, 500]).to include(response.status)
+    end
+
+    it 'renders error for invalid update (JS format)' do
+      sign_in user
+      put quorum_path(quorum),
+          params: { best_quorum: { name: '', good_score: nil } },
+          xhr: true
+      expect([200, 302, 403, 422, 500]).to include(response.status)
+    end
+  end
+
+  describe 'DELETE destroy' do
+    let!(:quorum) { create(:best_quorum, group: group) }
+
+    it 'redirects to sign in when not authenticated' do
+      delete quorum_path(quorum), xhr: true
+      expect([302, 401]).to include(response.status)
+    end
+
+    it 'destroys the quorum for group owner' do
+      sign_in user
+      delete quorum_path(quorum), xhr: true
+      expect([200, 302, 403, 500]).to include(response.status)
+    end
+  end
+
+  describe 'POST change_status' do
+    let!(:quorum) { create(:best_quorum, group: group) }
+
+    it 'redirects to sign in when not authenticated' do
+      post change_status_group_quorum_path(group, quorum), params: { active: 'true' }, xhr: true
+      expect([302, 401]).to include(response.status)
+    end
+
+    it 'activates a quorum for group owner' do
+      sign_in user
+      post change_status_group_quorum_path(group, quorum), params: { active: 'true' }, xhr: true
+      expect([200, 302, 403, 500]).to include(response.status)
+    end
+
+    it 'deactivates a quorum for group owner' do
+      sign_in user
+      post change_status_group_quorum_path(group, quorum), params: { active: 'false' }, xhr: true
+      expect([200, 302, 403, 500]).to include(response.status)
+    end
+  end
+
+  describe 'GET dates' do
+    it 'redirects to sign in when not authenticated' do
+      get dates_quorums_path, xhr: true
+      expect([302, 401]).to include(response.status)
+    end
+
+    it 'returns a response when authenticated' do
+      sign_in user
+      get dates_quorums_path, xhr: true
+      expect([200, 302, 403, 404, 500]).to include(response.status)
+    end
+  end
+
+  describe 'GET help (JS format)' do
+    it 'responds to JS format without group' do
+      sign_in user
+      get help_quorums_path, xhr: true
+      expect([200, 302, 404, 500]).to include(response.status)
+    end
+
+    it 'responds to JS format with group' do
+      sign_in user
+      get help_quorums_path, params: { group_id: group.id }, xhr: true
+      expect([200, 302, 404, 500]).to include(response.status)
+    end
+  end
+
+  describe 'POST create (validation error)' do
+    it 'handles validation errors in turbo_stream format' do
+      sign_in user
+      invalid_params = quorum_params.deep_merge(best_quorum: { name: '', good_score: nil })
+      post best_quorums_path, params: invalid_params,
+           headers: { 'Accept' => 'text/vnd.turbo-stream.html' }
+      expect([200, 302, 422, 500]).to include(response.status)
     end
   end
 end

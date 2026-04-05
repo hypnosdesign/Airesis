@@ -10,7 +10,7 @@ class GroupInvitationsController < ApplicationController
       format.html do
         @page_title = t('pages.groups.invite_your_friends.title')
       end
-      format.js
+      format.turbo_stream
     end
   end
 
@@ -26,7 +26,7 @@ class GroupInvitationsController < ApplicationController
       else
         flash[:error] = t('error.group_invitations.create')
       end
-      format.js
+      format.turbo_stream
       format.html { redirect_to @group }
     end
   end

@@ -81,7 +81,8 @@ class ProposalCommentSearch
                         order('rank desc').take(left)
       end
       @proposal_comments = tmp_comments
-      @total_pages = (@proposal.contributes.listable.where(conditions_arel).count.to_f / COMMENTS_PER_PAGE).ceil
+      total_count = @proposal.contributes.listable.where(conditions_arel).count
+      @total_pages = (total_count.to_f / COMMENTS_PER_PAGE).ceil
       @current_page = (@page || 1).to_i
     else
       order = if rank_order?
@@ -89,9 +90,11 @@ class ProposalCommentSearch
               else
                 proposal_comments_t[:updated_at].desc
               end
-      @proposal_comments = @proposal.contributes.listable.where(conditions_arel).order(order).page(@page).per(@limit)
-      @total_pages = @proposal_comments.total_pages
-      @current_page = @proposal_comments.current_page
+      @current_page = (@page || 1).to_i
+      scope = @proposal.contributes.listable.where(conditions_arel).order(order)
+      total_count = scope.count(:all)
+      @total_pages = (total_count.to_f / @limit).ceil
+      @proposal_comments = scope.offset((@current_page - 1) * @limit).limit(@limit)
     end
     @proposal_comments
   end

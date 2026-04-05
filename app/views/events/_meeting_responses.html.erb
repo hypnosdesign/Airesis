@@ -1,0 +1,26 @@
+<div class="card bg-base-200 p-4">
+  <h4>
+    <%= @event.past? ? t('pages.events.show.participants') : t('pages.events.show.will_partecipate') %>
+  </h4>
+  <div class="mybox_button"></div>
+  <div>
+    <%= render partial: 'events/participants', locals: {participants: @event.meeting.yes_participations} %>
+    <% if @event.meeting.yes_participations.empty? %>
+      <% if @event.past? %>
+        <h4><%= t('pages.events.show.no_participants') %></h4>
+      <% else %>
+        <h4><%= t('pages.events.show.no_participants_yet') %></h4>
+      <% end %>
+    <% end %>
+  </div>
+</div>
+
+<div class="card bg-base-200 p-4">
+  <h4>
+    <%= @event.past? ? t('pages.events.show.non_participants') : t('pages.events.show.will_non_participants') %>
+  </h4>
+  <div class="mybox_button close" data-menu2show="0"></div>
+  <div style="display:none">
+    <%= render partial: 'events/participants', locals: {participants: @event.meeting.no_participations} %>
+  </div>
+</div>

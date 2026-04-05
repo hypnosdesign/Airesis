@@ -1,0 +1,14 @@
+<div id="available_quorums" class="help">
+  <%= render partial: 'help_menu' %>
+  <%= render partial: 'help_content' %>
+  <div style="clear: both;"></div>
+</div>
+
+<script>
+  function showSection(id) {
+    document.querySelectorAll('.quorum_section').forEach(function (el) { el.style.display = 'none'; });
+    document.getElementById(id).style.display = '';
+  }
+  document.querySelectorAll('.quorum_section').forEach(function (el) { el.style.display = 'none'; });
+  document.getElementById('whatis').style.display = '';
+</script>

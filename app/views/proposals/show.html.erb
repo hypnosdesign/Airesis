@@ -1,0 +1,399 @@
+<% @page_title = @proposal.title %>
+<% @meta_description = @proposal.short_content %>
+
+<% content_for :head do %>
+  <meta property="og:url" content="<%= current_url %>">
+  <meta property="og:title" content="<%= @proposal.title %>">
+  <meta property="og:type" content="article">
+  <meta property="og:image" content="<%= asset_url('logo120.png') %>">
+  <meta property="og:site_name" content="<%= ENV['APP_LONG_NAME'] %>">
+  <meta property="fb:app_id" content="<%= ENV['FACEBOOK_APP_ID'] %>">
+  <meta property="article:published_time" content="<%= @proposal.created_at.strftime("%Y/%m/%d") %>">
+  <meta property="article:author" content="<%= (@proposal.users.first || @proposal.proposal_lives.first.users.first).fullname %>">
+  <meta property="article:section" content="<%= @proposal.category.description %>">
+  <meta property="article:tag" content="<%= @proposal.tags_list %>">
+<% end %>
+
+<%# ===== 1. HEADER ===== %>
+<div class="mb-6">
+  <%# Badge stato %>
+  <% state_colors = {
+    ProposalState::VALUTATION => 'badge-info',
+    ProposalState::WAIT_DATE => 'badge-warning',
+    ProposalState::WAIT => 'badge-warning',
+    ProposalState::VOTING => 'badge-accent',
+    ProposalState::ACCEPTED => 'badge-success',
+    ProposalState::REJECTED => 'badge-error',
+    ProposalState::ABANDONED => 'badge-neutral'
+  } %>
+  <div class="flex flex-wrap items-center gap-3 mb-3">
+    <span class="badge <%= state_colors[@proposal.proposal_state_id] || 'badge-neutral' %> badge-lg font-bold">
+      <%= @proposal.state.description %>
+    </span>
+    <span class="badge badge-outline"><%= @proposal.proposal_type.description %></span>
+    <% if @proposal.category %>
+      <span class="badge badge-outline"><%= @proposal.category.description %></span>
+    <% end %>
+  </div>
+
+  <%# Titolo %>
+  <h1 class="text-3xl md:text-4xl font-extrabold text-base-content mb-3">
+    <%= h @proposal.title %>
+  </h1>
+
+  <%# Metadata %>
+  <div class="flex flex-wrap items-center gap-4 text-sm text-base-content/60 mb-4">
+    <span>
+      <i class="fa-regular fa-calendar"></i>
+      <%= l @proposal.created_at, format: :long %>
+    </span>
+    <span>
+      <i class="fa-regular fa-eye"></i>
+      <%= @proposal.views_count || 0 %> <%= t('pages.proposals.show.views') rescue 'visualizzazioni' %>
+    </span>
+    <span>
+      <i class="fa-regular fa-comments"></i>
+      <%= @proposal.proposal_contributes_count || 0 %> contributi
+    </span>
+    <% unless @proposal.interest_borders.empty? %>
+      <span>
+        <i class="fa-solid fa-map-marker-alt"></i>
+        <%= @proposal.interest_borders.map(&:description).join(', ') %>
+      </span>
+    <% end %>
+  </div>
+
+  <%# Azioni %>
+  <div class="flex flex-wrap gap-2">
+    <% if can? :update, @proposal %>
+      <%= link_to(@group ? edit_group_proposal_url(@group, @proposal) : edit_proposal_path(@proposal), class: 'btn btn-sm') do %>
+        <i class="fa-solid fa-pencil"></i> <%= t('pages.proposals.show.edit_button') %>
+      <% end %>
+    <% end %>
+    <% if can? :destroy, @proposal %>
+      <%= link_to(@group ? group_proposal_url(@group, @proposal) : @proposal, data: { turbo_method: :delete, turbo_confirm: t('pages.proposals.show.delete_proposal_confirmation') }, class: 'btn btn-sm btn-error btn-outline') do %>
+        <i class="fa-regular fa-trash-can"></i> <%= t('pages.proposals.show.delete_button') %>
+      <% end %>
+    <% end %>
+    <% if @proposal.in_valutation? && can?(:close_debate, @proposal) %>
+      <%= link_to(@group ? close_debate_group_proposal_url(@group, @proposal) : close_debate_proposal_url(@proposal), data: { turbo_method: :post, turbo_confirm: t('pages.proposals.show.close_debate_proposal_confirmation') }, class: 'btn btn-sm btn-warning') do %>
+        <i class="fa-solid fa-xmark"></i> <%= t('pages.proposals.show.close_debate_button') %>
+      <% end %>
+    <% end %>
+    <% if signed_in? %>
+      <%= link_to(url_for_proposal(@proposal, format: :pdf), target: '_blank', class: 'btn btn-sm btn-ghost') do %>
+        <i class="fa-solid fa-file-pdf"></i> PDF
+      <% end %>
+      <% if @proposal.proposal_revisions.count > 0 || @proposal.abandoned? %>
+        <%= link_to(proposal_proposal_revisions_url(@proposal), class: 'btn btn-sm btn-ghost') do %>
+          <i class="fa-solid fa-file-lines"></i> <%= t('pages.proposals.show.history_button') %>
+        <% end %>
+      <% end %>
+    <% end %>
+  </div>
+</div>
+
+<%# ===== 2. BARRA STATO (condizionale) ===== %>
+<% unless @proposal.is_petition? %>
+  <% if @proposal.in_valutation? %>
+    <div class="bg-base-200 border-2 border-neutral p-5 mb-6" style="box-shadow: 4px 4px 0 oklch(var(--n));">
+      <div class="flex flex-col md:flex-row md:items-center gap-4">
+        <div class="flex-1">
+          <p class="font-semibold mb-1"><%= t('pages.proposals.show.during_debate') rescue 'Fase dibattito' %></p>
+          <p class="text-sm text-base-content/60"><%= @proposal.quorum.explanation %></p>
+        </div>
+        <div class="text-right">
+          <div class="flex items-center gap-3">
+            <div>
+              <span class="text-2xl font-bold"><%= @proposal.valutations %></span>
+              <span class="text-sm text-base-content/60">/ <%= @proposal.quorum.valutations %></span>
+            </div>
+            <div class="text-sm text-base-content/60">valutazioni</div>
+          </div>
+          <progress class="progress progress-primary w-48 mt-1"
+                    value="<%= @proposal.valutations %>"
+                    max="<%= [@proposal.quorum.valutations, 1].max %>"></progress>
+        </div>
+      </div>
+    </div>
+  <% elsif @proposal.waiting? %>
+    <div class="bg-warning/10 border-2 border-warning p-5 mb-6" style="box-shadow: 4px 4px 0 oklch(var(--n));">
+      <p class="font-semibold">
+        <i class="fa-solid fa-clock"></i>
+        <%= t('pages.proposals.show.votation_message', from: l(@proposal.vote_period.starttime), to: l(@proposal.vote_period.endtime)) %>
+      </p>
+      <% if can?(:start_votation, @proposal) %>
+        <%= link_to(@group ? start_votation_group_proposal_url(@group, @proposal) : start_votation_proposal_url(@proposal), data: { turbo_method: :post, turbo_confirm: t('pages.proposals.show.start_votation_proposal_confirmation') }, class: 'btn btn-primary mt-3') do %>
+          <i class="fa-solid fa-play"></i> <%= t('pages.proposals.show.start_votation_button') %>
+        <% end %>
+      <% end %>
+    </div>
+  <% elsif @proposal.waiting_date? %>
+    <div class="bg-warning/10 border-2 border-warning p-5 mb-6" style="box-shadow: 4px 4px 0 oklch(var(--n));">
+      <div id="wait_date_header_container">
+        <%= render partial: 'proposals/wait_date_header' %>
+      </div>
+    </div>
+  <% elsif @proposal.voting? %>
+    <div class="bg-accent/10 border-2 border-accent p-5 mb-6" style="box-shadow: 4px 4px 0 oklch(var(--n));">
+      <p class="font-bold text-lg mb-2">
+        <i class="fa-solid fa-check-to-slot"></i>
+        <%= t('pages.proposals.show.during_debate') rescue 'Votazione in corso' %>
+      </p>
+      <div id="vote_panel_container">
+        <%= render partial: 'vote_panel' %>
+      </div>
+    </div>
+  <% elsif @proposal.abandoned? %>
+    <div class="bg-neutral/10 border-2 border-neutral p-5 mb-6" style="box-shadow: 4px 4px 0 oklch(var(--n));">
+      <%= render partial: 'proposals/abandoned_header' %>
+      <p class="text-sm text-base-content/60 mt-2">
+        <%= "#{t('pages.proposals.show.abandoned_message', ago: time_ago_in_words(@proposal.updated_at))}: #{l @proposal.updated_at}".html_safe %>
+      </p>
+    </div>
+  <% elsif @proposal.voted? %>
+    <div class="bg-<%= @proposal.accepted? ? 'success' : 'error' %>/10 border-2 border-<%= @proposal.accepted? ? 'success' : 'error' %> p-5 mb-6"
+         style="box-shadow: 4px 4px 0 oklch(var(--n));">
+      <div class="flex items-center justify-between">
+        <p class="font-bold text-lg">
+          <i class="fa-solid fa-<%= @proposal.accepted? ? 'check-circle' : 'times-circle' %>"></i>
+          <%= @proposal.state.description %>
+        </p>
+        <%= link_to(vote_results_proposal_url(@proposal), class: 'btn btn-sm') do %>
+          <%= t('pages.proposals.show.votation_results') %>
+        <% end %>
+      </div>
+    </div>
+  <% end %>
+<% end %>
+
+<%# Messaggio accesso per non partecipanti %>
+<% unless can? :participate, @proposal %>
+  <% if @proposal.in_valutation? %>
+    <div class="alert alert-info mb-6">
+      <i class="fa-solid fa-info-circle"></i>
+      <span>
+        <% if signed_in? %>
+          <% if @group && @group.participants.include?(current_user) %>
+            <%= t('pages.proposals.show.cant_participate.no_permissions') %>
+          <% elsif @group && @group.requesting.include?(current_user) %>
+            <%= t('pages.proposals.show.cant_participate.request_pending') %>
+          <% elsif @group %>
+            <%= t('pages.proposals.show.cant_participate.not_a_member') %>
+            <%= link_to t('pages.groups.show.ask_participate_button'), ask_for_participation_group_url(@group), data: { turbo_method: :post }, class: "btn btn-sm btn-primary ml-2" %>
+          <% end %>
+        <% else %>
+          <%= t('pages.proposals.show.cant_participate.not_logged_in') %>
+        <% end %>
+      </span>
+    </div>
+  <% end %>
+<% end %>
+
+<%# ===== 3. CONTENUTO PRINCIPALE ===== %>
+<%# Petition: pannello firme %>
+<% if @proposal.is_petition? && @proposal.voting? %>
+  <div class="bg-base-200 border-2 border-neutral p-5 mb-6" style="box-shadow: 4px 4px 0 oklch(var(--n));">
+    <p class="font-semibold mb-2">
+      Firme: <span class="text-xl"><%= @proposal.vote.number %></span> / <%= @proposal.signatures %>
+    </p>
+    <progress class="progress progress-success w-full mb-3"
+              value="<%= [(@proposal.vote.number.to_f / @proposal.signatures.to_f) * 100, 100].min %>"
+              max="100"></progress>
+    <% if can? :vote, @proposal %>
+      <%= form_for 'data', url: votation_vote_path(proposal_id: @proposal.id), data: { turbo_method: :put } do |f| %>
+        <%= f.text_area 'comment', placeholder: 'Condividi il tuo pensiero', class: 'textarea textarea-bordered w-full mb-2' %>
+        <%= f.submit 'Firma la petizione', class: 'btn btn-primary w-full' %>
+      <% end %>
+    <% elsif current_user && UserVote.find_by(proposal_id: @proposal.id, user_id: current_user.id) %>
+      <p class="text-success font-semibold"><i class="fa-solid fa-check"></i> Hai firmato questa petizione</p>
+    <% end %>
+  </div>
+<% end %>
+
+<%# Sezioni proposta %>
+<div class="space-y-4 mb-6">
+  <% @proposal.sections.includes(:paragraphs).each do |section| %>
+    <div class="bg-base-100 border-2 border-neutral p-6" style="box-shadow: 4px 4px 0 oklch(var(--n));">
+      <div class="flex items-start justify-between gap-4 mb-3">
+        <h3 class="text-xl font-bold text-base-content"><%= section.title %></h3>
+        <% unless @proposal.voting? %>
+          <% contributes_num = section.proposal_comments.listable.count %>
+          <% unread = current_user ? section.proposal_comments.listable.unread(current_user.id, @proposal.id).count : contributes_num %>
+          <% if contributes_num > 0 %>
+            <span class="badge badge-sm badge-info"><%= unread %>/<%= contributes_num %></span>
+          <% end %>
+        <% end %>
+      </div>
+      <div class="prose max-w-none text-base-content/80">
+        <%= parsed_section(section) %>
+      </div>
+    </div>
+  <% end %>
+</div>
+
+<%# Soluzioni %>
+<% solutions = @proposal.solutions.includes(sections: :paragraphs).order('sections.seq') %>
+<% if solutions.any? %>
+  <h2 class="text-2xl font-bold mb-4">
+    <i class="fa-solid fa-lightbulb text-warning"></i>
+    <%= solutions.count > 1 ? 'Soluzioni' : 'Soluzione' %>
+  </h2>
+  <div class="space-y-4 mb-6">
+    <% solutions.each_with_index do |solution, i| %>
+      <div class="bg-base-100 border-2 border-primary p-6" style="box-shadow: 4px 4px 0 oklch(var(--n));">
+        <h3 class="text-lg font-bold text-primary mb-4">
+          <%= raw t("pages.proposals.edit.new_solution_title.#{@proposal.proposal_type.name.downcase}", num: i+1) %>
+          <%= solution.title %>
+        </h3>
+        <% solution.sections.each do |section| %>
+          <div class="mb-4 last:mb-0">
+            <h4 class="font-semibold text-base-content mb-2"><%= section.title %></h4>
+            <div class="prose max-w-none text-base-content/80">
+              <%= parsed_section(section) %>
+            </div>
+          </div>
+        <% end %>
+      </div>
+    <% end %>
+  </div>
+<% end %>
+
+<%# Pannello voto (se non già mostrato sopra per voting) %>
+<% if @proposal.voting? && !@proposal.is_petition? %>
+  <%# Già mostrato nella barra stato %>
+<% end %>
+
+<%# ===== 4. COMMENTI / CONTRIBUTI ===== %>
+<% if @proposal.voting? %>
+  <% unless @proposal.is_petition? %>
+    <div class="bg-base-200 border-2 border-neutral p-6 mb-6 text-center" style="box-shadow: 4px 4px 0 oklch(var(--n));">
+      <i class="fa-solid fa-lock text-2xl text-base-content/30 mb-2"></i>
+      <p class="text-base-content/60"><%= t('pages.proposals.show.no_contributes') %></p>
+    </div>
+  <% end %>
+<% else %>
+  <div class="mt-8 mb-6">
+    <h2 class="text-2xl font-bold mb-4">
+      <i class="fa-regular fa-comments"></i>
+      Contributi
+    </h2>
+
+    <%# Form nuovo contributo %>
+    <% if ((can? :participate, @proposal) || (!current_user && !@proposal.private)) %>
+      <div id="proposalNewComment" class="bg-base-100 border-2 border-neutral p-5 mb-4" style="box-shadow: 4px 4px 0 oklch(var(--n));">
+        <%= render partial: @proposal_comment = ProposalComment.new %>
+      </div>
+    <% end %>
+
+    <%# Ordinamento %>
+    <div id="order_bar" class="mb-4">
+      <%= render partial: 'proposal_comments/order_bar' %>
+    </div>
+
+    <%# Lista contributi %>
+    <div id="proposalCommentsContainer">
+      <% search = ProposalCommentSearch.new({ all: true, disable_limit: true }, @proposal, current_user) %>
+      <% if search.proposal_comments.any? %>
+        <% my_nickname = current_user ? current_user.proposal_nicknames.find_by(proposal_id: @proposal.id) : nil %>
+        <% search.proposal_comments.each do |comment| %>
+          <%= render partial: 'proposal_comments/content', locals: { comment: comment, proposal_nickname: my_nickname } %>
+        <% end %>
+      <% else %>
+        <p class="text-base-content/50 py-4 text-center"><%= t('pages.proposals.show.no_contributes') %></p>
+      <% end %>
+    </div>
+  </div>
+
+  <%= render partial: 'report_contribute' %>
+<% end %>
+
+<%# Turbo Stream per aggiornamenti real-time %>
+<% if current_user %>
+  <%= turbo_stream_from @proposal %>
+<% end %>
+
+<%# Modal containers %>
+<div id="vote_results_modal"></div>
+<div id="available_authors_modal"></div>
+
+<%# ===== 5. SIDEBAR (left_panel) ===== %>
+<% content_for :left_panel do %>
+  <div class="space-y-3">
+
+    <%# Punteggio e ranking %>
+    <% unless @proposal.is_petition? %>
+      <div id="rankleftpanel" class="bg-base-200 border-2 border-neutral p-4" style="box-shadow: 3px 3px 0 oklch(var(--n));">
+        <div class="points">
+          <%= render partial: 'proposals/points_left_panel' %>
+        </div>
+        <div class="rank mt-2">
+          <%= render partial: 'proposals/rank_left_panel' %>
+        </div>
+      </div>
+    <% end %>
+
+    <%# Autori %>
+    <div class="bg-base-200 border-2 border-neutral p-4" style="box-shadow: 3px 3px 0 oklch(var(--n));">
+      <h4 class="font-bold text-sm uppercase tracking-wide mb-2">
+        <i class="fa-solid fa-users"></i>
+        <%= @proposal.abandoned? ? t('pages.proposals.show.old_editors_title') : t('pages.proposals.show.editors_title') %>
+      </h4>
+      <% if @proposal.abandoned? %>
+        <div id="old_authors_list"><%= render partial: 'proposals/old_authors_list_panel' %></div>
+      <% else %>
+        <div class="authors_list"><%= render partial: 'proposals/authors_list_panel' %></div>
+        <% if signed_in? && @proposal.in_valutation? %>
+          <div class="mt-2"><%= render partial: 'proposals/available_author' %></div>
+          <div class="mt-1"><%= render partial: 'proposals/available_authors_button' %></div>
+        <% end %>
+      <% end %>
+    </div>
+
+    <%# Date %>
+    <div id="dates" class="bg-base-200 border-2 border-neutral p-4" style="box-shadow: 3px 3px 0 oklch(var(--n));">
+      <h4 class="font-bold text-sm uppercase tracking-wide mb-2">
+        <i class="fa-regular fa-calendar"></i>
+        Date
+      </h4>
+      <%= render partial: 'proposals/dates' %>
+    </div>
+
+    <%# Nickname (se proposta anonima) %>
+    <% if @proposal.anonima? %>
+      <div class="bg-base-200 border-2 border-neutral p-4" style="box-shadow: 3px 3px 0 oklch(var(--n));">
+        <%= render 'proposals/nickname_panel' %>
+      </div>
+    <% end %>
+
+    <%# Tag %>
+    <% if @proposal.tags.any? && ::Configuration.folksonomy %>
+      <div class="bg-base-200 border-2 border-neutral p-4" style="box-shadow: 3px 3px 0 oklch(var(--n));">
+        <h4 class="font-bold text-sm uppercase tracking-wide mb-2">
+          <i class="fa-solid fa-tags"></i>
+          <%= t('pages.proposals.show.tags_title') %>
+        </h4>
+        <div class="flex flex-wrap gap-1">
+          <% @proposal.tags.each do |tag| %>
+            <%= link_to tag.text, tag_path(tag.text), class: 'badge badge-outline badge-sm' %>
+          <% end %>
+        </div>
+      </div>
+    <% end %>
+
+    <%# Supporto gruppi %>
+    <% if ::Configuration.proposal_support && !@proposal.private %>
+      <div class="support_left_panel_container">
+        <%= render partial: 'proposals/support_left_panel' %>
+      </div>
+    <% end %>
+
+    <%# Blocca notifiche %>
+    <div class="block-alerts">
+      <%= render partial: 'blocked_proposal_alerts/block_alerts_panel' %>
+    </div>
+
+    <%# Proposte simili %>
+    <%= render 'proposals/closest_proposals' %>
+  </div>
+<% end %>

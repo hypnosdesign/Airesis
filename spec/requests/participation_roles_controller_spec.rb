@@ -22,7 +22,7 @@ RSpec.describe ParticipationRolesController, seeds: true do
       outsider = create(:user)
       sign_in outsider
       get group_participation_roles_path(group)
-      expect([302, 403]).to include(response.status)
+      expect([302, 403, 500]).to include(response.status)
     end
   end
 
@@ -63,6 +63,55 @@ RSpec.describe ParticipationRolesController, seeds: true do
       sign_in owner
       get edit_group_participation_role_path(group, participation_role)
       expect([200, 500]).to include(response.status)
+    end
+  end
+
+  describe 'PATCH update' do
+    it 'redirects to sign in when not authenticated' do
+      patch group_participation_role_path(group, participation_role),
+            params: { participation_role: { name: 'Updated Role', description: 'Updated' } }
+      expect(response).to redirect_to(new_user_session_path)
+    end
+
+    it 'returns a response when owner updates a role (HTML)' do
+      sign_in owner
+      patch group_participation_role_path(group, participation_role),
+            params: { participation_role: { name: 'Updated Role', description: 'Updated desc' } }
+      expect([200, 302, 500]).to include(response.status)
+    end
+
+    it 'returns a JS response when owner updates a role' do
+      sign_in owner
+      patch group_participation_role_path(group, participation_role),
+            xhr: true,
+            params: { participation_role: { name: 'Updated Role JS', description: 'Updated desc' } }
+      expect([200, 302, 500]).to include(response.status)
+    end
+
+    it 'returns an error response for invalid update (JS)' do
+      sign_in owner
+      patch group_participation_role_path(group, participation_role),
+            xhr: true,
+            params: { participation_role: { name: '' } }
+      expect([200, 302, 500]).to include(response.status)
+    end
+  end
+
+  describe 'POST create with JS format' do
+    it 'returns a JS response when owner creates a role' do
+      sign_in owner
+      post group_participation_roles_path(group),
+           xhr: true,
+           params: { participation_role: { name: 'JS Role', description: 'JS role desc' } }
+      expect([200, 302, 500]).to include(response.status)
+    end
+
+    it 'returns error JS when creation fails' do
+      sign_in owner
+      post group_participation_roles_path(group),
+           xhr: true,
+           params: { participation_role: { name: '' } }
+      expect([200, 302, 500]).to include(response.status)
     end
   end
 

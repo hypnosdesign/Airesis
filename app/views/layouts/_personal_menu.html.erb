@@ -1,0 +1,18 @@
+<li><%= link_to home_url do %><i class="fa-solid fa-house mr-2"></i><%= t('pages.header.menu.my_page') %><% end %></li>
+<li>
+  <% if current_user.blog %>
+    <%= link_to current_user.blog do %><i class="fa-solid fa-pencil mr-2"></i><%= t('pages.header.menu.my_blog') %><% end %>
+  <% else %>
+    <%= link_to new_blog_path do %><i class="fa-solid fa-pencil mr-2"></i><%= t('pages.header.menu.create_blog') %><% end %>
+  <% end %>
+</li>
+<li><%= link_to user_url(current_user) do %><i class="fa-solid fa-gear mr-2"></i><%= t('pages.header.menu.preferences') %><% end %></li>
+<li class="divider"></li>
+<% if is_moderator? %>
+  <li><%= link_to moderator_panel_path do %><i class="fa-solid fa-shield mr-2"></i><%= t('pages.header.menu.moderator') %><% end %></li>
+<% end %>
+<% if is_admin? %>
+  <li><%= link_to admin_panel_path do %><i class="fa-solid fa-crown mr-2"></i><%= t('pages.header.menu.administration') %><% end %></li>
+<% end %>
+<li class="divider"></li>
+<li><%= link_to destroy_user_session_path, method: 'delete', class: 'text-error' do %><i class="fa-solid fa-right-from-bracket mr-2"></i><%= t('pages.header.menu.logout') %><% end %></li>

@@ -15,6 +15,6 @@ class Newsletter < ApplicationRecord
                else
                  [User.last.id]
     end
-    NewsletterSender.perform_in(5.seconds, id, user_ids)
+    NewsletterSender.set(wait: 5.seconds).perform_later(id, user_ids)
   end
 end

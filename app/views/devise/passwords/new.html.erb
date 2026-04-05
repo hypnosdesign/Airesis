@@ -1,0 +1,10 @@
+<% @page_title = t("pages.password.title") %>
+
+<div class="card bg-base-200 p-4">
+  <h2><%= @page_title %></h2>
+  <%= simple_form_for(@user, url: user_password_path, html: { data: { turbo_method: :post } }) do |f| %>
+    <%= f.input :email, required: true, label: t('activerecord.attributes.user.email') %>
+    <%= f.button :button, t("pages.password.submit"), class: 'btn btn-primary' %>
+  <% end %>
+  <%= render partial: 'devise/shared/links' %>
+</div>

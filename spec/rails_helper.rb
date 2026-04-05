@@ -2,8 +2,8 @@ require 'simplecov'
 
 unless ENV['NO_COVERAGE']
   SimpleCov.start 'rails'
-  SimpleCov.minimum_coverage 32.90
-  SimpleCov.maximum_coverage_drop 0
+  SimpleCov.minimum_coverage 79.50
+  SimpleCov.maximum_coverage_drop 0.5
 end
 
 ENV['RAILS_ENV'] ||= 'test'
@@ -12,14 +12,12 @@ require File.expand_path('../config/environment', __dir__)
 require 'rspec/rails'
 require 'active_storage_validations/matchers'
 require 'shoulda/matchers'
-require 'sidekiq/testing'
 require 'capybara/rspec'
 require 'capybara/rails'
 require 'selenium/webdriver'
 
 Dir[Rails.root.join('spec/support/**/*.rb')].sort.each { |f| require f }
 
-ActiveRecord::Migration.check_pending! if defined?(ActiveRecord::Migration)
 
 Shoulda::Matchers.configure do |config|
   config.integrate do |with|
@@ -33,11 +31,11 @@ RSpec.configure do |config|
 
   config.before do
     ActionMailer::Base.deliveries.clear
-    Sidekiq::Worker.clear_all
     I18n.locale = I18n.default_locale = :'en-EU'
   end
 
   config.include ActiveStorageValidations::Matchers
+  config.include ActiveJob::TestHelper
   config.include FactoryBot::Syntax::Methods
   config.include Devise::Test::IntegrationHelpers, type: :request
   config.include Warden::Test::Helpers
@@ -70,9 +68,9 @@ RSpec.configure do |config|
           next if /Blocked attempt to show a 'beforeunload' confirmation panel/.match?(error.message)
           next if /connect.facebook.net/.match?(error.message)
 
-          # TODO: should not happen
+
           next if /Cannot read property 'getSelectedElement' of null/.match?(error.message)
-          # TODO: should not happen
+
           next if /FormValidation.Framework.Bootstrap/.match?(error.message)
 
           expect(error.level).not_to eq('SEVERE'), error.message
