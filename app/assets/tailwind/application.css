@@ -8,3 +8,187 @@
   font-family: 'Sora', sans-serif;
   border-radius: 0 !important;
 }
+
+/* ============================
+   Trix Editor — DaisyUI theme
+   ============================ */
+
+trix-toolbar {
+  border: 2px solid oklch(var(--bc) / 0.15);
+  border-bottom: none;
+  background: oklch(var(--b1));
+  padding: 0.5rem;
+}
+
+trix-toolbar .trix-button-row {
+  gap: 0.25rem;
+}
+
+trix-toolbar .trix-button-group {
+  border: 2px solid oklch(var(--bc) / 0.15);
+  margin-bottom: 0;
+}
+
+trix-toolbar .trix-button-group:not(:first-child) {
+  margin-left: 0.5rem;
+}
+
+trix-toolbar .trix-button {
+  color: oklch(var(--bc));
+  background: oklch(var(--b1));
+  border: none;
+  border-bottom: none;
+  padding: 0 0.5em;
+  height: 2.25rem;
+  width: 2.25rem;
+}
+
+trix-toolbar .trix-button:not(:first-child) {
+  border-left: 1px solid oklch(var(--bc) / 0.1);
+}
+
+trix-toolbar .trix-button:hover {
+  background: oklch(var(--bc) / 0.08);
+}
+
+trix-toolbar .trix-button.trix-active {
+  background: oklch(var(--p));
+  color: oklch(var(--pc));
+}
+
+trix-toolbar .trix-button:disabled {
+  color: oklch(var(--bc) / 0.2);
+}
+
+/* Invert black SVG icons to match current text color */
+trix-toolbar .trix-button--icon::before {
+  opacity: 0.7;
+  filter: var(--trix-icon-filter, none);
+}
+
+trix-toolbar .trix-button--icon.trix-active::before {
+  opacity: 1;
+  filter: brightness(0) invert(1);
+}
+
+/* On dark theme, invert the black SVG icons to white */
+[data-theme="night"] trix-toolbar .trix-button--icon::before {
+  filter: brightness(0) invert(1);
+  opacity: 0.7;
+}
+
+[data-theme="night"] trix-toolbar .trix-button--icon.trix-active::before {
+  opacity: 1;
+}
+
+/* Trix dialogs */
+trix-toolbar .trix-dialogs {
+  background: oklch(var(--b1));
+  border: 2px solid oklch(var(--bc) / 0.15);
+}
+
+trix-toolbar .trix-dialog {
+  background: oklch(var(--b1));
+  border-top: 2px solid oklch(var(--bc) / 0.15);
+  padding: 0.75rem;
+}
+
+trix-toolbar .trix-dialog__link-fields {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+trix-toolbar .trix-dialog input[type="text"],
+trix-toolbar .trix-dialog input[type="url"] {
+  background: oklch(var(--b2, var(--b1)));
+  border: 2px solid oklch(var(--bc) / 0.15);
+  color: oklch(var(--bc));
+  padding: 0.375rem 0.625rem;
+  font-size: 0.875rem;
+  font-family: 'Sora', sans-serif;
+  outline: none;
+}
+
+trix-toolbar .trix-dialog input[type="text"]:focus,
+trix-toolbar .trix-dialog input[type="url"]:focus {
+  border-color: oklch(var(--p));
+}
+
+trix-toolbar .trix-dialog .trix-button-group {
+  border: none;
+}
+
+trix-toolbar .trix-dialog .trix-button-group .trix-button {
+  background: oklch(var(--p));
+  color: oklch(var(--pc));
+  font-size: 0.75rem;
+  font-weight: 700;
+  padding: 0.375rem 0.75rem;
+  width: auto;
+  height: auto;
+  text-indent: 0;
+}
+
+/* Editor body */
+trix-editor {
+  border: 2px solid oklch(var(--bc) / 0.15);
+  background: oklch(var(--b1));
+  color: oklch(var(--bc));
+  padding: 0.75rem 1rem;
+  min-height: 12em;
+  font-family: 'Sora', sans-serif;
+  font-size: 0.9375rem;
+  line-height: 1.7;
+  outline: none;
+}
+
+trix-editor:focus {
+  border-color: oklch(var(--p));
+}
+
+trix-editor h1 {
+  font-size: 1.5rem;
+  font-weight: 800;
+  margin: 1em 0 0.5em;
+}
+
+trix-editor a {
+  color: oklch(var(--p));
+  text-decoration: underline;
+}
+
+trix-editor blockquote {
+  border-left: 4px solid oklch(var(--p) / 0.4);
+  padding-left: 1rem;
+  margin: 1em 0;
+  color: oklch(var(--bc) / 0.7);
+}
+
+trix-editor pre {
+  background: oklch(var(--bc) / 0.05);
+  border: 1px solid oklch(var(--bc) / 0.1);
+  padding: 0.75rem 1rem;
+  font-family: ui-monospace, monospace;
+  font-size: 0.875rem;
+  overflow-x: auto;
+}
+
+trix-editor ul, trix-editor ol {
+  padding-left: 1.5em;
+  margin: 0.5em 0;
+}
+
+/* ActionText attachment styling */
+.trix-content .attachment {
+  display: inline-block;
+  position: relative;
+  max-width: 100%;
+}
+
+.trix-content .attachment__caption {
+  font-size: 0.75rem;
+  color: oklch(var(--bc) / 0.5);
+  text-align: center;
+  margin-top: 0.25rem;
+}
