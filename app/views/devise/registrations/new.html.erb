@@ -102,20 +102,26 @@
           <span class="label-text text-sm">
             <%= t('pages.registration.i_accept', default: 'Accetto i') %>
             <button type="button" class="link link-primary" onclick="document.getElementById('reg_eula_modal').showModal()"><%= t('pages.registration.terms_link', default: 'Termini di Servizio') %></button>
-            <%= t('words.and', default: 'e la') %>
-            <button type="button" class="link link-primary" onclick="document.getElementById('reg_privacy_modal').showModal()"><%= t('pages.registration.privacy_link', default: 'Privacy Policy') %></button>
           </span>
         </label>
         <% resource.errors[:accept_conditions].each do |err| %>
           <p class="text-error text-xs"><%= err %></p>
         <% end %>
+
+        <%# Privacy checkbox %>
+        <label class="label cursor-pointer gap-2 justify-start">
+          <%= f.check_box :accept_privacy, class: "checkbox checkbox-sm checkbox-primary #{resource.errors[:accept_privacy].any? ? 'checkbox-error' : ''}" %>
+          <span class="label-text text-sm">
+            <%= t('pages.registration.i_accept_privacy', default: 'Accetto la') %>
+            <button type="button" class="link link-primary" onclick="document.getElementById('reg_privacy_modal').showModal()"><%= t('pages.registration.privacy_link', default: 'Privacy Policy') %></button>
+          </span>
+        </label>
         <% resource.errors[:accept_privacy].each do |err| %>
           <p class="text-error text-xs"><%= err %></p>
         <% end %>
 
         <%# Hidden fields %>
         <%= f.hidden_field :sys_locale_id %>
-        <%= f.hidden_field :accept_privacy, value: '0', id: 'user_accept_privacy_hidden' %>
 
         <% if ::Configuration.recaptcha %>
           <div><%= recaptcha_tags display: { 'theme' => 'clean' } %></div>
@@ -199,9 +205,3 @@
   <form method="dialog" class="modal-backdrop"><button>close</button></form>
 </dialog>
 
-<script>
-  // Sync: accettare TOS implica accettare anche privacy
-  document.querySelector('[name="user[accept_conditions]"]').addEventListener('change', function() {
-    document.getElementById('user_accept_privacy_hidden').value = this.checked ? '1' : '0';
-  });
-</script>
