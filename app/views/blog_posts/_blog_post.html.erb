@@ -15,7 +15,8 @@
   </h3>
 
   <div class="blogPostBody mb-4">
-    <%= sanitize truncate_html(blog_post.body, length: 800, omission: "...(#{link_to t('keep_reading'), [blog_post.blog, blog_post]})") %>
+    <%= truncate(blog_post.body.to_plain_text, length: 800) %>
+    <%= link_to t('keep_reading'), [blog_post.blog, blog_post] %>
   </div>
 
   <div class="blogPostFooter">

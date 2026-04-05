@@ -2,7 +2,7 @@
   <div class="card bg-base-200 p-4 mb-4">
     <div class="mb-2">
       <strong><%= newsletter.subject %></strong>
-      <p><%= sanitize truncate_html(newsletter.body, length: 100, omission: '...') %></p>
+      <p><%= truncate(newsletter.body.to_s, length: 100) %></p>
     </div>
     <div class="mb-2">
       <%= render 'publish_form', newsletter: newsletter %>

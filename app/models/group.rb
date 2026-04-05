@@ -5,7 +5,7 @@ class Group < ApplicationRecord
 
   pg_search_scope :search, lambda { |query, any_word = false|
     { query: query,
-      against: { name: 'A', description: 'B' },
+      against: { name: 'A' },
       order_within_rank: 'group_participations_count desc, created_at desc',
       using: { tsearch: { any_word: any_word } } }
   }
@@ -13,6 +13,8 @@ class Group < ApplicationRecord
   friendly_id :name, use: %i[slugged history]
 
   has_paper_trail versions: { class_name: 'GroupVersion' }
+  has_rich_text :description
+  has_rich_text :rule_book
 
   include ImageHelper
   REQ_BY_PORTAVOCE = 'p'.freeze
@@ -100,10 +102,6 @@ class Group < ApplicationRecord
   after_commit :create_folder
 
   before_save :normalize_blank_values
-
-  def description
-    super.try(:html_safe)
-  end
 
   def normalize_blank_values
     [:admin_title].each do |att|
@@ -209,11 +207,8 @@ class Group < ApplicationRecord
     params[:and] = params[:and].nil? || params[:and]
     tag = params[:tag]
 
-    page = params[:page] || 1
-    limit = params[:limit] || 30
-
     if tag
-      joins(:tags).where(tags: { text: tag }).order('group_participations_count desc, created_at desc').page(page).per(limit)
+      joins(:tags).where(tags: { text: tag }).order('group_participations_count desc, created_at desc')
     else
       groups = if query.blank?
                  Group.order(group_participations_count: :desc, created_at: :desc)
@@ -227,18 +222,29 @@ class Group < ApplicationRecord
                    groups.where(interest_border_token: params[:interest_border])
                  end
       end
-      groups.page(page).per(limit)
+      groups
     end
   end
 
-  def self.most_active(territory = nil)
+  def self.most_active(territory = nil, limit: 5)
     groups = Group.includes(interest_border: :territory)
     groups = groups.by_interest_border(InterestBorder.to_key(territory)) if territory.present?
-    groups.order(group_participations_count: :desc).page(1).per(5)
+    groups.order(group_participations_count: :desc).limit(limit)
   end
 
   def should_generate_new_friendly_id?
     name_changed?
+  end
+
+  # ActionText setter override: build the association if not yet initialized
+  # (needed because the `description` DB column shadows ActionText's lazy builder
+  # when the record is new and AR column methods are generated after has_rich_text)
+  def description=(value)
+    (rich_text_description || build_rich_text_description).body = value
+  end
+
+  def rule_book=(value)
+    (rich_text_rule_book || build_rich_text_rule_book).body = value
   end
 
   private

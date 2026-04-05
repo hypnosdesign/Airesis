@@ -15,7 +15,7 @@
     </div>
   <% end %>
 
-  <%= forem_pages_widget(@posts) %>
+  <%= forem_pages_widget(@pagy) %>
 
   <div class="topic_title mb-4">
     <h2 class="text-xl font-bold"><%= @topic.subject %></h2>
@@ -25,7 +25,7 @@
     <%= render partial: "frm/posts/post", collection: @posts %>
   </div>
 
-  <%= forem_pages_widget(@posts) %>
+  <%= forem_pages_widget(@pagy) %>
 </div>
 
 <% content_for :left_panel do %>

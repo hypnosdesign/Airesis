@@ -215,7 +215,7 @@ class Proposal < ApplicationRecord
                 where('proposals.private = false or proposals.visible_outside = false').
                 where.not(proposal_type_id: 11)
     proposals = proposals.by_interest_borders(InterestBorder.to_key(current_territory)) if current_territory.present?
-    proposals = proposals.order(updated_at: :desc).page(1).per(10)
+    proposals = proposals.order(updated_at: :desc).limit(10)
     ActiveRecord::Associations::Preloader.new.preload(proposals, %i[quorum groups supporting_groups category])
     proposals
   end

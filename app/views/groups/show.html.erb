@@ -17,7 +17,7 @@
       <% if params[:action] == 'by_year_and_month' %>
         <h2 class="text-xl font-bold mb-4"><%= t('pages.groups.archives.page_title', year: params[:year], month: month_long(params[:month])) %></h2>
       <% else %>
-        <div class="card bg-base-100 p-6 mb-4 prose max-w-none"><%= raw @group.description %></div>
+        <div class="card bg-base-100 p-6 mb-4 prose max-w-none"><%= @group.description %></div>
       <% end %>
 
       <div id="posts_container">

@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html class="no-js" lang="en" data-theme="nord">
+<html class="no-js" lang="<%= I18n.locale %>" data-theme="nord">
   <head>
     <meta charset="utf-8">
     <title><%= t('home.tags.title') %></title>
@@ -11,7 +11,6 @@
     <meta property="og:site_name" content="<%= ENV['APP_LONG_NAME'] %>">
     <meta property="og:description" content="<%= t('home.tags.description') %>">
     <meta property="fb:app_id" content="<%= ENV['FACEBOOK_APP_ID'] %>">
-    <meta name="author" content="Alessandro Rodi">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 
     <%= stylesheet_link_tag "tailwind", "data-turbo-track": "reload" %>
@@ -20,231 +19,213 @@
     <%= render 'layouts/favicons' %>
   </head>
 
-  <body class="bg-base-100">
+  <body class="bg-base-200 min-h-screen">
 
-    <header class="bg-gray-900 text-white py-4">
-      <div class="max-w-7xl mx-auto px-4 flex justify-between items-center">
-        <div class="logo">
-          <a href="#hero">
-            <%= image_tag 'logo_completo_white_mini.png', class: "h-8" %>
+    <%# ===== NAVBAR ===== %>
+    <nav class="navbar bg-secondary text-secondary-content border-b-3 border-neutral sticky top-0 z-50"
+         style="box-shadow: 0 4px 0 oklch(var(--n));">
+      <div class="max-w-7xl mx-auto w-full px-4 flex justify-between items-center">
+        <a href="#hero" class="text-2xl font-extrabold tracking-tight">
+          <%= ENV['APP_SHORT_NAME'] || 'AIRESIS' %>
+        </a>
+
+        <div class="flex items-center gap-6">
+          <nav class="hidden md:flex gap-8">
+            <%= link_to t('pages.home.index.whatis'), '#features',
+                class: 'font-semibold hover:-translate-y-0.5 hover:-rotate-1 hover:scale-105 transition-transform' %>
+            <%= link_to t('pages.home.index.features'), '#features',
+                class: 'font-semibold hover:-translate-y-0.5 hover:-rotate-1 hover:scale-105 transition-transform' %>
+            <%= link_to t('pages.home.index.register'), new_user_registration_path,
+                class: 'font-semibold hover:-translate-y-0.5 hover:-rotate-1 hover:scale-105 transition-transform' %>
+          </nav>
+
+          <a href="#" onclick="document.getElementById('language').showModal(); return false;"
+             class="hover:opacity-80 transition">
+            <%= image_tag "flags/#{I18n.locale}.png", class: 'h-5', title: t('pages.home.index.change_language') %>
           </a>
-        </div>
 
-        <nav class="hidden md:block">
-          <ul class="flex space-x-6 text-xs font-bold uppercase tracking-widest">
-            <li><%= link_to t('pages.home.index.whatis'), edemocracy_path, class: "hover:text-blue-400 transition" %></li>
-            <li><%= link_to t('pages.home.index.features'), '#features', class: 'hover:text-blue-400 transition' %></li>
-            <li><%= link_to t('pages.home.index.register'), new_user_registration_path, class: "hover:text-blue-400 transition" %></li>
-          </ul>
-        </nav>
-
-        <div class="flex items-center space-x-4">
-          <div class="language-button">
-            <a href="#" onclick="document.getElementById('language').showModal(); return false;">
-              <%= image_tag "flags/#{I18n.locale}.png", class: 'h-4 shadow-sm hover:opacity-80 transition', title: t('pages.home.index.change_language') %>
+          <div class="flex gap-3">
+            <a href="https://www.facebook.com/airesisit" target="_blank" class="hover:scale-110 transition-transform">
+              <i class="fa-brands fa-facebook text-lg"></i>
+            </a>
+            <a href="https://twitter.com/democracyo" target="_blank" class="hover:scale-110 transition-transform">
+              <i class="fa-brands fa-x-twitter text-lg"></i>
             </a>
           </div>
-
-          <ul class="flex space-x-4">
-            <li><a href="https://www.facebook.com/airesisit" target="_blank" class="hover:text-blue-500 transition"><i class="fa-brands fa-facebook text-lg"></i></a></li>
-            <li><a href="https://twitter.com/democracyo" target="_blank" class="hover:text-blue-400 transition"><i class="fa-brands fa-x-twitter text-lg"></i></a></li>
-          </ul>
         </div>
       </div>
-    </header>
+    </nav>
 
-    <!-- Homepage Hero -->
-    <section id="hero" class="bg-base-200 py-16 md:py-24">
-      <div class="max-w-7xl mx-auto px-4">
-        <div class="hero-text text-center mb-12">
-          <%= image_tag 'logo_completo_medium.png', alt: 'Airesis - The Social Network for E-Democracy', title: t('home.tags.title'), class: 'mx-auto max-w-xs md:max-w-md' %>
-          <h1 class="text-3xl md:text-5xl font-extrabold mt-8 text-base-content leading-tight"><%= t('home.intro.paragraph_1.title') %></h1>
-        </div>
+    <%# ===== HERO SECTION ===== %>
+    <section id="hero" class="bg-base-100 border-b-2 border-neutral">
+      <div class="max-w-7xl mx-auto px-4 py-16 md:py-24 flex flex-col md:flex-row items-center gap-12 md:gap-20">
 
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-12 mt-16">
-          <div class="card bg-base-100 p-8 shadow-brutal-lg border border-base-300">
-            <%= form_for resource, as: resource_name, url: user_session_path do |f| %>
-              <div class="space-y-6">
-                <% if ::Configuration.socialnetwork_active %>
-                  <ul class="grid grid-cols-3 gap-4">
-                    <li><%= link_to_ip t('pages.top_panel.facebook_login'), :facebook, 'facebook' %></li>
-                    <li><%= link_to_ip t('pages.top_panel.google_login'), :google_oauth2, 'google' %></li>
-                    <li><%= link_to_ip t('pages.top_panel.twitter_login'), :twitter, 'twitter' %></li>
-                  </ul>
-
-                  <div class="divider"><%= t('common.or') rescue 'or' %></div>
-                <% end %>
-
-                <div class="space-y-4">
-                  <%= f.email_field :email, placeholder: 'Email', class: 'input input-bordered w-full' %>
-                  <%= f.password_field :password, placeholder: 'Password', class: 'input input-bordered w-full' %>
-                </div>
-
-                <div class="flex items-center justify-between">
-                  <div class="flex items-center gap-2">
-                    <%= f.check_box :remember_me, checked: true, class: 'checkbox checkbox-primary checkbox-sm' %>
-                    <%= f.label :remember_me, t('pages.home.index.keep_connected'), class: 'text-sm' %>
-                  </div>
-
-                  <div class="text-sm">
-                    <%= link_to t('pages.home.index.forgot_password'), new_user_password_path, class: 'link link-hover text-primary' %>
-                  </div>
-                </div>
-
-                <div>
-                  <%= f.submit t('pages.home.index.login'), class: 'btn btn-primary w-full' %>
-                </div>
-              </div>
-            <% end %>
-          </div>
-
-          <div class="card bg-base-100 p-8 shadow-brutal-lg border border-base-300 flex flex-col justify-center">
-            <h2 class="text-2xl font-bold mb-6 text-base-content"><%= t('pages.home.index.field_1.title') rescue "Benvenuto" %></h2>
-            <p class="text-base-content/70 text-lg mb-10 leading-relaxed"><%= t('pages.home.index.field_1.content') %></p>
-            <div class="flex flex-col sm:flex-row gap-4">
-              <%= link_to t('pages.home.index.register'), new_user_registration_path, class: 'btn btn-error flex-1' %>
-              <%= link_to t('pages.home.index.try_it'), open_space_path, class: 'btn btn-outline flex-1' %>
-            </div>
-          </div>
-        </div>
-
-        <div class="mt-20 text-center">
-          <%= image_tag 'landing/hero-airesis.png', class: 'mx-auto shadow-brutal border border-base-300' %>
-        </div>
-      </div>
-    </section>
-
-    <section id="whatis" class="bg-primary text-primary-content py-20">
-      <div class="max-w-5xl mx-auto px-4 flex items-start space-x-8">
-        <span><i class="fa-solid fa-quote-left text-5xl opacity-30"></i></span>
-        <div class="text-container">
-          <h2 class="text-3xl md:text-4xl font-bold mb-8"><%= t('home.whatis.paragraph_1.title') %></h2>
-          <blockquote class="border-l-4 border-primary-content/20 pl-6">
-            <p class="text-xl md:text-2xl leading-relaxed italic"><%= t('home.whatis.paragraph_1.content_html') %></p>
-          </blockquote>
-        </div>
-        <span><i class="fa-solid fa-quote-right text-5xl opacity-30 self-end"></i></span>
-      </div>
-    </section>
-
-    <section id="features" class="py-24 bg-base-100 space-y-32">
-      <div class="max-w-7xl mx-auto px-4 flex flex-col md:flex-row items-center gap-16">
-        <div class="md:w-1/2 relative">
-          <div class="absolute -inset-4 bg-blue-100 rounded-full blur-3xl opacity-30"></div>
-          <%= image_tag 'presentation/group.png', class: 'relative shadow-brutal-lg border border-base-300 w-full' %>
-        </div>
-        <div class="md:w-1/2">
-          <div class="card p-10 bg-base-200 border border-base-300">
-            <div class="inline-flex items-center justify-center p-3 bg-primary shadow-brutal mb-6">
-              <i class="fa-solid fa-users text-primary-content text-xl"></i>
-            </div>
-            <h3 class="text-3xl font-bold mb-6 text-base-content"><%= t('home.whatis.paragraph_2.title') %></h3>
-            <p class="text-base-content/70 text-lg leading-relaxed"><%= t('home.whatis.paragraph_2.content_html', groups: Group.count) %></p>
-          </div>
-        </div>
-      </div>
-
-      <div class="max-w-7xl mx-auto px-4 flex flex-col md:flex-row-reverse items-center gap-16">
-        <div class="md:w-1/2 relative">
-          <div class="absolute -inset-4 bg-green-100 rounded-full blur-3xl opacity-30"></div>
-          <%= image_tag 'presentation/permissions.png', class: 'relative shadow-brutal-lg border border-base-300 w-full' %>
-        </div>
-        <div class="md:w-1/2">
-          <div class="card p-10 bg-base-200 border border-base-300">
-            <div class="inline-flex items-center justify-center p-3 bg-success shadow-brutal mb-6">
-              <i class="fa-solid fa-shield-halved text-success-content text-xl"></i>
-            </div>
-            <h3 class="text-3xl font-bold mb-6 text-base-content"><%= t('home.whatis.paragraph_3.title') %></h3>
-            <p class="text-base-content/70 text-lg leading-relaxed"><%= t('home.whatis.paragraph_3.content_html') %></p>
-          </div>
-        </div>
-      </div>
-
-      <div class="max-w-7xl mx-auto px-4 flex flex-col md:flex-row items-center gap-16">
-        <div class="md:w-1/2 relative">
-          <div class="absolute -inset-4 bg-purple-100 rounded-full blur-3xl opacity-30"></div>
-          <%= image_tag 'presentation/event.png', class: 'relative shadow-brutal-lg border border-base-300 w-full' %>
-        </div>
-        <div class="md:w-1/2">
-          <div class="card p-10 bg-base-200 border border-base-300">
-            <div class="inline-flex items-center justify-center p-3 bg-secondary shadow-brutal mb-6">
-              <i class="fa-solid fa-calendar-check text-secondary-content text-xl"></i>
-            </div>
-            <h3 class="text-3xl font-bold mb-6 text-base-content"><%= t('home.whatis.paragraph_5.title') %></h3>
-            <p class="text-base-content/70 text-lg leading-relaxed"><%= t('home.whatis.paragraph_5.content_html') %></p>
-          </div>
-        </div>
-      </div>
-
-      <div class="max-w-7xl mx-auto px-4 flex flex-col md:flex-row-reverse items-center gap-16">
-        <div class="md:w-1/2 relative">
-          <div class="absolute -inset-4 bg-orange-100 rounded-full blur-3xl opacity-30"></div>
-          <%= image_tag 'presentation/proposal.png', class: 'relative shadow-brutal-lg border border-base-300 w-full' %>
-        </div>
-        <div class="md:w-1/2">
-          <div class="card p-10 bg-base-200 border border-base-300">
-            <div class="inline-flex items-center justify-center p-3 bg-warning shadow-brutal mb-6">
-              <i class="fa-solid fa-lightbulb text-warning-content text-xl"></i>
-            </div>
-            <h3 class="text-3xl font-bold mb-6 text-base-content"><%= t('home.whatis.paragraph_4.title') %></h3>
-            <p class="text-base-content/70 text-lg leading-relaxed"><%= t('home.whatis.paragraph_4.content_html', users: User.count, proposals: Proposal.count) %></p>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <section id="testimonials" class="bg-neutral text-neutral-content py-24">
-      <div class="max-w-5xl mx-auto px-4 text-center">
-        <h2 class="text-3xl md:text-4xl font-bold mb-16">Citations</h2>
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-12">
-          <blockquote class="bg-neutral-focus p-8 border-b-4 border-primary">
-            <p class="text-lg italic mb-6">"Quae optima sunt, esse communia."</p>
-            <cite class="block font-bold text-primary">&mdash; Lucio Anneo Seneca</cite>
-          </blockquote>
-
-          <blockquote class="bg-neutral-focus p-8 border-b-4 border-success">
-            <p class="text-lg italic mb-6">"The tragedy of modern democracies is that they have not yet succeeded in effecting democracy."</p>
-            <cite class="block font-bold text-success">&mdash; Jacques Maritain</cite>
-          </blockquote>
-
-          <blockquote class="bg-neutral-focus p-8 border-b-4 border-warning">
-            <p class="text-lg italic mb-6">"Nothing is stronger than an idea whose time has come."</p>
-            <cite class="block font-bold text-warning">&mdash; Victor Hugo</cite>
-          </blockquote>
-        </div>
-      </div>
-    </section>
-
-    <footer class="bg-neutral text-neutral-content/60 py-16 border-t border-neutral-content/10">
-      <div class="max-w-7xl mx-auto px-4 grid grid-cols-1 md:grid-cols-3 gap-12">
-        <div class="info space-y-6">
-          <div class="footer-logo">
-            <%= image_tag 'logo_completo_white_mini.png', class: "h-8" %>
-          </div>
-          <p class="text-sm">
-            Airesis is the open source platform for e-democracy.
-            <br>
-            <a class="link link-hover text-primary" href="https://github.com/airesis/airesis" target="_blank">View on GitHub</a>
-            v.<%= AIRESIS_VERSION %>
+        <%# Left: headline + CTA %>
+        <div class="flex-1 space-y-6">
+          <h1 class="text-4xl md:text-6xl font-extrabold leading-tight text-base-content">
+            <%= t('home.intro.paragraph_1.title') %>
+          </h1>
+          <p class="text-lg md:text-xl text-base-content/60 max-w-lg">
+            <%= t('home.tags.description') %>
           </p>
+          <div class="flex flex-wrap gap-4 pt-2">
+            <%= link_to t('pages.home.index.register'), new_user_registration_path,
+                class: 'btn btn-primary border-3 border-neutral text-lg px-8' %>
+            <%= link_to (t('pages.home.index.try_it') rescue 'Esplora'), open_space_path,
+                class: 'btn btn-ghost border-3 border-neutral text-lg px-8' %>
+          </div>
         </div>
 
-        <div class="social text-center">
-          <h3 class="text-neutral-content font-bold uppercase mb-6 text-sm tracking-widest">Socialize</h3>
-          <ul class="flex justify-center space-x-6">
-            <li><a class="hover:text-primary transition" href="https://www.facebook.com/airesisit/"><i class="fa-brands fa-facebook text-2xl"></i></a></li>
-            <li><a class="hover:text-primary transition" href="https://twitter.com/democracyo"><i class="fa-brands fa-x-twitter text-2xl"></i></a></li>
-          </ul>
-        </div>
+        <%# Right: login card %>
+        <div class="w-full md:w-[400px] bg-base-200 border-3 border-neutral p-8 space-y-5"
+             style="box-shadow: 8px 8px 0 oklch(var(--n));">
 
-        <div class="contact text-right">
-          <h3 class="text-neutral-content font-bold uppercase mb-6 text-sm tracking-widest">Contact Us</h3>
-          <a class="link link-hover text-primary" href="mailto:info@airesis.it">info@airesis.it</a>
+          <h2 class="text-2xl font-bold text-base-content">
+            <%= t('pages.home.index.login') rescue 'Accedi' %>
+          </h2>
+
+          <% if ::Configuration.socialnetwork_active %>
+            <div class="grid grid-cols-3 gap-3">
+              <% [
+                   ['facebook', '#3b5998', t('pages.top_panel.facebook_login')],
+                   ['google', '#db4437', t('pages.top_panel.google_login')],
+                   ['twitter', '#1da1f2', t('pages.top_panel.twitter_login')]
+                 ].each do |provider, color, label| %>
+                <%= link_to omniauth_authorize_path(:user, provider == 'google' ? :google_oauth2 : provider.to_sym),
+                    class: 'btn btn-sm border-2 border-neutral text-white font-semibold',
+                    style: "background:#{color}; box-shadow: 3px 3px 0 oklch(var(--n));" do %>
+                  <i class="fa-brands fa-<%= provider %>"></i>
+                  <span class="hidden sm:inline"><%= label %></span>
+                <% end %>
+              <% end %>
+            </div>
+
+            <div class="divider text-sm text-base-content/50"><%= t('common.or') rescue 'oppure' %></div>
+          <% end %>
+
+          <%= form_for resource, as: resource_name, url: user_session_path do |f| %>
+            <div class="space-y-4">
+              <%= f.email_field :email, placeholder: 'Email',
+                  class: 'input w-full border-2 border-neutral bg-base-100 focus:outline-none',
+                  style: 'box-shadow: none;' %>
+              <%= f.password_field :password, placeholder: 'Password',
+                  class: 'input w-full border-2 border-neutral bg-base-100 focus:outline-none',
+                  style: 'box-shadow: none;' %>
+
+              <div class="flex items-center justify-between text-sm">
+                <label class="flex items-center gap-2 cursor-pointer">
+                  <%= f.check_box :remember_me, checked: true, class: 'checkbox checkbox-sm checkbox-primary' %>
+                  <%= t('pages.home.index.keep_connected') %>
+                </label>
+                <%= link_to t('pages.home.index.forgot_password'), new_user_password_path,
+                    class: 'text-primary font-medium hover:underline' %>
+              </div>
+
+              <%= f.submit t('pages.home.index.login'), class: 'btn btn-primary w-full border-3 border-neutral text-lg' %>
+            </div>
+          <% end %>
         </div>
       </div>
+    </section>
 
-      <div class="mt-16 text-center">
-        <a class="btn btn-circle btn-ghost" title="Back to Top" href="#hero">
+    <%# ===== FEATURES SECTION ===== %>
+    <section id="features" class="bg-base-200 py-16 md:py-24">
+      <div class="max-w-7xl mx-auto px-4">
+        <h2 class="text-3xl md:text-5xl font-extrabold text-center text-base-content mb-16">
+          <%= t('home.whatis.paragraph_2.title') rescue 'Come funziona' %>
+        </h2>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+          <%
+            features = [
+              {
+                icon: 'fa-users',
+                color: 'bg-accent',
+                title: t('home.whatis.paragraph_2.title'),
+                desc: t('home.whatis.paragraph_2.content_html', groups: Group.count)
+              },
+              {
+                icon: 'fa-lightbulb',
+                color: 'bg-primary',
+                title: t('home.whatis.paragraph_4.title'),
+                desc: t('home.whatis.paragraph_4.content_html', users: User.count, proposals: Proposal.count)
+              },
+              {
+                icon: 'fa-calendar-check',
+                color: 'bg-warning',
+                title: t('home.whatis.paragraph_5.title'),
+                desc: t('home.whatis.paragraph_5.content_html')
+              },
+              {
+                icon: 'fa-comments',
+                color: 'bg-secondary',
+                title: t('home.whatis.paragraph_3.title'),
+                desc: t('home.whatis.paragraph_3.content_html')
+              }
+            ]
+          %>
+
+          <% features.each do |f| %>
+            <div class="bg-base-100 border-3 border-neutral p-8 space-y-4"
+                 style="box-shadow: 6px 6px 0 oklch(var(--n));">
+              <div class="h-1.5 w-full <%= f[:color] %>"></div>
+              <div class="inline-flex items-center justify-center w-14 h-14 border-2 border-neutral <%= f[:color] %>"
+                   style="box-shadow: 3px 3px 0 oklch(var(--n));">
+                <i class="fa-solid <%= f[:icon] %> text-xl"></i>
+              </div>
+              <h3 class="text-2xl font-bold text-base-content"><%= f[:title] %></h3>
+              <p class="text-base-content/60 leading-relaxed"><%= f[:desc] %></p>
+            </div>
+          <% end %>
+        </div>
+      </div>
+    </section>
+
+    <%# ===== TESTIMONIALS ===== %>
+    <section class="bg-secondary text-secondary-content border-y-2 border-neutral py-16 md:py-24">
+      <div class="max-w-5xl mx-auto px-4 text-center">
+        <h2 class="text-3xl md:text-4xl font-extrabold mb-12">
+          Cosa dicono i grandi pensatori
+        </h2>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+          <% [
+               { text: 'Quae optima sunt, esse communia.', author: 'Lucio Anneo Seneca' },
+               { text: 'The tragedy of modern democracies is that they have not yet succeeded in effecting democracy.', author: 'Jacques Maritain' },
+               { text: 'Nothing is stronger than an idea whose time has come.', author: 'Victor Hugo' }
+             ].each do |q| %>
+            <blockquote class="bg-base-100 text-base-content border-3 border-neutral p-7 text-left space-y-4"
+                        style="box-shadow: 6px 6px 0 oklch(var(--n));">
+              <p class="text-base italic leading-relaxed">"<%= q[:text] %>"</p>
+              <cite class="block font-bold text-primary text-sm not-italic">&mdash; <%= q[:author] %></cite>
+            </blockquote>
+          <% end %>
+        </div>
+      </div>
+    </section>
+
+    <%# ===== FOOTER ===== %>
+    <footer class="bg-neutral text-neutral-content py-12">
+      <div class="max-w-7xl mx-auto px-4 flex flex-col items-center gap-4 text-center">
+        <span class="text-2xl font-extrabold"><%= ENV['APP_SHORT_NAME'] || 'AIRESIS' %></span>
+        <p class="text-neutral-content/50 text-sm">
+          Piattaforma open source per la democrazia partecipativa
+        </p>
+        <div class="flex gap-4">
+          <a href="https://www.facebook.com/airesisit/" target="_blank" class="hover:text-primary transition">
+            <i class="fa-brands fa-facebook text-xl"></i>
+          </a>
+          <a href="https://twitter.com/democracyo" target="_blank" class="hover:text-primary transition">
+            <i class="fa-brands fa-x-twitter text-xl"></i>
+          </a>
+          <a href="https://github.com/airesis/airesis" target="_blank" class="hover:text-primary transition">
+            <i class="fa-brands fa-github text-xl"></i>
+          </a>
+        </div>
+        <p class="text-neutral-content/30 text-xs">
+          v.<%= APP_VERSION %> | Fork mantenuto da Mattia Piano | AGPL License
+        </p>
+        <a href="#hero" class="btn btn-ghost btn-sm border border-neutral-content/20 mt-2">
           <i class="fa-solid fa-chevron-up"></i>
         </a>
       </div>

@@ -1,6 +1,6 @@
 <%= turbo_stream.append "proposals_list_#{params[:state] || 'default'}" do %>
   <%= render partial: "proposals/proposal", collection: @proposals, as: :proposal %>
 <% end %>
-<% unless @proposals.total_pages > @proposals.current_page %>
+<% unless @pagy.next %>
   <%= turbo_stream.remove "loading_results" %>
 <% end %>

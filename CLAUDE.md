@@ -385,6 +385,69 @@ RAILS_LOG_TO_STDOUT=true
     - `APP_VERSION = '6.0.0'` in `config/initializers/sentry.rb`
     - Rails 8.1.3 + Ruby 3.4.4 + Tailwind v4 + DaisyUI 5 + Hotwire completo
 
+### Fase 8 — Feature future (possibili) ⬜
+
+31. ⬜ **TipTap + editing collaborativo**
+    - Sostituire Trix con TipTap (MIT, headless) per rich text editing avanzato
+    - Toolbar custom DaisyUI tramite Stimulus controller
+    - Collaborative editing real-time sulle proposte: **TipTap + Y.js (MIT) + Action Cable**
+    - `y-prosemirror` come ponte tra Y.js e ProseMirror/TipTap
+    - Presenza utenti (cursori colorati, chi sta editando)
+    - Zero costi — tutto open source e self-hosted, nessun TipTap Cloud
+    - **Prerequisiti:** CKEditor rimosso, ActionText + Trix funzionante come base
+
+32. ⬜ **Admin globale — governance della piattaforma**
+    - Attualmente l'Admin globale opera solo via RailsAdmin (CRUD DB diretto) — manca un'interfaccia di governance
+    - Vista "tutti i gruppi" con azioni: sospendere, sciogliere, forzare elezioni, entrare come osservatore
+    - Moderazione trasversale: operare dentro qualsiasi gruppo senza esserne membro
+    - Gestione utenti avanzata: sospensioni temporanee, storico azioni, note admin
+    - **Prerequisiti:** pannello admin attuale funzionante
+
+33. ⬜ **Dashboard analytics** (priorità media)
+    - Utenti attivi (DAU/MAU), nuove registrazioni, trend
+    - Proposte create/mese, tasso di successo (accettate/respinte), tempo medio dibattito
+    - Voti totali, partecipazione media per proposta
+    - Gruppi più attivi, crescita membri
+    - Grafici con Chartkick o simile (server-side, zero JS framework)
+
+34. ⬜ **Configurazione app da UI** (priorità media)
+    - Sostituire `config/application.yml` (ENV) con tabella `settings` in DB
+    - UI admin per modificare: nome app, social network attivi, limiti upload, SMTP, feature toggle
+    - Nessun deploy necessario per cambiare configurazione
+    - Gem candidata: `rails-settings-cached` o custom con ActiveRecord
+
+35. ⬜ **Audit log con UI** (priorità bassa)
+    - PaperTrail già traccia le versioni dei modelli — manca solo l'interfaccia
+    - Vista admin: chi ha modificato cosa, quando, diff prima/dopo
+    - Filtri per utente, modello, data
+    - Export CSV per compliance
+
+36. ⬜ **Feature flags** (priorità bassa)
+    - Attivare/disattivare funzionalità da UI admin senza deploy
+    - Gem candidata: `flipper` (Rails native, supporta per-gruppo e per-utente)
+    - Use case: disabilitare forum per un gruppo, abilitare Schulze solo per certi gruppi
+
+37. ⬜ **Multi-tenant** (priorità bassa, solo se SaaS)
+    - Ogni organizzazione ha la propria istanza logica (gruppi, proposte, utenti)
+    - Superadmin di piattaforma vs admin di organizzazione
+    - Gem candidata: `acts_as_tenant` o schema-based con PostgreSQL
+    - **Solo se l'app diventa un servizio hosted per più organizzazioni**
+
+38. ⬜ **Excalidraw — lavagna collaborativa nelle proposte** (priorità media)
+    - Integrare Excalidraw (MIT, React) come componente embeddabile nelle proposte
+    - Utenti possono creare schemi, diagrammi, disegni a mano libera per spiegare le proposte
+    - Salvataggio: JSON in DB (campo `excalidraw_data` su Proposal o come allegato Active Storage)
+    - Rendering: embed read-only nella vista proposta, editing in modale/pagina dedicata
+    - Collaborative editing real-time possibile via `@excalidraw/excalidraw` + Action Cable (stesso pattern di TipTap + Y.js)
+    - Integrazione: Stimulus controller wrapper per montare il componente React in un elemento DOM
+    - Export: PNG/SVG per condivisione esterna
+    - **Prerequisiti:** esbuild configurato (già attivo), Action Cable funzionante (già attivo)
+
+39. ⬜ **Gestione temi/branding da UI** (priorità bassa)
+    - Admin sceglie colori, logo, nome dalla UI
+    - Override CSS generato dinamicamente (CSS custom properties)
+    - Ogni gruppo potrebbe avere il proprio branding (sub-theme)
+
 ---
 
 ## Debito tecnico residuo
@@ -428,7 +491,7 @@ RAILS_LOG_TO_STDOUT=true
 - Autorizzazione: sempre via **CanCanCan** (`can?` / `authorize!`)
 - Job asincroni: sempre via **ActiveJob** (`perform_later`) — Solid Queue come adapter in production
 - Ricerca full-text: **pg_search** (non LIKE)
-- Paginazione: **kaminari**
+- Paginazione: **pagy**
 - Form: **simple_form** con wrapper Tailwind/DaisyUI
 - Internazionalizzazione: ogni stringa UI deve passare per `I18n.t()`
 

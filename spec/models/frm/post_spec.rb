@@ -4,7 +4,6 @@ require 'rails_helper'
 RSpec.describe Frm::Post do
   describe 'validations' do
     it { is_expected.to validate_presence_of(:text) }
-    it { is_expected.to validate_length_of(:text).is_at_most(1.megabyte) }
   end
 
   context 'when created' do

@@ -3,7 +3,7 @@
     <button class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2" data-action="click->modal#close">&times;</button>
     <h2 class="text-xl font-bold mb-4"><%= t('pages.groups.show.rules_button') %></h2>
     <% if @group.rule_book && !@group.rule_book.empty? %>
-      <%= raw @group.rule_book %>
+      <%= @group.rule_book %>
     <% else %>
       <div><%= t('pages.groups.show.rule_book_html') %></div>
       <ul>
