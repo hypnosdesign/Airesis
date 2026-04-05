@@ -13,7 +13,7 @@ class Meeting < ApplicationRecord
 
   accepts_nested_attributes_for :place
 
-  # TODO: issue fixed in Rails 4.1. cannot put dependent: :destroy because it fails (foreign_key violation)
+ 
   # foreign keys are supported in rails 4.1 so it works
   after_destroy :delete_place
 

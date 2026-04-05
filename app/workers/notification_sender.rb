@@ -1,4 +1,3 @@
-# TODO: duplicated code, all that code is duplicated from notification helper. please fix it asap
 class NotificationSender < ApplicationJob
   include Rails.application.routes.url_helpers
   include ProposalsHelper
@@ -24,13 +23,12 @@ class NotificationSender < ApplicationJob
     send_notification_to_user(notification, user)
   end
 
-  # TODO: implement
   def check_destroyable(notification, user)
     destroyable = notification.notification_type.destroyable # list of destroyable notification types
     destroyable.each do |notification_type|
       alert_jobs = search_alert_jobs(notification_type, user)
       alert_jobs.each do |alert_job|
-        if alert_job.completed? # TODO: this doesn't exist
+        if alert_job.completed?
           alert_job.alert.soft_delete
           email_job = alert_job.alert.email_job
           email_job.canceled! unless email_job.completed?

@@ -1,4 +1,3 @@
-# TODO: to remove
 class Image < ApplicationRecord
   attr_accessor :random_id
 

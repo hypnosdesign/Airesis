@@ -15,7 +15,7 @@ class AreaParticipationsController < ApplicationController
   def create
     # part = @group_area.area_participations.new
     # part.user_id = params[:user_id]
-    # TODO: check if the user can be added to the area
+
     @area_participation.area_role_id = @group_area.area_role_id
     if @area_participation.save
       flash[:notice] = t('info.area_participation.create')

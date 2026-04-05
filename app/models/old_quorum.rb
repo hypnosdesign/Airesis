@@ -55,7 +55,7 @@ class OldQuorum < Quorum
     if !ret.empty?
       ret.join(or? ? " #{I18n.t('words.or').upcase} " : " #{I18n.t('words.and').upcase} ")
     else
-      'IN STALLO' # TODO: i18n
+      I18n.t('models.quorum.stalled', default: 'STALLED')
     end
   end
 
@@ -186,7 +186,7 @@ class OldQuorum < Quorum
     count = 1
     if percentage
       count = if group
-                (percentage.to_f * 0.01 * group.scoped_participants(:participate_proposals).count) # TODO: group areas
+                (percentage.to_f * 0.01 * group.scoped_participants(:participate_proposals).count)
               else
                 (percentage.to_f * 0.001 * User.count)
               end
@@ -211,7 +211,7 @@ class OldQuorum < Quorum
     ret.html_safe
   end
 
-  # TODO: we need to refactor this part of code but at least now is more clear
+
   # explain a quorum when assigned to a proposal in it's current state
   def assigned_explanation_pop
     ret = ''

@@ -39,7 +39,7 @@ class Proposal < ApplicationRecord
   has_many :proposal_supports, class_name: 'ProposalSupport', dependent: :destroy
   has_many :supporting_groups, through: :proposal_supports, class_name: 'Group', source: :group
 
-  # TODO: remove both
+
   has_many :proposal_borders, class_name: 'ProposalBorder', dependent: :destroy
   has_many :interest_borders, through: :proposal_borders, class_name: 'InterestBorder'
 
@@ -76,7 +76,7 @@ class Proposal < ApplicationRecord
   # validation
   validates :title, presence: true, uniqueness: true
 
-  validates :quorum, presence: { unless: :is_petition? } # TODO: bug in client_side_validation
+  validates :quorum, presence: { unless: :is_petition? }
 
   validates_with AtLeastOneValidator, associations: [:solutions], unless: :is_petition?
 
@@ -213,7 +213,7 @@ class Proposal < ApplicationRecord
                        alerts_count_subquery(user_id).as('alerts_count'),
                        ranking_subquery(user_id).as('ranking')).
                 where('proposals.private = false or proposals.visible_outside = false').
-                where.not(proposal_type_id: 11) # TODO: petitions excluded
+                where.not(proposal_type_id: 11)
     proposals = proposals.by_interest_borders(InterestBorder.to_key(current_territory)) if current_territory.present?
     proposals = proposals.order(updated_at: :desc).page(1).per(10)
     ActiveRecord::Associations::Preloader.new.preload(proposals, %i[quorum groups supporting_groups category])
@@ -316,7 +316,7 @@ class Proposal < ApplicationRecord
     proposal_type.name == ProposalType::POLL
   end
 
-  # TODO: remove jobs
+
   def remove_scheduled_tasks
     # Resque.remove_delayed(ProposalsWorker, {action: ProposalsWorker::ENDTIME, proposal_id: self.id})
   end
@@ -382,14 +382,14 @@ class Proposal < ApplicationRecord
 
   # return the group to which belongs the proposal
   # if is in the open space then nil is returned
-  # TODO: if belongs to many groups returns the first. we actually have max 1 group
+
   def group
     groups.first
   end
 
   # return the group_area to which belongs the proposal
   # if is in the open space then nil is returned
-  # TODO: if belongs to many group_areas returns the first. we actually have max 1 group area
+
   def group_area
     presentation_areas.first
   end
@@ -408,9 +408,9 @@ class Proposal < ApplicationRecord
     return User.confirmed.unblocked.count unless private?
 
     if !presentation_areas.empty? # if we are in a working area
-      presentation_areas.first.scoped_participants(:vote_proposals).count # TODO: it can belong to more areas
+      presentation_areas.first.scoped_participants(:vote_proposals).count
     else
-      groups.first.scoped_participants(:vote_proposals).count # TODO: it can belong to more groups
+      groups.first.scoped_participants(:vote_proposals).count
     end
   end
 
@@ -585,7 +585,7 @@ class Proposal < ApplicationRecord
 
     self.proposal_state_id = ProposalState::VOTING
     save!
-    unless vote # TODO: non è possibile che esistano già
+    unless vote
       vote_data = ProposalVote.new(proposal_id: id, positive: 0, negative: 0, neutral: 0)
       vote_data.save!
     end
@@ -861,7 +861,7 @@ class Proposal < ApplicationRecord
       copy.ends_at = endtime
     end
 
-    # TODO: move quorum build in quorum model
+
     base_valutations = 0
     base_vote_valutations = 0
     if group_area # we have to calculate the number of valutations based on group area participants
@@ -874,7 +874,7 @@ class Proposal < ApplicationRecord
       base_vote_valutations = base_valutations = User.count_active
     end
     copy.valutations = ((quorum.percentage.to_f * base_valutations) / 100).floor
-    # TODO: we must calculate it before votation because there can be new users in the meantime
+
     copy.vote_valutations = ((quorum.vote_percentage.to_f * base_vote_valutations) / 100).floor
 
     # always add 1 and at least 1.

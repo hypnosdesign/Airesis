@@ -85,7 +85,7 @@ class GroupsController < ApplicationController
                 select('COUNT(*) AS posts, extract(month from blog_posts.created_at) AS MONTH, extract(year from blog_posts.created_at) AS YEAR').
                 group('MONTH, YEAR').
                 order(Arel.sql('YEAR desc, extract(month from blog_posts.created_at) desc'))
-    # TODO: slow query. remove eager loading
+
     @last_topics = @group.topics.
                    accessible_by(Ability.new(current_user)).
                    includes(:views, :forum).order('frm_topics.created_at desc').limit(10)

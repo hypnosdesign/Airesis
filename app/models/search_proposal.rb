@@ -40,7 +40,7 @@ class SearchProposal < ApplicationRecord
 
   def search
     proposals = text ? Proposal.search(text) : Proposal.all
-    proposals = proposals.where.not(proposal_type_id: 11) # TODO: removed petitions
+    proposals = proposals.where.not(proposal_type_id: 11)
     proposals = proposals.where(created_at: created_at_from..(created_at_to || Time.zone.now)) if created_at_from
     proposals = proposals.where(proposal_category_id: proposal_category_id) if proposal_category_id
     proposals = proposals.where(proposal_type_id: proposal_type_id) if proposal_type_id

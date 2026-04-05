@@ -2,7 +2,7 @@ class AreaRole < ApplicationRecord
   has_many :area_participations
   has_many :users, through: :area_participations
 
-  # TODO: not optional, but is created before the area itself at the moment
+
   belongs_to :group_area, optional: true, autosave: false
 
   validates :name, uniqueness: { scope: :group_area_id }

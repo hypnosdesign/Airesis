@@ -26,12 +26,12 @@ class ProposalsController < ApplicationController
       authorize! :view_data, @group
 
       unless can? :view_proposal, @group
-        flash.now[:warn] = 'Non hai i permessi per visualizzare le proposte private. Contatta gli amministratori del gruppo.' # TODO: I18n
+        flash.now[:warn] = t('error.proposals.no_permission_to_view', default: 'You do not have permission to view private proposals. Contact the group administrators.')
       end
 
       if params[:group_area_id]
         unless can? :view_proposal, @group_area
-          flash.now[:warn] = 'Non hai i permessi per visualizzare le proposte private. Contatta gli amministratori del gruppo.' # TODO: I18n
+          flash.now[:warn] = t('error.proposals.no_permission_to_view', default: 'You do not have permission to view private proposals. Contact the group administrators.')
         end
       end
     end
@@ -93,7 +93,7 @@ class ProposalsController < ApplicationController
   def show
     return redirect_to redirect_url(@proposal) if wrong_url?
 
-    @proposal.check_phase # TODO: checks only the state during the debate. this is a security check, so if the background job didn't run we can always fix it/ we should check also for waiting and vote inconsistent phase.
+    @proposal.check_phase
     @proposal.reload
     if @proposal.private # la proposta è interna ad un gruppo
       if @proposal.visible_outside # se è visibile dall'esterno mostra solo un messaggio
@@ -356,7 +356,7 @@ class ProposalsController < ApplicationController
 
   # the url is wrong if you try to access a private proposal without indicating the group
   # we redirect you to the corret url
-  # TODO: when there will be more groups we cannot do that anymore
+
   def wrong_url?
     @proposal.private? && !@group
   end

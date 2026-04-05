@@ -74,7 +74,7 @@ class ApplicationController < ActionController::Base
 
   protected
 
-  # TODO: enable this also in tests
+
   def load_tutorial
     @step = get_next_step(current_user) if current_user && !Rails.env.test?
   end
@@ -203,7 +203,7 @@ class ApplicationController < ActionController::Base
     end
   end
 
-  # TODO: avoid permit!
+
   def current_url(overwrite = {})
     url_for params.permit!.to_h.merge(overwrite).merge(only_path: false)
   end

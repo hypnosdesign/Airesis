@@ -137,7 +137,7 @@ module Frm
     end
 
     def approve_user
-      # TODO: disattivato user.update_attribute(:forem_state, "approved") if user && user.forem_state != "approved"
+
     end
 
     def blacklist_user
