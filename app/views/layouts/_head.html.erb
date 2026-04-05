@@ -11,10 +11,8 @@
 <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
 <%= javascript_include_tag "application", "data-turbo-track": "reload", defer: true %>
 
-<%= turbo_include_tags %>
-
 <%= yield :elfinder_assets %>
-<%= csrf_meta_tag %>
+<%= csrf_meta_tags %>
 
 <%= render 'layouts/favicons' %>
 
@@ -58,21 +56,6 @@ Airesis.i18n = {
   locale: '<%= I18n.locale %>',
   l: '<%= params[:l] %>',
   rankdown_reason: '<%= I18n.t('rankdown_reason') %>',
-  feedback: {
-    h2cPath: '<%= javascript_path 'html2canvas' %>',
-    label: '<%= j t('pages.feedback.send_feedback') %>',
-    header: '<%= j t('pages.feedback.send_feedback') %>',
-    nextLabel: '<%= j t('pages.feedback.add_details') %>',
-    reviewLabel: '<%= j t('pages.feedback.view_preview') %>',
-    sendLabel: '<%= j t('buttons.send') %>',
-    closeLabel: '<%= j t('buttons.close') %>',
-    messageSuccess: '<%= j t('pages.feedback.send_succes') %>',
-    messageError: '<%= j raw t('pages.feedback.send_error') %>',
-    describeProblem: "<%= I18n.t('pages.feedback.describe_problem') %>",
-    blackoutButtonMessage: "<%= j t('pages.feedback.blackout') %>",
-    highlightButtonMessage: "<%= j t('pages.feedback.highlight') %>",
-    highlightOrBlackout: "<%= j t('pages.feedback.highlight_or_blackout') %>"
-  },
   interestBorders: {
     hintText: '<%= j t('interest_borders.hint') %>',
     noResultsText: '<%= j t('interest_borders.no_place_found') %>',
@@ -131,7 +114,7 @@ Airesis.i18n = {
 
 <%= yield :google_maps %>
 
-<% if defined?(Sentry) %>
+<% if defined?(Sentry) && !Rails.env.development? %>
   <script>
     window.sentryConfig = {dsn: '<%= ENV['SENTRY_DSN'] %>', environment: '<%= ENV['SENTRY_ENVIRONMENT'] %>'};
   </script>

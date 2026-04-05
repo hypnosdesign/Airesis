@@ -70,6 +70,10 @@ class ProposalComment < ApplicationRecord
     parent_proposal_comment_id.nil?
   end
 
+  def is_reply?
+    parent_proposal_comment_id.present?
+  end
+
   def set_paragraph_id
     self.paragraph = Paragraph.where(section_id: section_id).first
   end

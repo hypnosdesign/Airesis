@@ -427,11 +427,21 @@ RAILS_LOG_TO_STDOUT=true
     - Gem candidata: `flipper` (Rails native, supporta per-gruppo e per-utente)
     - Use case: disabilitare forum per un gruppo, abilitare Schulze solo per certi gruppi
 
-37. ⬜ **Multi-tenant** (priorità bassa, solo se SaaS)
-    - Ogni organizzazione ha la propria istanza logica (gruppi, proposte, utenti)
-    - Superadmin di piattaforma vs admin di organizzazione
-    - Gem candidata: `acts_as_tenant` o schema-based con PostgreSQL
-    - **Solo se l'app diventa un servizio hosted per più organizzazioni**
+37. ⬜ **Multi-tenant ibrido — piattaforma + organizzazioni** (priorità bassa)
+    - **Due modalità di distribuzione:**
+      - **SaaS hosted**: piattaforma pubblica + N organizzazioni private sulla stessa istanza
+      - **Self-hosted**: organizzazione installa sul proprio server in single-org mode (punto 39)
+    - **Modello ibrido (SaaS):**
+      - L'utente si registra alla piattaforma → accede a open space, gruppi pubblici
+      - L'utente viene invitato a un'organizzazione → accede al workspace privato isolato
+      - Stesso account, N organizzazioni + piattaforma pubblica
+      - Organization switcher nella navbar (stile Slack/Notion)
+    - **Implementazione:**
+      - Flag `organization: true` su Group per distinguere organizzazioni da gruppi normali
+      - Scoping dati per organizzazione (proposte, forum, eventi interni non visibili fuori)
+      - Billing separato per organizzazione (se SaaS a pagamento)
+      - Gem candidata: `acts_as_tenant` o scoping custom con `Current.organization`
+    - **Prerequisiti:** single-org mode (punto 39), feature flags (punto 36), admin globale (punto 32)
 
 38. ⬜ **Excalidraw — lavagna collaborativa nelle proposte** (priorità media)
     - Integrare Excalidraw (MIT, React) come componente embeddabile nelle proposte
@@ -443,7 +453,43 @@ RAILS_LOG_TO_STDOUT=true
     - Export: PNG/SVG per condivisione esterna
     - **Prerequisiti:** esbuild configurato (già attivo), Action Cable funzionante (già attivo)
 
-39. ⬜ **Gestione temi/branding da UI** (priorità bassa)
+39. ⬜ **Single-org mode — versione leggera per organizzazioni** (priorità media)
+    - Flag `SINGLE_ORG_MODE=true` in configurazione (o DB settings)
+    - Un solo gruppo = l'organizzazione. Utenti auto-assegnati al join/invito
+    - Disabilita: creazione gruppi, open space, landing pubblica, blog pubblici
+    - Registrazione solo su invito admin (no registrazione pubblica)
+    - Homepage → redirect diretto alla dashboard del gruppo unico
+    - Sidebar e navbar semplificate (nascondi voci inutili)
+    - Il modello dati non cambia — stessa codebase, due modalità
+    - Implementazione: `before_action` nei controller + `if/unless` nelle view
+    - Use case: aziende, enti, associazioni con server proprio
+    - **Prerequisiti:** feature flags (punto 36) o semplice ENV var
+
+40. ⬜ **Setup wizard — configurazione al primo avvio** (priorità media)
+    - Pagina `/setup` al primo avvio (o rake task `rails airesis:setup`)
+    - Scelta modalità piattaforma: `PLATFORM_MODE=public|organization|saas|school`
+      - `public` — piattaforma aperta, multi-gruppo, registrazione pubblica
+      - `organization` — singola organizzazione, solo inviti, server proprio
+      - `saas` — piattaforma pubblica + organizzazioni private hosted
+      - `school` — preset scolastico con classi, assemblee, ruoli predefiniti
+    - Configurazione base: nome app, email admin, password admin, lingua default, territorio
+    - Opzionale: logo, colori tema, SMTP, social auth keys
+    - Salva in DB (`settings` table) — la modalità è fissa dopo il primo setup
+    - Redirect automatico a `/setup` se DB vuoto (nessun User admin presente)
+    - **Prerequisiti:** configurazione app da UI (punto 34), single-org mode (punto 39)
+
+41. ⬜ **Preset School — versione per organizzazioni scolastiche** (priorità media)
+    - Preset del setup wizard (`PLATFORM_MODE=school`), non un fork separato
+    - **Mapping concetti:** organizzazione = istituto, gruppo = classe/consiglio, proposta = mozione, evento votazione = assemblea
+    - **Ruoli preconfigurati:** Studente, Rappresentante, Docente, Dirigente (invece di ruoli custom)
+    - **Classi come gruppi:** auto-create dall'admin, studenti assegnati per anno/sezione
+    - **Template predefiniti:** assemblea d'istituto (ordine del giorno + votazione), elezione rappresentanti (Schulze)
+    - **Registrazione controllata:** solo email istituzionali (`@scuola.edu.it`) o inviti da docente/dirigente
+    - **Linguaggio adattato:** i18n dedicato — "proposta" → "mozione", "gruppo" → "classe", "portavoce" → "rappresentante"
+    - **Privacy GDPR minori:** consenso genitoriale obbligatorio, dati minimi, niente social auth, niente tracking
+    - **Prerequisiti:** single-org mode (punto 39), setup wizard (punto 40)
+
+41. ⬜ **Gestione temi/branding da UI** (priorità bassa)
     - Admin sceglie colori, logo, nome dalla UI
     - Override CSS generato dinamicamente (CSS custom properties)
     - Ogni gruppo potrebbe avere il proprio branding (sub-theme)

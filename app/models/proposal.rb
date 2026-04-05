@@ -115,12 +115,6 @@ class Proposal < ApplicationRecord
   scope :waiting, -> { where(proposal_state_id: ProposalState::WAIT) }
   scope :voting, -> { where(arel_table[:proposal_state_id].eq(ProposalState::VOTING)) }
 
-  scope :not_voted_by, lambda { |user_id|
-    where('proposal_state_id = ? and
-                       proposals.id not in (select proposal_id from user_votes where user_id = ?)',
-          ProposalState::VOTING, user_id)
-  }
-
   # tutte le proposte accettate
   scope :accepted, -> { where(proposal_state_id: ProposalState::ACCEPTED) }
   # tutte le proposte respinte
@@ -136,24 +130,10 @@ class Proposal < ApplicationRecord
   # all proposals visible to not logged users
   scope :visible, -> { where('private = ? or visible_outside = ?', false, true) }
 
-  scope :internal, -> { where(private: true) } # proposte interne ai gruppi
-
   # inconsistent proposals
   scope :invalid_debate_phase, -> { in_valutation.joins(:quorum).where('current_timestamp > quorums.ends_at') }
   scope :invalid_waiting_phase, -> { waiting.joins(:vote_period).where('current_timestamp > events.starttime') }
   scope :invalid_vote_phase, -> { voting.joins(:vote_period).where('current_timestamp > events.endtime') }
-
-  scope :select_alerts_and_rankings, lambda { |user_id|
-    select('proposals.*',
-           Proposal.alerts_count_subquery(user_id).as('alerts_count'),
-           Proposal.ranking_subquery(user_id).as('ranking'))
-  }
-
-  scope :for_list, lambda { |user_id = nil|
-    select_alerts_and_rankings(user_id).
-      includes(:interest_borders, :user_votes, :presentation_areas, :groups,
-               :category, :quorum, :vote_period, :proposal_type)
-  }
 
   scope :by_interest_borders, ->(ib) { where('proposals.derived_interest_borders_tokens @> ARRAY[?]::varchar[]', ib) }
 
@@ -216,7 +196,7 @@ class Proposal < ApplicationRecord
                 where.not(proposal_type_id: 11)
     proposals = proposals.by_interest_borders(InterestBorder.to_key(current_territory)) if current_territory.present?
     proposals = proposals.order(updated_at: :desc).limit(10)
-    ActiveRecord::Associations::Preloader.new.preload(proposals, %i[quorum groups supporting_groups category])
+    ActiveRecord::Associations::Preloader.new(records: proposals, associations: %i[quorum groups supporting_groups category]).call
     proposals
   end
 
@@ -237,8 +217,8 @@ class Proposal < ApplicationRecord
                 where(proposals[:proposal_type_id].not_eq(petition_id)).
                 where(proposals[:id].in(list_c)).
                 order(updated_at: :desc).to_a
-    ActiveRecord::Associations::Preloader.new.preload(proposals, [:quorum, :category, { users: :image },
-                                                                  :proposal_type, :groups, :supporting_groups])
+    ActiveRecord::Associations::Preloader.new(records: proposals, associations: [:quorum, :category, { users: :image },
+                                                                  :proposal_type, :groups, :supporting_groups]).call
     proposals
   end
 
