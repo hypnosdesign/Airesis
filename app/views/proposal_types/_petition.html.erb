@@ -1,3 +1,4 @@
+<% content_for :ckeditor %>
 <h2><%= @title %></h2>
 <div id="create_proposal">
   <%= form_for (@group.present?) ? [@group, @proposal] : @proposal, validate: true do |f| %>

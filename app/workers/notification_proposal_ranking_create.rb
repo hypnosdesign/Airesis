@@ -4,7 +4,7 @@ class NotificationProposalRankingCreate < NotificationSender
     proposal_ranking = ProposalRanking.find(proposal_ranking_id)
     @proposal = proposal_ranking.proposal
     @trackable = @proposal
-    group = @proposal.groups.first if @proposal.in_group?
+    @proposal.groups.first if @proposal.in_group?
 
     data = { proposal_id: @proposal.id, title: @proposal.title }
     notification_a = Notification.create(notification_type_id: NotificationType::NEW_VALUTATION_MINE,

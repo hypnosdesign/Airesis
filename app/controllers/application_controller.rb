@@ -1,4 +1,5 @@
 class ApplicationController < ActionController::Base
+  include Pagy::Backend
   include StepsHelper
   include ApplicationHelper
   helper :all
@@ -92,7 +93,7 @@ class ApplicationController < ActionController::Base
     return unless @blog
 
     @user = @blog.user
-    @blog_posts = @blog.blog_posts.includes(:user, :blog, :tags).page(params[:page]).per(COMMENTS_PER_PAGE)
+    @pagy, @blog_posts = pagy(@blog.blog_posts.includes(:user, :blog, :tags), items: COMMENTS_PER_PAGE)
     @recent_comments = @blog.comments.includes(:blog_post, user: [:image]).order('created_at DESC').limit(10)
     @recent_posts = @blog.blog_posts.published.limit(10)
     @archives = @blog.blog_posts.
@@ -168,7 +169,6 @@ class ApplicationController < ActionController::Base
         flash.now[:error] = "<b>#{t('error.error_500.title')}</b></br>#{t('error.error_500.description')}"
         render partial: 'layouts/flash_stream', status: :internal_server_error
       end
-      format.js { head :internal_server_error }
       format.html do
         render template: 'errors/500', status: :internal_server_error, layout: 'application'
       end
@@ -198,7 +198,6 @@ class ApplicationController < ActionController::Base
         flash.now[:error] = 'Page not available.'
         render partial: 'layouts/flash_stream', status: :not_found
       end
-      format.js { head :not_found }
       format.html { render 'errors/404', status: :not_found, layout: 'application' }
     end
   end
@@ -259,7 +258,6 @@ class ApplicationController < ActionController::Base
         flash.now[:error] = t('error.admin_required')
         render partial: 'layouts/flash_stream', status: :forbidden
       end
-      format.js { head :forbidden }
       format.html do
         store_location
         flash[:error] = t('error.admin_required')
@@ -284,7 +282,6 @@ class ApplicationController < ActionController::Base
           redirect_to new_user_session_path
         end
       end
-      format.js { head :forbidden }
       format.html do # ritorna indietro oppure all'HomePage
         if current_user
           log_error(exception)

@@ -1,6 +1,8 @@
 module Api
   module V1
     class ApplicationController < ActionController::Base
+      include Pagy::Backend
+
       before_action :authenticate_user_from_token!
 
       protect_from_forgery with: :null_session

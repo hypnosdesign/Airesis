@@ -63,8 +63,8 @@ RSpec.describe Frm::TopicsHelper, type: :helper, seeds: true do
     end
 
     it 'includes new_posts class when topic has new posts after forum_view' do
-      forum_view = Frm::View.create!(viewable: forum, user: user, current_viewed_at: 1.hour.ago, past_viewed_at: 1.hour.ago)
-      topic_view = Frm::View.create!(viewable: topic, user: user, current_viewed_at: 2.hours.ago, past_viewed_at: 2.hours.ago)
+      Frm::View.create!(viewable: forum, user: user, current_viewed_at: 1.hour.ago, past_viewed_at: 1.hour.ago)
+      Frm::View.create!(viewable: topic, user: user, current_viewed_at: 2.hours.ago, past_viewed_at: 2.hours.ago)
       result = helper.icon_classes(topic)
       expect(result).to be_a(String)
     end

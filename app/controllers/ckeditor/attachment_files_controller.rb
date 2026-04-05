@@ -1,10 +1,11 @@
 class Ckeditor::AttachmentFilesController < Ckeditor::ApplicationController
   respond_to :html
   def index
-    @attachments = Ckeditor.attachment_file_adapter.find_all(ckeditor_attachment_files_scope(assetable_id: ckeditor_current_user))
-    @attachments = Ckeditor::Paginatable.new(@attachments).page(params[:page])
+    attachments = Ckeditor.attachment_file_adapter.find_all(ckeditor_attachment_files_scope(assetable_id: ckeditor_current_user))
+    @pagy, @attachments = pagy_array(attachments.to_a)
+    first_page = @pagy.page == 1
 
-    respond_with(@attachments, layout: @attachments.first_page?)
+    respond_with(@attachments, layout: first_page)
   end
 
   def create

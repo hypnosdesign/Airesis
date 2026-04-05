@@ -9,7 +9,7 @@ module Frm
       if find_topic
         flash[:warn] = t('info.topic.hidden') if @topic.hidden
         register_view(@topic, current_user)
-        @posts = find_posts(@topic).page(params[:page]).per(TOPICS_PER_PAGE)
+        @pagy, @posts = pagy(find_posts(@topic), items: TOPICS_PER_PAGE)
       end
     end
 

@@ -12,7 +12,7 @@ class GroupParticipationsController < ApplicationController
     @page_title = t('pages.group_participations.index.title')
     @search_participant = @group.search_participants.build(search_participant_params)
     @unscoped_group_participations = @search_participant.results
-    @group_participations = @unscoped_group_participations.page(params[:page]).per(GroupParticipation::PER_PAGE)
+    @pagy, @group_participations = pagy(@unscoped_group_participations, items: GroupParticipation::PER_PAGE)
 
     respond_to do |format|
       format.html
@@ -77,7 +77,7 @@ class GroupParticipationsController < ApplicationController
       end
     end
     flash[:notice] = t('info.participations_destroyed')
-  rescue StandardError => e
+  rescue StandardError
     flash[:error] = t('error.participations_destroyed')
   ensure
     respond_to do |format|

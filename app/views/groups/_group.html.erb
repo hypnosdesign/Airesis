@@ -1,3 +1,4 @@
+<% content_for :ckeditor %>
 <%= simple_form_for @group, validate: true, html: { multipart: true } do |f| %>
   <%= f.error_notification %>
   <% if @group.is_private? %>

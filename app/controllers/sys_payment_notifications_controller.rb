@@ -25,7 +25,7 @@ class SysPaymentNotificationsController < ApplicationController
     http.read_timeout = 60
     http.verify_mode = OpenSSL::SSL::VERIFY_NONE
     http.use_ssl = true
-    response = http.post(uri.request_uri, raw,
+    http.post(uri.request_uri, raw,
                          'Content-Length' => raw.size.to_s,
                          'User-Agent' => 'My custom user agent').body
   end

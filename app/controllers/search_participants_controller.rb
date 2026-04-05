@@ -6,7 +6,7 @@ class SearchParticipantsController < ApplicationController
 
   def create
     @unscoped_group_participations = @search_participant.results
-    @group_participations = @unscoped_group_participations.page(params[:page]).per(GroupParticipation::PER_PAGE)
+    @pagy, @group_participations = pagy(@unscoped_group_participations, items: GroupParticipation::PER_PAGE)
     flash[:notice] = t('info.groups.search_participants')
     respond_to do |format|
       format.html

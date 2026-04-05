@@ -23,7 +23,7 @@ RSpec.describe NotificationAvailableAuthorCreate, type: :model, emails: true, no
   end
 
   def trigger_event
-    available_author = create(:available_author, proposal: proposal, user: create(:user))
+    create(:available_author, proposal: proposal, user: create(:user))
   end
 
   cumulable_event_process_spec

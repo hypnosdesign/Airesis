@@ -45,11 +45,11 @@ class GroupsController < ApplicationController
           return
         end
         @page_title = @group.name
-        @group_posts = @group_posts.page(params[:page]).per(COMMENTS_PER_PAGE)
+        @pagy, @group_posts = pagy(@group_posts, items: COMMENTS_PER_PAGE)
         load_page_data
       end
       format.turbo_stream do
-        @group_posts = @group_posts.page(params[:page]).per(COMMENTS_PER_PAGE)
+        @pagy, @group_posts = pagy(@group_posts, items: COMMENTS_PER_PAGE)
       end
       format.atom
       format.json
@@ -62,8 +62,8 @@ class GroupsController < ApplicationController
                    where(' extract(year from blog_posts.created_at) = ? AND extract(month from blog_posts.created_at) = ? ', params[:year], params[:month]).
                    order('post_publishings.featured desc, published_at DESC').
                    select('post_publishings.*, published_at').
-                   distinct.
-                   page(params[:page]).per(COMMENTS_PER_PAGE)
+                   distinct
+    @pagy, @group_posts = pagy(@group_posts, items: COMMENTS_PER_PAGE)
 
     respond_to do |format|
       format.html do
@@ -330,7 +330,7 @@ class GroupsController < ApplicationController
       format.turbo_stream
       format.html { redirect_back fallback_location: group_path(@group) }
     end
-  rescue StandardError => e
+  rescue StandardError
     flash[:error] = t('error.groups.post_removed')
     respond_to do |format|
       format.turbo_stream { render partial: 'layouts/flash_stream' }

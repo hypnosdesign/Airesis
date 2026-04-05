@@ -12,7 +12,6 @@ gem 'daemons'
 gem 'devise'
 gem 'devise_traceable', git: 'https://github.com/coorasse/devise_traceable'
 gem 'el_finder'
-# gem 'foundation-rails', '~> 5.0' # removed: all CSS migrated to Tailwind/DaisyUI
 gem 'friendly_id'
 gem 'gemoji'
 gem 'geocoder'
@@ -20,18 +19,15 @@ gem 'globalize'
 gem 'httparty'
 gem 'icalendar'
 gem 'jbuilder'
-# gem 'jquery-rails' # removed: JS legacy not loaded, all views use Stimulus/Turbo
-gem 'kaminari'
+gem 'pagy', '~> 9.0'
 gem 'koala'
 gem 'mustache'
-# gem 'mustache-js-rails' # removed: JS legacy not loaded
 gem 'nickname_generator'
 gem 'omniauth-facebook'
 gem 'omniauth-google-oauth2'
 gem 'omniauth-twitter'
 gem 'pg'
 gem 'premailer-rails', '>= 1.12.0'
-# private_pub removed — replaced by Action Cable + Turbo Streams
 gem 'rack-cors', require: 'rack/cors'
 gem 'rails_admin'
 gem 'rails_autolink'
@@ -41,29 +37,18 @@ gem 'rotp'
 gem 'active_storage_validations'
 gem 'ostruct'
 gem 'sanitize', '>= 6.0'
-gem 'sass-rails'
-# gem 'select2-rails' # removed: Select2 loaded from CDN, not via Sprockets
 gem 'solid_queue'
 gem 'solid_cable'
-# gem 'sidekiq'          # removed: replaced by solid_queue (Rails 8 native, no Redis)
-# gem 'sidekiq-failures' # removed: solid_queue persists failures in DB
 gem 'simple_form'
-# gem 'simple_token_authentication' # removed: replaced by has_secure_token (Rails native)
-# gem 'sinatra', require: false # removed: was only needed for sidekiq-failures UI
 gem 'sitemap_generator'
-# gem 'slim-rails' # removed: all views converted to ERB
 gem 'sprockets', '~> 4.0'
+gem 'sprockets-rails'
 gem 'timezone', git: 'https://github.com/coorasse/timezone'
-
-# gem 'uglifier' # removed: esbuild handles JS minification
-# gem 'uri-js-rails' # removed: JS legacy not loaded
-gem 'matrix' # required by vote-schulze; removed from Ruby stdlib in 3.1
-gem 'vote-schulze', git: 'https://github.com/coorasse/schulze-vote', ref: '0f47cbb'
+gem 'schulze-vote', '~> 2.3'
 gem 'jsbundling-rails'
 gem 'wicked_pdf'
 # TODO: in version 2.0 support for AR is extracted (https://github.com/geekq/workflow#state-persistence-with-activerecord)
 gem 'airesis_i18n', git: 'https://github.com/airesis/airesis_i18n'
-gem 'cookies_eu'
 gem 'email_reply_parser'
 gem 'faker'
 gem 'figaro'
@@ -77,7 +62,6 @@ gem 'pg_search'
 gem 'puma'
 gem 'rack-attack'
 gem 'sshkit'
-gem 'truncate_html'
 gem 'workflow', '~> 1.2'
 
 group :development do
@@ -85,8 +69,6 @@ group :development do
   gem 'better_errors'
   gem 'binding_of_caller'
   gem 'bullet'
-  # gem 'erb2slim' # removed: no more Slim files
-  # gem 'html2slim' # removed: no more Slim files
   gem 'i18n-tasks'
 
 

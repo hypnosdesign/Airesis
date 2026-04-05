@@ -67,7 +67,7 @@ class ProposalCommentsController < ApplicationController
       format.html { redirect_to @proposal }
       format.json { head :ok }
     end
-  rescue StandardError => e
+  rescue StandardError
     respond_to do |format|
       flash[:error] = @proposal_comment.errors.messages.values.join(' e ')
       format.turbo_stream { render partial: 'layouts/flash_stream', status: :unprocessable_entity }
@@ -123,14 +123,14 @@ class ProposalCommentsController < ApplicationController
     ProposalCommentReport.transaction do
       report = @proposal_comment.reports.find_by(user_id: current_user.id)
       report&.destroy
-      report = @proposal_comment.reports.create(user_id: current_user.id, proposal_comment_report_type_id: params[:reason])
+      @proposal_comment.reports.create(user_id: current_user.id, proposal_comment_report_type_id: params[:reason])
     end
     flash[:notice] = t('info.proposal.contribute_reported')
     respond_to do |format|
       format.turbo_stream
       format.html { redirect_back fallback_location: proposal_path(@proposal) }
     end
-  rescue StandardError => e
+  rescue StandardError
     flash[:error] = t('error.proposals.contribute_report')
     respond_to do |format|
       format.turbo_stream { render partial: 'layouts/flash_stream' }

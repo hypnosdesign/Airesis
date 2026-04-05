@@ -196,7 +196,7 @@ RSpec.describe ProposalsController, search: true, seeds: true do
     end
 
     it "can't retrieve public proposals if specify a group, and can see group's proposals if signed in and is group admin" do
-      proposal2 = create(:public_proposal, title: 'una giornata da inferno', current_user_id: user.id)
+      create(:public_proposal, title: 'una giornata da inferno', current_user_id: user.id)
       group = create(:group, current_user_id: user.id)
       proposal3 = create(:group_proposal, title: 'questo gruppo è un INFERNO! riorganizziamolo!!!!', current_user_id: user.id, group_proposals: [GroupProposal.new(group: group)], visible_outside: false)
       sign_in user

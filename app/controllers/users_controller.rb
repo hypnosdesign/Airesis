@@ -16,7 +16,7 @@ class UsersController < ApplicationController
   def join_accounts
     oauth_data = session['devise.omniauth_data']
     oauth_data_parser = OauthDataParser.new(oauth_data)
-    raw_info = oauth_data_parser.raw_info
+    oauth_data_parser.raw_info
     user_info = oauth_data_parser.user_info
 
     if wrong_join_accounts_params?
@@ -89,7 +89,7 @@ class UsersController < ApplicationController
     current_user.save!
     flash[:notice] = params[:active] == 'true' ? t('info.user.tooltips_enabled') : t('info.user.tooltips_disabled')
     respond_to_preference
-  rescue StandardError => e
+  rescue StandardError
     flash[:error] = t('error.setting_preferences')
     respond_to_preference
   end
@@ -99,7 +99,7 @@ class UsersController < ApplicationController
     current_user.save!
     flash[:notice] = params[:active] == 'true' ? t('info.user.url_shown') : t('info.user.url_hidden')
     respond_to_preference
-  rescue StandardError => e
+  rescue StandardError
     flash[:error] = t('error.setting_preferences')
     respond_to_preference
   end
@@ -113,7 +113,7 @@ class UsersController < ApplicationController
                        t('info.private_messages_inactive')
                      end
     respond_to_preference
-  rescue StandardError => e
+  rescue StandardError
     flash[:error] = t('error.setting_preferences')
     respond_to_preference
   end
@@ -123,7 +123,7 @@ class UsersController < ApplicationController
     current_user.save!
     flash[:notice] = t('info.locale_changed')
     respond_to_preference
-  rescue StandardError => e
+  rescue StandardError
     flash[:error] = t('error.setting_preferences')
     respond_to_preference
   end
@@ -133,7 +133,7 @@ class UsersController < ApplicationController
     current_user.save!
     flash[:notice] = t('info.user.time_zone_changed')
     respond_to_preference
-  rescue StandardError => e
+  rescue StandardError
     flash[:error] = t('error.setting_preferences')
     respond_to_preference
   end
@@ -152,7 +152,7 @@ class UsersController < ApplicationController
       format.turbo_stream
       format.html { redirect_back fallback_location: root_path }
     end
-  rescue StandardError => e
+  rescue StandardError
     flash[:error] = t('error.setting_preferences')
     respond_to_preference
   end

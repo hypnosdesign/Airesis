@@ -325,7 +325,7 @@ class ProposalsController < ApplicationController
       @proposal.reload
     end
     flash[:notice] = t('info.proposal.authors_added')
-  rescue StandardError => e
+  rescue StandardError
     flash[:error] = t('errors.proposal.authors_added')
     respond_to do |format|
       format.turbo_stream { render partial: 'layouts/flash_stream' }

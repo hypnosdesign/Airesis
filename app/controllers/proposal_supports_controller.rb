@@ -49,7 +49,7 @@ class ProposalSupportsController < ApplicationController
       end
       format.turbo_stream
     end
-  rescue ActiveRecord::ActiveRecordError => e
+  rescue ActiveRecord::ActiveRecordError
     respond_to do |format|
       format.html redirect_to proposal_path(@proposal)
       format.turbo_stream do

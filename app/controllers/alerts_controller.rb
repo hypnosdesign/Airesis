@@ -46,11 +46,8 @@ class AlertsController < ApplicationController
     @alert = current_user.admin? ? Alert.find(params[:id]) : current_user.alerts.find_by(id: params[:id])
     @alert.check!
 
-    respond_to do |format|
-      format.html { redirect_to calculate_alert_path(@alert) }
-      format.js { head :ok }
-    end
-  rescue StandardError => e
+    redirect_to calculate_alert_path(@alert)
+  rescue StandardError
     @title = t('error.alerts.not_found_title', default: 'Alert not found')
     @message = t('error.alerts.not_found_message', default: 'The notification could not be found. You may be logged in with the wrong account.')
     render template: '/errors/404', status: 404, layout: true
@@ -60,9 +57,7 @@ class AlertsController < ApplicationController
 
   def check_all
     current_user.unread_alerts.check_all
-    respond_to do |format|
-      format.js { head :ok }
-    end
+    head :ok
   end
 
   # return notification tooltip for a specific proposal and user

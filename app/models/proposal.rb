@@ -187,7 +187,7 @@ class Proposal < ApplicationRecord
   def self.alerts_count_subquery(user_id)
     alerts = Alert.arel_table
     proposals = Proposal.arel_table
-    alerts_count = alerts.
+    alerts.
                    project('count(*)').
                    where(alerts[:trackable_id].eq(proposals[:id]).
             and(alerts[:trackable_type].eq('Proposal')).
@@ -198,7 +198,7 @@ class Proposal < ApplicationRecord
   def self.ranking_subquery(user_id)
     proposals = Proposal.arel_table
     proposal_rankings = ProposalRanking.arel_table
-    ranking = proposal_rankings.
+    proposal_rankings.
               project(proposal_rankings[:ranking_type_id]).
               where(proposal_rankings[:proposal_id].eq(proposals[:id]).
             and(proposal_rankings[:user_id].eq(user_id)))
@@ -256,13 +256,13 @@ class Proposal < ApplicationRecord
 
   def self.votation_portlet(user)
     user_id = user.id
-    proposals = Proposal.arel_table
-    group_proposals = GroupProposal.arel_table
-    group_participations = GroupParticipation.arel_table
-    groups = Group.arel_table
+    Proposal.arel_table
+    GroupProposal.arel_table
+    GroupParticipation.arel_table
+    Group.arel_table
     events = Event.arel_table
     participation_roles = ParticipationRole.arel_table
-    user_votes = UserVote.arel_table
+    UserVote.arel_table
     petition_id = ProposalType.find_by(name: ProposalType::PETITION).id
     alerts_count = alerts_count_subquery(user_id)
     ranking = ranking_subquery(user_id)
@@ -318,7 +318,6 @@ class Proposal < ApplicationRecord
 
 
   def remove_scheduled_tasks
-    # Resque.remove_delayed(ProposalsWorker, {action: ProposalsWorker::ENDTIME, proposal_id: self.id})
   end
 
   # return true if the proposal is currently in debate
@@ -551,10 +550,6 @@ class Proposal < ApplicationRecord
 
     save!
 
-    # remove the timer if is still there
-    # if self.minutes #todo remove jobs
-    #  Resque.remove_delayed(ProposalsWorker, {action: ProposalsWorker::ENDTIME, proposal_id: proposal.id})
-    # end
   end
 
   # put the proposal back in debate from abandoned
@@ -794,7 +789,7 @@ class Proposal < ApplicationRecord
   end
 
   def save_history
-    something = false
+    false
     seq = (proposal_revisions.maximum(:seq) || 0) + 1
     revision = proposal_revisions.build(user_id: update_user_id, valutations: valutations_was, rank: rank_was, seq: seq)
     something_sections = save_sections_history(revision)

@@ -46,7 +46,7 @@ RSpec.describe 'check permissions are actually working inside groups' do
     expect(@group.scoped_participants(:vote_proposals).count).to eq all
     expect(@group.scoped_participants(:choose_date_proposals).count).to eq all
 
-    doc_manager = create(:participation_role, group: @group, manage_documents: true)
+    create(:participation_role, group: @group, manage_documents: true)
   end
 
   it 'you can see your permissions in the group', :js do

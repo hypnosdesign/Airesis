@@ -25,7 +25,7 @@ class EventsController < ApplicationController
     authorize! :view_data, @group if @group
     @page_title = @event.title
     @event_comment = @event.event_comments.new
-    @event_comments = @event.event_comments.includes(:user).order('created_at DESC').page(params[:page]).per(COMMENTS_PER_PAGE)
+    @pagy, @event_comments = pagy(@event.event_comments.includes(:user).order('created_at DESC'), items: COMMENTS_PER_PAGE)
     respond_to do |format|
       format.html do
         @proposals = @event.proposals.for_list(current_user.try(:id)) if @event.votation?
@@ -106,7 +106,7 @@ class EventsController < ApplicationController
       format.turbo_stream
       format.html { redirect_to @group ? group_events_url(@group) : events_url }
     end
-  rescue ActiveRecord::ActiveRecordError => e
+  rescue ActiveRecord::ActiveRecordError
     respond_to do |format|
       format.turbo_stream { render partial: 'layouts/flash_stream', status: :unprocessable_entity }
     end

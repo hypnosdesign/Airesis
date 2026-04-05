@@ -38,7 +38,7 @@ class Alert < ApplicationRecord
   def email_subject
     group = data[:group]
     subject = group ? "[#{group}] " : ''
-    subject += I18n.t(notification.email_subject_interpolation, **data)
+    subject + I18n.t(notification.email_subject_interpolation, **data)
   end
 
   def message

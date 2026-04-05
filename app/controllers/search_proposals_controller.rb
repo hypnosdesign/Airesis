@@ -4,7 +4,6 @@ class SearchProposalsController < ApplicationController
     flash[:notice] = t('info.groups.search_proposal')
     respond_to do |format|
       format.html
-      format.js
     end
   end
 end

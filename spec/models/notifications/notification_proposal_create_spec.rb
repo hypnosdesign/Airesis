@@ -12,7 +12,7 @@ RSpec.describe NotificationProposalCreate, type: :model, emails: true, notificat
       participants << user
       create_participation(user, group)
     end
-    proposal = create(:group_proposal, current_user_id: participants[1].id, group_proposals: [GroupProposal.new(group: group)])
+    create(:group_proposal, current_user_id: participants[1].id, group_proposals: [GroupProposal.new(group: group)])
 
     expect(described_class.jobs.size).to eq 1
     described_class.drain
@@ -34,11 +34,11 @@ RSpec.describe NotificationProposalCreate, type: :model, emails: true, notificat
 
   it ' when a new proposal is created users do not receive notifications for public proposals by default' do
     user1 = create(:user)
-    participants = []
+    []
     5.times do
-      user = create(:user)
+      create(:user)
     end
-    proposal = create(:public_proposal, current_user_id: user1.id)
+    create(:public_proposal, current_user_id: user1.id)
 
     expect(described_class.jobs.size).to eq 1
     described_class.drain
@@ -50,12 +50,12 @@ RSpec.describe NotificationProposalCreate, type: :model, emails: true, notificat
 
   it ' when a new proposal is created users can receive notifications for public proposals' do
     user1 = create(:user)
-    participants = []
+    []
     2.times do
       user = create(:user)
       user.blocked_alerts.find_by(notification_type_id: NotificationType::NEW_PUBLIC_PROPOSALS).destroy
     end
-    proposal = create(:public_proposal, current_user_id: user1.id)
+    create(:public_proposal, current_user_id: user1.id)
 
     expect(described_class.jobs.size).to eq 1
     described_class.drain
