@@ -214,3 +214,73 @@ trix-editor ul, trix-editor ol {
   text-align: center;
   margin-top: 0.25rem;
 }
+
+/* FullCalendar v6 — tema DaisyUI
+   Ref: docs/dashboard_template/src/pages/apps/calendar.html */
+.fc {
+  --fc-border-color: oklch(var(--bc) / 0.12);
+  --fc-button-bg-color: oklch(var(--p));
+  --fc-button-border-color: oklch(var(--p));
+  --fc-button-hover-bg-color: oklch(var(--p) / 0.85);
+  --fc-button-hover-border-color: oklch(var(--p) / 0.85);
+  --fc-button-active-bg-color: oklch(var(--p) / 0.75);
+  --fc-button-active-border-color: oklch(var(--p) / 0.75);
+  --fc-today-bg-color: oklch(var(--p) / 0.08);
+  --fc-page-bg-color: oklch(var(--b1));
+  --fc-neutral-bg-color: oklch(var(--b2));
+  --fc-neutral-text-color: oklch(var(--bc));
+  --fc-list-event-hover-bg-color: oklch(var(--b2));
+  font-family: 'Sora', sans-serif;
+}
+
+/* Nessun border-radius — coerente con design system */
+.fc .fc-button,
+.fc .fc-button-group,
+.fc-theme-standard .fc-scrollgrid,
+.fc-theme-standard td,
+.fc-theme-standard th {
+  border-radius: 0 !important;
+}
+
+/* Colori testo header toolbar */
+.fc .fc-toolbar-title {
+  font-size: 1rem;
+  font-weight: 700;
+  color: oklch(var(--bc));
+}
+
+.fc .fc-col-header-cell-cushion,
+.fc .fc-daygrid-day-number,
+.fc .fc-list-event-time,
+.fc .fc-list-event-title {
+  color: oklch(var(--bc));
+  text-decoration: none;
+}
+
+.fc .fc-day-today .fc-daygrid-day-number {
+  background-color: oklch(var(--p));
+  color: oklch(var(--pc));
+  border-radius: 0 !important;
+  padding: 2px 6px;
+}
+
+/* Slot orari */
+.fc .fc-timegrid-slot-label-cushion {
+  color: oklch(var(--bc) / 0.5);
+  font-size: 0.75rem;
+}
+
+/* List view */
+.fc .fc-list-day-cushion {
+  background-color: oklch(var(--b2));
+}
+
+.fc .fc-list-empty {
+  background-color: oklch(var(--b1));
+  color: oklch(var(--bc) / 0.5);
+}
+
+/* Contenitore calendario */
+#fc-calendar {
+  padding: 1rem;
+}
