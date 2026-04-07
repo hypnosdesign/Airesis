@@ -41,8 +41,8 @@ export default class extends Controller {
       slotMinTime: "07:00:00",
       slotMaxTime: "22:00:00",
       events: this.eventsUrlValue,
-      editable: this.editableValue,
-      selectable: this.editableValue && this.newEventUrlValue.length > 0,
+      editable: this.editableValue,          // drag & resize eventi esistenti
+      selectable: !!this.newEventUrlValue,   // drag su slot vuoto per creare
       selectMirror: true,
 
       // Click su evento → naviga
@@ -53,7 +53,17 @@ export default class extends Controller {
         }
       },
 
-      // Click su slot vuoto → form nuovo evento (se autorizzato)
+      // Singolo click su slot vuoto → form nuovo evento
+      dateClick: (info) => {
+        if (!this.newEventUrlValue) return
+        const url = new URL(this.newEventUrlValue, window.location.origin)
+        url.searchParams.set("starttime", info.date.getTime())
+        url.searchParams.set("endtime", info.date.getTime() + 3600000) // +1h default
+        url.searchParams.set("has_time", info.allDay ? "false" : "true")
+        Turbo.visit(url.toString())
+      },
+
+      // Drag su slot vuoto → form con intervallo esatto
       select: (info) => {
         if (!this.newEventUrlValue) return
         const url = new URL(this.newEventUrlValue, window.location.origin)
