@@ -1,5 +1,16 @@
 # Airesis - The Social Network for E-Democracy
 
+[![Ruby](https://img.shields.io/badge/Ruby-3.4.4-CC342D?logo=ruby&logoColor=white)](https://www.ruby-lang.org/)
+[![Rails](https://img.shields.io/badge/Rails-8.1.3-D30001?logo=rubyonrails&logoColor=white)](https://rubyonrails.org/)
+[![PostgreSQL](https://img.shields.io/badge/PostgreSQL-17-4169E1?logo=postgresql&logoColor=white)](https://www.postgresql.org/)
+[![Tailwind CSS](https://img.shields.io/badge/Tailwind-v4-06B6D4?logo=tailwindcss&logoColor=white)](https://tailwindcss.com/)
+[![DaisyUI](https://img.shields.io/badge/DaisyUI-5-5A0EF8?logo=daisyui&logoColor=white)](https://daisyui.com/)
+[![Hotwire](https://img.shields.io/badge/Hotwire-Turbo%20%2B%20Stimulus-9333EA?logo=hotwire&logoColor=white)](https://hotwired.dev/)
+[![License: AGPL v3](https://img.shields.io/badge/License-AGPL%20v3-blue.svg)](https://www.gnu.org/licenses/agpl-3.0)
+[![Test Coverage](https://img.shields.io/badge/coverage-80%25-brightgreen)](https://github.com/hypnosdesign/Airesis)
+[![Last Commit](https://img.shields.io/github/last-commit/hypnosdesign/Airesis)](https://github.com/hypnosdesign/Airesis/commits/main)
+[![Docker](https://img.shields.io/badge/Docker-ready-2496ED?logo=docker&logoColor=white)](https://github.com/hypnosdesign/Airesis/blob/main/docker-compose.yml)
+
 The first open source web application for eDemocracy.
 
 Airesis is a platform for participatory democracy that allows citizens, groups, and organizations to create proposals, discuss them in forums and blogs, organize events, and make collective decisions using the Schulze voting method.
