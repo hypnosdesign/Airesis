@@ -6,7 +6,7 @@ Airesis is a platform for participatory democracy that allows citizens, groups, 
 
 > **Current version: 6.0.0** — Rails 8.1.3 · Ruby 3.4.4 · Tailwind v4 + DaisyUI 5 · Hotwire (Turbo + Stimulus)
 >
-> This is a fork of the original [Airesis](https://github.com/airesis/airesis) project by Alessandro Rodi ([coorasse/airesis](https://github.com/coorasse/airesis)). The original project has been inactive since 2022 and is no longer deployed in production. The modernization effort (v4 → v6) is carried out by **Mattia Piano**.
+> This is a fork of the original [Airesis](https://github.com/airesis/airesis) project by Alessandro Rodi ([coorasse/airesis](https://github.com/coorasse/airesis)).
 
 ---
 
