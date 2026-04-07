@@ -1,9 +1,17 @@
-<div class="title">
-  <%= t('pages.groups.show.last_proposals') %>
+<div class="flex items-center gap-2 mb-3">
+  <div class="bg-primary/10 text-primary w-7 h-7 flex items-center justify-center shrink-0">
+    <i class="fa-solid fa-file-lines text-xs"></i>
+  </div>
+  <h4 class="font-bold text-sm"><%= t('pages.groups.show.last_proposals') %></h4>
 </div>
 <% @c = Proposal.group_portlet(@group, current_user) %>
-<% unless @c.empty? %>
-  <div class="scrollable">
+<% if @c.empty? %>
+  <p class="text-sm text-base-content/40 text-center py-2">
+    <i class="fa-solid fa-inbox mr-1"></i>
+    <%= t('pages.home.show.no_proposals', default: 'Nessuna proposta recente') %>
+  </p>
+<% else %>
+  <div class="divide-y divide-base-content/10">
     <%= render partial: 'proposals/mini_proposal', collection: @c, as: 'proposal' %>
   </div>
 <% end %>

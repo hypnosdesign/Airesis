@@ -1,22 +1,29 @@
-<li>
-  <div class="card bg-base-200 p-4">
-    <div class="image rounded-lg overflow-hidden mb-2" style="background: url('<%= blog.user.user_image_url(120, force_size: false) %>'); background-size: cover; height: 120px;"></div>
-    <div class="info mb-2">
-      <div class="name font-bold">
-        <%= link_to (blog.title.to_s != '' ? blog.title : 'No title'), blog, title: blog.title %>
-      </div>
-    </div>
-    <div class="bottom text-sm">
-      <div><%= link_to_user blog.user, full_name: true %></div>
-      <div>
-        <%= t('pages.blogs.index.blog_subtitle', posts: blog.blog_posts.count, comments: blog.comments.count) %>
+<div class="bg-base-100 border-2 border-base-content/15 overflow-hidden flex flex-col">
+  <%# Cover image %>
+  <div class="h-36 bg-base-200" style="background: url('<%= blog.user.user_image_url(240, force_size: false) %>') center/cover no-repeat;"></div>
+
+  <%# Body %>
+  <div class="p-4 flex-1 flex flex-col">
+    <p class="font-bold text-sm mb-1">
+      <%= link_to (blog.title.present? ? blog.title : t('pages.blogs.index.no_title', default: 'Senza titolo')), blog, title: blog.title, class: 'hover:text-primary' %>
+    </p>
+    <p class="text-[11px] text-base-content/40 mb-auto">
+      <%= link_to_user blog.user, full_name: true %>
+    </p>
+    <p class="text-[11px] text-base-content/40 mt-2">
+      <%= t('pages.blogs.index.blog_subtitle', posts: blog.blog_posts.count, comments: blog.comments.count) %>
+    </p>
+    <% if can?(:edit, blog) || can?(:destroy, blog) %>
+      <div class="flex gap-1 mt-3 pt-3 border-t border-base-content/10">
         <% if can? :edit, blog %>
-          <%= link_to t('buttons.edit'), edit_blog_path(blog), class: 'btn btn-xs' %>
+          <%= link_to t('buttons.edit'), edit_blog_path(blog), class: 'btn btn-ghost btn-xs font-bold flex-1' %>
         <% end %>
         <% if can? :destroy, blog %>
-          <%= link_to t('buttons.delete'), blog, data: { turbo_confirm: 'Sei sicuro di voler eliminare questo blog?', turbo_method: :delete }, class: 'btn btn-xs btn-error' %>
+          <%= link_to t('buttons.delete'), blog,
+                data: { turbo_confirm: 'Sei sicuro di voler eliminare questo blog?', turbo_method: :delete },
+                class: 'btn btn-ghost btn-xs text-error font-bold flex-1' %>
         <% end %>
       </div>
-    </div>
+    <% end %>
   </div>
-</li>
+</div>

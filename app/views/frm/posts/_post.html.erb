@@ -1,67 +1,65 @@
-<div id="post_<%= post_counter + 1 %>" class="flex w-full post-container mb-4 border-b border-base-300 pb-4">
-  <div class="w-1/6 user_post text-center">
-    <a name="post-<%= post.id %>"></a>
-    <div class="post <%= cycle('odd', 'even') %>">
-      <% if post.pending_review? %>
-        <div class="moderation alert alert-warning mb-2">
-          <%= t(".pending_review") %>
-          <% if forem_admin_or_moderator?(post.topic.forum) %>
-            <% if local_assigns[:mass_moderation] %>
-              <%= render "/frm/posts/moderation_tools", post: post %>
-            <% else %>
-              <%= form_tag group_frm_forum_moderate_posts_url(@group, forum), data: { turbo_method: :put } do %>
-                <%= render "/frm/posts/moderation_tools", post: post %>
-              <% end %>
-            <% end %>
+<div id="post-<%= post.id %>" class="bg-base-100 border-2 border-base-content/15 mb-3">
+
+  <%# Moderation banner %>
+  <% if post.pending_review? %>
+    <div class="bg-warning/10 border-b-2 border-warning px-4 py-2 flex items-center gap-2 text-sm">
+      <i class="fa-solid fa-triangle-exclamation text-warning"></i>
+      <%= t(".pending_review") %>
+      <% if forem_admin_or_moderator?(post.topic.forum) %>
+        <% if local_assigns[:mass_moderation] %>
+          <%= render "/frm/posts/moderation_tools", post: post %>
+        <% else %>
+          <%= form_tag group_frm_forum_moderate_posts_url(@group, forum), data: { turbo_method: :put } do %>
+            <%= render "/frm/posts/moderation_tools", post: post %>
+          <% end %>
+        <% end %>
+      <% end %>
+    </div>
+  <% end %>
+
+  <div class="flex gap-0">
+    <%# Author sidebar %>
+    <div class="w-20 lg:w-28 shrink-0 flex flex-col items-center p-4 bg-base-200/50 border-r border-base-content/10">
+      <% if post.user %>
+        <%= avatar(post.user, size: 48) %>
+        <p class="text-xs font-bold text-center mt-2 break-all leading-tight">
+          <%= link_to post.user.fullname, post.user, class: 'hover:text-primary' %>
+        </p>
+      <% end %>
+    </div>
+
+    <%# Post content %>
+    <div class="flex-1 min-w-0 p-4">
+      <%# Header: timestamp + reply-to + actions %>
+      <div class="flex items-start justify-between gap-2 mb-3">
+        <div class="text-xs text-base-content/40">
+          <a href="#post-<%= post.id %>">
+            <time datetime="<%= post.created_at.to_s(:db) %>"><%= time_ago_in_words(post.created_at) %> fa</time>
+          </a>
+          <% if post.reply_to %>
+            <span class="ml-2">
+              &rarr; <%= link_to "#{t('.in_reply_to')} #{post.reply_to.user}", "#post-#{post.reply_to.id}", class: 'text-primary hover:underline' %>
+            </span>
           <% end %>
         </div>
-      <% end %>
-      <div class="user">
-        <div class="icon mb-2">
-          <%= avatar(post.user, size: 100) if post.user %>
-        </div>
-        <div class="username text-sm font-semibold">
-          <%= link_to(post.user.fullname, post.user) if post.user %>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <div class="w-5/6 non_user_post pl-4">
-    <div class="post-header flex items-center justify-between mb-2">
-      <div>
-        <a href="#post-<%= post.id %>">
-          <div class="post-when text-sm text-base-content/60">
-            <time datetime="<%= post.created_at.to_s(:db) %>">
-              <%= "#{time_ago_in_words(post.created_at)}" %>
-            </time>
-            <% if post.reply_to %>
-              <span class="in-reply-to">
-                <%= link_to "#{t(".in_reply_to")} #{post.reply_to.user}", "#post-#{post.reply_to.id}" %>
-              </span>
+        <% if current_user %>
+          <div class="flex gap-1 shrink-0">
+            <% if can?(:reply, post.topic) && post.topic.can_be_replied_to? %>
+              <%= link_to t('reply', scope: 'frm.topic'), new_group_forum_topic_post_url(@group, post.topic.forum, post.topic, reply_to_id: post.id), class: 'btn btn-ghost btn-xs font-bold' %>
+              <%= link_to t('quote', scope: 'frm.topic'), new_group_forum_topic_post_url(@group, post.topic.forum, post.topic, reply_to_id: post.id, quote: true), class: 'btn btn-ghost btn-xs font-bold' %>
+            <% end %>
+            <% if post.owner_or_moderator?(current_user) %>
+              <% if can?(:edit_post, post.topic.forum) %>
+                <%= link_to t('edit', scope: 'frm.post.buttons'), edit_group_forum_topic_post_url(@group, post.topic.forum, post.topic, post), class: 'btn btn-ghost btn-xs font-bold' %>
+              <% end %>
+              <%= link_to t('delete', scope: 'frm.topic'), group_forum_topic_post_url(@group, post.topic.forum, post.topic, post), data: { turbo_method: :delete, turbo_confirm: t("are_you_sure") }, class: 'btn btn-ghost btn-xs text-error font-bold' %>
             <% end %>
           </div>
-        </a>
+        <% end %>
       </div>
-      <% if current_user %>
-        <div class="flex gap-1">
-          <% if can?(:reply, post.topic) %>
-            <% if post.topic.can_be_replied_to? %>
-              <%= link_to t('reply', scope: 'frm.topic'), new_group_forum_topic_post_url(@group, post.topic.forum, post.topic, reply_to_id: post.id), class: 'btn btn-xs' %>
-              <%= link_to t('quote', scope: 'frm.topic'), new_group_forum_topic_post_url(@group, post.topic.forum, post.topic, reply_to_id: post.id, quote: true), class: 'btn btn-xs' %>
-            <% end %>
-          <% end %>
-          <% if post.owner_or_moderator?(current_user) %>
-            <% if can?(:edit_post, post.topic.forum) %>
-              <%= link_to t('edit', scope: 'frm.post.buttons'), edit_group_forum_topic_post_url(@group, post.topic.forum, post.topic, post), class: 'btn btn-xs' %>
-            <% end %>
-            <%= link_to t('delete', scope: 'frm.topic'), group_forum_topic_post_url(@group, post.topic.forum, post.topic, post), data: { turbo_method: :delete, turbo_confirm: t("are_you_sure") }, class: 'btn btn-xs btn-error' %>
-          <% end %>
-        </div>
-      <% end %>
-    </div>
-    <div class="post_content">
-      <div class="post-body prose max-w-none">
+
+      <%# Body %>
+      <div class="post-body prose max-w-none text-sm">
         <%= post.text %>
       </div>
     </div>

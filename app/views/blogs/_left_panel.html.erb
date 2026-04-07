@@ -1,37 +1,61 @@
-<div class="card bg-base-200 p-4 mb-4">
-  <h4 class="font-bold mb-2">Recent comments</h4>
-  <div>
-    <% @recent_comments.each do |comment| %>
-      <div class="blog_comment flex items-start gap-2 mb-2">
-        <div class="comment_avatar"><%= avatar(comment.user, size: 40) %></div>
-        <div class="comment_desc">
-          <%= link_to_user comment.user, full_name: true %>
-          on
-          <%= link_to(h(comment.blog_post.title), [@blog, comment.blog_post]) %>
+<%# Recent comments %>
+<% if @recent_comments.present? %>
+  <div class="bg-base-100 border-2 border-base-content/15 p-4 mb-4">
+    <div class="flex items-center gap-3 mb-3">
+      <div class="bg-secondary/10 text-secondary w-7 h-7 flex items-center justify-center shrink-0">
+        <i class="fa-solid fa-comments text-xs"></i>
+      </div>
+      <h4 class="font-bold text-sm"><%= t('pages.blogs.left_panel.recent_comments', default: 'Commenti recenti') %></h4>
+    </div>
+    <div class="divide-y divide-base-content/10">
+      <% @recent_comments.each do |comment| %>
+        <div class="py-2 flex items-start gap-2">
+          <div class="shrink-0 mt-0.5"><%= avatar(comment.user, size: 28) %></div>
+          <div class="flex-1 min-w-0 text-xs">
+            <span class="font-bold"><%= link_to_user comment.user, full_name: true %></span>
+            <span class="text-base-content/40"> su </span>
+            <%= link_to h(comment.blog_post.title), [@blog, comment.blog_post], class: 'text-primary hover:underline truncate block' %>
+          </div>
         </div>
-      </div>
-    <% end %>
+      <% end %>
+    </div>
   </div>
-</div>
+<% end %>
 
-<div class="card bg-base-200 p-4 mb-4">
-  <h4 class="font-bold mb-2">Recent posts</h4>
-  <div>
-    <% @recent_posts.each do |post| %>
-      <div class="blog_comment mb-1">
-        <%= link_to(h(post.title), [@blog, post]) %>
+<%# Recent posts %>
+<% if @recent_posts.present? %>
+  <div class="bg-base-100 border-2 border-base-content/15 p-4 mb-4">
+    <div class="flex items-center gap-3 mb-3">
+      <div class="bg-primary/10 text-primary w-7 h-7 flex items-center justify-center shrink-0">
+        <i class="fa-solid fa-file-lines text-xs"></i>
       </div>
-    <% end %>
+      <h4 class="font-bold text-sm"><%= t('pages.blogs.left_panel.recent_posts', default: 'Post recenti') %></h4>
+    </div>
+    <div class="space-y-1">
+      <% @recent_posts.each do |post| %>
+        <div class="text-sm">
+          <%= link_to h(post.title), [@blog, post], class: 'hover:text-primary' %>
+        </div>
+      <% end %>
+    </div>
   </div>
-</div>
+<% end %>
 
-<div class="card bg-base-200 p-4 mb-4">
-  <h4 class="font-bold mb-2">Archives</h4>
-  <div>
-    <% @archives.each do |rec| %>
-      <div class="blog_comment mb-1">
-        <%= link_to "#{month_long(rec.month)} #{rec.year.to_i} (#{rec.posts})", posts_by_year_and_month_blog_path(@blog, month: rec.month.to_i, year: rec.year.to_i) %>
+<%# Archives %>
+<% if @archives.present? %>
+  <div class="bg-base-100 border-2 border-base-content/15 p-4 mb-4">
+    <div class="flex items-center gap-3 mb-3">
+      <div class="bg-accent/10 text-accent w-7 h-7 flex items-center justify-center shrink-0">
+        <i class="fa-solid fa-box-archive text-xs"></i>
       </div>
-    <% end %>
+      <h4 class="font-bold text-sm"><%= t('pages.blogs.left_panel.archives', default: 'Archivio') %></h4>
+    </div>
+    <div class="space-y-1">
+      <% @archives.each do |rec| %>
+        <div class="text-sm">
+          <%= link_to "#{month_long(rec.month)} #{rec.year.to_i} (#{rec.posts})", posts_by_year_and_month_blog_path(@blog, month: rec.month.to_i, year: rec.year.to_i), class: 'hover:text-primary' %>
+        </div>
+      <% end %>
+    </div>
   </div>
-</div>
+<% end %>

@@ -1,16 +1,30 @@
 <% @page_title = "#{t('.title')} #{@group.name}" %>
 <% @extend = true %>
 
+<%# ===== HERO BANNER ===== %>
+<div class="bg-primary text-primary-content p-6 lg:p-8 mb-6 border-2 border-base-content/15 relative overflow-hidden">
+  <div class="relative z-10 max-w-xl">
+    <p class="text-[11px] font-bold tracking-widest text-primary-content/50 uppercase mb-3"><%= @group.name %></p>
+    <h1 class="text-2xl lg:text-3xl font-extrabold leading-tight mb-2"><%= t('.title') %></h1>
+    <p class="text-primary-content/60 text-sm"><%= t('frm.forums.index.subtitle', default: 'Discussioni e argomenti del gruppo') %></p>
+  </div>
+  <i class="fa-solid fa-comments absolute right-6 lg:right-12 top-1/2 -translate-y-1/2 text-[7rem] lg:text-[9rem] text-primary-content/[0.06] hidden md:block"></i>
+</div>
+
 <div id="forums_container">
-  <h1 id="forums_title" class="text-2xl font-bold mb-4"><%= t('.title') %></h1>
   <%= render @categories %>
 </div>
 
 <% if is_group_admin? @group %>
   <% content_for :left_panel do %>
-    <div class="card bg-base-200 p-4">
-      <h4 class="font-bold mb-2"><%= t('frm.admin.area') %></h4>
-      <%= link_to t("area", scope: "frm.admin"), group_frm_admin_root_url(@group), class: 'btn btn-sm' %>
+    <div class="bg-base-100 border-2 border-base-content/15 p-4">
+      <div class="flex items-center gap-3 mb-3">
+        <div class="bg-primary/10 text-primary w-7 h-7 flex items-center justify-center shrink-0">
+          <i class="fa-solid fa-crown text-xs"></i>
+        </div>
+        <h4 class="font-bold text-sm"><%= t('frm.admin.area') %></h4>
+      </div>
+      <%= link_to t("area", scope: "frm.admin"), group_frm_admin_root_url(@group), class: 'btn btn-outline btn-sm font-bold w-full' %>
     </div>
   <% end %>
 <% end %>

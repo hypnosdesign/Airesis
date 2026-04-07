@@ -1,46 +1,47 @@
+<% @extend = true %>
+<% @page_title = @blog.title %>
+
 <%= content_for :head do %>
   <%= auto_discovery_link_tag(:atom, blog_url(@blog, format: 'atom')) %>
 <% end %>
 
-<% javascript 'endless_page' %>
+<%# ===== HERO BANNER ===== %>
+<div class="bg-primary text-primary-content p-6 lg:p-8 mb-6 border-2 border-base-content/15 relative overflow-hidden">
+  <div class="relative z-10">
+    <p class="text-[11px] font-bold tracking-widest text-primary-content/50 uppercase mb-3">Blog</p>
+    <h1 class="text-2xl lg:text-3xl font-extrabold leading-tight mb-2"><%= @blog.title %></h1>
+    <p class="text-primary-content/60 text-sm">
+      <%= link_to_user @blog.user, full_name: true %>
+    </p>
+  </div>
+  <i class="fa-solid fa-newspaper absolute right-6 lg:right-12 top-1/2 -translate-y-1/2 text-[7rem] lg:text-[9rem] text-primary-content/[0.06] hidden md:block"></i>
+</div>
 
-<%= render layout: "layouts/page_title", locals: { title: @blog.title } do %>
-  <% if @blog_posts.size == 0 && !params[:page] %>
-    <div class="blogPost card bg-base-200 p-4">
-      <h3 class="text-lg font-bold"><%= t('pages.blogs.show.no_posts') %></h3>
-      <p><%= t('pages.blogs.show.no_posts_long') %></p>
+<%# ===== POSTS ===== %>
+<% if @tag %>
+  <div class="flex items-center gap-2 mb-4">
+    <div class="bg-primary/10 text-primary w-7 h-7 flex items-center justify-center">
+      <i class="fa-solid fa-tag text-xs"></i>
     </div>
-  <% else %>
-    <% if @tag %>
-      <h3 class="text-lg mb-2">
-        <%= t('pages.blogs.show.tag') %>: <%= @tag %>
-      </h3>
-    <% end %>
-    <div id="blogPostContainer">
-      <%= render collection: @blog_posts, partial: 'blog_posts/blog_post' %>
-    </div>
-  <% end %>
-  <div id="loading_results">
-    <span><%= t('pages.blogs.show.previous_posts') %></span>
+    <span class="font-bold text-sm"><%= t('pages.blogs.show.tag') %>: <span class="text-primary"><%= @tag %></span></span>
   </div>
 <% end %>
 
-<script>
-  document.querySelectorAll('.hidden_menu').forEach(function (el) {
-    el.addEventListener('click', function (event) {});
-  });
-  document.documentElement.addEventListener('click', function () {
-    document.querySelectorAll('.hidden_menu').forEach(function (el) { el.style.display = 'none'; });
-    document.querySelectorAll('.hidden_link.visible').forEach(function (el) { el.classList.remove('visible'); });
-  });
-  document.querySelectorAll('.hidden_link').forEach(function (el) {
-    el.addEventListener('click', function (event) {
-      this.classList.add('visible');
-      this.nextElementSibling.style.display = '';
-      event.stopPropagation();
-    });
-  });
-</script>
+<% if @blog_posts.size == 0 && !params[:page] %>
+  <div class="bg-base-100 border-2 border-base-content/15 p-8 text-center">
+    <i class="fa-solid fa-newspaper text-4xl text-base-content/20 mb-3"></i>
+    <h3 class="font-bold text-base-content/60"><%= t('pages.blogs.show.no_posts') %></h3>
+    <p class="text-sm text-base-content/40 mt-1"><%= t('pages.blogs.show.no_posts_long') %></p>
+  </div>
+<% else %>
+  <div id="blogPostContainer">
+    <%= render collection: @blog_posts, partial: 'blog_posts/blog_post' %>
+  </div>
+<% end %>
+
+<div id="loading_results" class="mt-4 text-center">
+  <span class="text-xs text-primary font-bold hover:underline cursor-pointer"><%= t('pages.blogs.show.previous_posts') %></span>
+</div>
 
 <% content_for :left_panel do %>
   <%= render 'blog_posts/admin_links' %>

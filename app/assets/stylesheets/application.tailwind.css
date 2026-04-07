@@ -7,3 +7,27 @@
 @theme {
   --font-sans: "Sora", ui-sans-serif, system-ui, sans-serif;
 }
+
+/* =========================================================
+   TYPOGRAPHY HIERARCHY — DaisyUI 5 + Sora
+   Heading defaults per la gerarchia visiva del design system.
+   Le utility Tailwind in-template sovrascrivono dove necessario.
+   ========================================================= */
+@layer base {
+  h1 {
+    @apply text-2xl lg:text-3xl font-extrabold leading-tight tracking-tight;
+  }
+  h2 {
+    @apply text-xl font-bold leading-snug;
+  }
+  h3 {
+    @apply text-lg font-bold;
+  }
+  h4 {
+    @apply text-sm font-bold;
+  }
+  h5,
+  h6 {
+    @apply text-xs font-bold uppercase tracking-wider text-base-content/50;
+  }
+}
