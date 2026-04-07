@@ -2,10 +2,12 @@
 <% html_attrs = { 'xml:lang' => I18n.locale, 'lang' => I18n.locale }.merge(yield(:html_options).is_a?(Hash) ? yield(:html_options) : {}) %>
 <html <%= html_attrs.map { |k, v| "#{k}=\"#{v}\"" }.join(' ') %> data-controller="theme">
 <head>
+  <%# FOUC prevention: applica il tema salvato PRIMA che il CSS carichi, evitando il flash di tema sbagliato %>
+  <script>(function(){var t=localStorage.getItem('theme')||'nord';document.documentElement.setAttribute('data-theme',t);}());</script>
   <title><%= (@page_title || t('open_space')) + ' - ' + APP_SHORT_NAME %></title>
   <%= render 'layouts/head' %>
 </head>
-<body class="min-h-screen bg-base-200" data-page="<%= body_page_name %>">
+<body class="min-h-screen bg-base-200 opacity-0" data-page="<%= body_page_name %>">
 
   <div class="drawer lg:drawer-open">
     <input id="sidebar-drawer" type="checkbox" class="drawer-toggle" />
@@ -15,6 +17,9 @@
 
       <%# Navbar %>
       <%= render 'layouts/top_menu' %>
+
+      <%# Page header strip (opzionale, configurato dalle singole view via content_for :page_header) %>
+      <%= yield(:page_header) if content_for?(:page_header) %>
 
       <%# Page content %>
       <div class="max-w-[1400px] mx-auto px-4 lg:px-8 py-6 lg:py-8 w-full">
@@ -41,5 +46,12 @@
   <div id="privacy_modal"></div>
   <div id="terms_modal"></div>
   <div id="message_modal"></div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      document.body.classList.remove('opacity-0');
+      document.body.classList.add('transition-opacity', 'duration-150');
+    });
+  </script>
 </body>
 </html>

@@ -178,6 +178,19 @@ class Alert < ApplicationRecord
       partial: "layouts/flash",
       locals: { flash: { notice: message } }
     )
+    # Aggiorna il badge count in real-time: +1 perché l'alert corrente è appena creato
+    # ma la query unread_alerts potrebbe non includerlo ancora (dipende dal timing after_commit)
+    unread_count = user.unread_alerts.count
+    badge_html = if unread_count > 0
+                   "<span id='notification_badge' class='indicator-item badge badge-error badge-xs'>#{unread_count}</span>"
+                 else
+                   "<span id='notification_badge' class='indicator-item badge badge-error badge-xs hidden'></span>"
+                 end
+    Turbo::StreamsChannel.broadcast_replace_to(
+      "notifications_#{user.id}",
+      target: "notification_badge",
+      html: badge_html
+    )
   rescue StandardError => e
     Rails.logger.error "Error broadcasting notification: #{e.message}"
   end

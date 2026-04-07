@@ -32,12 +32,42 @@
           <span class="is-drawer-close:hidden"><%= t('pages.sidebar.proposals', default: 'Proposte') %></span>
         <% end %>
       </li>
-      <li>
-        <%= link_to groups_path, class: "#{controller_name == 'groups' ? 'bg-primary text-primary-content font-semibold' : 'text-base-content/60 hover:bg-base-200 hover:text-base-content'} is-drawer-close:tooltip is-drawer-close:tooltip-right is-drawer-close:justify-center", "data-tip": t('pages.sidebar.groups', default: 'Gruppi') do %>
-          <i class="fa-solid fa-users w-6 text-center text-lg"></i>
-          <span class="is-drawer-close:hidden"><%= t('pages.sidebar.groups', default: 'Gruppi') %></span>
-        <% end %>
-      </li>
+      <% if current_user && current_user.groups.any? %>
+        <li data-controller="sidebar-menu"
+            data-sidebar-menu-open-value="<%= @group.present? ? 'true' : 'false' %>">
+          <button data-action="click->sidebar-menu#toggle"
+                  class="w-full <%= controller_name == 'groups' ? 'bg-primary text-primary-content font-semibold' : 'text-base-content/60 hover:bg-base-200 hover:text-base-content' %> flex items-center px-3 py-2 text-sm gap-2 is-drawer-close:justify-center is-drawer-close:tooltip is-drawer-close:tooltip-right"
+                  data-tip="<%= t('pages.sidebar.groups', default: 'Gruppi') %>">
+            <i class="fa-solid fa-users w-6 text-center text-lg shrink-0"></i>
+            <span class="is-drawer-close:hidden flex-1 text-left"><%= t('pages.sidebar.groups', default: 'Gruppi') %></span>
+            <i class="fa-solid fa-chevron-right text-xs is-drawer-close:hidden transition-transform duration-200"
+               data-sidebar-menu-target="arrow"></i>
+          </button>
+          <ul data-sidebar-menu-target="submenu"
+              style="max-height: 0; overflow: hidden; transition: max-height 0.25s ease;"
+              class="is-drawer-close:hidden pl-8 mt-0.5 space-y-0.5">
+            <% current_user.groups.limit(6).each do |g| %>
+              <li>
+                <%= link_to g.name, group_path(g),
+                    class: "block px-3 py-1.5 text-sm #{@group&.id == g.id ? 'text-primary font-semibold' : 'text-base-content/60 hover:bg-base-200 hover:text-base-content'} truncate" %>
+              </li>
+            <% end %>
+            <% if current_user.groups.count > 6 %>
+              <li>
+                <%= link_to t('pages.sidebar.all_groups', default: 'Tutti i gruppi →'), groups_path,
+                    class: 'block px-3 py-1.5 text-xs text-primary font-bold hover:underline' %>
+              </li>
+            <% end %>
+          </ul>
+        </li>
+      <% else %>
+        <li>
+          <%= link_to groups_path, class: "#{controller_name == 'groups' ? 'bg-primary text-primary-content font-semibold' : 'text-base-content/60 hover:bg-base-200 hover:text-base-content'} is-drawer-close:tooltip is-drawer-close:tooltip-right is-drawer-close:justify-center", "data-tip": t('pages.sidebar.groups', default: 'Gruppi') do %>
+            <i class="fa-solid fa-users w-6 text-center text-lg"></i>
+            <span class="is-drawer-close:hidden"><%= t('pages.sidebar.groups', default: 'Gruppi') %></span>
+          <% end %>
+        </li>
+      <% end %>
       <li>
         <%= link_to events_path, class: "#{controller_name == 'events' ? 'bg-primary text-primary-content font-semibold' : 'text-base-content/60 hover:bg-base-200 hover:text-base-content'} is-drawer-close:tooltip is-drawer-close:tooltip-right is-drawer-close:justify-center", "data-tip": t('pages.sidebar.events', default: 'Eventi') do %>
           <i class="fa-solid fa-calendar w-6 text-center text-lg"></i>

@@ -81,6 +81,22 @@ module ApplicationHelper
     [controller_name.camelcase, action_name.camelcase].join if response&.successful?
   end
 
+  # Renders a page header strip between the navbar and page content.
+  # Usage in views: <%= page_header(title: "My Page", description: "Optional subtitle") { cta_button } %>
+  def page_header(title:, description: nil, &block)
+    content_for :page_header do
+      tag.div(class: 'bg-base-100 border-b-2 border-base-content/15 px-4 lg:px-8 py-4') do
+        tag.div(class: 'max-w-[1400px] mx-auto flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3') do
+          concat(tag.div(class: 'space-y-0.5') do
+            concat tag.h1(title, class: 'text-lg sm:text-xl font-semibold')
+            concat tag.p(description, class: 'text-sm text-base-content/70') if description.present?
+          end)
+          concat capture(&block) if block
+        end
+      end
+    end
+  end
+
 
   def add_params(to_add = {})
     params.reject { |k, _v| %w[controller action].include? k }.merge to_add
