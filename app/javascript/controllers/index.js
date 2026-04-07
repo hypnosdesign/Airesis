@@ -42,3 +42,6 @@ application.register("chart", ChartController)
 
 import RightDrawerController from "./right_drawer_controller"
 application.register("right-drawer", RightDrawerController)
+
+import CalendarController from "./calendar_controller"
+application.register("calendar", CalendarController)

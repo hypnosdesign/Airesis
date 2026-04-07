@@ -1,2 +1,43 @@
 <% @extend = true %>
-<%= render partial: "calendar", locals: {group: @group} %>
+
+<%# Hero banner — ispirato a Cleopatra Dashboard (docs/dashboard_template/src/pages/apps/calendar.html) %>
+<div class="bg-primary text-primary-content p-6 lg:p-8 mb-6 border-2 border-base-content/15 relative overflow-hidden">
+  <div class="relative z-10 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+    <div>
+      <p class="text-[11px] font-bold tracking-widest text-primary-content/50 uppercase mb-2">
+        <%= @group ? @group.name : t('open_space') %>
+      </p>
+      <h1 class="text-2xl lg:text-3xl font-extrabold leading-tight">
+        <%= t('pages.events.index.title') %>
+      </h1>
+    </div>
+    <div class="flex items-center gap-2 shrink-0">
+      <% if @group %>
+        <% if can?(:create_any_event, @group) || can?(:create_event, @group) || can?(:create_date, @group) %>
+          <% event_type_id = can?(:create_event, @group) ? EventType::MEETING : EventType::VOTATION %>
+          <%= link_to new_group_event_url(@group, event_type_id: event_type_id),
+                      class: 'btn btn-sm bg-white/20 hover:bg-white/30 border-white/30 text-white font-bold gap-2' do %>
+            <i class="fa-solid fa-plus"></i>
+            <%= t('pages.calendar.create_event_button') %>
+          <% end %>
+        <% end %>
+        <%= link_to "http://www.google.com/calendar/render?cid=#{group_events_url(@group, format: :ics)}",
+                    target: '_blank',
+                    class: 'btn btn-sm bg-white/10 hover:bg-white/20 border-white/20 text-white gap-2',
+                    title: 'Esporta su Google Calendar' do %>
+          <i class="fa-brands fa-google"></i>
+          <span class="hidden sm:inline">Google Cal</span>
+        <% end %>
+      <% elsif is_admin? %>
+        <span class="btn btn-sm bg-white/10 border-white/20 text-white/50 font-bold gap-2 cursor-not-allowed">
+          <i class="fa-solid fa-plus"></i>
+          <%= t('pages.calendar.create_event_button') %>
+        </span>
+      <% end %>
+    </div>
+  </div>
+  <i class="fa-solid fa-calendar-days absolute -right-4 -bottom-4 text-[120px] text-primary-content/5"></i>
+</div>
+
+<%# Calendario — Cleopatra reference: docs/dashboard_template/src/pages/apps/calendar.html %>
+<%= render partial: "calendar", locals: { group: @group } %>
