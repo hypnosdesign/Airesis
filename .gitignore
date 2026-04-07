@@ -53,3 +53,6 @@ docs/
 CLAUDE.md
 DESIGNSYSTEM.md
 llms.md
+
+# Cookie jar curl (dati di sessione locali)
+cookie_jar

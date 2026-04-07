@@ -1,0 +1,4 @@
+--markup markdown
+--output-dir doc/
+app/**/*.rb
+lib/**/*.rb
