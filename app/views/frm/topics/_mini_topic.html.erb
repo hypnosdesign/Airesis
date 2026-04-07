@@ -1,12 +1,12 @@
-<div class="topic <%= cycle('odd', 'even') %> <%= topic.locked? ? 'locked' : 'unlocked' %>">
-  <div class="<%= icon_classes(topic) %>"></div>
-  <div class="byline topic-title">
+<div class="py-2 flex items-start gap-3 <%= topic.locked? ? 'opacity-60' : '' %>">
+  <div class="<%= topic.locked? ? 'bg-base-200 text-base-content/40' : 'bg-secondary/10 text-secondary' %> w-7 h-7 flex items-center justify-center shrink-0 mt-0.5">
+    <i class="fa-solid <%= topic.locked? ? 'fa-lock' : 'fa-comments' %> text-xs"></i>
+  </div>
+  <div class="flex-1 min-w-0">
     <%= new_since_last_view_text(topic) %>
-    <div class="subject">
-      <%= link_to topic.subject, group_forum_topic_url(topic.forum.group, topic.forum, topic) %>
-    </div>
-    <div class="started-by text-sm text-base-content/60">
-      <%= t('started_by') %> <%= relevant_posts(topic).first.user %>
-    </div>
+    <%= link_to topic.subject, group_forum_topic_url(topic.forum.group, topic.forum, topic), class: 'font-bold text-sm hover:text-primary truncate block' %>
+    <p class="text-[11px] text-base-content/40">
+      <%= t('started_by') %> <%= relevant_posts(topic).first&.user %>
+    </p>
   </div>
 </div>

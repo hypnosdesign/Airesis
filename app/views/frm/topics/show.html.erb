@@ -1,27 +1,52 @@
 <% @page_title = "#{@topic.subject} - #{@group.name}" %>
 <% @extend = true %>
 
+<%# ===== HERO BANNER ===== %>
+<div class="bg-primary text-primary-content p-6 lg:p-8 mb-6 border-2 border-base-content/15 relative overflow-hidden">
+  <div class="relative z-10">
+    <%# Breadcrumb %>
+    <div class="flex items-center gap-1 text-[11px] text-primary-content/50 mb-2 flex-wrap">
+      <%= link_to t('frm.forum.forums'), group_forums_url(@group), class: 'hover:text-primary-content/80' %>
+      <i class="fa-solid fa-chevron-right text-[8px]"></i>
+      <span><%= @forum.title %></span>
+    </div>
+    <h1 class="text-xl lg:text-2xl font-extrabold leading-tight mb-2"><%= @topic.subject %></h1>
+    <div class="flex flex-wrap items-center gap-3 text-[11px] text-primary-content/60">
+      <% if @topic.locked? %>
+        <span class="badge badge-sm font-bold bg-primary-content/20 border-0 text-primary-content">
+          <i class="fa-solid fa-lock mr-1"></i><%= t('frm.topics.show.lock.true', default: 'Bloccato') %>
+        </span>
+      <% end %>
+      <% if @topic.pinned? %>
+        <span class="badge badge-sm font-bold bg-primary-content/20 border-0 text-primary-content">
+          <i class="fa-solid fa-thumbtack mr-1"></i><%= t('frm.topics.show.pin.true', default: 'In evidenza') %>
+        </span>
+      <% end %>
+    </div>
+  </div>
+  <i class="fa-solid fa-comments absolute right-6 top-1/2 -translate-y-1/2 text-[7rem] text-primary-content/[0.06] hidden md:block"></i>
+</div>
+
 <div id="topic" class="<%= @topic.locked? ? 'locked' : 'unlocked' %>">
   <%= render partial: 'frm/topics/head', locals: { topic: @topic } %>
 
   <% if @topic.pending_review? %>
-    <div id="topic_moderation" class="moderation alert alert-warning mb-4">
-      <%= t("frm.topics.show.pending_review") %>
-      <% if forem_admin_or_moderator?(@topic.forum) %>
-        <%= form_for @topic, url: group_frm_moderate_forum_topic_url(@topic.forum, @topic), data: { turbo_method: :put } do |f| %>
-          <%= render "/frm/moderation/options", f: f %>
+    <div id="topic_moderation" class="bg-warning/10 border-2 border-warning p-4 mb-4 flex items-center gap-3">
+      <i class="fa-solid fa-triangle-exclamation text-warning"></i>
+      <div class="flex-1">
+        <%= t("frm.topics.show.pending_review") %>
+        <% if forem_admin_or_moderator?(@topic.forum) %>
+          <%= form_for @topic, url: group_frm_moderate_forum_topic_url(@topic.forum, @topic), data: { turbo_method: :put } do |f| %>
+            <%= render "/frm/moderation/options", f: f %>
+          <% end %>
         <% end %>
-      <% end %>
+      </div>
     </div>
   <% end %>
 
   <%= forem_pages_widget(@pagy) %>
 
-  <div class="topic_title mb-4">
-    <h2 class="text-xl font-bold"><%= @topic.subject %></h2>
-  </div>
-
-  <div id="posts" class="posts">
+  <div id="posts" class="posts space-y-0">
     <%= render partial: "frm/posts/post", collection: @posts %>
   </div>
 
@@ -29,18 +54,24 @@
 </div>
 
 <% content_for :left_panel do %>
-  <div class="card bg-base-200 p-4 mb-4">
-    <h4 class="font-bold mb-2"><%= t('frm.forum.topic_tools') %></h4>
+  <%# Topic tools %>
+  <div class="bg-base-100 border-2 border-base-content/15 p-4 mb-4">
+    <div class="flex items-center gap-3 mb-3">
+      <div class="bg-primary/10 text-primary w-7 h-7 flex items-center justify-center shrink-0">
+        <i class="fa-solid fa-wrench text-xs"></i>
+      </div>
+      <h4 class="font-bold text-sm"><%= t('frm.forum.topic_tools') %></h4>
+    </div>
     <div class="flex flex-col gap-2">
       <%= render 'proposals/new_proposal' %>
       <% if @topic.can_be_replied_to? && can?(:reply, @topic) %>
-        <%= link_to new_group_forum_topic_post_url(@group, @forum, @topic), class: "btn btn-sm disable", data: { disable_with: t('loading') } do %>
-          <i class="fa-solid fa-comments"></i>
+        <%= link_to new_group_forum_topic_post_url(@group, @forum, @topic), class: "btn btn-primary btn-sm font-bold disable", data: { disable_with: t('loading') } do %>
+          <i class="fa-solid fa-reply"></i>
           <%= t(".reply") %>
         <% end %>
       <% end %>
       <% if @topic.user == current_user || forem_admin?(@group) %>
-        <%= link_to group_forum_topic_url(@group, @forum, @topic), data: { turbo_method: :delete, turbo_confirm: t("are_you_sure") }, class: "btn btn-sm" do %>
+        <%= link_to group_forum_topic_url(@group, @forum, @topic), data: { turbo_method: :delete, turbo_confirm: t("are_you_sure") }, class: "btn btn-ghost btn-sm text-error font-bold" do %>
           <i class="fa-regular fa-trash-can"></i>
           <%= t(".delete") %>
         <% end %>
@@ -53,33 +84,47 @@
     </div>
   </div>
 
+  <%# Related proposals %>
   <% if @topic.proposals.count > 0 %>
-    <div class="card bg-base-200 p-4 mb-4">
-      <h4 class="font-bold mb-2"><%= t('.related_proposals') %></h4>
-      <% @topic.proposals.each do |proposal| %>
-        <%= proposal_tag proposal %>
-      <% end %>
+    <div class="bg-base-100 border-2 border-base-content/15 p-4 mb-4">
+      <div class="flex items-center gap-3 mb-3">
+        <div class="bg-secondary/10 text-secondary w-7 h-7 flex items-center justify-center shrink-0">
+          <i class="fa-solid fa-file-lines text-xs"></i>
+        </div>
+        <h4 class="font-bold text-sm"><%= t('.related_proposals') %></h4>
+      </div>
+      <div class="space-y-1">
+        <% @topic.proposals.each do |proposal| %>
+          <%= proposal_tag proposal %>
+        <% end %>
+      </div>
     </div>
   <% end %>
 
+  <%# Admin tools %>
   <% if forem_admin?(@group) %>
-    <div class="card bg-base-200 p-4 mb-4">
-      <h4 class="font-bold mb-2"><%= t('frm.forum.admin_tools') %></h4>
+    <div class="bg-base-100 border-2 border-base-content/15 p-4 mb-4">
+      <div class="flex items-center gap-3 mb-3">
+        <div class="bg-warning/10 text-warning w-7 h-7 flex items-center justify-center shrink-0">
+          <i class="fa-solid fa-crown text-xs"></i>
+        </div>
+        <h4 class="font-bold text-sm"><%= t('frm.forum.admin_tools') %></h4>
+      </div>
       <div class="flex flex-col gap-2">
-        <%= link_to edit_group_frm_admin_forum_topic_url(@group, @forum, @topic), class: "btn btn-sm" do %>
-          <i class="fa-solid fa-pencil"></i>
+        <%= link_to edit_group_frm_admin_forum_topic_url(@group, @forum, @topic), class: "btn btn-ghost btn-sm font-bold justify-start" do %>
+          <i class="fa-solid fa-pencil w-4"></i>
           <%= t('frm.topic.links.edit') %>
         <% end %>
-        <%= link_to toggle_hide_group_frm_admin_forum_topic_url(@group, @forum, @topic), data: { turbo_method: :put }, class: "btn btn-sm", data: { disable_with: t('loading') } do %>
-          <i class="fa-solid fa-eye-slash"></i>
+        <%= link_to toggle_hide_group_frm_admin_forum_topic_url(@group, @forum, @topic), data: { turbo_method: :put, disable_with: t('loading') }, class: "btn btn-ghost btn-sm font-bold justify-start" do %>
+          <i class="fa-solid fa-eye-slash w-4"></i>
           <%= t("frm.topics.show.hide.#{@topic.hidden}") %>
         <% end %>
-        <%= link_to toggle_lock_group_frm_admin_forum_topic_url(@group, @forum, @topic), data: { turbo_method: :put }, class: "btn btn-sm", data: { disable_with: t('loading') } do %>
-          <i class="fa-solid fa-lock"></i>
+        <%= link_to toggle_lock_group_frm_admin_forum_topic_url(@group, @forum, @topic), data: { turbo_method: :put, disable_with: t('loading') }, class: "btn btn-ghost btn-sm font-bold justify-start" do %>
+          <i class="fa-solid fa-lock w-4"></i>
           <%= t("frm.topics.show.lock.#{@topic.locked}") %>
         <% end %>
-        <%= link_to toggle_pin_group_frm_admin_forum_topic_url(@group, @forum, @topic), data: { turbo_method: :put }, class: "btn btn-sm", data: { disable_with: t('loading') } do %>
-          <i class="fa-solid fa-thumbtack"></i>
+        <%= link_to toggle_pin_group_frm_admin_forum_topic_url(@group, @forum, @topic), data: { turbo_method: :put, disable_with: t('loading') }, class: "btn btn-ghost btn-sm font-bold justify-start" do %>
+          <i class="fa-solid fa-thumbtack w-4"></i>
           <%= t("frm.topics.show.pin.#{@topic.pinned}") %>
         <% end %>
       </div>

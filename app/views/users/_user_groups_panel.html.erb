@@ -1,21 +1,31 @@
 <% if user_signed_in? %>
-  <div class="card bg-base-200 p-4">
-    <h4 class="font-bold mb-2"><%= t('pages.groups.index.groups_list') %></h4>
-    <div>
-      <% @groups = current_user.groups %>
-      <% if @groups.empty? %>
-        <%= raw t('pages.groups.index.no_groups_yet', name: (link_to t('group'), groups_path)) %>
-      <% end %>
-      <% @groups.each do |group| %>
-        <div class="flex items-center gap-2 mb-2 p-2 bg-base-300 rounded">
-          <div class="w-6">
-            <%= group.group_image_tag(24) rescue nil %>
-          </div>
-          <div>
-            <%= link_to group.name, group_url(group) %>
-          </div>
-        </div>
-      <% end %>
+  <div class="bg-base-100 border-2 border-base-content/15 p-4">
+    <div class="flex items-center gap-3 mb-3">
+      <div class="bg-accent/10 text-accent w-8 h-8 flex items-center justify-center shrink-0">
+        <i class="fa-solid fa-users text-sm"></i>
+      </div>
+      <h4 class="font-bold text-sm"><%= t('pages.groups.index.groups_list') %></h4>
     </div>
+    <% @groups = current_user.groups %>
+    <% if @groups.empty? %>
+      <p class="text-sm text-base-content/40 text-center py-2">
+        <%= raw t('pages.groups.index.no_groups_yet', name: (link_to t('group'), groups_path, class: 'text-primary font-bold hover:underline')) %>
+      </p>
+    <% else %>
+      <div class="divide-y divide-base-content/10">
+        <% @groups.each do |group| %>
+          <div class="py-2 flex items-center gap-3">
+            <div class="avatar placeholder">
+              <div class="bg-accent text-accent-content w-7 h-7 flex items-center justify-center">
+                <span class="text-xs font-bold"><%= group.name.first(2).upcase %></span>
+              </div>
+            </div>
+            <div class="flex-1 min-w-0">
+              <%= link_to group.name, group_url(group), class: 'font-bold text-sm hover:text-primary truncate block' %>
+            </div>
+          </div>
+        <% end %>
+      </div>
+    <% end %>
   </div>
 <% end %>

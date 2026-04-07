@@ -1,24 +1,68 @@
 <% @page_title = 'Pannello amministrazione' %>
+
+<%# ===== HERO BANNER ===== %>
+<div class="bg-primary text-primary-content p-6 lg:p-8 mb-6 border-2 border-base-content/15 relative overflow-hidden">
+  <div class="relative z-10">
+    <p class="text-[11px] font-bold tracking-widest text-primary-content/50 uppercase mb-2">Sistema</p>
+    <h1 class="text-2xl lg:text-3xl font-extrabold leading-tight mb-1">Pannello Amministrazione</h1>
+    <p class="text-primary-content/60 text-sm">Strumenti di gestione e manutenzione</p>
+  </div>
+  <i class="fa-solid fa-crown absolute right-6 top-1/2 -translate-y-1/2 text-[7rem] text-primary-content/[0.06] hidden md:block"></i>
+</div>
+
 <% if is_admin? %>
-  <div class="flex flex-wrap gap-2 mb-4">
-    <%= link_to 'Ricalcola ranking utenti', calculate_rankings_admin_panel_path, class: 'btn btn-sm' %>
-    <%= link_to 'Ricalcola stato proposte', change_proposals_state_admin_panel_path, class: 'btn btn-sm', title: 'Verifica lo stato di tutte le proposte in votazione. Se il temrine è scaduto e non sono state elaborate, le elabora' %>
-    <%= link_to 'Aggiorna sitemap', write_sitemap_admin_panel_path, class: 'btn btn-sm' %>
-    <%= link_to 'Cancella vecchie notifiche', delete_old_notifications_admin_panel_path, class: 'btn btn-sm' %>
-    <%= link_to 'Redis Test', test_redis_admin_panel_path, class: 'btn btn-sm' %>
-    <%= link_to 'Scheduler Test', test_scheduler_admin_panel_path, class: 'btn btn-sm' %>
-    <%= link_to 'Test exceptions', test_exceptions_admin_panel_path, class: 'btn btn-sm' %>
-    <%= link_to 'Calcola affinità Utenti-Gruppi', calculate_user_group_affinity_admin_panel_path, class: 'btn btn-sm' %>
+  <%# ===== SYSTEM ACTIONS ===== %>
+  <div class="bg-base-100 border-2 border-base-content/15 p-6 mb-6">
+    <div class="flex items-center gap-3 mb-4">
+      <div class="bg-primary/10 text-primary w-8 h-8 flex items-center justify-center shrink-0">
+        <i class="fa-solid fa-bolt text-sm"></i>
+      </div>
+      <div>
+        <h2 class="font-bold text-sm">Azioni di sistema</h2>
+        <p class="text-[11px] text-base-content/40">Operazioni di manutenzione e ricalcolo</p>
+      </div>
+    </div>
+    <div class="flex flex-wrap gap-2">
+      <%= link_to 'Ricalcola ranking utenti', calculate_rankings_admin_panel_path, class: 'btn btn-outline btn-sm font-bold' %>
+      <%= link_to 'Ricalcola stato proposte', change_proposals_state_admin_panel_path, class: 'btn btn-outline btn-sm font-bold', title: 'Verifica lo stato di tutte le proposte in votazione. Se il termine è scaduto e non sono state elaborate, le elabora' %>
+      <%= link_to 'Aggiorna sitemap', write_sitemap_admin_panel_path, class: 'btn btn-outline btn-sm font-bold' %>
+      <%= link_to 'Cancella vecchie notifiche', delete_old_notifications_admin_panel_path, class: 'btn btn-outline btn-sm font-bold' %>
+      <%= link_to 'Calcola affinità Utenti-Gruppi', calculate_user_group_affinity_admin_panel_path, class: 'btn btn-outline btn-sm font-bold' %>
+    </div>
   </div>
 
-  <div class="card bg-base-200 p-4 mb-4">
-    <h3 class="text-lg font-bold mb-2">Alert Test</h3>
-    <%= form_tag "/admin/test_notification/" do %>
-      <%= label_tag 'Alert ID' %>
-      <%= text_field_tag 'alert_id', nil, class: 'input input-bordered w-full max-w-xs' %>
-      <%= submit_tag 'Send', class: 'btn btn-sm mt-2' %>
-    <% end %>
+  <%# ===== DEBUG / TEST ===== %>
+  <div class="bg-base-100 border-2 border-base-content/15 p-6 mb-6">
+    <div class="flex items-center gap-3 mb-4">
+      <div class="bg-warning/10 text-warning w-8 h-8 flex items-center justify-center shrink-0">
+        <i class="fa-solid fa-bug text-sm"></i>
+      </div>
+      <div>
+        <h2 class="font-bold text-sm">Debug & Test</h2>
+        <p class="text-[11px] text-base-content/40">Strumenti di diagnostica</p>
+      </div>
+    </div>
+    <div class="flex flex-wrap gap-2 mb-6">
+      <%= link_to 'Redis Test', test_redis_admin_panel_path, class: 'btn btn-outline btn-sm font-bold' %>
+      <%= link_to 'Scheduler Test', test_scheduler_admin_panel_path, class: 'btn btn-outline btn-sm font-bold' %>
+      <%= link_to 'Test exceptions', test_exceptions_admin_panel_path, class: 'btn btn-outline btn-sm font-bold' %>
+    </div>
+
+    <%# Alert test %>
+    <div class="border-t border-base-content/10 pt-4">
+      <h4 class="font-bold text-sm mb-3">Test Notifica</h4>
+      <%= form_tag "/admin/test_notification/" do %>
+        <div class="flex gap-2 items-end">
+          <div class="flex-1 max-w-xs">
+            <%= label_tag 'alert_id', 'Alert ID', class: 'label label-text text-xs font-bold' %>
+            <%= text_field_tag 'alert_id', nil, class: 'input input-bordered w-full input-sm' %>
+          </div>
+          <%= submit_tag 'Invia', class: 'btn btn-primary btn-sm font-bold' %>
+        </div>
+      <% end %>
+    </div>
   </div>
 
+  <%# ===== BLOCK USERS ===== %>
   <%= render 'admin/block_users' %>
 <% end %>

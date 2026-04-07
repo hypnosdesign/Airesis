@@ -1,14 +1,36 @@
-<tr class="topic <%= cycle('odd', 'even') %> <%= topic.locked? ? 'locked' : 'unlocked' %>">
-  <td class="<%= icon_classes(topic) %>"></td>
-  <td class="byline topic-title">
-    <div class="subject">
-      <%= link_to topic.subject, group_forum_topic_url(@group, @forum, topic) %>
+<div class="px-4 py-3 flex flex-col sm:flex-row sm:items-center gap-3 <%= topic.locked? ? 'opacity-60' : '' %>">
+  <%# Status icon + title %>
+  <div class="flex items-start gap-3 flex-1 min-w-0">
+    <div class="w-8 h-8 flex items-center justify-center shrink-0 mt-0.5 <%= topic.locked? ? 'bg-base-300 text-base-content/40' : 'bg-secondary/10 text-secondary' %>">
+      <% if topic.locked? %>
+        <i class="fa-solid fa-lock text-xs"></i>
+      <% else %>
+        <i class="fa-solid fa-comments text-xs"></i>
+      <% end %>
     </div>
-    <div class="started-by text-sm text-base-content/60">
-      <%= t("started_by") %> <%= relevant_posts(topic).first.user %>
+    <div class="flex-1 min-w-0">
+      <%= new_since_last_view_text(topic) %>
+      <%= link_to topic.subject, group_forum_topic_url(@group, @forum, topic), class: "font-bold text-sm hover:text-primary" %>
+      <p class="text-[11px] text-base-content/40">
+        <%= t("started_by") %> <%= relevant_posts(topic).first&.user %>
+      </p>
     </div>
-  </td>
-  <td class="posts-count text-center"><%= relevant_posts(topic).count %></td>
-  <td class="views-count text-center"><%= topic.views_count %></td>
-  <td class="latest-post"><%= link_to_latest_post(topic) %></td>
-</tr>
+  </div>
+
+  <%# Stats %>
+  <div class="flex items-center gap-4 text-xs text-base-content/40 shrink-0 pl-11 sm:pl-0">
+    <span class="flex items-center gap-1">
+      <i class="fa-regular fa-file-lines"></i>
+      <span><%= relevant_posts(topic).count %></span>
+    </span>
+    <span class="flex items-center gap-1">
+      <i class="fa-regular fa-eye"></i>
+      <span><%= topic.views_count %></span>
+    </span>
+  </div>
+
+  <%# Latest post %>
+  <div class="text-xs text-base-content/40 shrink-0 pl-11 sm:pl-0 sm:min-w-[140px] sm:max-w-[180px]">
+    <%= link_to_latest_post(topic) %>
+  </div>
+</div>

@@ -1,23 +1,48 @@
-<div class="card bg-base-200 p-4 mb-4">
-  <h3 class="text-lg font-bold mb-2">Lock users</h3>
-  <%= form_tag block_admin_users_path do %>
-    <%= label_tag 'Blocca utente' %>
-    <%= text_field_tag 'user_id', nil, class: 'input input-bordered w-full max-w-xs' %>
-    <%= submit_tag 'Vai!', class: 'btn btn-primary btn-sm mt-2' %>
-  <% end %>
-</div>
+<div class="bg-base-100 border-2 border-base-content/15 p-6 mb-6">
+  <div class="flex items-center gap-3 mb-4">
+    <div class="bg-error/10 text-error w-8 h-8 flex items-center justify-center shrink-0">
+      <i class="fa-solid fa-ban text-sm"></i>
+    </div>
+    <div>
+      <h2 class="font-bold text-sm">Gestione Utenti Bloccati</h2>
+      <p class="text-[11px] text-base-content/40">Blocca o sblocca utenti per ID</p>
+    </div>
+  </div>
 
-<div class="card bg-base-200 p-4">
-  <h3 class="text-lg font-bold mb-2">Elenco utenti bloccati</h3>
-  <ul class="list-disc pl-4">
-    <% User.blocked.each do |user| %>
-      <li class="mb-1">
-        <%= link_to "#{user.id}: #{user.blocked_name} #{user.blocked_surname} (#{user.email})", user %>
-        <%= link_to unblock_admin_user_path(user), class: 'btn btn-sm btn-ghost' do %>
-          <i class="fa-solid fa-unlock"></i>
-          <%= t('buttons.unlock') %>
+  <%# Block form %>
+  <%= form_tag block_admin_users_path do %>
+    <div class="flex gap-2 items-end mb-6">
+      <div class="flex-1 max-w-xs">
+        <%= label_tag 'user_id', 'ID Utente', class: 'label label-text text-xs font-bold' %>
+        <%= text_field_tag 'user_id', nil, class: 'input input-bordered w-full input-sm', placeholder: 'es. 42' %>
+      </div>
+      <%= submit_tag 'Blocca', class: 'btn btn-error btn-sm font-bold' %>
+    </div>
+  <% end %>
+
+  <%# Blocked users list %>
+  <% blocked = User.blocked %>
+  <% if blocked.any? %>
+    <div class="border-t border-base-content/10 pt-4">
+      <h4 class="font-bold text-sm mb-3">Utenti bloccati (<%= blocked.count %>)</h4>
+      <div class="divide-y divide-base-content/10">
+        <% blocked.each do |user| %>
+          <div class="py-2 flex items-center justify-between gap-3">
+            <div class="flex-1 min-w-0">
+              <%= link_to "#{user.id}: #{user.blocked_name} #{user.blocked_surname}", user, class: 'font-bold text-sm hover:text-primary' %>
+              <p class="text-[11px] text-base-content/40"><%= user.email %></p>
+            </div>
+            <%= link_to unblock_admin_user_path(user), class: 'btn btn-ghost btn-xs text-success font-bold shrink-0' do %>
+              <i class="fa-solid fa-unlock"></i>
+              <%= t('buttons.unlock') %>
+            <% end %>
+          </div>
         <% end %>
-      </li>
-    <% end %>
-  </ul>
+      </div>
+    </div>
+  <% else %>
+    <div class="border-t border-base-content/10 pt-4 text-center">
+      <p class="text-sm text-base-content/40"><i class="fa-solid fa-check-circle mr-1 text-success"></i> Nessun utente bloccato</p>
+    </div>
+  <% end %>
 </div>

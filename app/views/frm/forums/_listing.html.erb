@@ -1,14 +1,3 @@
-<table id="forums" class="table forums table-striped" cellspacing="0">
-  <thead>
-    <tr>
-      <th class="desc"><%= t('forum', scope: 'frm.general') %></th>
-      <th class="topics-count"><%= t('topics', scope: 'frm.general') %></th>
-      <th class="posts-count"><%= t('posts', scope: 'frm.general') %></th>
-      <th class="views-count"><%= t('frm.forums.index.views') %></th>
-      <th class="last-post"><%= t('last_post') %></th>
-    </tr>
-  </thead>
-  <tbody>
-    <%= render category.forums %>
-  </tbody>
-</table>
+<div class="bg-base-100 border-2 border-base-content/15 divide-y divide-base-content/10 mb-4">
+  <%= render category.forums %>
+</div>

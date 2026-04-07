@@ -5,25 +5,16 @@
   <%= render partial: 'frm/forums/head', locals: { forum: @forum } %>
   <%= forem_pages_widget(@pagy) %>
 
-  <table class="table topics table-striped" cellspacing="0">
-    <thead>
-      <tr>
-        <th class="icon"></th>
-        <th class="byline topic-title"><%= t('frm.topic.headings.topic') %></th>
-        <th class="posts-count"><%= t('frm.topic.headings.posts') %></th>
-        <th class="views-count"><%= t('frm.topic.headings.views') %></th>
-        <th class="latest-post"><%= t('frm.topic.headings.latest') %></th>
-      </tr>
-    </thead>
-    <tbody>
-      <% if @topics.empty? %>
-        <tr>
-          <td colspan="5" align="center"><%= t('frm.topic.none') %></td>
-        </tr>
-      <% end %>
+  <% if @topics.empty? %>
+    <div class="bg-base-100 border-2 border-base-content/15 p-8 text-center">
+      <i class="fa-solid fa-comments text-4xl text-base-content/20 mb-3"></i>
+      <p class="text-sm text-base-content/40"><%= t('frm.topic.none') %></p>
+    </div>
+  <% else %>
+    <div class="bg-base-100 border-2 border-base-content/15 divide-y divide-base-content/10">
       <%= render @topics %>
-    </tbody>
-  </table>
+    </div>
+  <% end %>
 
   <%= forem_pages_widget(@pagy) %>
 </div>

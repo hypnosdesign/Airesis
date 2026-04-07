@@ -1,10 +1,16 @@
-<div class="title">
-  <%= t('pages.groups.show.last_topics') %>
+<div class="flex items-center gap-2 mb-3">
+  <div class="bg-secondary/10 text-secondary w-7 h-7 flex items-center justify-center shrink-0">
+    <i class="fa-solid fa-comments text-xs"></i>
+  </div>
+  <h4 class="font-bold text-sm"><%= t('pages.groups.show.last_topics') %></h4>
 </div>
 <% if @last_topics.size > 0 %>
-  <div class="scrollable">
-    <div class="mini_topics">
-      <%= render partial: 'frm/topics/mini_topic', collection: @last_topics, as: 'topic' %>
-    </div>
+  <div class="divide-y divide-base-content/10">
+    <%= render partial: 'frm/topics/mini_topic', collection: @last_topics, as: 'topic' %>
   </div>
+<% else %>
+  <p class="text-sm text-base-content/40 text-center py-2">
+    <i class="fa-solid fa-inbox mr-1"></i>
+    <%= t('home.portlets.topics.empty', default: 'Nessuna discussione recente') %>
+  </p>
 <% end %>

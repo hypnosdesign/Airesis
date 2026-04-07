@@ -1,25 +1,40 @@
 <% if can?(:read, forum) %>
-  <tr class="forum <%= cycle("odd", "even") %>">
-    <td class="forum-description">
-      <%= link_to forum.title, group_forum_url(@group, forum), class: "title font-semibold" %>
-      <div class="description text-sm text-base-content/60"><%= forem_format(forum.description) %></div>
-    </td>
-    <td class="topics-count text-center"><%= topics_count(forum) %></td>
-    <td class="posts-count text-center"><%= posts_count(forum) %></td>
-    <td class="views-count text-center"><%= forum.views_count %></td>
-    <td class="last-post">
-      <span class="last_post text-sm">
-        <% if last_post = forum.last_post_for(current_user) %>
-          <%= link_to(last_post.topic.subject, group_forum_topic_url(@group, forum, last_post.topic)) %>
-          <%= t('by') %> <%= last_post.user %>
-          <br>
-          <time datetime="<%= last_post.created_at.to_s(:db) %>">
-            <%= "#{time_ago_in_words(last_post.created_at)}" %>
-          </time>
-        <% else %>
-          <%= t('frm.forums.index.none') %>
+  <div class="px-4 py-3 flex flex-col sm:flex-row sm:items-center gap-3">
+    <%# Icon + title + description %>
+    <div class="flex items-start gap-3 flex-1 min-w-0">
+      <div class="bg-primary/10 text-primary w-9 h-9 flex items-center justify-center shrink-0 mt-0.5">
+        <i class="fa-solid fa-comments text-sm"></i>
+      </div>
+      <div class="flex-1 min-w-0">
+        <%= link_to forum.title, group_forum_url(@group, forum), class: "font-bold text-sm hover:text-primary" %>
+        <% if forum.description.present? %>
+          <p class="text-[11px] text-base-content/40 truncate"><%= forem_format(forum.description) %></p>
         <% end %>
+      </div>
+    </div>
+
+    <%# Stats %>
+    <div class="flex items-center gap-4 text-xs text-base-content/40 shrink-0 pl-12 sm:pl-0">
+      <span class="flex items-center gap-1">
+        <i class="fa-solid fa-comments"></i>
+        <span><%= topics_count(forum) %></span>
       </span>
-    </td>
-  </tr>
+      <span class="flex items-center gap-1">
+        <i class="fa-regular fa-file-lines"></i>
+        <span><%= posts_count(forum) %></span>
+      </span>
+      <span class="flex items-center gap-1">
+        <i class="fa-regular fa-eye"></i>
+        <span><%= forum.views_count %></span>
+      </span>
+    </div>
+
+    <%# Last post %>
+    <% if last_post = forum.last_post_for(current_user) %>
+      <div class="text-xs text-base-content/40 shrink-0 pl-12 sm:pl-0 min-w-0 sm:max-w-[200px]">
+        <%= link_to last_post.topic.subject, group_forum_topic_url(@group, forum, last_post.topic), class: 'text-primary hover:underline truncate block' %>
+        <span><%= t('by') %> <%= last_post.user %> &middot; <%= time_ago_in_words(last_post.created_at) %> fa</span>
+      </div>
+    <% end %>
+  </div>
 <% end %>
