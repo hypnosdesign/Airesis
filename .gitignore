@@ -48,3 +48,8 @@ config/credentials/*.key
 
 # YARD output
 docs/
+
+# File locali di sviluppo/AI
+CLAUDE.md
+DESIGNSYSTEM.md
+llms.md
