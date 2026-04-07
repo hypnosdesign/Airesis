@@ -69,10 +69,14 @@
   <div id="message_modal"></div>
 
   <script>
-    document.addEventListener('DOMContentLoaded', function() {
+    function revealBody() {
       document.body.classList.remove('opacity-0');
       document.body.classList.add('transition-opacity', 'duration-150');
-    });
+    }
+    // DOMContentLoaded: primo caricamento pagina
+    document.addEventListener('DOMContentLoaded', revealBody);
+    // turbo:load: ogni navigazione Turbo Drive (body viene sostituito e opacity-0 ripristinato)
+    document.addEventListener('turbo:load', revealBody);
   </script>
 </body>
 </html>
