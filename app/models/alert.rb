@@ -180,7 +180,7 @@ class Alert < ApplicationRecord
     )
     # Aggiorna il badge count in real-time: +1 perché l'alert corrente è appena creato
     # ma la query unread_alerts potrebbe non includerlo ancora (dipende dal timing after_commit)
-    unread_count = user.unread_alerts.count
+    unread_count = Alert.unscoped.where(user_id: user.id, checked: false).count
     badge_html = if unread_count > 0
                    "<span id='notification_badge' class='indicator-item badge badge-error badge-xs'>#{unread_count}</span>"
                  else

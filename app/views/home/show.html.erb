@@ -19,7 +19,7 @@
   voting_proposals = Proposal.votation_portlet(current_user)
   user_groups = current_user.groups
   user_topics = @user.viewed_topics.order('created_at desc').limit(10)
-  unread_notifications = current_user.unread_alerts.count
+  unread_notifications = Alert.unscoped.where(user_id: current_user.id, checked: false).count
 %>
 <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-6">
   <div class="bg-base-100 p-4 flex items-center gap-4 border-2 border-base-content/15">
