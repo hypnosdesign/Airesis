@@ -1,3 +1,13 @@
+# Un gruppo è la comunità di base di Airesis: raccoglie utenti, proposte, eventi, forum e blog.
+#
+# I gruppi possono essere pubblici o privati (`private = true`).
+# Ogni gruppo ha almeno un portavoce (ruolo admin), un quorum di default e un forum.
+#
+# La membership è gestita tramite `GroupParticipation` con `ParticipationRole` configurabile.
+# Le richieste di adesione seguono la policy definita da `accept_requests`:
+#   - {REQ_BY_PORTAVOCE} — approvate dal portavoce
+#   - {REQ_BY_VOTE} — approvate per voto
+#   - {REQ_BY_BOTH} — approvate da entrambi
 class Group < ApplicationRecord
   extend FriendlyId
   include Taggable
@@ -17,12 +27,19 @@ class Group < ApplicationRecord
   has_rich_text :rule_book
 
   include ImageHelper
+
+  # == Constants
+
+  # Valori per il campo `accept_requests`: definisce chi approva le richieste di adesione.
   REQ_BY_PORTAVOCE = 'p'.freeze
   REQ_BY_VOTE = 'v'.freeze
   REQ_BY_BOTH = 'b'.freeze
 
+  # Valori per il campo `status`: usati da `CalculateGroupStatistics` worker.
   STATUS_ACTIVE = 'active'.freeze
   STATUS_FEW_USERS_A = 'few_users_a'.freeze
+
+  # == Validations
 
   validates :name, presence: true, uniqueness: true, length: { within: 3..60 }
 
@@ -35,11 +52,14 @@ class Group < ApplicationRecord
   attr_reader :participant_tokens
   attr_accessor :default_role_name, :default_role_actions, :current_user_id
 
+  # == Associations
+
   has_many :group_follows, class_name: 'GroupFollow', dependent: :destroy
   has_many :post_publishings, class_name: 'PostPublishing', inverse_of: :group, dependent: :destroy
 
   has_many :group_participations, class_name: 'GroupParticipation', dependent: :destroy
   has_many :participants, through: :group_participations, source: :user, class_name: 'User'
+  # I "portavoce" sono gli utenti con ruolo admin del gruppo — hanno tutti i permessi di moderazione.
   has_many :portavoce, -> { where(['group_participations.participation_role_id = ?', ParticipationRole.admin.id]) }, through: :group_participations, source: :user, class_name: 'User'
 
   has_many :followers, through: :group_follows, source: :user, class_name: 'User'
@@ -94,11 +114,19 @@ class Group < ApplicationRecord
                     content_type: ['image/jpeg', 'image/png', 'image/gif']
 
 
+  # == Scopes
+
+  # Filtra gruppi per territorio usando l'array PostgreSQL `derived_interest_borders_tokens`.
+  # Usa l'operatore `@>` (contains) per trovare gruppi il cui territorio include `ib` o suoi antenati.
   scope :by_interest_border, ->(ib) { where('derived_interest_borders_tokens @> ARRAY[?]::varchar[]', ib) }
+
+  # == Callbacks
 
   before_create :pre_populate
   after_create :after_populate
 
+  # Crea la directory privata per elfinder (file manager) dopo ogni commit, non solo al create.
+  # L'after_commit garantisce che la directory esista anche se il record è già presente in DB.
   after_commit :create_folder
 
   before_save :normalize_blank_values
@@ -109,14 +137,22 @@ class Group < ApplicationRecord
     end
   end
 
+  # == Instance Methods
+
+  # Inizializza il gruppo prima della creazione:
+  # - aggiunge il creatore come portavoce (admin)
+  # - copia tutti i quorum pubblici visibili come quorum privati del gruppo
+  # - crea il ruolo di partecipazione di default con i permessi specificati dall'utente
+  #
+  # I quorum vengono duplicati (non condivisi) per permettere al gruppo di modificarli indipendentemente.
   def pre_populate
-    # creator is also administrator
+    # Il creatore diventa automaticamente portavoce e il suo ingresso è pre-approvato (status_id = 3)
     participation_requests.build(user_id: current_user_id, group_participation_request_status_id: 3)
-    group_participations.build(user_id: current_user_id, participation_role: ParticipationRole.admin) # portavoce
+    group_participations.build(user_id: current_user_id, participation_role: ParticipationRole.admin)
 
     BestQuorum.visible.each do |quorum|
       copy = quorum.dup
-      copy.public = false
+      copy.public = false # i quorum del gruppo sono sempre privati
       copy.save!
       group_quorums.build(quorum_id: copy.id)
     end
@@ -129,15 +165,20 @@ class Group < ApplicationRecord
     self.max_storage_size = UPLOAD_LIMIT_GROUPS / 1024
   end
 
+  # Post-create: assegna il group_id al ruolo di default e crea i forum iniziali.
+  # L'`after_create` è necessario perché in `pre_populate` (before_create) il gruppo non ha ancora un ID.
+  # Crea sempre un forum privato (solo partecipanti) e uno pubblico (visibile fuori dal gruppo).
   def after_populate
+    # Il group_id non era disponibile nel before_create, va impostato qui
     default_participation_role.update_attribute(:group_id, id)
 
-    # create default forums
+    # Forum privato: discussioni interne riservate ai partecipanti
     private = categories.create(name: I18n.t('frm.admin.categories.default_private'), visible_outside: false)
     private_f = private.forums.build(name: I18n.t('frm.admin.forums.default_private'), description: I18n.t('frm.admin.forums.default_private_description'), visible_outside: false)
     private_f.group = self
     private_f.save!
 
+    # Forum pubblico: discussioni visibili anche agli utenti non iscritti al gruppo
     public = categories.create(name: I18n.t('frm.admin.categories.default_public'))
     public_f = public.forums.create(name: I18n.t('frm.admin.forums.default_public'), description: I18n.t('frm.admin.forums.default_public_description'))
     public_f.group = self
@@ -155,7 +196,12 @@ class Group < ApplicationRecord
     private
   end
 
-  # utenti che possono eseguire un'azione
+  # Utenti del gruppo che hanno il permesso per una specifica azione.
+  # Le azioni sono colonne boolean in `participation_roles` (es. `participate_proposals`, `vote_proposals`).
+  # Usato per calcolare le `valutations` del quorum e il conteggio degli elettori eleggibili.
+  #
+  # @param action [Symbol, String] nome della colonna in `participation_roles` (es. `:vote_proposals`)
+  # @return [ActiveRecord::Relation<User>]
   def scoped_participants(action)
     participants.
       joins('JOIN participation_roles on group_participations.participation_role_id = participation_roles.id').
@@ -171,10 +217,13 @@ class Group < ApplicationRecord
     interest_border_token
   end
 
+  # Imposta il confine di interesse dal token UI nel formato 'X-id' (es. 'C-123' = comune 123).
+  # Ricostruisce `derived_interest_borders_tokens` risalendo la gerarchia geografica.
+  # Il token viene memorizzato sia come stringa (`interest_border_token`) sia come FK (`interest_border_id`).
   def interest_border_tkn=(tkn)
     if tkn.present?
-      ftype = tkn[0, 1] # tipologia (primo carattere)
-      fid = tkn[2..] # chiave primaria (dal terzo all'ultimo carattere)
+      ftype = tkn[0, 1] # tipo di territorio: primo carattere del token (C=comune, P=provincia, N=nazione...)
+      fid = tkn[2..] # ID del territorio: tutto ciò che segue il separatore '-'
       found = InterestBorder.table_element(tkn)
       if found # se ho trovato qualcosa, allora l'identificativo è corretto e posso procedere alla creazione del confine di interesse
         self.interest_border_token = tkn
@@ -202,6 +251,12 @@ class Group < ApplicationRecord
     accept_requests == REQ_BY_BOTH
   end
 
+  # Ricerca gruppi con supporto per tag, full-text (pg_search) e filtro territoriale.
+  # Se `params[:and]` è false usa la modalità `any_word` (OR tra i termini).
+  # Se `params[:area]` è presente filtra per territorio derivato, altrimenti per token esatto.
+  #
+  # @param params [Hash] parametri di ricerca: :search, :tag, :interest_border, :area, :and
+  # @return [ActiveRecord::Relation<Group>]
   def self.look(params)
     query = params[:search]
     params[:and] = params[:and].nil? || params[:and]
@@ -226,6 +281,12 @@ class Group < ApplicationRecord
     end
   end
 
+  # Gruppi più attivi per numero di partecipanti, opzionalmente filtrati per territorio.
+  # Usato per le widget di homepage e portlet territoriali.
+  #
+  # @param territory [InterestBorder, nil] se presente, filtra per territorio derivato
+  # @param limit [Integer] numero massimo di risultati (default: 5)
+  # @return [ActiveRecord::Relation<Group>]
   def self.most_active(territory = nil, limit: 5)
     groups = Group.includes(interest_border: :territory)
     groups = groups.by_interest_border(InterestBorder.to_key(territory)) if territory.present?

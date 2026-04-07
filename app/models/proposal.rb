@@ -1,16 +1,31 @@
+# Entità centrale della piattaforma: una proposta deliberativa, una petizione o un sondaggio.
+#
+# Il ciclo di vita è gestito tramite stati (`ProposalState`):
+#   VALUTATION → WAIT_DATE → WAIT → VOTING → ACCEPTED | REJECTED
+#   VALUTATION → ABANDONED (se il quorum di dibattito non è soddisfatto)
+#
+# Il sistema di voto supporta tre modalità (`proposal_votation_type_id`):
+#   - `standard` — voto binario positivo/negativo/neutro
+#   - `preference` — preferenza tra soluzioni
+#   - `schulze` — metodo Schulze (ranking ordinale tra N soluzioni)
+#
+# Le proposte possono essere pubbliche (open space) o private (dentro un gruppo).
+# Le petizioni (proposal_type_id = 11) hanno un flusso semplificato senza quorum.
 class Proposal < ApplicationRecord
   include Taggable
   include ProposalBuildable
   include Frm::Concerns::Viewable
   include ProposalSearchable
 
+  # == Associations
+
   belongs_to :state, class_name: 'ProposalState', foreign_key: :proposal_state_id
   belongs_to :category, class_name: 'ProposalCategory', foreign_key: :proposal_category_id
   belongs_to :vote_period, class_name: 'Event', foreign_key: :vote_period_id, optional: true # attached when is decided
   belongs_to :vote_event, class_name: 'Event', foreign_key: :vote_event_id, optional: true # attached when the proposal is created
 
-  # can't move tags before proposal_presentations because these are necessary when creating the tags
-  # can't add dependent_destroy to presentations because tags must be destroyed before
+  # L'ordine DESC è intenzionale: proposal_presentations.first restituisce il presentatore principale.
+  # Non usare dependent: :destroy qui — i tags devono essere distrutti prima delle presentations.
   has_many :proposal_presentations, -> { order 'id DESC' }, class_name: 'ProposalPresentation', inverse_of: :proposal
   has_many :users, through: :proposal_presentations, class_name: 'User', inverse_of: :proposals
   has_many :proposal_tags, class_name: 'ProposalTag', dependent: :destroy
@@ -31,6 +46,7 @@ class Proposal < ApplicationRecord
   has_many :contributes, -> { where(parent_proposal_comment_id: nil) },
            class_name: 'ProposalComment', dependent: :destroy
   has_many :rankings, class_name: 'ProposalRanking', dependent: :destroy
+  # ranking_type_id = 1 → voto positivo ("supporto"). Gli altri tipi (2=neutro, 3=negativo) sono usati solo nelle statistiche.
   has_many :positive_rankings, -> { where(['ranking_type_id = 1']) }, class_name: 'ProposalRanking'
 
   has_many :proposal_lives, -> { order 'proposal_lives.created_at DESC' },
@@ -89,7 +105,9 @@ class Proposal < ApplicationRecord
   accepts_nested_attributes_for :sections, allow_destroy: true
   accepts_nested_attributes_for :solutions, allow_destroy: true
 
-  # tutte le proposte 'attive'. sono attive le proposte dalla  fase di valutazione fino a quando non vengono accettate o respinte
+  # == Scopes
+
+  # Tutte le proposte 'attive': dalla fase di valutazione fino a quando non vengono accettate o respinte.
   scope :current, lambda {
     where(proposal_state_id: [ProposalState::VALUTATION,
                               ProposalState::WAIT_DATE,
@@ -100,7 +118,8 @@ class Proposal < ApplicationRecord
   scope :in_valutation, -> { where(proposal_state_id: ProposalState::VALUTATION) }
   # tutte le proposte in attesa di votazione o attualmente in votazione
 
-  # retrieve proposals in a state before votation, exclude petitions
+  # Proposte in fase pre-voto, escludendo le petizioni.
+  # proposal_type_id = 11 è la petizione — ha un flusso senza quorum, non deve comparire nei portlet standard.
   scope :before_votation,
         lambda {
           where(['proposal_state_id in (?) and proposal_type_id != ?', [ProposalState::VALUTATION,
@@ -137,6 +156,8 @@ class Proposal < ApplicationRecord
 
   scope :by_interest_borders, ->(ib) { where('proposals.derived_interest_borders_tokens @> ARRAY[?]::varchar[]', ib) }
 
+  # == Callbacks
+
   after_initialize :init
 
   before_validation :before_create_populate, on: :create
@@ -148,14 +169,19 @@ class Proposal < ApplicationRecord
 
   before_update :before_update_populate
 
-  # fix to delete relations properly
+  # Le presentations devono essere distrutte esplicitamente prima del record principale
+  # perché `dependent: :destroy` è omesso (vedi associazione) per preservare l'ordine di distruzione dei tags.
   before_destroy :destroy_presentations
 
   after_destroy :remove_scheduled_tasks
 
-  # updates the content of the short_content field which is displayed in the lists
+  # Mantiene `short_content` sincronizzato ad ogni salvataggio per evitare query aggiuntive nei listing.
   after_validation :update_short_content
 
+  # == Instance Methods
+
+  # Inizializza i valori di default per i nuovi record.
+  # Viene chiamato da `after_initialize`, quindi anche per record già persistiti — usare `nil?` per non sovrascrivere.
   def init
     self.anonima = (is_petition? ? false : DEFAULT_ANONIMA) if anonima.nil?
     self.visible_outside = true if visible_outside.nil?
@@ -164,6 +190,13 @@ class Proposal < ApplicationRecord
     self.proposal_votation_type_id ||= :standard
   end
 
+  # == Class Methods
+
+  # Subquery Arel che conta gli alert non letti per una proposta per l'utente dato.
+  # Viene usata come colonna virtuale (`AS alerts_count`) nelle query dei portlet per evitare N+1.
+  #
+  # @param user_id [Integer] ID dell'utente; passare -1 per utenti non autenticati (nessun alert)
+  # @return [Arel::SelectManager] subquery correlata da includere in un `select`
   def self.alerts_count_subquery(user_id)
     alerts = Alert.arel_table
     proposals = Proposal.arel_table
@@ -175,6 +208,11 @@ class Proposal < ApplicationRecord
             and(alerts[:checked].eq(false)))
   end
 
+  # Subquery Arel che restituisce il tipo di ranking dato dall'utente per ciascuna proposta.
+  # Usata come colonna virtuale (`AS ranking`) nelle query dei portlet.
+  #
+  # @param user_id [Integer] ID dell'utente corrente
+  # @return [Arel::SelectManager] subquery correlata da includere in un `select`
   def self.ranking_subquery(user_id)
     proposals = Proposal.arel_table
     proposal_rankings = ProposalRanking.arel_table
@@ -184,7 +222,13 @@ class Proposal < ApplicationRecord
             and(proposal_rankings[:user_id].eq(user_id)))
   end
 
-  # retrieve the list of propsoals for the user with a count of the number of the notifications for each proposal
+  # Proposte dell'open space per la widget della homepage pubblica.
+  # Usa subquery Arel per `alerts_count` e `ranking` per evitare N+1;
+  # carica le associazioni tramite `Preloader` per non alterare il SELECT principale.
+  #
+  # @param user [User, nil] utente corrente; nil → nessun alert conteggiato (user_id = -1)
+  # @param current_territory [InterestBorder, nil] se presente, filtra per territorio derivato
+  # @return [Array<Proposal>] max 10 proposte, ordinate per `updated_at DESC`
   def self.open_space_portlet(user = nil, current_territory = nil)
     user_id = user ? user.id : -1
 
@@ -200,7 +244,12 @@ class Proposal < ApplicationRecord
     proposals
   end
 
-  # retrieve the list of proposals for the user with a count of the number of the notifications for each proposal
+  # Proposte per la dashboard dell'utente loggato (proposte a cui partecipa o ha creato).
+  # Unisce la lista delle proposte create (`list_a`) con quelle a cui partecipa come co-autore (`list_b`).
+  # Restituisce `[]` se l'utente non ha proposte attive, per evitare query SQL con `IN ()` vuoto.
+  #
+  # @param user [User] utente loggato
+  # @return [Array<Proposal>] proposte correnti, ordinate per `updated_at DESC`
   def self.home_portlet(user)
     proposals = Proposal.arel_table
     petition_id = ProposalType.find_by(name: ProposalType::PETITION).id
@@ -222,7 +271,11 @@ class Proposal < ApplicationRecord
     proposals
   end
 
-  # retrieve the list of propsoals for the user with a count of the number of the notifications for each proposal
+  # Petizioni visibili nell'open space per la widget della homepage.
+  # Le petizioni (proposal_type_id = 11) usano questo portlet separato perché non hanno quorum.
+  #
+  # @param user [User] utente corrente (usato per il conteggio alert)
+  # @return [ActiveRecord::Relation<Proposal>] max 10 petizioni visibili, per `updated_at DESC`
   def self.open_space_petitions_portlet(user)
     proposals = Proposal.arel_table
     petition_id = ProposalType.find_by(name: ProposalType::PETITION).id
@@ -234,6 +287,12 @@ class Proposal < ApplicationRecord
       order(updated_at: :desc).limit(10)
   end
 
+  # Proposte in votazione per cui l'utente è eleggibile a votare e non ha ancora votato.
+  # Filtra tramite JOIN su `participation_roles` (deve avere `vote_proposals = true` o essere portavoce/admin).
+  # LEFT JOIN su `user_votes` + `WHERE user_votes.id IS NULL` evita di mostrare proposte già votate.
+  #
+  # @param user [User] utente loggato
+  # @return [Array<Proposal>] ordinate per `end_time ASC` (prima le votazioni in scadenza)
   def self.votation_portlet(user)
     user_id = user.id
     Proposal.arel_table
@@ -260,7 +319,13 @@ class Proposal < ApplicationRecord
     proposals
   end
 
-  # retrieve the list of proposals for the group with a count of the number of the notifications for each proposal
+  # Ultime 10 proposte del gruppo per la sidebar del gruppo.
+  # Usa `find_by_sql` con Arel invece di `where` perché richiede un `JOIN` esplicito su `group_proposals`
+  # senza alterare il default_scope di Proposal.
+  #
+  # @param group [Group] il gruppo di cui mostrare le proposte
+  # @param user [User] utente corrente (usato per alert_count e ranking)
+  # @return [Array<Proposal>] max 10 proposte, ordinate per `created_at DESC`
   def self.group_portlet(group, user)
     user_id = user.id
     proposals = Proposal.arel_table
@@ -284,14 +349,20 @@ class Proposal < ApplicationRecord
     self.integrated_contributes_ids = value.split(/,\s*/)
   end
 
+  # Una proposta con più di una soluzione usa il metodo Schulze per il voto.
+  # Il flag non è salvato in DB: viene derivato dinamicamente dal numero di soluzioni.
+  #
+  # @return [Boolean]
   def is_schulze?
     solutions.count > 1
   end
 
+  # @return [Boolean] true se è una proposta deliberativa standard (non poll, non petizione)
   def is_standard?
     proposal_type.name == ProposalType::STANDARD
   end
 
+  # @return [Boolean] true se è un sondaggio (poll) — nessun quorum, voto di preferenza
   def is_polling?
     proposal_type.name == ProposalType::POLL
   end
@@ -341,7 +412,10 @@ class Proposal < ApplicationRecord
      ProposalState::VOTING].include? proposal_state_id
   end
 
-  # restituisce 'true' se la proposta è attualmente anonima, ovvero è stata definita come tale ed è in dibattito
+  # Una proposta anonima nasconde le identità degli autori SOLO durante il dibattito.
+  # Dopo la votazione (stato non `current?`) le identità vengono rivelate automaticamente.
+  #
+  # @return [Boolean]
   def is_anonima?
     is_current? && anonima
   end
@@ -355,6 +429,10 @@ class Proposal < ApplicationRecord
     in_group? && presentation_areas.any?
   end
 
+  # Le petizioni sono identificate da proposal_type_id = 11 (valore fisso in DB, non costante).
+  # Le petizioni non hanno quorum e usano `ProposalVote` (voto positivo/negativo) come sistema di firme.
+  #
+  # @return [Boolean]
   def is_petition?
     proposal_type_id == 11
   end
@@ -382,7 +460,11 @@ class Proposal < ApplicationRecord
     @first_user ||= proposal_presentations.first.user
   end
 
-  # retrieve the number of users that can vote this proposal
+  # Numero di utenti che possono votare questa proposta.
+  # Per le proposte pubbliche conta tutti gli utenti confermati e non bloccati.
+  # Per le proposte private usa `scoped_participants` che filtra per il permesso `vote_proposals`.
+  #
+  # @return [Integer]
   def eligible_voters_count
     return User.confirmed.unblocked.count unless private?
 
@@ -393,8 +475,11 @@ class Proposal < ApplicationRecord
     end
   end
 
-  # count without fetching, for the list.
-  # this number may be different from participants because doesn't look if the participants are still in the group
+  # Conta i partecipanti unici (chi ha commentato o rankato) senza caricarli in memoria.
+  # Può differire da `participants` perché non verifica se l'utente è ancora nel gruppo.
+  # Usare per display nei listing; usare `participants` per logica applicativa.
+  #
+  # @return [Integer]
   def participants_count
     users = User.arel_table
     proposal_comments = ProposalComment.arel_table
@@ -406,7 +491,11 @@ class Proposal < ApplicationRecord
     User.where(users[:id].in(comments_subquery).or(users[:id].in(rankings_subquery))).count
   end
 
-  # retrieve all the participants to the proposals that are still part of the group
+  # Partecipanti effettivi: chi ha commentato o rankato E è ancora nel gruppo (per proposte private).
+  # Per le proposte pubbliche restituisce tutti i commentatori/ranker senza filtrare per gruppo.
+  # Questo metodo fa query multiple — non usarlo nei listing, usare `participants_count`.
+  #
+  # @return [Array<User>]
   def participants
     # all users who ranked the proposal
     rankers = User.joins(proposal_rankings: :proposal).where(proposals: { id: id }).load
@@ -478,7 +567,10 @@ class Proposal < ApplicationRecord
     user.original_locale.territory
   end
 
-  # restituisce la percentuale di avanzamento della proposta in base al quorum assegnato
+  # Calcola la percentuale di avanzamento del dibattito delegando al quorum assegnato.
+  # Restituisce nil se la proposta non ha quorum (es. petizioni).
+  #
+  # @return [Float, nil] valore 0-100 oppure nil
   def calculate_percentage
     return unless quorum
 
@@ -505,6 +597,12 @@ class Proposal < ApplicationRecord
     quorum.close_vote_phase if voting?
   end
 
+  # Abbandona la proposta: salva uno snapshot della vita corrente (`ProposalLife`) e resetta ranking/autori.
+  # Il reset di valutations/rank permette alla proposta di essere rigenerata con un nuovo quorum (`regenerate`).
+  # La notifica è schedulata con 1 minuto di delay per dare tempo al salvataggio di completarsi.
+  #
+  # @return [void]
+  # @raise [ActiveRecord::RecordInvalid] se il salvataggio fallisce
   def abandon
     return unless in_valutation?
 
@@ -515,9 +613,9 @@ class Proposal < ApplicationRecord
                                 rank: rank,
                                 seq: ((proposal_lives.maximum(:seq) || 0) + 1))
 
-    # save old authors
+    # Snapshot degli autori correnti prima di distruggerli
     users.each { |user| life.users << user }
-    # delete old data
+    # Reset dei dati di dibattito: necessario per permettere la rigenerazione con un nuovo quorum
     self.valutations = 0
     self.rank = 0
 
@@ -555,12 +653,18 @@ class Proposal < ApplicationRecord
     end
   end
 
+  # Avvia la fase di votazione: crea il record `ProposalVote` se non esiste e
+  # schedula notifiche di promemoria 24h e 1h prima della chiusura.
+  # Idempotente: se la proposta è già in votazione non fa nulla.
+  #
+  # @return [void]
   def start_votation
     return if voting?
 
     self.proposal_state_id = ProposalState::VOTING
     save!
     unless vote
+      # Crea il record di voto iniziale (contatori a zero) che accumula i voti durante la votazione
       vote_data = ProposalVote.new(proposal_id: id, positive: 0, negative: 0, neutral: 0)
       vote_data.save!
     end
@@ -577,6 +681,12 @@ class Proposal < ApplicationRecord
     end
   end
 
+  # Assegna un evento di votazione già esistente alla proposta e la porta in stato WAIT.
+  # Il check su `starttime > 5.seconds.from_now` previene race condition in cui
+  # un utente sceglie un evento che inizia quasi subito.
+  #
+  # @param vote_period_id [Integer] ID dell'evento di votazione
+  # @raise [StandardError] se l'evento è già iniziato
   def set_votation_date(vote_period_id)
     vote_period = Event.find(vote_period_id)
     raise StandardError unless vote_period.starttime > 5.seconds.from_now # security check
@@ -616,6 +726,9 @@ class Proposal < ApplicationRecord
 
   private
 
+  # Distrugge esplicitamente le presentations prima del destroy del record principale.
+  # Necessario perché `proposal_presentations` non usa `dependent: :destroy`
+  # (i tags devono essere distrutti prima).
   def destroy_presentations
     proposal_presentations.destroy_all
   end
@@ -785,11 +898,14 @@ class Proposal < ApplicationRecord
     end
   end
 
+  # Sincronizza i confini di interesse della proposta partendo dal token UI (`interest_borders_tkn`).
+  # Ricostruisce `derived_interest_borders_tokens` risalendo la gerarchia territoriale (comune → regione → nazione → continente).
+  # Se nessun confine è specificato, usa il territorio del gruppo (se privata) o dell'utente corrente (se pubblica).
   def update_borders
     proposal_borders.destroy_all
 
-    # set the interest border and extracts the derived ones
-    interest_borders_tkn.to_s.split(',').each do |border| # the identifiers are in the format 'X-id'
+    # I token hanno formato 'X-id' dove X identifica il tipo di territorio (es. 'C' = comune, 'N' = nazione)
+    interest_borders_tkn.to_s.split(',').each do |border|
       found = InterestBorder.table_element(border)
 
       next unless found # if I found something I can proceed
@@ -824,10 +940,14 @@ class Proposal < ApplicationRecord
     end
   end
 
+  # Duplica il quorum scelto dall'utente e lo assegna alla proposta calcolando valori assoluti.
+  # Il quorum originale rimane pubblico e riutilizzabile; la copia è privata e specifica per questa proposta.
+  # Le `valutations` (soglia di voti per il dibattito) vengono calcolate come percentuale del totale eleggibili.
+  # Se l'utente ha già scelto una data di votazione (`votation`), viene validata e assegnata qui.
   def assign_quorum
     group = group_proposals.first.try(:group)
     group_area = GroupArea.find(group_area_id) if group_area_id.present?
-    copy = quorum.dup # make a copy of the assigned quorum and work on it
+    copy = quorum.dup # copia del quorum: la proposta lavora sempre su una istanza propria
     starttime = Time.zone.now
     # the quorum has minutes defined. calculate started_at and ends_at using these minutes
     copy.started_at = starttime

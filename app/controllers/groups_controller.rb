@@ -1,3 +1,11 @@
+# Controller CRUD per i gruppi e le azioni di partecipazione.
+# I gruppi sono comunità con ruoli, proposte interne, blog, forum ed eventi.
+#
+# Flusso di partecipazione:
+# - `ask_for_participation` → crea una `GroupParticipationRequest` (status 1 = in attesa)
+# - `participation_request_confirm` → accetta (status 3) o manda a votazione (status 2)
+# - `participation_request_decline` → rifiuta (status 4) o manda a votazione (status 2)
+# Il comportamento dipende da `group.request_by_portavoce?` (accettazione automatica vs votazione).
 class GroupsController < ApplicationController
   layout :choose_layout
 
@@ -7,6 +15,8 @@ class GroupsController < ApplicationController
 
   load_resource
 
+  # `participation_request_confirm/decline` gestiscono la propria autorizzazione internamente
+  # perché richiedono CanCan `:accept_requests` su @group, non il permesso CRUD standard.
   authorize_resource except: %i[participation_request_confirm participation_request_decline]
 
   before_action :admin_required, only: [:autocomplete]
@@ -33,6 +43,8 @@ class GroupsController < ApplicationController
     end
   end
 
+  # Pagina principale del gruppo con blog posts, ultimi topic forum ed eventi futuri.
+  # Il redirect 301 forza la URL canonica (friendly_id può avere slug multipli dopo rename).
   def show
     @group_posts = @group.post_publishings.
                    accessible_by(current_ability).
@@ -40,6 +52,8 @@ class GroupsController < ApplicationController
 
     respond_to do |format|
       format.html do
+        # Canonical URL enforcement: friendly_id mantiene gli slug vecchi come redirect.
+        # Senza questo check, lo stesso gruppo sarebbe raggiungibile via slug vecchio e nuovo.
         if request.url.split('?')[0] != group_url(@group).split('?')[0]
           redirect_to group_url(@group), status: :moved_permanently
           return
@@ -78,6 +92,9 @@ class GroupsController < ApplicationController
     end
   end
 
+  # Carica i dati laterali comuni a `show` e `by_year_and_month`.
+  # `accessible_by(current_ability, false)` — il secondo argomento `false` disabilita la sanitizzazione
+  # per permettere la query GROUP BY (la sanitizzazione standard di CanCan non è compatibile con aggregazioni).
   def load_page_data
     @group_participations = @group.participants
     @archives = @group.blog_posts.
@@ -140,19 +157,27 @@ class GroupsController < ApplicationController
     end
   end
 
+  # Invia una richiesta di partecipazione al gruppo.
+  # Stati della GroupParticipationRequest:
+  #   1 = in attesa (pendente)
+  #   2 = in votazione (il gruppo vota l'ammissione)
+  #   3 = accettata
+  #   4 = rifiutata
+  #
+  # Caso speciale: se l'utente è già membro (partecipazione senza richiesta nel DB),
+  # crea una richiesta di correzione con status 3 per allineare i dati.
   def ask_for_participation
-    # verifica se l'utente ha già effettuato una richiesta di partecipazione a questo gruppo
     request = current_user.group_participation_requests.find_by(group_id: @group.id)
-    if request # se non l'ha mai fatta
+    if request
       flash[:notice] = t('info.group_participations.request_alredy_sent')
     else
       participation = @group.participants.include? current_user
-      if participation # verifica se per caso non fa già parte del gruppo
-        # crea una nuova richiesta di partecipazione ACCETTATA per correggere i dati
+      if participation
+        # Correzione dati: l'utente è già membro ma manca la richiesta nel DB
         request = GroupParticipationRequest.new
         request.user_id = current_user.id
         request.group_id = @group.id
-        request.group_participation_request_status_id = 3 # accettata, dati corretti
+        request.group_participation_request_status_id = 3
         saved = request.save
         if saved
           flash[:error] = t('error.group_participations.request_not_registered')
@@ -160,11 +185,10 @@ class GroupsController < ApplicationController
           flash[:notice] = t('error.group_participations.already_member')
         end
       else
-        # inoltra la richiesta di partecipazione con stato IN ATTESA
         request = GroupParticipationRequest.new
         request.user_id = current_user.id
         request.group_id = @group.id
-        request.group_participation_request_status_id = 1 # in attesa...
+        request.group_participation_request_status_id = 1
         saved = request.save
         if saved
           flash[:notice] = t('info.group_participations.request_sent')
@@ -176,6 +200,9 @@ class GroupsController < ApplicationController
     redirect_to_back(group_path(@group))
   end
 
+  # Invia richieste di partecipazione multiple (onboarding wizard, step "seguire gruppi consigliati").
+  # Gli ID dei gruppi arrivano come stringa separata da `;` dal form JS.
+  # Usa transazione: se una richiesta fallisce, nessuna viene salvata.
   def ask_for_multiple_follow
     Group.transaction do
       groups = params[:groupsi][:group_ids].split(';')
@@ -208,6 +235,11 @@ class GroupsController < ApplicationController
     end
   end
 
+  # Conferma una richiesta di partecipazione pendente.
+  # Se il gruppo accetta per decisione del portavoce (`request_by_portavoce?`):
+  #   → crea GroupParticipation con ruolo default, status = 3 (accettata)
+  # Altrimenti (accettazione con voto dei membri):
+  #   → status = 2 (in votazione), la partecipazione sarà creata dopo il voto
   def participation_request_confirm
     authorize! :accept_requests, @group
     @request = @group.participation_requests.pending.find(params[:request_id])
@@ -230,6 +262,10 @@ class GroupsController < ApplicationController
     end
   end
 
+  # Rifiuta una richiesta di partecipazione pendente.
+  # Se il gruppo decide per portavoce: status = 4 (rifiutata).
+  # Se decide per voto: status = 2 (in votazione — i membri voteranno anche il rifiuto).
+  # `find_by` (non `find`) per evitare eccezione se la richiesta è già stata gestita da un altro portavoce.
   def participation_request_decline
     authorize! :accept_requests, @group
     @request = @group.participation_requests.pending.find_by(id: params[:request_id])
@@ -320,6 +356,9 @@ class GroupsController < ApplicationController
     redirect_to group_group_areas_url @group
   end
 
+  # Rimuove un post dal gruppo (elimina il `PostPublishing`, non il `BlogPost` originale).
+  # Il post rimane nel blog personale dell'autore — viene solo dissociato dal gruppo.
+  # Autorizzato se: portavoce del gruppo OPPURE autore del post.
   def remove_post
     raise StandardError unless (can? :remove_post, @group) || (can? :update, BlogPost.find(params[:post_id]))
 
@@ -338,6 +377,8 @@ class GroupsController < ApplicationController
     end
   end
 
+  # Alterna il flag `featured` sul `PostPublishing`.
+  # I post featured appaiono in cima alla lista nel gruppo (ordinati per `featured desc`).
   def feature_post
     publishing = @group.post_publishings.find_by(blog_post_id: params[:post_id])
     publishing.update(featured: !publishing.featured)
@@ -358,6 +399,8 @@ class GroupsController < ApplicationController
 
   protected
 
+  # Pattern comune per le azioni di configurazione del gruppo (change_advanced_options, etc.).
+  # Turbo Stream: mostra il flash in-page senza reload. HTML: redirect all'edit.
   def respond_to_group_setting
     respond_to do |format|
       format.turbo_stream { render partial: 'layouts/flash_stream' }

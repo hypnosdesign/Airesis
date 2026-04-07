@@ -1,9 +1,26 @@
+# Quorum di tipo "best" — il modello di quorum standard usato per le proposte deliberative.
+#
+# Gestisce due timer separati:
+#   - **dibattito** (`minutes`): durata della fase di dibattito (valutazione)
+#   - **votazione** (`vote_minutes`): durata della fase di voto
+#
+# I tempi di votazione sono memorizzati in minuti in DB ma esposti all'utente come
+# giorni/ore/minuti tramite gli accessori `vote_days_m`, `vote_hours_m`, `vote_minutes_m`.
+#
+# La transizione di fase (dibattito → voto) è gestita da `check_phase`.
+# La chiusura del voto e calcolo del risultato Schulze/standard è in `close_vote_phase`.
 class BestQuorum < Quorum
   validates :minutes, numericality: { only_integer: true, greater_than_or_equal_to: 5 }
+
+  # Accessori per la UI: l'utente inserisce giorni/ore/minuti, `populate_vote` li converte in minuti totali.
   attr_accessor :vote_days_m, :vote_hours_m, :vote_minutes_m
 
+  # Chiamato SOLO alla creazione: calcola `vote_minutes` se non è già impostato.
+  # Permette di importare quorum con `vote_minutes` già valorizzato senza sovrascrivere.
   before_save :populate_vote
 
+  # Chiamato ad ogni UPDATE: ricalcola sempre `vote_minutes` dagli accessori UI.
+  # Il comportamento differisce da `before_save` perché in update si assume che l'utente abbia modificato i valori.
   before_update :populate_vote!
 
   after_find :populate_accessor
@@ -12,6 +29,8 @@ class BestQuorum < Quorum
     (self[:valutations]) || 1
   end
 
+  # Scompone `vote_minutes` (intero in DB) negli accessori UI giorni/ore/minuti.
+  # Chiamato da `after_find` per pre-popolare i campi del form di editing.
   def populate_accessor
     super
     self.vote_minutes_m = vote_minutes
@@ -26,18 +45,26 @@ class BestQuorum < Quorum
     self.vote_hours_m = vote_hours_m % 24
   end
 
-  # calculate minutes from user input only if they were not set already
+  # Calcola `vote_minutes` dagli accessori UI solo se non è già impostato.
+  # Usato nel `before_save` (solo create): preserva un valore già esistente (es. import da admin).
+  # Imposta anche `bad_score = good_score` (i nuovi quorum non hanno un punteggio "cattivo" separato).
+  #
+  # @return [void]
   def populate_vote
     unless vote_minutes
       self.vote_minutes = vote_minutes_m.to_i + (vote_hours_m.to_i * 60) + (vote_days_m.to_i * 24 * 60)
-      self.vote_minutes = nil if vote_minutes == 0
+      self.vote_minutes = nil if vote_minutes == 0 # 0 minuti = durata libera (l'utente sceglie)
     end
     self.bad_score = good_score
   end
 
+  # Ricalcola SEMPRE `vote_minutes` dagli accessori UI.
+  # Usato nel `before_update`: in edit si assume che l'utente abbia inserito nuovi valori.
+  #
+  # @return [void]
   def populate_vote!
     self.vote_minutes = vote_minutes_m.to_i + (vote_hours_m.to_i * 60) + (vote_days_m.to_i * 24 * 60)
-    self.vote_minutes = nil if vote_minutes == 0
+    self.vote_minutes = nil if vote_minutes == 0 # 0 minuti = durata libera
   end
 
   def or?
@@ -126,11 +153,20 @@ class BestQuorum < Quorum
     end
   end
 
+  # Verifica se la proposta ha superato il quorum di dibattito e decide la transizione di stato.
+  # Chiamato da `ProposalsWorker` allo scadere del timer o forzato manualmente (portavoce).
+  #
+  # Flusso:
+  # - Se rank >= good_score E valutations superate → passa a WAIT o WAIT_DATE (a seconda se la data è già scelta)
+  # - Altrimenti → la proposta viene abbandonata e può essere rigenerata con un nuovo quorum
+  #
+  # @param force_end [Boolean] se true ignora il timer e forza la transizione (usato dai portavoce)
+  # @return [void]
   def check_phase(force_end = false)
-    return unless force_end || (Time.zone.now > ends_at) # skip if we have not passed the time yet
+    return unless force_end || (Time.zone.now > ends_at) # salta se il timer non è ancora scaduto
 
     vpassed = !valutations || (proposal.valutations >= valutations)
-    if (proposal.rank >= good_score) && vpassed # and we passed the debate quorum
+    if (proposal.rank >= good_score) && vpassed # quorum di dibattito superato
       if proposal.vote_defined # the user already chose the votation period! that's great, we can just sit along the river waiting for it to begin
         proposal.proposal_state_id = ProposalState::WAIT
         # automatically create
@@ -163,11 +199,24 @@ class BestQuorum < Quorum
     proposal.reload
   end
 
+  # Chiude la fase di voto e calcola il risultato finale.
+  #
+  # Per il metodo **Schulze** (più di una soluzione):
+  # - Costruisce la stringa di voti nel formato atteso dalla gem `vote-schulze`
+  # - Assegna `schulze_score` a ciascuna soluzione in ordine di ID
+  # - Proposta ACCEPTED se i voti >= `vote_valutations`, altrimenti REJECTED
+  #
+  # Per il voto **standard** (binario):
+  # - Proposta ACCEPTED se positivi/(positivi+negativi) > soglia percentuale E voti >= `vote_valutations`
+  #
+  # @return [void]
+  # @raise [ActiveRecord::RecordInvalid] se il salvataggio fallisce
   def close_vote_phase
     if proposal.is_schulze?
       vote_data_schulze = proposal.schulze_votes
       Proposal.transaction do
-        votesstring = '' # this is the string to pass to schulze library to calculate the score
+        # Formato atteso da SchulzeBasic: "N=preferenze\n" dove N è il conteggio voti identici
+        votesstring = ''
         vote_data_schulze.each do |vote|
           # each row is composed by the vote string and, if more then one, the number of votes of that kind
           votesstring += vote.count > 1 ? "#{vote.count}=#{vote.preferences}\n" : "#{vote.preferences}\n"
@@ -202,6 +251,10 @@ class BestQuorum < Quorum
     false # new quora does not have bad score
   end
 
+  # Percentuale di avanzamento temporale del dibattito (0-100).
+  # Usa `min(Time.now, ends_at)` per non superare 100% anche se il timer è scaduto.
+  #
+  # @return [Float] valore 0-100
   def debate_progress
     minimum = [Time.zone.now, ends_at].min
     minimum = ((minimum - started_at) / 60)
@@ -211,16 +264,26 @@ class BestQuorum < Quorum
 
   protected
 
+  # Calcola il numero minimo di partecipanti al dibattito basandosi sulla percentuale del quorum.
+  # Per gruppi: usa i partecipanti con permesso `participate_proposals`.
+  # Per open space: usa il 0.1% degli utenti totali (fattore ridotto per la scala globale).
+  # Aggiunge sempre +1 per garantire che almeno 1 persona partecipi.
+  #
+  # @return [Integer]
   def min_participants_pop
     percentage_f = percentage.to_f
     count = if group
               percentage_f * 0.01 * group.scoped_participants(:participate_proposals).count
             else
-              percentage_f * 0.001 * User.count
+              percentage_f * 0.001 * User.count # 0.1% per open space (scala globale)
             end
-    [count, 0].max.floor + 1 # we always add +1 in new quora
+    [count, 0].max.floor + 1 # +1 garantisce almeno 1 partecipante
   end
 
+  # Come `min_participants_pop` ma per la fase di voto.
+  # Usa il permesso `vote_proposals` che può differire da `participate_proposals`.
+  #
+  # @return [Integer]
   def min_vote_participants_pop
     vote_percentage_f = vote_percentage.to_f
     count = if group
@@ -228,7 +291,7 @@ class BestQuorum < Quorum
             else
               vote_percentage_f * 0.001 * User.count
             end
-    [count, 0].max.floor + 1 # we always add +1 in new quora
+    [count, 0].max.floor + 1 # +1 garantisce almeno 1 votante
   end
 
   def explanation_pop

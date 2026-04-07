@@ -1,9 +1,22 @@
+# Controller CRUD per le proposte. Gestisce il ciclo di vita completo:
+# creazione, dibattito (ranking), chiusura dibattito, votazione, risultati.
+#
+# Le proposte possono essere pubbliche (open space) o private (dentro un gruppo).
+# Per quelle private, le route sono nested sotto `group` o `group_area`:
+#   GET /groups/:group_id/proposals        → index nel gruppo
+#   GET /proposals                         → open space
+#
+# CanCanCan usa `load_and_authorize_resource` con `through: [:group, :group_area]`
+# per caricare `@proposal` in modo sicuro e verificare i permessi in ogni azione.
 class ProposalsController < ApplicationController
   include ProposalsHelper
 
   before_action :load_group
   before_action :load_group_area
 
+  # Autorizza l'accesso al contesto parent prima di autorizzare la proposta stessa.
+  # Necessario per le route nested: senza questo, CanCan autorizzerebbe la proposta
+  # senza verificare se l'utente può accedere al gruppo/area contenitore.
   before_action :authorize_parent
 
   def authorize_parent
@@ -11,6 +24,9 @@ class ProposalsController < ApplicationController
     authorize! :read, @group_area if @group_area
   end
 
+  # `shallow: true` → le azioni che agiscono su una proposta esistente (show, edit, update, destroy)
+  # usano la route non-nested `/proposals/:id`, mentre index/new restano nested.
+  # `except: tab_list/similar/endless_index` → queste azioni gestiscono la propria autorizzazione.
   load_and_authorize_resource through: %i[group group_area], shallow: true, except: %i[tab_list similar endless_index]
   skip_authorize_resource only: :vote_results
 
@@ -21,6 +37,9 @@ class ProposalsController < ApplicationController
 
   before_action :check_page_alerts, only: :show
 
+  # Mostra la lista paginata delle proposte con i contatori per tab (debate/votation/voted/revision).
+  # I contatori vengono calcolati separatamente dalla lista paginata tramite `@search.counters`
+  # per non eseguire 4 query COUNT separate — SearchProposal fa tutto in un'unica query GROUP BY.
   def index
     if @group
       authorize! :view_data, @group
@@ -36,6 +55,7 @@ class ProposalsController < ApplicationController
       end
     end
     @search = populate_search
+    # `nil` per i counters: non filtrare per stato, così i contatori coprono tutti i tab.
     @search.proposal_state_tab = nil
     counters = @search.counters
     @in_valutation_count = counters[ProposalState::TAB_DEBATE]
@@ -54,7 +74,8 @@ class ProposalsController < ApplicationController
     end
   end
 
-  # list all proposals in a state
+  # Restituisce la lista delle proposte per uno specifico tab (debate/votation/voted/revision).
+  # Usato da Turbo Stream per aggiornare solo il contenuto del tab attivo senza ricaricare la pagina.
   def tab_list
     authorize! :index, Proposal
     query_index
@@ -67,6 +88,8 @@ class ProposalsController < ApplicationController
     end
   end
 
+  # Carica la pagina successiva delle proposte per l'infinite scroll (Turbo Stream).
+  # Il Stimulus `infinite_scroll_controller` triggera questa azione al raggiungimento del fondo.
   def endless_index
     authorize! :index, Proposal
     query_index
@@ -90,22 +113,29 @@ class ProposalsController < ApplicationController
     end
   end
 
+  # Mostra la pagina di dettaglio della proposta. Gestisce tre scenari di visibilità:
+  # 1. Proposta pubblica → accessibile a tutti
+  # 2. Proposta privata `visible_outside: true` → visibile ma non partecipabile dall'esterno
+  # 3. Proposta privata `visible_outside: false` → solo membri del gruppo
+  #
+  # `check_phase` valuta se il quorum è scaduto e aggiorna lo stato prima della visualizzazione.
+  # `reload` è necessario perché `check_phase` può modificare lo stato via `update_columns`.
   def show
     return redirect_to redirect_url(@proposal) if wrong_url?
 
     @proposal.check_phase
     @proposal.reload
-    if @proposal.private # la proposta è interna ad un gruppo
-      if @proposal.visible_outside # se è visibile dall'esterno mostra solo un messaggio
+    if @proposal.private
+      if @proposal.visible_outside
         if !current_user
           flash[:info] = I18n.t('info.proposal.ask_participation')
         elsif !(can? :participate, @proposal) && @proposal.in_valutation?
           flash[:info] = I18n.t('error.proposals.participate')
         end
-      else # se è bloccata alla visione di utenti esterni
-        if !current_user # se l'utente non è loggato richiedi l'autenticazione
+      else
+        if !current_user
           authenticate_user!
-        elsif !(can? :show, @proposal) # se è loggato ma non ha i permessi caccialo fuori
+        elsif !(can? :show, @proposal)
           respond_to do |format|
             flash[:error] = I18n.t('error.proposals.view_proposal')
             format.html do
@@ -121,6 +151,7 @@ class ProposalsController < ApplicationController
       end
     end
 
+    # Il nickname anonimo è specifico per proposta — ogni utente ha uno pseudonimo diverso per proposta.
     @my_nickname = current_user.proposal_nicknames.find_by(proposal_id: @proposal.id) if current_user
 
     load_my_vote
@@ -142,6 +173,9 @@ class ProposalsController < ApplicationController
     end
   end
 
+  # Form di creazione proposta. Inizializza la struttura della proposta in base al tipo.
+  # `LIMIT_PROPOSALS` (costante di configurazione) abilita il rate limiting anti-spam:
+  # l'utente deve aspettare `PROPOSALS_TIME_LIMIT` tra una proposta e l'altra.
   def new
     if LIMIT_PROPOSALS
       max = current_user.proposals.maximum(:created_at) || Time.zone.now - (PROPOSALS_TIME_LIMIT + 1.second)
@@ -186,6 +220,8 @@ class ProposalsController < ApplicationController
 
   def geocode; end
 
+  # Crea la proposta. Doppio check LIMIT_PROPOSALS (anche in `new`) per prevenire abuse via direct POST.
+  # `current_user_id` viene assegnato dopo la build CanCan perché i model callback lo richiedono.
   def create
     max = current_user.proposals.maximum(:created_at) || Time.zone.now - (PROPOSALS_TIME_LIMIT + 1.second)
     raise StandardError if LIMIT_PROPOSALS && ((Time.zone.now - max) < PROPOSALS_TIME_LIMIT)
@@ -272,17 +308,18 @@ class ProposalsController < ApplicationController
     redirect_to @group ? group_proposals_url(@group) : proposals_url
   end
 
+  # Voto positivo (ranking_type_id = 1). Delega a `rank`.
   def rankup
     rank 1
   end
 
+  # Voto negativo (ranking_type_id = 3). Delega a `rank`.
   def rankdown
     rank 3
   end
 
-  # restituisce una lista di tutte le proposte simili a quella
-  # passata come parametro
-  # se è indicato un group_id cerca anche tra quelle interne a quel gruppo
+  # Restituisce proposte simili tramite `SearchProposal#similar` (pg_search con `any_word: true`).
+  # Usato nel form di creazione per avvisare l'utente di duplicati potenziali prima di salvare.
   def similar
     authorize! :index, Proposal
     search = SearchProposal.new
@@ -297,14 +334,15 @@ class ProposalsController < ApplicationController
     end
   end
 
-  # questo metodo permette all'utente corrente di mettersi a disposizione per redigere la sintesi della proposta
+  # Aggiunge l'utente corrente come autore disponibile per la redazione della sintesi.
+  # Il portavoce vedrà gli autori disponibili e potrà scegliere chi co-redige la revisione.
   def available_author
     @proposal.available_user_authors << current_user
     @proposal.save!
     flash[:notice] = I18n.t('info.proposal.offered_editor')
   end
 
-  # restituisce la lista degli utenti disponibili a redigere la sintesi della proposta
+  # Lista degli autori disponibili — renderizzata via Turbo Stream nel pannello del portavoce.
   def available_authors_list
     @available_authors = @proposal.available_user_authors
     respond_to do |format|
@@ -312,7 +350,9 @@ class ProposalsController < ApplicationController
     end
   end
 
-  # add available authors as authors to the proposal
+  # Promuove gli autori disponibili selezionati ad autori effettivi della proposta.
+  # Rimuove dalla lista degli available e aggiunge `ProposalPresentation` con l'accettante (portavoce).
+  # Tutto in transazione: se un'assegnazione fallisce, nessuna viene salvata.
   def add_authors
     available_ids = params['user_ids']
     Proposal.transaction do
@@ -339,14 +379,16 @@ class ProposalsController < ApplicationController
     authorize! :show, @proposal
   end
 
-  # exlipcitly close the debate of a proposal
+  # Chiusura anticipata del dibattito da parte del portavoce (`force_end: true`).
+  # `check_phase(true)` ignora il timer e forza la valutazione del quorum immediatamente.
   def close_debate
     authorize! :close_debate, @proposal
     @proposal.check_phase(true)
     redirect_to @proposal
   end
 
-  # explicitly start the votation of a proposal
+  # Avvio manuale della votazione (portavoce). Bypassa il timer di attesa.
+  # `Proposal#start_votation` schedula i job STARTVOTATION/ENDVOTATION.
   def start_votation
     @proposal.start_votation
     redirect_to @proposal
@@ -354,9 +396,11 @@ class ProposalsController < ApplicationController
 
   protected
 
-  # the url is wrong if you try to access a private proposal without indicating the group
-  # we redirect you to the corret url
-
+  # Una proposta privata deve essere sempre accessibile via URL nested (`/groups/:id/proposals/:id`).
+  # Se l'utente accede a `/proposals/:id` per una proposta privata, reindirizzo alla URL canonica.
+  # Previene anche la discovery indiretta di proposte private tramite ID progressivo.
+  #
+  # @return [Boolean]
   def wrong_url?
     @proposal.private? && !@group
   end
@@ -365,13 +409,20 @@ class ProposalsController < ApplicationController
     @group ? 'groups' : 'open_space'
   end
 
-  # query per la ricerca delle proposte
+  # Esegue la query di ricerca e popola `@proposals` paginata con Pagy.
+  # @return [void]
   def query_index
     @search = populate_search
     @pagy, @proposals = pagy(@search.results, items: @search.per_page || 10)
   end
 
-  # valuta una proposta
+  # Salva o aggiorna il ranking dell'utente sulla proposta.
+  # `find_or_create_by` evita duplicati: un utente ha un solo ranking per proposta.
+  # La transazione garantisce che reload e load_my_vote vedano lo stato aggiornato.
+  # In caso di errore (es. validazione), mostra il template `proposals/errors/rank`.
+  #
+  # @param rank_type [Integer] 1 = positivo, 3 = negativo
+  # @return [void]
   def rank(rank_type)
     ProposalRanking.transaction do
       ranking = @proposal.rankings.find_or_create_by(user_id: current_user.id)
@@ -400,7 +451,13 @@ class ProposalsController < ApplicationController
     @group_area = @group.group_areas.find(params[:group_area_id]) if @group && params[:group_area_id]
   end
 
-  # fill @my_vote and @can_vote_again variables
+  # Carica il voto corrente dell'utente e stabilisce se può votare di nuovo.
+  # `@can_vote_again` è true in due casi:
+  # 1. L'utente non ha ancora votato
+  # 2. La proposta è stata aggiornata dopo l'ultimo voto (ranking.updated_at < proposal.updated_at)
+  #    → il testo è cambiato, l'utente dovrebbe rivalutare
+  #
+  # @return [void]
   def load_my_vote
     return unless @proposal.in_valutation?
 
@@ -417,6 +474,10 @@ class ProposalsController < ApplicationController
     end
   end
 
+  # Guard: blocca le azioni di dibattito (rankup, rankdown, available_author)
+  # se la proposta non è più in stato VALUTATION. Risponde con flash error.
+  #
+  # @return [void]
   def valutation_state_required
     return if @proposal.in_valutation?
 
@@ -427,6 +488,12 @@ class ProposalsController < ApplicationController
     end
   end
 
+  # Costruisce il `SearchProposal` dai parametri della request.
+  # `interest_border` di default: il territorio del dominio corrente (locale geografico).
+  # I timestamp di `params[:time]` arrivano in millisecondi da JS — divisi per 1000 per i secondi Unix.
+  # `search.or = params[:or]` attiva la modalità OR tra tag e testo (meno precisa, più risultati).
+  #
+  # @return [SearchProposal]
   def populate_search
     search = SearchProposal.new
     search.order_id = params[:view]
@@ -446,7 +513,6 @@ class ProposalsController < ApplicationController
                                InterestBorder.find_or_create_by_key(params[:interest_border])
                              end
 
-    # apply filter for the group
     if @group
       search.group_id = @group.id
       if params[:group_area_id]
@@ -456,6 +522,7 @@ class ProposalsController < ApplicationController
     end
 
     if params[:time]
+      # I timestamp arrivano in millisecondi dal datepicker JS
       search.created_at_from = Time.zone.at(params[:time][:start].to_i / 1000) if params[:time][:start]
       search.created_at_to = Time.zone.at(params[:time][:end].to_i / 1000) if params[:time][:end]
       search.time_type = params[:time][:type]
@@ -515,6 +582,9 @@ class ProposalsController < ApplicationController
                                            %i[id seq content content_dirty]]])
   end
 
+  # I campi strutturali (titolo, territorio, quorum, anonimato, visibilità, voto segreto) possono essere
+  # modificati solo da chi ha il permesso `:destroy` (= portavoce/autore).
+  # Gli altri autori co-redattori possono modificare solo il contenuto testuale.
   def update_proposal_params
     (can? :destroy, @proposal) ?
       proposal_params :
