@@ -30,7 +30,8 @@
       <div class="dropdown dropdown-end">
         <div tabindex="0" role="button" class="btn btn-ghost btn-circle indicator" id="alerts_link">
           <i class="fa-solid fa-bell text-lg"></i>
-          <span class="indicator-item badge badge-error badge-xs"></span>
+          <% unread_count = current_user.unread_alerts.count %>
+          <span id="notification_badge" class="indicator-item badge badge-error badge-xs<%= ' hidden' if unread_count == 0 %>"><%= unread_count > 0 ? unread_count : '' %></span>
         </div>
         <div tabindex="0" class="dropdown-content z-[60] mt-3 w-80 bg-base-100 border-2 border-base-content/15">
           <div class="px-4 py-3 border-b-2 border-base-content/10 flex items-center justify-between">
@@ -57,13 +58,23 @@
               <% end %>
             </p>
           </div>
-          <div class="avatar placeholder">
-            <div class="bg-primary text-primary-content w-10"><span class="font-bold text-sm"><%= current_user.name[0..0].upcase %><%= current_user.surname.present? ? current_user.surname[0..0].upcase : '' %></span></div>
+          <div class="avatar<%= ' placeholder' unless current_user.avatar.attached? %>">
+            <% if current_user.avatar.attached? %>
+              <div class="w-10"><%= image_tag url_for(current_user.avatar), class: 'object-cover' %></div>
+            <% else %>
+              <div class="bg-primary text-primary-content w-10"><span class="font-bold text-sm"><%= current_user.name[0..0].upcase %><%= current_user.surname.present? ? current_user.surname[0..0].upcase : '' %></span></div>
+            <% end %>
           </div>
         </div>
         <div tabindex="0" class="dropdown-content z-[60] mt-3 w-60 bg-base-100 border-2 border-base-content/15">
           <div class="p-4 border-b-2 border-base-content/10 flex items-center gap-3">
-            <div class="avatar placeholder"><div class="bg-primary text-primary-content w-11"><span class="font-bold"><%= current_user.name[0..0].upcase %><%= current_user.surname.present? ? current_user.surname[0..0].upcase : '' %></span></div></div>
+            <div class="avatar<%= ' placeholder' unless current_user.avatar.attached? %>">
+              <% if current_user.avatar.attached? %>
+                <div class="w-11"><%= image_tag url_for(current_user.avatar), class: 'object-cover' %></div>
+              <% else %>
+                <div class="bg-primary text-primary-content w-11"><span class="font-bold"><%= current_user.name[0..0].upcase %><%= current_user.surname.present? ? current_user.surname[0..0].upcase : '' %></span></div>
+              <% end %>
+            </div>
             <div class="min-w-0">
               <p class="font-bold text-sm"><%= current_user.fullname %></p>
               <p class="text-[11px] text-base-content/40 truncate"><%= current_user.email %></p>

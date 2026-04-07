@@ -33,3 +33,6 @@ application.register("toggle", ToggleController)
 
 import CookieConsentController from "./cookie_consent_controller"
 application.register("cookie-consent", CookieConsentController)
+
+import SidebarMenuController from "./sidebar_menu_controller"
+application.register("sidebar-menu", SidebarMenuController)
