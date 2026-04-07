@@ -43,7 +43,7 @@
 
 "@esbuild/darwin-arm64@0.27.4":
   version "0.27.4"
-  resolved "https://registry.yarnpkg.com/@esbuild/darwin-arm64/-/darwin-arm64-0.27.4.tgz#6c550ee6c0273bcb0fac244478ff727c26755d80"
+  resolved "https://registry.npmjs.org/@esbuild/darwin-arm64/-/darwin-arm64-0.27.4.tgz"
   integrity sha512-b7xaGIwdJlht8ZFCvMkpDN6uiSmnxxK56N2GDTMYPr2/gzvfdQN8rTfBsvVKmIVY/X7EM+/hJKEIbbHs9oA4tQ==
 
 "@esbuild/darwin-x64@0.27.4":
@@ -63,7 +63,7 @@
 
 "@esbuild/linux-arm64@0.27.4":
   version "0.27.4"
-  resolved "https://registry.npmjs.org/@esbuild/linux-arm64/-/linux-arm64-0.27.4.tgz"
+  resolved "https://registry.yarnpkg.com/@esbuild/linux-arm64/-/linux-arm64-0.27.4.tgz#e52d57f202369386e6dbcb3370a17a0491ab1464"
   integrity sha512-7nQOttdzVGth1iz57kxg9uCz57dxQLHWxopL6mYuYthohPKEK0vU0C3O21CcBK6KDlkYVcnDXY099HcCDXd9dA==
 
 "@esbuild/linux-arm@0.27.4":
@@ -215,7 +215,7 @@
 
 "@parcel/watcher-darwin-arm64@2.5.6":
   version "2.5.6"
-  resolved "https://registry.yarnpkg.com/@parcel/watcher-darwin-arm64/-/watcher-darwin-arm64-2.5.6.tgz#88d3e720b59b1eceffce98dac46d7c40e8be5e8e"
+  resolved "https://registry.npmjs.org/@parcel/watcher-darwin-arm64/-/watcher-darwin-arm64-2.5.6.tgz"
   integrity sha512-Z2ZdrnwyXvvvdtRHLmM4knydIdU9adO3D4n/0cVipF3rRiwP+3/sfzpAwA/qKFL6i1ModaabkU7IbpeMBgiVEA==
 
 "@parcel/watcher-darwin-x64@2.5.6":
@@ -240,12 +240,12 @@
 
 "@parcel/watcher-linux-arm64-glibc@2.5.6":
   version "2.5.6"
-  resolved "https://registry.npmjs.org/@parcel/watcher-linux-arm64-glibc/-/watcher-linux-arm64-glibc-2.5.6.tgz"
+  resolved "https://registry.yarnpkg.com/@parcel/watcher-linux-arm64-glibc/-/watcher-linux-arm64-glibc-2.5.6.tgz#b75913fbd501d9523c5f35d420957bf7d0204809"
   integrity sha512-f2g/DT3NhGPdBmMWYoxixqYr3v/UXcmLOYy16Bx0TM20Tchduwr4EaCbmxh1321TABqPGDpS8D/ggOTaljijOA==
 
 "@parcel/watcher-linux-arm64-musl@2.5.6":
   version "2.5.6"
-  resolved "https://registry.npmjs.org/@parcel/watcher-linux-arm64-musl/-/watcher-linux-arm64-musl-2.5.6.tgz"
+  resolved "https://registry.yarnpkg.com/@parcel/watcher-linux-arm64-musl/-/watcher-linux-arm64-musl-2.5.6.tgz#da5621a6a576070c8c0de60dea8b46dc9c3827d4"
   integrity sha512-qb6naMDGlbCwdhLj6hgoVKJl2odL34z2sqkC7Z6kzir8b5W65WYDpLB6R06KabvZdgoHI/zxke4b3zR0wAbDTA==
 
 "@parcel/watcher-linux-x64-glibc@2.5.6":
@@ -314,14 +314,14 @@
 
 "@rails/actiontext@^8.1.300":
   version "8.1.300"
-  resolved "https://registry.yarnpkg.com/@rails/actiontext/-/actiontext-8.1.300.tgz#0b6d0a40e8ca8ba2caf5a0077e10b5503183a044"
+  resolved "https://registry.npmjs.org/@rails/actiontext/-/actiontext-8.1.300.tgz"
   integrity sha512-KPbLfZTt6aFKbdeTlU7ZzmX0uSSNhhfZx3G+2lfa6HltQ/r23HDcJnJOEVt72WKJo13IS5C5HK0sYwplVMCdNw==
   dependencies:
     "@rails/activestorage" ">= 8.1.0-alpha"
 
 "@rails/activestorage@>= 8.1.0-alpha":
   version "8.1.300"
-  resolved "https://registry.yarnpkg.com/@rails/activestorage/-/activestorage-8.1.300.tgz#624a6f291e0414c07c3d02ed3d1e6ee85c94277b"
+  resolved "https://registry.npmjs.org/@rails/activestorage/-/activestorage-8.1.300.tgz"
   integrity sha512-AOv3zZrTJjQlzm4L9uzOQtCz6zaM4IqUyux6yzSqmS+PZ8EzwD1F2JAc4LlJNJAv4MSyNYriG+CaCm1QbQTjsA==
   dependencies:
     spark-md5 "^3.0.1"
@@ -400,7 +400,7 @@
 
 "@types/trusted-types@^2.0.7":
   version "2.0.7"
-  resolved "https://registry.yarnpkg.com/@types/trusted-types/-/trusted-types-2.0.7.tgz#baccb07a970b91707df3a3e8ba6896c57ead2d11"
+  resolved "https://registry.npmjs.org/@types/trusted-types/-/trusted-types-2.0.7.tgz"
   integrity sha512-ScaPdn1dQczgbl0QFTeTOmVHFULt394XJgOQNoyVhZ6r2vLnMLJfBPd53SB52T/3G36VI1/g2MZaX0cwDuXsfw==
 
 abbrev@1:
@@ -451,6 +451,11 @@ ansi-styles@^4.0.0, ansi-styles@^4.1.0:
   integrity sha512-zbB9rCJAT1rbjiVDb2hqKFHNYLxgtk8NURxZ3IZwD3F6NtxbXZQCnnSi1Lkx+IDohdPlFp222wVALIheZJQSEg==
   dependencies:
     color-convert "^2.0.1"
+
+apexcharts@^5.10.5:
+  version "5.10.5"
+  resolved "https://registry.yarnpkg.com/apexcharts/-/apexcharts-5.10.5.tgz#85382ebdceaa1688d4c12ee55d6b261865531b55"
+  integrity sha512-RirosfLQLqYpWBdn4Pdv9B1M0M2FepzVxPRpcuXQPTilvuZvKt02vgVlEexhCVu2p4fApDIV/3yC9voAIK+qjw==
 
 "aproba@^1.0.3 || ^2.0.0":
   version "2.1.0"
@@ -714,7 +719,7 @@ detect-libc@^2.0.3:
 
 dompurify@^3.2.5:
   version "3.3.3"
-  resolved "https://registry.yarnpkg.com/dompurify/-/dompurify-3.3.3.tgz#680cae8af3e61320ddf3666a3bc843f7b291b2b6"
+  resolved "https://registry.npmjs.org/dompurify/-/dompurify-3.3.3.tgz"
   integrity sha512-Oj6pzI2+RqBfFG+qOaOLbFXLQ90ARpcGG6UePL82bJLtdsa6CYJD7nmiU8MW9nQNOtCHV3lZ/Bzq1X0QYbBZCA==
   optionalDependencies:
     "@types/trusted-types" "^2.0.7"
@@ -1566,7 +1571,7 @@ performance-now@^2.1.0:
 
 picocolors@^1.1.1:
   version "1.1.1"
-  resolved "https://registry.npmjs.org/picocolors/-/picocolors-1.1.1.tgz"
+  resolved "https://registry.yarnpkg.com/picocolors/-/picocolors-1.1.1.tgz#3d321af3eab939b083c8f929a1d12cda81c26b6b"
   integrity sha512-xceH2snhtb5M9liqDsmEw56le376mTZkEX/jEb/RxNFyegNul7eNslCXP9FDj/Lcu0X8KEyMceP2ntpaHrDEVA==
 
 picomatch@^4.0.3:
@@ -1845,7 +1850,7 @@ source-map@^0.7.3:
 
 spark-md5@^3.0.1:
   version "3.0.2"
-  resolved "https://registry.yarnpkg.com/spark-md5/-/spark-md5-3.0.2.tgz#7952c4a30784347abcee73268e473b9c0167e3fc"
+  resolved "https://registry.npmjs.org/spark-md5/-/spark-md5-3.0.2.tgz"
   integrity sha512-wcFzz9cDfbuqe0FZzfi2or1sgyIrsDwmPwfZC4hiNidPdPINjeUwNfv5kldczoEAcjl9Y1L3SM7Uz2PUEQzxQw==
 
 spdx-correct@^3.0.0:
@@ -1979,7 +1984,7 @@ trim-newlines@^3.0.0:
 
 trix@^2.1.18:
   version "2.1.18"
-  resolved "https://registry.yarnpkg.com/trix/-/trix-2.1.18.tgz#d87a5be64c10ecdab64f5af47f941b5318c08225"
+  resolved "https://registry.npmjs.org/trix/-/trix-2.1.18.tgz"
   integrity sha512-DWOdTsz3n9PO3YBc1R6pGh9MG1cXys/2+rouc/qsISncjc2MBew2UOW8nXh3NjUOjobKsXCIPR6LB02abg2EYg==
   dependencies:
     dompurify "^3.2.5"
