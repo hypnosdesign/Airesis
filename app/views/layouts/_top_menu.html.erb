@@ -30,7 +30,7 @@
       <div class="dropdown dropdown-end">
         <div tabindex="0" role="button" class="btn btn-ghost btn-circle indicator" id="alerts_link">
           <i class="fa-solid fa-bell text-lg"></i>
-          <% unread_count = current_user.unread_alerts.count %>
+          <% unread_count = Alert.unscoped.where(user_id: current_user.id, checked: false).count %>
           <span id="notification_badge" class="indicator-item badge badge-error badge-xs<%= ' hidden' if unread_count == 0 %>"><%= unread_count > 0 ? unread_count : '' %></span>
         </div>
         <div tabindex="0" class="dropdown-content z-[60] mt-3 w-80 bg-base-100 border-2 border-base-content/15">
