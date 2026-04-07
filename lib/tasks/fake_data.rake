@@ -13,6 +13,7 @@ namespace :airesis do
       task :votable_proposals, %i[number num_solutions] => :environment do |_task, args|
         require 'faker'
         require 'factory_bot_rails'
+        require 'timecop'
         number = (args[:number] || 1).to_i
         num_solutions = (args[:num_solutions] || 2).to_i
 
@@ -25,6 +26,7 @@ namespace :airesis do
       task :abandoned_proposals, [:number] => :environment do |_task, args|
         require 'faker'
         require 'factory_bot_rails'
+        require 'timecop'
         number = (args[:number] || 1).to_i
 
         Timecop.travel(10.days.ago) do

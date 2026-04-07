@@ -14,5 +14,6 @@ FactoryBot.define do
     t_vote_good_score { 's' }
     t_vote_minutes { 'f' }
     group_quorum { nil }
+    public { true } # necessario perché BestQuorum.visible filtra per public: true
   end
 end
