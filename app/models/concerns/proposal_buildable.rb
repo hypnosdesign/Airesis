@@ -1,3 +1,20 @@
+# Costruisce la struttura di sezioni e soluzioni per una proposta in base al tipo.
+#
+# Usa il pattern **dispatch tramite `send`**: il tipo di proposta determina quale metodo
+# viene chiamato. I metodi seguono la convenzione `{tipo}_new` (per il form) e
+# `{tipo}_create` (per la creazione in DB).
+#
+# Tipi supportati (da `ProposalType`):
+# - `simple`     — proposta semplice (1 sezione, 1 soluzione)
+# - `standard`   — proposta deliberativa completa (più sezioni: problema, stakeholder, requisiti...)
+# - `agenda`     — ordine del giorno (luogo, data/ora)
+# - `estimate`   — preventivo (vincoli tecnici, budget, destinatari...)
+# - `event`      — proposta di evento (esperienze, stakeholder, caratteristiche)
+# - `press`      — comunicato stampa (titolo, sottotitolo, incipit, corpo, conclusione)
+# - `rule_book`  — regolamento (4 articoli + pro/contro)
+# - `poll`       — sondaggio (testo + 3 soluzioni Schulze predefinite)
+# - `candidates` — elezione candidati (ruolo + curriculum per ogni candidato)
+# - `petition`   — petizione (nessuna soluzione, solo testo)
 module ProposalBuildable
   extend ActiveSupport::Concern
 
@@ -5,18 +22,40 @@ module ProposalBuildable
     before_validation :create_sections, on: :create
   end
 
+  # Costruisce la struttura base per il form di nuova proposta (in memoria, non salva).
+  # Chiamato dal controller prima di rendere il form.
+  # Dispatcha a `{tipo}_new` tramite `send`.
+  #
+  # @return [void]
   def build_sections
-    send "#{proposal_type.name.downcase}_new" # execute specific method to build sections
+    send "#{proposal_type.name.downcase}_new"
   end
 
+  # Aggiunge le sezioni aggiuntive specifiche del tipo durante la creazione in DB.
+  # Chiamato dal `before_validation` sul create.
+  # Dispatcha a `{tipo}_create` tramite `send`.
+  #
+  # @return [void]
   def create_sections
-    send "#{proposal_type.name.downcase}_create" # execute specific method to build sections
+    send "#{proposal_type.name.downcase}_create"
   end
 
+  # Costruisce (in memoria) la soluzione di default per il tipo di proposta corrente.
+  # Dispatcha a `{tipo}_solution` tramite `send`.
+  #
+  # @return [Solution] soluzione non ancora persistita
   def build_solution
     send(proposal_type.name.downcase + '_solution')
   end
 
+  # Aggiunge una sezione con un paragrafo vuoto a un elemento (proposta o soluzione).
+  # Usato dai metodi `*_new` e `solution_builder` per costruire la struttura gerarchica.
+  #
+  # @param element [Proposal, Solution] record a cui aggiungere la sezione
+  # @param section_title [String] titolo della sezione (localizzato)
+  # @param section_question [String] domanda guida per il compilatore
+  # @param section_seq [Integer] posizione ordinale della sezione
+  # @return [Paragraph] il paragrafo vuoto costruito (ultimo elemento della catena)
   def build_section(element, section_title, section_question, section_seq)
     element.sections.build(title: section_title,
                            question: section_question,
@@ -24,6 +63,8 @@ module ProposalBuildable
       paragraphs.build(content: '', seq: 1)
   end
 
+  # Alias di `build_section` per le sezioni dentro una soluzione.
+  # Mantiene la nomenclatura esplicita per chiarire il contesto.
   def build_solution_section(solution, section_title, section_question, section_seq)
     build_section(solution, section_title, section_question, section_seq)
   end
@@ -98,6 +139,9 @@ module ProposalBuildable
     self.proposal_votation_type_id = :standard
   end
 
+  # I sondaggi usano il metodo Schulze e partono con 3 opzioni predefinite.
+  # Il tipo di voto è `:schulze` (non `:standard`) perché ci sono più soluzioni.
+  # Nota: `proposal_type_id` è assegnato direttamente (non tramite find_by) perché `POLL` è una costante intera.
   def poll_new
     @text = sections.build(title: 'Testo del sondaggio', seq: 1)
     @solution_a = solutions.build(seq: 1)
@@ -133,6 +177,13 @@ module ProposalBuildable
     solutions << solution
   end
 
+  # Costruisce le sezioni aggiuntive (oltre la prima) di una proposta basandosi su una lista di nomi.
+  # La seq parte da 2 perché la sezione 1 è già stata creata da `{tipo}_new`.
+  # I testi delle sezioni sono recuperati da i18n con chiavi `pages.proposals.new.{model}.paragraph.{name}`.
+  #
+  # @param model [String] nome del tipo proposta in minuscolo (es. 'standard', 'estimate')
+  # @param paragraphs [Array<String>] nomi delle sezioni aggiuntive da costruire
+  # @return [void]
   def paragraphs_builder(model, paragraphs)
     seq = 1
     paragraphs.each do |paragraph_name|
@@ -194,6 +245,12 @@ module ProposalBuildable
 
   def petition_create(_proposal) end
 
+  # Fabbrica una `Solution` con le sezioni specificate, recuperando i testi da i18n.
+  # Pattern simmetrico a `paragraphs_builder` ma per le soluzioni.
+  #
+  # @param model [String] nome del tipo in minuscolo
+  # @param paragraphs [Array<String>] nomi delle sezioni della soluzione
+  # @return [Solution] soluzione non ancora persistita (non ha ancora un proposal_id)
   def solution_builder(model, paragraphs)
     seq = 0
     solution = Solution.new
@@ -206,12 +263,15 @@ module ProposalBuildable
     solution
   end
 
-  # create a solution for a standard proposal
+  # Soluzione per proposta semplice: solo descrizione.
+  # @return [Solution]
   def simple_solution
     solution_builder('simple', ['description'])
   end
 
-  # create a solution for a standard proposal
+  # Soluzione per proposta standard: struttura completa con descrizione, tempi, soggetti, risorse,
+  # aspetti, documenti, pro e contro.
+  # @return [Solution]
   def standard_solution
     solution_builder('standard', %w[description time subject resources aspects documents pros cons])
   end
@@ -220,6 +280,9 @@ module ProposalBuildable
     solution_builder('candidates', %w[data curriculum])
   end
 
+  # Soluzione per regolamento: 4 articoli numerati + pro/contro.
+  # Gli articoli usano parametro `num` nell'i18n per generare "Articolo 1", "Articolo 2"...
+  # @return [Solution]
   def rule_book_solution
     seq = 0
     solution = Solution.new

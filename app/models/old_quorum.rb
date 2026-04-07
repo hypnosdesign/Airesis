@@ -1,19 +1,38 @@
+# Quorum legacy (precedente a `BestQuorum`) con logica OR/AND tra condizioni di tempo e partecipanti.
+#
+# A differenza di `BestQuorum`, `OldQuorum` supporta:
+# - Condizione **OR**: il quorum è soddisfatto se scade il tempo OPPURE raggiunge i partecipanti
+# - Condizione **AND**: richede entrambe le condizioni
+# - Punteggio negativo (`bad_score`) diverso da quello positivo (`good_score`)
+#   → una proposta può essere abbandonata se scende sotto `bad_score`
+#
+# `OldQuorum` è ancora in uso per le proposte create con il vecchio sistema.
+# I nuovi quorum usano `BestQuorum` (sempre OR implicito, nessun bad_score distinto).
 class OldQuorum < Quorum
   validate :minutes_or_percentage
   validates :condition, inclusion: { in: %w[OR AND] }
 
+  # Almeno uno tra tempo (days/hours/minutes) e percentuale deve essere specificato.
+  # Senza questo vincolo si creerebbe un quorum che non può mai terminare.
   def minutes_or_percentage
     errors.add(:minutes, 'Devi indicare la durata della proposta o il numero minimo di partecipanti') if days_m.blank? && hours_m.blank? && minutes_m.blank? && !percentage && !minutes
   end
 
+  # @return [Boolean] true se la condizione è OR (scadenza tempo O raggiungimento partecipanti)
   def or?
     condition&.casecmp('OR')&.zero?
   end
 
+  # @return [Boolean] true se la condizione è AND (scadenza tempo E raggiungimento partecipanti)
   def and?
     condition&.casecmp('AND')&.zero?
   end
 
+  # Un quorum è "time_fixed" (durata definita) se ha i minuti impostati, nessuna percentuale,
+  # e il bad_score è uguale al good_score o non definito.
+  # Usato per decidere se schedulare automaticamente le notifiche di scadenza.
+  #
+  # @return [Boolean]
   def time_fixed?
     minutes && !percentage && ((good_score == bad_score) || !bad_score)
   end
@@ -59,12 +78,21 @@ class OldQuorum < Quorum
     end
   end
 
+  # Verifica se la proposta ha superato il quorum con logica OR/AND.
+  # A differenza di `BestQuorum#check_phase`, gestisce tre esiti:
+  # - rank >= good_score → WAIT o WAIT_DATE (transizione a votazione)
+  # - rank < bad_score   → ABANDONED (proposta abbandonata)
+  # - bad_score <= rank < good_score → nessuna azione, il dibattito continua
+  #
+  # @param force_end [Boolean] se true ignora il timer e forza la valutazione
+  # @return [void]
   def check_phase(force_end = false)
     proposal = self.proposal
     passed = false
     timepassed = (!ends_at || Time.zone.now > ends_at)
     vpassed = (!valutations || proposal.valutations >= valutations)
-    # if both parameters were defined
+    # Valuta la condizione OR/AND solo se entrambi i parametri sono definiti.
+    # Se uno solo è definito, basta che quell'uno sia vero (l'altro è sempre true per default).
     if ends_at && valutations
       if or?
         passed = (timepassed || vpassed)
@@ -72,14 +100,14 @@ class OldQuorum < Quorum
         and?
         passed = (timepassed && vpassed)
       end
-    else # we just need one of two (one will be certainly true)
+    else # solo uno dei due parametri è definito: l'altro è true per default
       passed = (timepassed && vpassed)
     end
-    passed ||= force_end # maybe we want to force the end of the proposal
+    passed ||= force_end # forzatura da portavoce o job amministrativo
 
-    if passed # if we have to move one
-      if proposal.rank >= good_score # and we passed the debate quorum
-        if proposal.vote_defined # the user already choosed the votation period! that's great, we can just sit along the river waiting for it to begin
+    if passed
+      if proposal.rank >= good_score # quorum di dibattito superato
+        if proposal.vote_defined # l'utente ha già scelto il periodo di votazione
           proposal.proposal_state_id = ProposalState::WAIT
           # automatically create
           if proposal.vote_event_id
@@ -154,6 +182,12 @@ class OldQuorum < Quorum
     bad_score && (bad_score != good_score)
   end
 
+  # Percentuale di avanzamento del dibattito tenendo conto della condizione OR/AND.
+  # - OR: prende il MAX tra le percentuali (basta che una condizione stia per essere soddisfatta)
+  # - AND: prende il MIN (entrambe le condizioni devono essere soddisfatte)
+  # Usa `min(now, ends_at)` e `min(valutations_correnti, valutations_richieste)` per non superare 100%.
+  #
+  # @return [Float, nil] 0-100 o nil se nessuna condizione è definita
   def debate_progress
     percentages = []
     if valutations
@@ -171,9 +205,9 @@ class OldQuorum < Quorum
     end
 
     if or?
-      percentages.max
+      percentages.max # OR: il progresso è il massimo tra le due condizioni
     else
-      percentages.min
+      percentages.min # AND: il progresso è limitato dalla condizione più lenta
     end
   end
 
