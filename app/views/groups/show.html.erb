@@ -116,6 +116,31 @@
 
     <%# Sidebar portlets %>
     <div class="hidden lg:block space-y-4">
+      <%# Attività gruppo — donut chart %>
+      <div class="bg-base-100 border-2 border-base-content/15">
+        <div class="p-4 border-b-2 border-base-content/15 flex items-center gap-3">
+          <div class="bg-primary/10 text-primary w-8 h-8 flex items-center justify-center">
+            <i class="fa-solid fa-chart-pie text-sm"></i>
+          </div>
+          <h2 class="font-bold text-sm"><%= t('pages.groups.show.activity', default: 'Attività') %></h2>
+        </div>
+        <div class="p-2">
+          <% group_chart_data = {
+            series: [@group.group_participations_count, @group.proposals_count, @group.next_events.size],
+            labels: [
+              t('pages.groups.index.participants_number', default: 'Membri'),
+              t('pages.groups.index.proposals_number', default: 'Proposte'),
+              t('pages.groups.index.events_number', default: 'Eventi')
+            ],
+            colors: ['#6366f1', '#10b981', '#f59e0b']
+          } %>
+          <div data-controller="chart"
+               data-chart-type-value="donut"
+               data-chart-data-value="<%= group_chart_data.to_json.gsub('"', '&quot;') %>">
+          </div>
+        </div>
+      </div>
+
       <% if can? :view_proposal, @group %>
         <%= render partial: "groups/portlets/proposals", layout: "layouts/portlet" %>
       <% end %>
