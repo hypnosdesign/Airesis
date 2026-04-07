@@ -19,8 +19,9 @@
   voting_proposals = Proposal.votation_portlet(current_user)
   user_groups = current_user.groups
   user_topics = @user.viewed_topics.order('created_at desc').limit(10)
+  unread_notifications = current_user.unread_alerts.count
 %>
-<div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
+<div class="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-6">
   <div class="bg-base-100 p-4 flex items-center gap-4 border-2 border-base-content/15">
     <div class="bg-primary/10 text-primary w-10 h-10 flex items-center justify-center">
       <i class="fa-solid fa-file-lines text-lg"></i>
@@ -46,6 +47,15 @@
     <div>
       <div class="text-2xl font-bold"><%= user_groups.size %></div>
       <div class="text-[11px] text-base-content/40 uppercase tracking-wider font-bold"><%= t('pages.groups.index.groups_list', default: 'I tuoi gruppi') %></div>
+    </div>
+  </div>
+  <div class="bg-base-100 p-4 flex items-center gap-4 border-2 border-base-content/15">
+    <div class="bg-error/10 text-error w-10 h-10 flex items-center justify-center">
+      <i class="fa-solid fa-bell text-lg"></i>
+    </div>
+    <div>
+      <div class="text-2xl font-bold"><%= unread_notifications %></div>
+      <div class="text-[11px] text-base-content/40 uppercase tracking-wider font-bold"><%= t('pages.home.show.unread_notifications', default: 'Non lette') %></div>
     </div>
   </div>
 </div>
@@ -208,13 +218,41 @@
   <%# RIGHT SIDEBAR %>
   <div class="space-y-6">
 
+    <%# Proposals chart %>
+    <div class="bg-base-100 border-2 border-base-content/15">
+      <div class="p-4 border-b-2 border-base-content/15 flex items-center gap-3">
+        <div class="bg-primary/10 text-primary w-8 h-8 flex items-center justify-center">
+          <i class="fa-solid fa-chart-pie"></i>
+        </div>
+        <h2 class="font-bold text-sm"><%= t('pages.home.show.proposals_by_state', default: 'Proposte per stato') %></h2>
+      </div>
+      <div class="p-2">
+        <% chart_data = {
+          series: [user_proposals.size, voting_proposals.size],
+          labels: [
+            t('pages.proposals.index.debate_title', count: '', default: 'In dibattito').strip,
+            t('pages.proposals.index.voting_title', count: '', default: 'In votazione').strip
+          ],
+          colors: ['#6366f1', '#f59e0b']
+        } %>
+        <div data-controller="chart"
+             data-chart-type-value="donut"
+             data-chart-data-value="<%= chart_data.to_json.gsub('"', '&quot;') %>">
+        </div>
+      </div>
+    </div>
+
     <%# User profile card %>
     <div class="bg-base-100 border-2 border-base-content/15">
       <div class="p-4 flex items-center gap-3">
-        <div class="avatar placeholder">
-          <div class="bg-primary text-primary-content w-12 h-12 flex items-center justify-center">
-            <span class="text-lg font-bold"><%= current_user.name.first(2).upcase %></span>
-          </div>
+        <div class="avatar<%= ' placeholder' unless current_user.avatar.attached? %>">
+          <% if current_user.avatar.attached? %>
+            <div class="w-12 h-12"><%= image_tag url_for(current_user.avatar), class: 'object-cover' %></div>
+          <% else %>
+            <div class="bg-primary text-primary-content w-12 h-12 flex items-center justify-center">
+              <span class="text-lg font-bold"><%= current_user.name.first(2).upcase %></span>
+            </div>
+          <% end %>
         </div>
         <div>
           <div class="font-bold"><%= current_user.fullname %></div>

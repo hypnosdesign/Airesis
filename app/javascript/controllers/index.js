@@ -36,3 +36,9 @@ application.register("cookie-consent", CookieConsentController)
 
 import SidebarMenuController from "./sidebar_menu_controller"
 application.register("sidebar-menu", SidebarMenuController)
+
+import ChartController from "./chart_controller"
+application.register("chart", ChartController)
+
+import RightDrawerController from "./right_drawer_controller"
+application.register("right-drawer", RightDrawerController)

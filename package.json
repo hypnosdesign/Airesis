@@ -6,6 +6,7 @@
     "@hotwired/turbo-rails": "^8.0.23",
     "@rails/actiontext": "^8.1.300",
     "@sentry/browser": "^5.15.5",
+    "apexcharts": "^5.10.5",
     "daisyui": "^5.5.19",
     "rails_admin": "3.3.0",
     "sass": "^1.56.0",

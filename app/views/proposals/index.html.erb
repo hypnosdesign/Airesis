@@ -8,6 +8,11 @@
   <% end %>
 <% end %>
 
+<%# Filter drawer: espone i filtri proposta nel right drawer del layout %>
+<% content_for :filter_drawer do %>
+  <%= render 'left_panel_index' %>
+<% end %>
+
 <%# ===== HERO BANNER ===== %>
 <div class="bg-primary text-primary-content p-6 lg:p-8 mb-6 border-2 border-base-content/15 relative overflow-hidden">
   <div class="relative z-10">
@@ -21,6 +26,15 @@
     </p>
   </div>
   <i class="fa-solid fa-scroll absolute -right-4 -bottom-4 text-[120px] text-primary-content/10 rotate-12"></i>
+</div>
+
+<%# ===== FILTER BUTTON ===== %>
+<div class="flex justify-end mb-3">
+  <button onclick="document.getElementById('right-drawer').classList.remove('translate-x-full'); document.querySelector('[data-right-drawer-target=overlay]').classList.remove('hidden'); document.body.classList.add('overflow-hidden');"
+          class="btn btn-outline btn-sm gap-2">
+    <i class="fa-solid fa-sliders"></i>
+    <%= t('pages.proposals.index.filters', default: 'Filtri') %>
+  </button>
 </div>
 
 <%# ===== TAB NAVIGATION ===== %>
