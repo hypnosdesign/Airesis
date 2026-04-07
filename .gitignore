@@ -45,3 +45,6 @@ config/credentials/*.key
 .env.local
 *.swp
 *.swo
+
+# YARD output
+docs/
