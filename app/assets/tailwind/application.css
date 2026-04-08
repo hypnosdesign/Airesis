@@ -40,8 +40,8 @@
    Global form overrides
    ============================ */
 
-/* All checkboxes get DaisyUI styling */
-input[type="checkbox"] {
+/* All checkboxes get DaisyUI styling (escludi drawer-toggle) */
+input[type="checkbox"]:not(#sidebar-drawer) {
   @apply checkbox checkbox-primary;
 }
 
