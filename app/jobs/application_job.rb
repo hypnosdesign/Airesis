@@ -1,4 +1,8 @@
 class ApplicationJob < ActiveJob::Base
+  # Se il record referenziato è stato eliminato prima dell'esecuzione del job,
+  # lo scartiamo silenziosamente invece di far fallire e riprovare.
+  discard_on ActiveRecord::RecordNotFound
+
   # Sidekiq-compatible test helpers for specs using .jobs / .drain pattern
   def self.jobs
     ActiveJob::Base.queue_adapter.enqueued_jobs.select { |j| j[:job] == self }

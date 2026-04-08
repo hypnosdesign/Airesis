@@ -173,7 +173,6 @@ class Proposal < ApplicationRecord
   # perché `dependent: :destroy` è omesso (vedi associazione) per preservare l'ordine di distruzione dei tags.
   before_destroy :destroy_presentations
 
-  after_destroy :remove_scheduled_tasks
 
   # Mantiene `short_content` sincronizzato ad ogni salvataggio per evitare query aggiuntive nei listing.
   after_validation :update_short_content
@@ -368,8 +367,6 @@ class Proposal < ApplicationRecord
   end
 
 
-  def remove_scheduled_tasks
-  end
 
   # return true if the proposal is currently in debate
   def in_valutation?
@@ -550,16 +547,17 @@ class Proposal < ApplicationRecord
     sql_q += ' left join group_proposals gp on gp.proposal_id = p.id ' if group_id
     sql_q += " WHERE pt.tag_id IN (SELECT pti.tag_id
                                   FROM proposal_tags pti
-                                  WHERE pti.proposal_id = #{id})
-              AND pt.proposal_id != #{id} "
+                                  WHERE pti.proposal_id = ?)
+              AND pt.proposal_id != ? "
     sql_q += ' AND (p.private = false OR p.visible_outside = true '
-    sql_q += group_id ? " OR (p.private = true AND gp.group_id = #{group_id}))" : ')'
+    sql_q += group_id ? ' OR (p.private = true AND gp.group_id = ?))' : ')'
     sql_q += " GROUP BY p.id, p.proposal_state_id, p.proposal_category_id, p.title, p.quorum_id, p.anonima,
                p.visible_outside, p.secret_vote, p.proposal_votation_type_id, p.content,
                p.created_at, p.updated_at, p.valutations, p.vote_period_id, p.proposal_comments_count,
                p.rank, p.show_comment_authors
                ORDER BY closeness DESC limit 10"
-    Proposal.find_by_sql(sql_q)
+    binds = group_id ? [id, id, group_id] : [id, id]
+    Proposal.find_by_sql([sql_q, *binds])
   end
 
   def user_territory
