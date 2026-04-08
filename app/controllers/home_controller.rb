@@ -20,6 +20,8 @@ class HomeController < ApplicationController
     render 'open_space'
   end
 
+  def landing; end
+
   def intro; end
 
   def press; end
@@ -54,38 +56,32 @@ class HomeController < ApplicationController
   end
 
   def feedback
-    respond_to do |format|
-      format.js do
-        feedback = JSON.parse(params[:data])
-        data = feedback[1][22..] if feedback[1] # get the feedback image data
+    feedback = JSON.parse(params[:data])
+    data = feedback[1][22..] if feedback[1] # get the feedback image data
 
-        stack = ''
-        if current_user
-          stack << "user id: #{current_user.id}\n"
-          stack << "user email: #{current_user.email}\n"
-          stack << "current url: #{session[:user_return_to]}\n"
-        end
-        feedback = SentFeedback.new(message: feedback[0]['message'], stack: stack)
-
-        feedback.email = current_user.email if current_user # save user email if is logged in
-
-        if data
-          temp_file = Tempfile.new(['tmp', '.png'], encoding: 'ascii-8bit')
-          begin
-            temp_file.write(Base64.decode64(data))
-            feedback.image.attach(io: temp_file, filename: 'feedback.png', content_type: 'image/png')
-          ensure
-            temp_file.close
-            temp_file.unlink
-          end
-        end
-        feedback.save!
-
-        ResqueMailer.feedback(feedback.id).deliver_later
-        head :ok
-      end
-      format.html { head :ok }
+    stack = ''
+    if current_user
+      stack << "user id: #{current_user.id}\n"
+      stack << "user email: #{current_user.email}\n"
+      stack << "current url: #{session[:user_return_to]}\n"
     end
+    sent = SentFeedback.new(message: feedback[0]['message'], stack: stack)
+    sent.email = current_user.email if current_user
+
+    if data
+      temp_file = Tempfile.new(['tmp', '.png'], encoding: 'ascii-8bit')
+      begin
+        temp_file.write(Base64.decode64(data))
+        sent.image.attach(io: temp_file, filename: 'feedback.png', content_type: 'image/png')
+      ensure
+        temp_file.close
+        temp_file.unlink
+      end
+    end
+    sent.save!
+
+    ResqueMailer.feedback(sent.id).deliver_later
+    head :ok
   end
 
   protected

@@ -173,6 +173,13 @@ class ProposalsController < ApplicationController
     end
   end
 
+  def promote
+    respond_to do |format|
+      format.html
+      format.turbo_stream
+    end
+  end
+
   # Form di creazione proposta. Inizializza la struttura della proposta in base al tipo.
   # `LIMIT_PROPOSALS` (costante di configurazione) abilita il rate limiting anti-spam:
   # l'utente deve aspettare `PROPOSALS_TIME_LIMIT` tra una proposta e l'altra.
