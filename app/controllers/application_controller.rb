@@ -14,8 +14,9 @@ class ApplicationController < ActionController::Base
   include ApplicationHelper
   helper :all
 
-  # L'ordine dei rescue_from è importante: Exception deve essere l'ultimo (catch-all).
-  rescue_from Exception, with: :render_error
+  # L'ordine dei rescue_from è importante: StandardError deve essere l'ultimo (catch-all).
+  # Non usare Exception: catturerebbe anche SystemExit e SignalException, impedendo lo shutdown corretto.
+  rescue_from StandardError, with: :render_error
   rescue_from ActiveRecord::RecordNotFound, with: :render_404
   rescue_from ActionController::RoutingError, with: :render_404
   rescue_from ::AbstractController::ActionNotFound, with: :render_404
@@ -57,29 +58,37 @@ class ApplicationController < ActionController::Base
   def after_sign_in_path_for(resource)
     # Se in sessione è memorizzato un contributo pendente, eseguilo prima del redirect
     if session[:proposal_comment] && session[:proposal_id]
-      @proposal = Proposal.find(session[:proposal_id])
+      @proposal = Proposal.find_by(id: session[:proposal_id])
       comment_params = session[:proposal_comment].slice('content', 'parent_proposal_comment_id', 'section_id')
       session[:proposal_id] = nil
       session[:proposal_comment] = nil
-      @proposal_comment = @proposal.proposal_comments.build(
-        ActionController::Parameters.new(comment_params).permit(:content, :parent_proposal_comment_id, :section_id)
-      )
-      post_contribute
-      proposal_path(@proposal)
+      if @proposal
+        @proposal_comment = @proposal.proposal_comments.build(
+          ActionController::Parameters.new(comment_params).permit(:content, :parent_proposal_comment_id, :section_id)
+        )
+        post_contribute
+        proposal_path(@proposal)
+      else
+        root_path
+      end
     elsif session[:blog_comment] && session[:blog_post_id] && session[:blog_id]
       blog = Blog.friendly.find(session[:blog_id])
-      blog_post = blog.blog_posts.find(session[:blog_post_id])
-      blog_comment = blog_post.blog_comments.build(session[:blog_comment])
-
+      blog_post = blog.blog_posts.find_by(id: session[:blog_post_id])
+      pending_comment = session[:blog_comment]
       session[:blog_id] = nil
       session[:blog_post_id] = nil
       session[:blog_comment] = nil
-      if save_blog_comment(blog_comment)
-        flash[:notice] = t('info.blog.comment_added')
+      if blog_post
+        blog_comment = blog_post.blog_comments.build(pending_comment)
+        if save_blog_comment(blog_comment)
+          flash[:notice] = t('info.blog.comment_added')
+        else
+          flash[:error] = t('error.blog.comment_added')
+        end
+        blog_blog_post_path(blog, blog_post)
       else
-        flash[:error] = t('error.blog.comment_added')
+        root_path
       end
-      blog_blog_post_path(blog, blog_post)
     else
       env = request.env
       ret = env['omniauth.origin'] || stored_location_for(resource) || root_path
