@@ -19,12 +19,20 @@ export default class extends Controller {
   }
 
   async connect() {
+    // Aspetta che il browser abbia calcolato le dimensioni del container
+    // (se il container ha size=0 al momento di connect(), le tile vengono piazzate male)
+    await new Promise(resolve => requestAnimationFrame(resolve))
+
     this.#initMap()
+
     if (this.queryValue) {
       await this.#geocodeAndFit(this.queryValue)
     } else {
       this.map.setView(ITALY_CENTER, ITALY_ZOOM)
     }
+
+    // Forza il ricalcolo delle dimensioni dopo il rendering
+    this.map.invalidateSize()
   }
 
   disconnect() {
@@ -64,8 +72,12 @@ export default class extends Controller {
       } else {
         this.map.setView(ITALY_CENTER, ITALY_ZOOM)
       }
+      this.map.invalidateSize()
     } catch {
-      if (this.map) this.map.setView(ITALY_CENTER, ITALY_ZOOM)
+      if (this.map) {
+        this.map.setView(ITALY_CENTER, ITALY_ZOOM)
+        this.map.invalidateSize()
+      }
     }
   }
 }
