@@ -26,6 +26,6 @@
     "rails_admin/@fortawesome/fontawesome-free": "^5.15.0"
   },
   "scripts": {
-    "build": "esbuild app/javascript/*.* --bundle --sourcemap --format=esm --outdir=app/assets/builds --public-path=/assets --loader:.png=dataurl"
+    "build": "esbuild app/javascript/*.* --bundle --sourcemap --format=esm --splitting --outdir=app/assets/builds --public-path=/assets --loader:.png=dataurl"
   }
 }
