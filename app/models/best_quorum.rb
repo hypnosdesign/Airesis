@@ -182,7 +182,7 @@ class BestQuorum < Quorum
             user: proposal.users.first
           }
           @event = if proposal.private?
-                     proposal.groups.first.events.create!(event_p)
+                     proposal.groups.first&.events&.create!(event_p)
                    else
                      Event.create!(event_p)
                    end

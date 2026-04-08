@@ -7,23 +7,26 @@ class SearchesController < ApplicationController
     @search.user_id = current_user.id
     @search.find
     results = []
-    if @search.groups.count > 0
+    groups = @search.groups.to_a
+    if groups.any?
       results << { value: t('controllers.searches.index.groups_divider'), type: 'Divider' }
-      @search.groups.each do |group|
+      groups.each do |group|
         results << { value: group.name, type: 'Group', url: group_url(group), proposals_url: group_proposals_url(group), events_url: group_events_url(group), participants_num: group.group_participations_count, proposals_num: group.proposals.count, image: group.image.attached? ? url_for(group.image) : nil }
       end
     end
-    if @search.proposals.count > 0
+    proposals = @search.proposals.includes(:groups).to_a
+    if proposals.any?
       results << { value: 'Proposals', type: 'Divider' }
-      @search.proposals.each do |proposal|
+      proposals.each do |proposal|
         url = proposal.private? ?
           group_proposal_url(proposal.groups.first, proposal) : proposal_url(proposal)
         results << { value: proposal.title, type: 'Proposal', url: url, image: '/img/gruppo-anonimo.png' }
       end
     end
-    if @search.blogs.count > 0
+    blogs = @search.blogs.includes(:user).to_a
+    if blogs.any?
       results << { value: 'Blogs', type: 'Divider' }
-      @search.blogs.each do |blog|
+      blogs.each do |blog|
         results << { value: blog.title, type: 'Blog', url: blog_url(blog), username: blog.user.fullname, user_url: user_url(blog.user), image: avatar(blog.user, size: 40) }
       end
     end

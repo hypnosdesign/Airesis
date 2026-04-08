@@ -20,7 +20,7 @@ class NotificationProposalAbandoned < NotificationSender
   end
 
   def old_authors
-    @proposal.proposal_lives.first.users
+    @proposal.proposal_lives.first&.users || []
   end
 
   def old_participants(participant_ids)
