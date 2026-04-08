@@ -315,34 +315,23 @@
         <h2 class="font-bold text-sm"><%= t('pages.home.show.your_territory', default: 'Il tuo territorio') %></h2>
       </div>
       <div class="p-4">
-        <div id="territory_map" class="w-full h-[240px] bg-base-200 border-2 border-base-content/15"></div>
-
-        <% @ib = current_user.interest_borders.first %>
-        <% if !@ib %>
-          <% @place_string = "Italia" %>
-        <% elsif @ib.territory_type == 'Municipality' %>
-          <% @place_string = "#{@ib.territory.description}, #{@ib.territory.province.description}, Italia" %>
-        <% elsif @ib.territory_type == 'Province' %>
-          <% @place_string = "#{@ib.territory.description}, Italia" %>
-        <% elsif @ib.territory_type == 'Region' %>
-          <% @place_string = "#{@ib.territory.description}, Italia" %>
+        <% ib = current_user.interest_borders.includes(:territory).first %>
+        <% query = case ib&.territory_type
+                   when 'Municipality' then "#{ib.territory.description}, #{ib.territory.province.description}"
+                   when 'Province'     then ib.territory.description
+                   when 'Region'       then ib.territory.description
+                   when 'Country'      then ib.territory.description
+                   else nil
+                   end %>
+        <div class="w-full h-[240px] border-2 border-base-content/15"
+             data-controller="map"
+             <%= tag.attributes("data-map-query-value": query) if query %>>
+        </div>
+        <% if ib.nil? %>
+          <p class="text-xs text-base-content/50 mt-2">
+            <%= link_to t('pages.users.edit.interest_borders', default: 'Imposta il tuo territorio'), edit_user_registration_path, class: "link link-primary" %>
+          </p>
         <% end %>
-
-        <script type="text/javascript">
-          (function() {
-            if (typeof google === 'undefined' || !google.maps) return;
-            var interestBorderPlace = "<%= @place_string %>";
-            var geocoder = new google.maps.Geocoder();
-            var myOptions = { center: new google.maps.LatLng(-34.397, 150.644), zoom: 8, mapTypeId: google.maps.MapTypeId.ROADMAP };
-            var map = new google.maps.Map(document.getElementById('territory_map'), myOptions);
-            geocoder.geocode({'address': interestBorderPlace}, function (results, status) {
-              if (status == google.maps.GeocoderStatus.OK) {
-                map.setCenter(results[0].geometry.location);
-                map.fitBounds(results[0].geometry.bounds);
-              }
-            });
-          })();
-        </script>
       </div>
     </div>
 
