@@ -45,14 +45,13 @@ module UsersHelper
 
   def user_tag_mini(user, proposal = nil)
     u_nick = user.proposal_nicknames.find_by(proposal_id: proposal.id) if proposal&.is_anonima? && (user != current_user)
-    ret = "<div class=\"blogUserImage\" title=\"#{u_nick ? u_nick.nickname : user.email}\">"
-    ret += if u_nick
-             "<img src=\"https://www.gravatar.com/avatar/#{Digest::MD5.hexdigest(u_nick.nickname)}?s=24&d=identicon&r=PG\"/>"
-           else
-             avatar(user, size: 20)
-           end
-    ret += '</div>'
-    ret.html_safe
+    content_tag(:div, class: 'blogUserImage', title: (u_nick ? u_nick.nickname : user.email)) do
+      if u_nick
+        image_tag "https://www.gravatar.com/avatar/#{Digest::MD5.hexdigest(u_nick.nickname)}?s=24&d=identicon&r=PG"
+      else
+        avatar(user, size: 20)
+      end
+    end
   end
 
   def user_valutation_image(user, proposal, _options = {})
@@ -62,20 +61,16 @@ module UsersHelper
             proposal.rankings.find_by(user_id: user.id).try(:ranking_type_id)
           end
     if val == ProposalRanking::POSITIVE
-      '<div class="like-mini" style="display:inline-block;" title="Hai valutato positivamente questa proposta"></div>'.html_safe
+      tag.div(class: 'like-mini', style: 'display:inline-block;', title: 'Hai valutato positivamente questa proposta')
     elsif val == ProposalRanking::NEGATIVE
-      '<div class="dislike-mini" style="display:inline-block;" title="Hai valutato negativamente questa proposta"></div>'.html_safe
+      tag.div(class: 'dislike-mini', style: 'display:inline-block;', title: 'Hai valutato negativamente questa proposta')
     end
   end
 
   def avatar(user, params = {})
     size = params[:size] || 80
     force_size = params[:force_size].nil? ? true : params[:force_size]
-
-    style = force_size ? "style=\"width:#{size}px;height:#{size}px;\"" : ''
-
-    ret = "<img src=\"#{user.user_image_url(size, params)}\" #{style} alt=\"\" itemprop=\"photo\" />"
-
-    ret.html_safe
+    style = force_size ? "width:#{size}px;height:#{size}px;" : nil
+    image_tag user.user_image_url(size, params), alt: '', itemprop: 'photo', style: style
   end
 end

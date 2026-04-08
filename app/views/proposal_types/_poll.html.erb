@@ -1,5 +1,5 @@
 <div id="create_proposal">
-  <%= form_for (@group.present?) ? [@group, @proposal] : @proposal, validate: true do |f| %>
+  <%= form_with model: (@group.present? ? [@group, @proposal] : @proposal), validate: true do |f| %>
     <%= render partial: 'proposal_types/wizard_steps' %>
     <div class="step root root">
       <% if @group && @group.enable_areas && @group.group_areas.count > 0 && params[:action] == "new" %>

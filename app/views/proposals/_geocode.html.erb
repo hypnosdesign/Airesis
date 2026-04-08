@@ -1,5 +1,5 @@
 <div id="map" style="width: 600px; height: 600px;"></div>
-<%= form_for (@group.present?) ? [@group, @proposal] : @proposal, remote: remote do %>
+<%= form_with model: (@group.present? ? [@group, @proposal] : @proposal) do %>
   <%= button_tag 'Fatto ;)', value: 'geocode', class: 'btn btn-primary' %>
 <% end %>
 <script type="text/javascript">

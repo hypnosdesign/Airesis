@@ -8,7 +8,8 @@
                   elsif can?(:create_date, @group)
                     new_group_event_url(@group, event_type_id: EventType::VOTATION)
                   end
-                elsif is_admin?
+                elsif current_user
+                  # Passa l'URL a tutti gli utenti loggati: la form gestisce l'autorizzazione
                   new_event_url
                 end
 %>
@@ -23,4 +24,3 @@
   </div>
 </div>
 
-<div id="create_event_dialog"></div>

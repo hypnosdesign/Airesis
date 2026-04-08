@@ -6,7 +6,7 @@
   </div>
 <% end %>
 
-<%= simple_form_for [@group, @quorum], validate: true, remote: request.xhr? do |e| %>
+<%= simple_form_for [@group, @quorum], validate: true do |e| %>
   <div class="flex flex-wrap">
     <div class="w-full">
       <%= e.input :name %>

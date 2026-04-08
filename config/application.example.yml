@@ -87,8 +87,6 @@ ADMIN_PASSWORD: "password"
 # sitemap host and email assets url (for images)
 SITE: "https://www.example.com"
 
-# where is listening your redis installation?
-REDIS_URL: "redis://127.0.0.1:6379/12"
 
 # remove these variables if you are not using amazon s3
 # AWS_HOST: "s3-eu-west-1.amazonaws.com"
@@ -101,6 +99,10 @@ REDIS_URL: "redis://127.0.0.1:6379/12"
 
 # remove this variable if you are not using cloudfront. set it to cloudfront alias if you want to you it
 # AWS_ALIAS: "static.yourwebsite.com"
+
+# Allowed CORS origins for the API (comma-separated). Leave empty to block all cross-origin requests.
+# Example: "https://app.example.com,https://www.example.com"
+ALLOWED_CORS_ORIGINS: ""
 
 # Newrelic configurations
 NEW_RELIC_LICENSE_KEY: 'FROM NEW RELCI'
@@ -241,5 +243,3 @@ MAILMAN_SENDER: 'Airesis Forum'
 # if the user does not access the platform for this number of days, his session will be destroyed
 SESSION_DAYS: '14'
 
-PRIVATEPUB_SERVER: 'http://localhost:9292/faye'
-PRIVATEPUB_SECRET_TOKEN: 'hello'

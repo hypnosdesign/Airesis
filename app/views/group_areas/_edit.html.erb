@@ -1,5 +1,5 @@
 <div class="card bg-base-200 p-4">
-  <%= simple_form_for [@group, @group_area], validate: true, remote: request.xhr? do |e| %>
+  <%= simple_form_for [@group, @group_area], validate: true do |e| %>
     <%= e.input :name %>
     <%= e.input :description, as: :text %>
     <%= e.submit t('buttons.update'), class: 'btn btn-primary', data: {disable_with: t('saving')} %>

@@ -183,12 +183,13 @@ class EventsController < ApplicationController
       calendar.add_event(event.to_ics)
     end
     calendar.publish
-    render text: calendar.to_ical
+    render plain: calendar.to_ical
   end
 
   def respond_with_json_index
     @events = @events.time_scoped(Time.zone.parse(params['start']), Time.zone.parse(params['end']))
     @events = @events.in_territory(current_domain.territory) unless @group
+    @events = @events.includes(:groups) unless @group  # evita N+1 in generate_event_obj
     events = @events.map { |event| generate_event_obj(event) }
     render json: events.to_json
   end

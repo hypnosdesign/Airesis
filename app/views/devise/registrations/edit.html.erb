@@ -9,7 +9,7 @@
   </div>
 </div>
 
-<%= form_for(resource, as: resource_name, url: registration_path(resource_name), html: { data: { turbo_method: :put } }) do |f| %>
+<%= form_with model: resource, as: resource_name, url: registration_path(resource_name), data: { turbo_method: :put } do |f| %>
   <% if resource.errors.any? %>
     <div role="alert" class="alert alert-error mb-6 border-2 border-base-content/15">
       <i class="fa-solid fa-circle-exclamation"></i>

@@ -1,4 +1,4 @@
-<%= form_for [@proposal, @proposal_comment] do |f| %>
+<%= form_with model: [@proposal, @proposal_comment] do |f| %>
   <%= f.text_area :content, class: 'edit_comment' %>
   <%= link_to t('buttons.cancel'), '#', class: 'btn', data: {cancel_edit_comment: @proposal_comment.id} %>
   <%= f.button t('buttons.update'), class: 'btn btn-primary', data: {disable_with: t('updating')} %>

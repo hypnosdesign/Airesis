@@ -1,6 +1,6 @@
 <h2 class="text-xl font-bold mb-4"><%= t('pages.users.send_message_title', name: @user.fullname) %></h2>
 
-<%= form_for 'message', url: send_message_user_path(@user), remote: request.xhr? do |e| %>
+<%= form_with url: send_message_user_path(@user) do |e| %>
   <div class="flex flex-wrap">
     <div class="w-full mb-4">
       <p>

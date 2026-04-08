@@ -62,14 +62,14 @@ module ApplicationHelper
           elsif diff > 1.hour
             I18n.l(from_time, format: :hour)
           else
-            "<div data-countdown data-time='#{from_time.to_i * 1000}' style='display:inline'></div>".html_safe
+            tag.div(data: { countdown: true, time: from_time.to_i * 1000 }, style: 'display:inline')
           end
     ret
   end
 
   def google_authenticator_qrcode(user)
     data = "otpauth://totp/#{user.email}?secret=#{user.rotp_secret}"
-    url = "https://chart.googleapis.​com/chart?chs=200x200&chld=M|0&cht=qr&chl=#{data}"
+    url = "https://chart.googleapis.com/chart?chs=200x200&chld=M|0&cht=qr&chl=#{data}"
     image_tag(url, alt: 'Google Authenticator QRCode')
   end
 

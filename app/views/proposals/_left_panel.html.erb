@@ -7,7 +7,7 @@
       </p>
       <progress class="progress progress-success w-full" value="<%= [(@proposal.vote.number.to_f / @proposal.signatures.to_f) * 100, 100].min %>" max="100"></progress>
       <% if can? :vote, @proposal %>
-        <%= form_for 'data', url: votation_vote_path(proposal_id: @proposal.id), data: { turbo_method: :put } do |f| %>
+        <%= form_with url: votation_vote_path(proposal_id: @proposal.id), method: :put do |f| %>
           <%= f.text_area 'comment', placeholder: 'Share your thought', class: 'textarea textarea-bordered w-full mb-2' %>
           <%= f.submit 'Sign the petition', class: 'btn btn-primary w-full', disable_with: t('loading') %>
         <% end %>

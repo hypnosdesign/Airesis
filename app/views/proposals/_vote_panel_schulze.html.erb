@@ -17,7 +17,7 @@
     </div>
   </div>
 </div>
-<%= form_for 'data', url: { action: "vote_schulze", controller: "votations", proposal_id: @proposal.id }, data: { turbo_method: :put } do |f| %>
+<%= form_with url: { action: "vote_schulze", controller: "votations", proposal_id: @proposal.id }, method: :put do |f| %>
   <%= f.hidden_field 'votes' %>
   <% if current_user.rotp_enabled && ::Configuration.rotp %>
     <%= f.label t('pages.proposals.show.security_token') %>

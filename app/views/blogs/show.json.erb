@@ -1,1 +1,1 @@
-{ "title": "<%= @blog.title %>", "posts": <%= raw @blog_posts.to_json({ only: [:id, :title, :created_at, :updated_at, :body], include: [user: { only: [:id], methods: [:fullname] }] }) %> }
+<%= { title: @blog.title, posts: @blog_posts.as_json(only: %i[id title created_at updated_at body], include: { user: { only: [:id], methods: [:fullname] } }) }.to_json %>

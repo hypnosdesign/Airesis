@@ -38,8 +38,8 @@ module Admin
       redirect_to admin_panel_path
     end
 
-    # invia una mail di prova tramite resque e redis
-    def test_redis
+    # invia una mail di prova tramite Solid Queue
+    def test_mailer
       ResqueMailer.test_mail.deliver_later
       flash[:notice] = 'Test avviato'
       redirect_to admin_panel_path

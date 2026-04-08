@@ -73,7 +73,7 @@ module Airesis
 
     config.middleware.insert_before 0, Rack::Cors, debug: Rails.env.development? do
       allow do
-        origins '*'
+        origins(*ENV.fetch('ALLOWED_CORS_ORIGINS', '').split(',').map(&:strip).presence || [])
 
         resource '/api/*',
                  headers: :any,

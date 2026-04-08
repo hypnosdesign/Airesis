@@ -4,7 +4,7 @@
       <a class="card mess new" href="<%= calculate_alert_path(alert) %>" data-proposal-id="<%= @proposal_id %>">
     </li>
     <div>
-      <p class="p2"><%= alert.message.html_safe %></p>
+      <p class="p2"><%= sanitize alert.message %></p>
     </div>
     <div class="p1"><%= l alert.created_at %></div>
   <% end %>
