@@ -1,12 +1,13 @@
 import { Controller } from "@hotwired/stimulus"
-import ApexCharts from "apexcharts"
 
 // Wrapper Stimulus per ApexCharts.
+// ApexCharts (~1MB) viene caricato solo quando il controller è attivo (lazy).
 // Uso: <div data-controller="chart" data-chart-type-value="donut" data-chart-data-value='<%= {...}.to_json %>'>
 export default class extends Controller {
   static values = { data: Object, type: String }
 
-  connect() {
+  async connect() {
+    const { default: ApexCharts } = await import("apexcharts")
     this.chart = new ApexCharts(this.element, this.buildOptions())
     this.chart.render()
 

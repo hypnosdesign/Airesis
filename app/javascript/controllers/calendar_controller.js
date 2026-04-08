@@ -1,11 +1,7 @@
 import { Controller } from "@hotwired/stimulus"
-import { Calendar } from "@fullcalendar/core"
-import dayGridPlugin from "@fullcalendar/daygrid"
-import timeGridPlugin from "@fullcalendar/timegrid"
-import listPlugin from "@fullcalendar/list"
-import interactionPlugin from "@fullcalendar/interaction"
 
 // Wrapper Stimulus per FullCalendar v6.
+// FullCalendar (~530KB) viene caricato solo quando il controller è attivo (lazy).
 // Dati passati via data-values:
 //   data-calendar-events-url-value  — URL JSON endpoint eventi
 //   data-calendar-new-event-url-value — URL form nuovo evento (opzionale)
@@ -19,7 +15,21 @@ export default class extends Controller {
     editable: { type: Boolean, default: false },
   }
 
-  connect() {
+  async connect() {
+    const [
+      { Calendar },
+      { default: dayGridPlugin },
+      { default: timeGridPlugin },
+      { default: listPlugin },
+      { default: interactionPlugin }
+    ] = await Promise.all([
+      import("@fullcalendar/core"),
+      import("@fullcalendar/daygrid"),
+      import("@fullcalendar/timegrid"),
+      import("@fullcalendar/list"),
+      import("@fullcalendar/interaction")
+    ])
+
     this.calendar = new Calendar(this.element, {
       plugins: [dayGridPlugin, timeGridPlugin, listPlugin, interactionPlugin],
       initialView: "timeGridWeek",
