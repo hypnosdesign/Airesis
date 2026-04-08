@@ -4,7 +4,7 @@
     <span class="blogPoster font-semibold"><%= link_to_user comment.user %></span>
   </div>
   <div class="blog-comment-content mb-2">
-    <%= raw auto_link((h(comment.body)).gsub(/\n/, '<br/>'), html: { target: '_blank' }, sanitize: false) { |text| truncate(text, length: 15) } %>
+    <%= auto_link(h(comment.body).gsub(/\n/, '<br/>'), html: { target: '_blank' }, sanitize: true) { |text| truncate(text, length: 15) } %>
   </div>
   <div class="blog-comment-footer text-sm text-base-content/60">
     <% if comment.likers.include? current_user %>

@@ -6,7 +6,7 @@
     </span>
   </div>
   <div class="blog-comment-content mb-2">
-    <%= raw auto_link((h(comment.body)).gsub(/\n/, '<br/>'), html: { target: '_blank' }, sanitize: false) { |text| truncate(text, length: 15) } %>
+    <%= auto_link(h(comment.body).gsub(/\n/, '<br/>'), html: { target: '_blank' }, sanitize: true) { |text| truncate(text, length: 15) } %>
   </div>
   <div class="blog-comment-footer text-sm text-base-content/60">
     <div title="<%= l comment.created_at %>">

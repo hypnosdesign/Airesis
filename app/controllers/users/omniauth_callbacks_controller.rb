@@ -30,7 +30,16 @@ class Users::OmniauthCallbacksController < Devise::OmniauthCallbacksController
           # se devo aggiornare il token...fallo
           new_token = oauth_data['credentials']['token']
           auth.update(token: new_token) if auth.token != new_token
-          return redirect_to request.env['omniauth.origin'] + '?share=true' if request.env['omniauth.params']['share']
+          if request.env['omniauth.params']['share']
+            origin = request.env['omniauth.origin'].to_s
+            safe_origin = begin
+              uri = URI.parse(origin)
+              uri.host.nil? || uri.host == request.host
+            rescue URI::InvalidURIError
+              false
+            end
+            return redirect_to safe_origin ? "#{origin}?share=true" : root_path
+          end
         end
         # cancel_operation
         flash[:error] = I18n.t('devise.omniauth_callbacks.join_failure', provider: provider.capitalize)
