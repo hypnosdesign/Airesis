@@ -251,7 +251,7 @@ class Proposal < ApplicationRecord
   # @return [Array<Proposal>] proposte correnti, ordinate per `updated_at DESC`
   def self.home_portlet(user)
     proposals = Proposal.arel_table
-    petition_id = ProposalType.find_by(name: ProposalType::PETITION).id
+    petition_id = ProposalType.find_by!(name: ProposalType::PETITION).id
     alerts_count = alerts_count_subquery(user.id)
     ranking = ranking_subquery(user.id)
 
@@ -277,7 +277,7 @@ class Proposal < ApplicationRecord
   # @return [ActiveRecord::Relation<Proposal>] max 10 petizioni visibili, per `updated_at DESC`
   def self.open_space_petitions_portlet(user)
     proposals = Proposal.arel_table
-    petition_id = ProposalType.find_by(name: ProposalType::PETITION).id
+    petition_id = ProposalType.find_by!(name: ProposalType::PETITION).id
     alerts_count = alerts_count_subquery(user.id)
 
     Proposal.visible.
@@ -301,7 +301,7 @@ class Proposal < ApplicationRecord
     events = Event.arel_table
     participation_roles = ParticipationRole.arel_table
     UserVote.arel_table
-    petition_id = ProposalType.find_by(name: ProposalType::PETITION).id
+    petition_id = ProposalType.find_by!(name: ProposalType::PETITION).id
     alerts_count = alerts_count_subquery(user_id)
     ranking = ranking_subquery(user_id)
 
@@ -454,7 +454,7 @@ class Proposal < ApplicationRecord
 
   # restituisce il primo autore della proposta
   def user
-    @first_user ||= proposal_presentations.first.user
+    @first_user ||= proposal_presentations.first&.user
   end
 
   # Numero di utenti che possono votare questa proposta.
@@ -468,7 +468,7 @@ class Proposal < ApplicationRecord
     if !presentation_areas.empty? # if we are in a working area
       presentation_areas.first.scoped_participants(:vote_proposals).count
     else
-      groups.first.scoped_participants(:vote_proposals).count
+      groups.first&.scoped_participants(:vote_proposals)&.count || 0
     end
   end
 
@@ -708,8 +708,8 @@ class Proposal < ApplicationRecord
   end
 
   def generate_short_content
-    section = sections.first || solutions.first.sections.first
-    truncate_words(section.paragraphs.first.content.gsub(%r{</?[^>]+?>}, ''), 40)
+    section = sections.first || solutions.first&.sections&.first
+    truncate_words(section&.paragraphs&.first&.content&.gsub(%r{</?[^>]+?>}, ''), 40)
   rescue StandardError
     nil
   end

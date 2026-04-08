@@ -80,17 +80,23 @@ module Admin
     end
 
     def proposals_stats
-      ret = Proposal.voted.
-            joins(:solutions).
-            group('proposals.id').
-            having('count(solutions.*) > 1').count.map do |proposal_id, count|
-        proposal = Proposal.find(proposal_id)
+      counts = Proposal.voted.
+               joins(:solutions).
+               group('proposals.id').
+               having('count(solutions.*) > 1').count
+      proposals_by_id = Proposal.where(id: counts.keys)
+                                .includes(:solutions, :schulze_votes)
+                                .index_by(&:id)
+      ret = counts.map do |proposal_id, count|
+        proposal = proposals_by_id[proposal_id]
+        next unless proposal
+
         { proposal_id: proposal_id,
           solutions_count: count,
           votes_count: proposal.user_votes_count,
           solutions: proposal.solutions.map(&:id).join(','),
           preferences: proposal.schulze_votes.map { |vote| { count: vote.count, data: vote.preferences } } }
-      end
+      end.compact
       File.open('stat.json', 'w') { |f| f.puts JSON.pretty_generate(ret) }
     end
   end

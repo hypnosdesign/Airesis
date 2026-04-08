@@ -17,12 +17,14 @@ module Frm
       def register_view_by(user)
         return unless user
 
-        view = views.find_or_create_by(user_id: user.id)
-        view.increment!('count')
-        self.class.update_counters id, views_count: 1
-        view.past_viewed_at = view.current_viewed_at || Time.zone.now
-        view.current_viewed_at = Time.zone.now
-        view.save
+        ActiveRecord::Base.transaction do
+          view = views.find_or_create_by(user_id: user.id)
+          view.increment!('count')
+          self.class.update_counters id, views_count: 1
+          view.past_viewed_at = view.current_viewed_at || Time.zone.now
+          view.current_viewed_at = Time.zone.now
+          view.save!
+        end
       end
     end
   end
