@@ -323,7 +323,7 @@
                    when 'Country'      then ib.territory.description
                    else nil
                    end %>
-        <div class="w-full h-[240px] border-2 border-base-content/15"
+        <div class="w-full h-[240px] border-2 border-base-content/15 relative overflow-hidden"
              data-controller="map"
              <%= tag.attributes("data-map-query-value": query) if query %>>
         </div>

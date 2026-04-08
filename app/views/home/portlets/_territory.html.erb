@@ -11,7 +11,7 @@
            else nil
            end %>
 
-<div class="w-full h-[340px] m-[5px]"
+<div class="w-full h-[340px] m-[5px] relative overflow-hidden"
      data-controller="map"
      <%= tag.attributes("data-map-query-value": query) if query %>>
 </div>
