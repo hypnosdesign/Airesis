@@ -10,7 +10,33 @@
   border-radius: 0 !important;
 }
 
-/* Leaflet: ripristina border-radius per popup, tooltip e controlli */
+/* ============================
+   Leaflet overrides
+   (Tailwind preflight può sovrascrivere alcune proprietà di Leaflet)
+   ============================ */
+
+/* Contenitore principale: overflow e position sono critici */
+.leaflet-container {
+  overflow: hidden !important;
+  position: relative !important;
+  font-family: inherit;
+}
+
+/* I pane interni devono restare absolute e azzerati */
+.leaflet-pane,
+.leaflet-tile,
+.leaflet-marker-icon,
+.leaflet-marker-shadow,
+.leaflet-tile-container,
+.leaflet-map-pane svg,
+.leaflet-map-pane canvas,
+.leaflet-zoom-box,
+.leaflet-image-layer,
+.leaflet-layer {
+  position: absolute !important;
+}
+
+/* Ripristina border-radius per popup, tooltip e controlli */
 .leaflet-popup-content-wrapper,
 .leaflet-popup-tip,
 .leaflet-tooltip,
