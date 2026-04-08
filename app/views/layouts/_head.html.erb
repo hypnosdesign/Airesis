@@ -9,7 +9,7 @@
 <%= stylesheet_link_tag "tailwind", "data-turbo-track": "reload" %>
 <%= stylesheet_link_tag "actiontext", "data-turbo-track": "reload" %>
 <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
-<%= javascript_include_tag "application", "data-turbo-track": "reload", defer: true %>
+<%= javascript_include_tag "application", "data-turbo-track": "reload", type: "module" %>
 
 <%= yield :elfinder_assets %>
 <%= csrf_meta_tags %>
