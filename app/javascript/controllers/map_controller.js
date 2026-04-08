@@ -18,24 +18,39 @@ export default class extends Controller {
     zoom: { type: Number, default: 8 }
   }
 
-  async connect() {
-    // Aspetta che il browser abbia calcolato le dimensioni del container
-    // (se il container ha size=0 al momento di connect(), le tile vengono piazzate male)
-    await new Promise(resolve => requestAnimationFrame(resolve))
+  connect() {
+    // Aspetta che il container abbia dimensioni reali prima di inizializzare Leaflet.
+    // requestAnimationFrame non basta quando il CSS è ancora in fase di applicazione;
+    // ResizeObserver si attiva solo quando width e height sono > 0.
+    this.resizeObserver = new ResizeObserver((entries) => {
+      for (const entry of entries) {
+        const { width, height } = entry.contentRect
+        if (width > 0 && height > 0) {
+          this.resizeObserver.disconnect()
+          this.resizeObserver = null
+          this.#setup()
+          return
+        }
+      }
+    })
+    this.resizeObserver.observe(this.element)
+  }
 
+  async #setup() {
     this.#initMap()
-
     if (this.queryValue) {
       await this.#geocodeAndFit(this.queryValue)
     } else {
       this.map.setView(ITALY_CENTER, ITALY_ZOOM)
     }
-
-    // Forza il ricalcolo delle dimensioni dopo il rendering
     this.map.invalidateSize()
   }
 
   disconnect() {
+    if (this.resizeObserver) {
+      this.resizeObserver.disconnect()
+      this.resizeObserver = null
+    }
     if (this.map) {
       this.map.remove()
       this.map = null
