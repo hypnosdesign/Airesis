@@ -22,17 +22,8 @@
   font-family: inherit;
 }
 
-/* I pane interni devono restare absolute e azzerati */
-.leaflet-pane,
-.leaflet-tile,
-.leaflet-marker-icon,
-.leaflet-marker-shadow,
-.leaflet-tile-container,
-.leaflet-map-pane svg,
-.leaflet-map-pane canvas,
-.leaflet-zoom-box,
-.leaflet-image-layer,
-.leaflet-layer {
+/* I pane interni devono restare absolute — NON forzare left/top, Leaflet li gestisce */
+.leaflet-pane {
   position: absolute !important;
 }
 
