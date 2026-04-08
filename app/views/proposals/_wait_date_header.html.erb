@@ -9,7 +9,7 @@
       <% collection = Event.visible.vote_period.collect { |p| ["da #{l p.starttime} a #{l p.endtime}", p.id, { 'data-start' => (l p.starttime), 'data-end' => (l p.endtime), 'data-title' => p.title }] } %>
     <% end %>
     <% if collection.size > 0 %>
-      <%= form_for @group ? [:set_votation_date, @group, @proposal] : [:set_votation_date, @proposal] do |f| %>
+      <%= form_with model: (@group ? [:set_votation_date, @group, @proposal] : [:set_votation_date, @proposal]) do |f| %>
         <p>
           <%= t('pages.proposals.show.choose_votation_period') %>
           <%= f.select :vote_period_id, options_for_select(collection), { style: 'width:400px' } %>

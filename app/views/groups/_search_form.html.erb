@@ -1,4 +1,4 @@
-<%= form_for groups_path, method: 'get' do |f| %>
+<%= form_with url: groups_path, method: :get do |f| %>
   <div class="flex flex-wrap">
     <div class="w-full">
       <%= f.label t('buttons.search'), t('pages.groups.index.search_with_query') %>

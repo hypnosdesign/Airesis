@@ -69,7 +69,7 @@ export default class extends Controller {
         const url = new URL(this.newEventUrlValue, window.location.origin)
         url.searchParams.set("starttime", info.start.getTime())
         url.searchParams.set("endtime", info.end.getTime())
-        url.searchParams.set("has_time", !info.allDay)
+        url.searchParams.set("has_time", info.allDay ? "false" : "true")
         Turbo.visit(url.toString())
       },
 
@@ -109,15 +109,19 @@ export default class extends Controller {
 
   async #patchEvent(id, action, data, revert) {
     const csrfToken = document.querySelector('meta[name="csrf-token"]')?.content
-    const response = await fetch(`/events/${id}/${action}`, {
-      method: "POST",
-      headers: {
-        "X-CSRF-Token": csrfToken,
-        "Content-Type": "application/json",
-        Accept: "application/json",
-      },
-      body: JSON.stringify(data),
-    })
-    if (!response.ok) revert()
+    try {
+      const response = await fetch(`/events/${id}/${action}`, {
+        method: "POST",
+        headers: {
+          "X-CSRF-Token": csrfToken,
+          "Content-Type": "application/json",
+          Accept: "application/json",
+        },
+        body: JSON.stringify(data),
+      })
+      if (!response.ok) revert()
+    } catch {
+      revert()
+    }
   }
 }

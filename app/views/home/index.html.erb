@@ -103,7 +103,7 @@
             <div class="divider text-sm text-base-content/50"><%= t('common.or') rescue 'oppure' %></div>
           <% end %>
 
-          <%= form_for resource, as: resource_name, url: user_session_path do |f| %>
+          <%= form_with model: resource, as: resource_name, url: user_session_path do |f| %>
             <div class="space-y-4">
               <%= f.email_field :email, placeholder: 'Email',
                   class: 'input w-full border-2 border-neutral bg-base-100 focus:outline-none',

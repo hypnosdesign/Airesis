@@ -58,10 +58,12 @@ class ApplicationController < ActionController::Base
     # Se in sessione è memorizzato un contributo pendente, eseguilo prima del redirect
     if session[:proposal_comment] && session[:proposal_id]
       @proposal = Proposal.find(session[:proposal_id])
-      params[:proposal_comment] = session[:proposal_comment].slice('content', 'parent_proposal_comment_id', 'section_id')
+      comment_params = session[:proposal_comment].slice('content', 'parent_proposal_comment_id', 'section_id')
       session[:proposal_id] = nil
       session[:proposal_comment] = nil
-      @proposal_comment = @proposal.proposal_comments.build(params[:proposal_comment].permit!)
+      @proposal_comment = @proposal.proposal_comments.build(
+        ActionController::Parameters.new(comment_params).permit(:content, :parent_proposal_comment_id, :section_id)
+      )
       post_contribute
       proposal_path(@proposal)
     elsif session[:blog_comment] && session[:blog_post_id] && session[:blog_id]
@@ -233,7 +235,8 @@ class ApplicationController < ActionController::Base
     replacement_locale = locales_replacement[required_locale]
     log_error(exception)
     flash[:error] = 'You are asking for a locale which is not available, sorry'
-    redirect_to url_for(params.permit!.merge(l: replacement_locale).merge(only_path: true)), status: :moved_permanently
+    # to_unsafe_h è sicuro qui: i parametri servono solo per ricostruire la route, non vengono assegnati a modelli
+    redirect_to url_for(params.to_unsafe_h.merge(l: replacement_locale, only_path: true)), status: :moved_permanently
   end
 
   def render_404(exception = nil)
@@ -249,7 +252,8 @@ class ApplicationController < ActionController::Base
 
 
   def current_url(overwrite = {})
-    url_for params.permit!.to_h.merge(overwrite).merge(only_path: false)
+    # to_unsafe_h è sicuro qui: i parametri servono solo per ricostruire l'URL corrente, non vengono assegnati a modelli
+    url_for params.to_unsafe_h.merge(overwrite).merge(only_path: false)
   end
 
   # helper method per determinare se l'utente attualmente collegato è amministratore di sistema

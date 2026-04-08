@@ -12,20 +12,10 @@ module ProposalsHelper
       end)
   end
 
-  def reload_message
-    ret = 'toastr.options = {tapToDismiss: false, extendedTimeOut: 0, timeOut: 0};'
-    ret += "toastr.info('<div id=\"reload_proposal\">"
-    ret += 'This page is outdate.<br/>Please reload the page.'
-    ret += '<br/>'
-    ret += '<a href="" class="btn" style="color: #444">Reload</a>'
-    ret += "</div>');"
-    ret.html_safe
-  end
-
   # return a parsed section
   def parsed_section(section)
     sanitize(section.paragraphs.first.content).gsub(/<.{1,3}>/, '').blank? ?
-      "<p><span class=\"fake_content\">#{section.question || t('pages.proposals.show.generic_fake_content')}</span></p>".html_safe :
+      content_tag(:p, content_tag(:span, section.question || t('pages.proposals.show.generic_fake_content'), class: 'fake_content')) :
       sanitize(section.paragraphs.first.content)
   end
 
@@ -78,10 +68,7 @@ module ProposalsHelper
   end
 
   def proposal_tag(proposal, _options = {})
-    ret = "<div class='proposal_tag'>"
-    ret += link_to_proposal(proposal)
-    ret += '</div>'
-    ret.html_safe
+    content_tag(:div, link_to_proposal(proposal), class: 'proposal_tag')
   end
 
   def link_to_proposal(proposal, options = {})

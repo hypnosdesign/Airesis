@@ -415,7 +415,7 @@ Rails.application.routes.draw do
         get :change_proposals_state
         get :write_sitemap
         get :delete_old_notifications
-        get :test_redis
+        get :test_mailer
         get :test_scheduler
         get :test_exceptions
         get :calculate_user_group_affinity

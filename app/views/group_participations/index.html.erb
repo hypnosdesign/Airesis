@@ -54,7 +54,7 @@
                 <button>close</button>
               </form>
             </dialog>
-            <%= form_for 'destroy', url: destroy_all_group_group_participations_path(@group), data: { turbo_method: :post }, html: { style: 'display:inline;' } do |e| %>
+            <%= form_with url: destroy_all_group_group_participations_path(@group), method: :post, style: 'display:inline;' do |e| %>
               <%= e.hidden_field 'ids', value: @unscoped_group_participations.map { |p| p.id }.join(',') %>
               <%= link_to '#', class: 'btn', id: 'remove_all' do %>
                 <i class="fa-regular fa-trash-can"></i>

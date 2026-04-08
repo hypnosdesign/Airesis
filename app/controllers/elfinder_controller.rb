@@ -39,6 +39,10 @@ class ElfinderController < ApplicationController
 
     headers.merge!(h)
 
-    render (r.empty? ? { nothing: true } : { json: r.to_json }), layout: false
+    if r.empty?
+      head :ok
+    else
+      render json: r.to_json, layout: false
+    end
   end
 end

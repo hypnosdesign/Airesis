@@ -19,6 +19,8 @@ module Admin
     end
 
     def preview
+      # render inline: è intenzionale — il body della newsletter è un template ERB scritto dall'admin.
+      # L'accesso a questa action è limitato agli admin autenticati (Admin::ApplicationController).
       @user = User.new(name: Faker::Name.name, surname: Faker::Name.last_name, original_locale: SysLocale.all.sample)
       render inline: @newsletter.body, layout: 'newsletters/default'
     end

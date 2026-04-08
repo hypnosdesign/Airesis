@@ -9,7 +9,7 @@
   <% end %>
   <%= turbo_stream.replace "proposalNewComment" do %>
     <div id="proposalNewComment">
-      <%= form_for [@proposal, ProposalComment.new] do |f| %>
+      <%= form_with model: [@proposal, ProposalComment.new] do |f| %>
         <p>
           <%= f.label :content do %>
             <%= t('pages.proposals.show.add_contribute') %>

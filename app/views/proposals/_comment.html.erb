@@ -38,7 +38,7 @@
         <div class="proposal_comment_reply">
           <div class="baloon-triangle"></div>
           <div id="<%= comment.id %>_reply_area_msg">
-            <%= form_for [@proposal, ProposalComment.new] do |f| %>
+            <%= form_with model: [@proposal, ProposalComment.new] do |f| %>
               <div class="reply_area">
                 <%= f.hidden_field :parent_proposal_comment_id, value: comment.id %>
                 <%= f.text_area :content, class: 'reply_textarea', data: { id: comment.id, textntags: '' }, id: "#{comment.id}_reply_text_area", placeholder: t('pages.proposals.show.reply_placeholder') %>

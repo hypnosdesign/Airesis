@@ -3,7 +3,7 @@
 <% if @available_groups.empty? %>
   <%= t('pages.proposal_supports.new.no_available_groups') %>
 <% else %>
-  <%= form_for [@proposal, @proposal_support], remote: request.xhr? do |f| %>
+  <%= form_with model: [@proposal, @proposal_support] do |f| %>
     <% @available_groups.each do |group| %>
       <%= f.label group.name do %>
         <%= check_box_tag "proposal[supporting_group_ids][]", group.id,
