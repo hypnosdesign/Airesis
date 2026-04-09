@@ -315,19 +315,11 @@
         <h2 class="font-bold text-sm"><%= t('pages.home.show.your_territory', default: 'Il tuo territorio') %></h2>
       </div>
       <div class="p-4">
-        <% ib = current_user.interest_borders.includes(:territory).first %>
-        <% query = case ib&.territory_type
-                   when 'Municipality' then "#{ib.territory.description}, #{ib.territory.province.description}"
-                   when 'Province'     then ib.territory.description
-                   when 'Region'       then ib.territory.description
-                   when 'Country'      then ib.territory.description
-                   else nil
-                   end %>
         <div class="w-full h-[240px] border-2 border-base-content/15 relative overflow-hidden"
              data-controller="map"
-             <%= tag.attributes("data-map-query-value": query) if query %>>
+             <%= tag.attributes("data-map-query-value": @territory_query) if @territory_query %>>
         </div>
-        <% if ib.nil? %>
+        <% if @territory_query.nil? %>
           <p class="text-xs text-base-content/50 mt-2">
             <%= link_to t('pages.users.edit.interest_borders', default: 'Imposta il tuo territorio'), edit_user_registration_path, class: "link link-primary" %>
           </p>

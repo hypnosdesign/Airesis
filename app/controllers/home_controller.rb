@@ -53,6 +53,7 @@ class HomeController < ApplicationController
   def show
     @user = current_user
     @page_title = @user.fullname
+    @territory_query = build_territory_query
   end
 
   def feedback
@@ -96,6 +97,18 @@ class HomeController < ApplicationController
     @proposals = Proposal.open_space_portlet(current_user, current_domain.territory)
     @most_active_groups = Group.most_active(current_domain.territory)
     @tags = Tag.most_used(current_domain.territory).limit(100)
+  end
+
+  def build_territory_query
+    ib = current_user.interest_borders.includes(:territory).first
+    return nil unless ib&.territory
+
+    case ib.territory_type
+    when 'Municipality'
+      "#{ib.territory.description}, #{ib.territory.province&.description}".strip.delete_suffix(',')
+    else
+      ib.territory.description
+    end
   end
 
   def choose_layout
