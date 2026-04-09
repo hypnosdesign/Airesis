@@ -116,10 +116,6 @@ class Event < ApplicationRecord
     event_type_id == EventType::MEETING
   end
 
-  def validate
-    errors.add_to_base('Start Time must be less than End Time') if (starttime >= endtime) && !all_day
-  end
-
   def to_param
     "#{id}-#{title.downcase.gsub(/[^a-zA-Z0-9]+/, '-').gsub(/-{2,}/, '-').gsub(/^-|-$/, '')}"
   end

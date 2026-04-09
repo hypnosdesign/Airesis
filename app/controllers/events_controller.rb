@@ -28,7 +28,10 @@ class EventsController < ApplicationController
     @pagy, @event_comments = pagy(@event.event_comments.includes(:user).order('created_at DESC'), items: COMMENTS_PER_PAGE)
     respond_to do |format|
       format.html do
-        @proposals = @event.proposals.for_list(current_user.try(:id)) if @event.votation?
+        if @event.votation?
+          @proposals = @event.proposals.for_list(current_user.try(:id))
+          @proposals_count = @event.proposals.count
+        end
       end
       format.turbo_stream
       format.ics do
@@ -113,11 +116,13 @@ class EventsController < ApplicationController
   end
 
   def move
+    authorize! :update, @event
     @event.move(params[:minute_delta].to_i, params[:day_delta].to_i, params[:all_day])
     head :ok
   end
 
   def resize
+    authorize! :update, @event
     @event.resize(params[:minute_delta].to_i, params[:day_delta].to_i)
     head :ok
   end
