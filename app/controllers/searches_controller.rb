@@ -9,9 +9,11 @@ class SearchesController < ApplicationController
     results = []
     groups = @search.groups.to_a
     if groups.any?
+      group_ids = groups.map(&:id)
+      proposals_count_by_group = GroupProposal.where(group_id: group_ids).group(:group_id).count
       results << { value: t('controllers.searches.index.groups_divider'), type: 'Divider' }
       groups.each do |group|
-        results << { value: group.name, type: 'Group', url: group_url(group), proposals_url: group_proposals_url(group), events_url: group_events_url(group), participants_num: group.group_participations_count, proposals_num: group.proposals.count, image: group.image.attached? ? url_for(group.image) : nil }
+        results << { value: group.name, type: 'Group', url: group_url(group), proposals_url: group_proposals_url(group), events_url: group_events_url(group), participants_num: group.group_participations_count, proposals_num: proposals_count_by_group[group.id] || 0, image: group.image.attached? ? url_for(group.image) : nil }
       end
     end
     proposals = @search.proposals.includes(:groups).to_a

@@ -270,7 +270,7 @@
     <% solutions.each_with_index do |solution, i| %>
       <div class="bg-base-100 border-2 border-base-content/15 p-6">
         <h3 class="text-base font-bold text-primary mb-4">
-          <%= raw t("pages.proposals.edit.new_solution_title.#{@proposal.proposal_type.name.downcase}", num: i+1) %>
+          <%= t("pages.proposals.edit.new_solution_title.#{@proposal.proposal_type.name.downcase}", num: i + 1, default: "#{i + 1}.") %>
           <%= solution.title %>
         </h3>
         <% solution.sections.each do |section| %>

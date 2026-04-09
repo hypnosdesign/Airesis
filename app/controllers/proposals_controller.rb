@@ -100,6 +100,7 @@ class ProposalsController < ApplicationController
 
   def banner
     @proposal = Proposal.find(params[:id])
+    authorize! :show, @proposal
     respond_to do |format|
       format.html { render 'banner', layout: false }
       format.turbo_stream
@@ -108,6 +109,7 @@ class ProposalsController < ApplicationController
 
   def test_banner
     @proposal = Proposal.find(params[:id])
+    authorize! :show, @proposal
     respond_to do |format|
       format.html
     end
@@ -125,6 +127,7 @@ class ProposalsController < ApplicationController
 
     @proposal.check_phase
     @proposal.reload
+    ActiveRecord::Associations::Preloader.new(records: [@proposal], associations: [interest_borders: :territory]).call
     if @proposal.private
       if @proposal.visible_outside
         if !current_user

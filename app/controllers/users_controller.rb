@@ -58,7 +58,7 @@ class UsersController < ApplicationController
   def index
     return redirect_to root_path if user_signed_in?
 
-    @users = User.where('upper(name) like upper(?)', "%#{params[:q]}%")
+    @users = User.where('upper(name) like upper(?)', "%#{params[:q].to_s.first(50)}%")
 
     respond_to do |format|
       format.html
