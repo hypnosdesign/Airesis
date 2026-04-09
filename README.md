@@ -15,7 +15,7 @@ The first open source web application for eDemocracy.
 
 Airesis is a platform for participatory democracy that allows citizens, groups, and organizations to create proposals, discuss them in forums and blogs, organize events, and make collective decisions using the Schulze voting method.
 
-> **Current version: 6.1.1** — Rails 8.1.3 · Ruby 3.4.4 · Tailwind v4 + DaisyUI 5 · Hotwire (Turbo + Stimulus)
+> **Current version: 6.1.2** — Rails 8.1.3 · Ruby 3.4.4 · Tailwind v4 + DaisyUI 5 · Hotwire (Turbo + Stimulus)
 >
 > This is a fork of the original [Airesis](https://github.com/airesis/airesis) project by Alessandro Rodi ([coorasse/airesis](https://github.com/coorasse/airesis)).
 
@@ -99,7 +99,8 @@ This project underwent a comprehensive modernization starting from a legacy Rail
 | 5.0.0 | Rails 8.1.3, Ruby 3.4.4, 80% test coverage, Solid Queue |
 | 6.0.0 | Zero jQuery, zero `.js.erb`, 100% Hotwire, Action Cable, 7 Stimulus controllers |
 | 6.1.0 | UI redesign: Trix theme, collapsible sidebar, auth pages, proposal/new, YARD docs |
-| **6.1.1** | Security fixes (authorize! on move/resize), N+1 eliminated, atomic transactions, XSS sanitize, sidebar mobile gap fix |
+| 6.1.1 | Security fixes (authorize! on move/resize), N+1 eliminated, atomic transactions, XSS sanitize, sidebar mobile gap fix |
+| **6.1.2** | N+1 searches+proposals, authorize! on banner/test_banner, LIKE input limit, territory query in controller, raw t() removed |
 
 ---
 
