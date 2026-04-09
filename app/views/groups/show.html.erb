@@ -51,7 +51,7 @@
         <i class="fa-solid fa-calendar"></i>
       </div>
       <div>
-        <p class="text-lg font-extrabold"><%= @group.next_events.size %></p>
+        <p class="text-lg font-extrabold"><%= @next_events_count %></p>
         <p class="text-[11px] text-base-content/40"><%= t('pages.groups.index.events_number', default: 'Eventi') %></p>
       </div>
     </div>
@@ -60,7 +60,7 @@
         <i class="fa-solid fa-comments"></i>
       </div>
       <div>
-        <p class="text-lg font-extrabold"><%= @group_posts.size %></p>
+        <p class="text-lg font-extrabold"><%= @pagy.count %></p>
         <p class="text-[11px] text-base-content/40"><%= t('pages.groups.show.no_blogs_yet', default: 'Post blog') %></p>
       </div>
     </div>
@@ -106,7 +106,7 @@
           <% end %>
         </div>
 
-        <% if @group_posts.size > COMMENTS_PER_PAGE %>
+        <% if @pagy.pages > 1 %>
           <div id="loading_results" class="post_results mt-4">
             <span class="text-xs text-primary font-bold hover:underline cursor-pointer"><%= t('pages.blogs.show.previous_posts') %></span>
           </div>
@@ -126,7 +126,7 @@
         </div>
         <div class="p-2">
           <% group_chart_data = {
-            series: [@group.group_participations_count, @group.proposals_count, @group.next_events.size],
+            series: [@group.group_participations_count, @group.proposals_count, @next_events_count],
             labels: [
               t('pages.groups.index.participants_number', default: 'Membri'),
               t('pages.groups.index.proposals_number', default: 'Proposte'),

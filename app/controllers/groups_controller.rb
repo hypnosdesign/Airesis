@@ -109,6 +109,7 @@ class GroupsController < ApplicationController
     @next_events = @group.events.
                    accessible_by(Ability.new(current_user)).next.
                    order('starttime asc').limit(4)
+    @next_events_count = @group.next_events.count
   end
 
   def new
@@ -244,20 +245,27 @@ class GroupsController < ApplicationController
     authorize! :accept_requests, @group
     @request = @group.participation_requests.pending.find(params[:request_id])
 
-    if @group.request_by_portavoce?
-      part = @group.group_participations.build(user: @request.user, acceptor: current_user, participation_role: @group.default_participation_role)
-      @request.group_participation_request_status_id = 3
-    else
-      @request.group_participation_request_status_id = 2
+    ActiveRecord::Base.transaction do
+      if @group.request_by_portavoce?
+        part = @group.group_participations.build(user: @request.user, acceptor: current_user, participation_role: @group.default_participation_role)
+        @request.group_participation_request_status_id = 3
+        part.save!
+        @request.save!
+      else
+        @request.group_participation_request_status_id = 2
+        @request.save!
+      end
     end
-    saved = part.save && @request.save
-    if saved
-      flash[:notice] = @group.request_by_portavoce? ? t('info.group_participations.status_accepted') : t('info.group_participations.status_voting')
-    else
-      flash[:error] = t('error.group_participations.error_saving')
-    end
+
+    flash[:notice] = @group.request_by_portavoce? ? t('info.group_participations.status_accepted') : t('info.group_participations.status_voting')
     respond_to do |format|
       format.turbo_stream
+      format.html { redirect_to group_url(@group) }
+    end
+  rescue ActiveRecord::ActiveRecordError
+    flash[:error] = t('error.group_participations.error_saving')
+    respond_to do |format|
+      format.turbo_stream { render partial: 'layouts/flash_stream' }
       format.html { redirect_to group_url(@group) }
     end
   end

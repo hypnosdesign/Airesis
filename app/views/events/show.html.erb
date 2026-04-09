@@ -35,7 +35,7 @@
         </div>
       </div>
       <div class="event_content prose max-w-none" itemprop="description">
-        <%= simple_format(@event.description) %>
+        <%= simple_format(sanitize(@event.description)) %>
       </div>
     </div>
 
@@ -48,13 +48,9 @@
           </div>
           <div>
             <h2 class="font-bold text-lg">
-              <% if @event.proposals.count > 0 %>
-                <%= t('pages.events.show.voting_proposals') %>
-              <% else %>
-                <%= t('pages.events.show.no_voting_proposals') %>
-              <% end %>
+              <%= @proposals_count > 0 ? t('pages.events.show.voting_proposals') : t('pages.events.show.no_voting_proposals') %>
             </h2>
-            <p class="text-[11px] text-base-content/40"><%= @event.proposals.count %> proposte</p>
+            <p class="text-[11px] text-base-content/40"><%= @proposals_count %> proposte</p>
           </div>
         </div>
         <div class="space-y-4">
