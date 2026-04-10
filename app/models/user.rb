@@ -80,7 +80,12 @@ class User < ApplicationRecord
   def avatar_url=(url)
     return if url.blank?
 
-    avatar.attach(io: URI.open(url), filename: File.basename(URI.parse(url).path))
+    uri = URI.parse(url)
+    return unless uri.is_a?(URI::HTTPS) || uri.is_a?(URI::HTTP)
+    return unless uri.host.present?
+
+    io = uri.open(read_timeout: 5, open_timeout: 5)
+    avatar.attach(io: io, filename: File.basename(uri.path).presence || 'avatar.jpg')
   rescue StandardError
     # Ignorato: avatar non disponibile non deve bloccare la creazione dell'account
   end

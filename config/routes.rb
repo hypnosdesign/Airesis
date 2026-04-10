@@ -411,14 +411,15 @@ Rails.application.routes.draw do
       # mount Sidekiq::Web => '/sidekiq' # removed: sidekiq replaced by solid_queue
       get '/', to: 'panel#show', as: 'panel'
       resource :panel, controller: 'panel' do
-        get :calculate_rankings
-        get :change_proposals_state
-        get :write_sitemap
-        get :delete_old_notifications
-        get :test_mailer
-        get :test_scheduler
-        get :test_exceptions
-        get :calculate_user_group_affinity
+        post :calculate_rankings
+        post :change_proposals_state
+        post :write_sitemap
+        post :delete_old_notifications
+        post :test_mailer
+        post :test_scheduler
+        post :test_exceptions
+        post :calculate_user_group_affinity
+        post :test_notification
       end
 
       resources :users, only: [] do

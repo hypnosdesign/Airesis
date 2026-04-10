@@ -48,7 +48,10 @@ module Admin
     # invia una notifica di prova tramite resque e redis
     def test_notification
       if params[:alert_id].to_s != ''
-        ResqueMailer.notification(params[:alert_id]).deliver_later
+        alert_id = params[:alert_id].to_i
+        return redirect_to(admin_panel_path, alert: 'Alert non trovato') unless Alert.exists?(alert_id)
+
+        ResqueMailer.notification(alert_id).deliver_later
       else
         NotificationType.all.each do |type|
           notification = type.notifications.order('created_at desc').first
@@ -97,7 +100,8 @@ module Admin
           solutions: proposal.solutions.map(&:id).join(','),
           preferences: proposal.schulze_votes.map { |vote| { count: vote.count, data: vote.preferences } } }
       end.compact
-      File.open('stat.json', 'w') { |f| f.puts JSON.pretty_generate(ret) }
+      FileUtils.mkdir_p(Rails.root.join('tmp', 'stats'))
+      File.open(Rails.root.join('tmp', 'stats', 'stat.json'), 'w') { |f| f.puts JSON.pretty_generate(ret) }
     end
   end
 end
