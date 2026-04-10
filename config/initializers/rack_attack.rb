@@ -27,5 +27,15 @@ module Rack
     Rack::Attack.throttle('api/ip', limit: 60, period: 1.minute) do |req|
       req.ip if req.path.start_with?('/api/')
     end
+
+    # Throttle admin panel: max 30 azioni per minuto per IP
+    Rack::Attack.throttle('admin/ip', limit: 30, period: 1.minute) do |req|
+      req.ip if req.path.start_with?('/admin/panel') && req.post?
+    end
+
+    # Throttle password reset: max 5 tentativi per ora per IP
+    Rack::Attack.throttle('password_reset/ip', limit: 5, period: 1.hour) do |req|
+      req.ip if req.path == '/users/password' && req.post?
+    end
   end
 end
