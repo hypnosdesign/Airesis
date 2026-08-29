@@ -57,6 +57,11 @@ RSpec.describe 'Guest and Logged abilities', type: :model, seeds: true do
   describe 'Logged ability' do
     let(:ability) { Ability.new(user) }
 
+    it 'can update only their own profile' do
+      expect(ability).to be_able_to(:update, user)
+      expect(ability).not_to be_able_to(:update, other_user)
+    end
+
     it 'can read their own alerts' do
       expect(ability).to be_able_to(:read, Alert.new(user_id: user.id))
     end

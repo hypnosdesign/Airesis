@@ -5,14 +5,13 @@ services:
     environment:
       - DATABASE_URL=postgresql://postgres@db
       - RAILS_ENV=development
-      - NODE_OPTIONS=--openssl-legacy-provider
     volumes:
       - .:/usr/src/app
-      - node_modules:/usr/src/app/node_modules
+      - node_modulesYarn4:/usr/src/app/node_modules
     depends_on:
       - db
     ports:
-      - "3000:3000"
+      - "${AIRESIS_WEB_PORT:-3001}:3000"
 
   solid_queue:
     build: .
@@ -24,23 +23,23 @@ services:
       - db
     volumes:
       - .:/usr/src/app
-      - node_modules:/usr/src/app/node_modules
+      - node_modulesYarn4:/usr/src/app/node_modules
 
   mailpit:
-    image: axllent/mailpit
+    image: axllent/mailpit:v1.30.0
     ports:
       - "8025:8025"
       - "1025:1025"
 
   db:
-    image: postgres:17-alpine
+    image: postgres:18.6-alpine
     environment:
       POSTGRES_HOST_AUTH_METHOD: trust
     volumes:
-      - airesisDB:/var/lib/postgresql/data
+      - airesisDB18:/var/lib/postgresql
     ports:
-      - "5433:5432"
+      - "${AIRESIS_POSTGRES_PORT:-5434}:5432"
 
 volumes:
-  airesisDB:
-  node_modules:
+  airesisDB18:
+  node_modulesYarn4:

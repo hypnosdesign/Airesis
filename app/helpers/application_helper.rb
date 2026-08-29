@@ -1,6 +1,4 @@
 module ApplicationHelper
-  include Pagy::Frontend
-
   # Override pagy_nav to render a DaisyUI-styled pagination component
   def pagy_nav(pagy, **vars)
     render partial: 'pagy/nav', locals: { pagy: pagy }

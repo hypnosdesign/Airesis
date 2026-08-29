@@ -179,6 +179,8 @@ class UsersController < ApplicationController
   end
 
   def update
+    authorize! :update, @user
+
     respond_to do |format|
       if @user.update(user_params)
         flash[:notice] = t('info.user.info_updated')

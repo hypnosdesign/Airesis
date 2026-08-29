@@ -9,7 +9,7 @@
 # - Helper metodi condivisi (`is_admin?`, `is_group_admin?`, `post_contribute`)
 # - Error handling centralizzato (500, 404, locale invalido)
 class ApplicationController < ActionController::Base
-  include Pagy::Backend
+  include Pagy::Method
   include StepsHelper
   include ApplicationHelper
   helper :all
@@ -122,7 +122,7 @@ class ApplicationController < ActionController::Base
     return unless @blog
 
     @user = @blog.user
-    @pagy, @blog_posts = pagy(@blog.blog_posts.includes(:user, :blog, :tags), items: COMMENTS_PER_PAGE)
+    @pagy, @blog_posts = pagy(:offset, @blog.blog_posts.includes(:user, :blog, :tags), limit: COMMENTS_PER_PAGE)
     @recent_comments = @blog.comments.includes(:blog_post, user: [:image]).order('created_at DESC').limit(10)
     @recent_posts = @blog.blog_posts.published.limit(10)
     @archives = @blog.blog_posts.

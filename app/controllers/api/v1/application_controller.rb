@@ -1,7 +1,7 @@
 module Api
   module V1
     class ApplicationController < ActionController::Base
-      include Pagy::Backend
+      include Pagy::Method
 
       before_action :authenticate_user_from_token!
 

@@ -65,6 +65,23 @@ RSpec.describe UsersController, seeds: true do
       expect(['200', '302']).to include(response.code)
       expect(user.reload.name).to eq(new_name)
     end
+
+    it 'forbids updating another user' do
+      sign_in user
+      original_attributes = other_user.attributes.slice('name', 'email', 'encrypted_password')
+
+      patch user_path(other_user), params: {
+        user: {
+          name: 'Compromised',
+          email: 'attacker-controlled@example.com',
+          password: 'attacker-password',
+          password_confirmation: 'attacker-password'
+        }
+      }
+
+      expect(response).to have_http_status(:forbidden)
+      expect(other_user.reload.attributes.slice('name', 'email', 'encrypted_password')).to eq(original_attributes)
+    end
   end
 
   describe 'GET alarm_preferences' do

@@ -10,7 +10,7 @@ class BlogsController < ApplicationController
     @page_title = t('pages.blogs.show.title')
 
     params[:interest_border] ||= InterestBorder.to_key(current_domain.territory)
-    @pagy, @blogs = pagy(Blog.look(params), items: 30)
+    @pagy, @blogs = pagy(:offset, Blog.look(params), limit: 30)
 
     respond_to do |format|
       format.html
@@ -20,7 +20,7 @@ class BlogsController < ApplicationController
 
   def show
     @page_title = @blog.title
-    @pagy, @blog_posts = pagy(@blog_posts.published, items: COMMENTS_PER_PAGE)
+    @pagy, @blog_posts = pagy(:offset, @blog_posts.published, limit: COMMENTS_PER_PAGE)
     respond_to do |format|
       format.html
       format.turbo_stream
@@ -30,7 +30,7 @@ class BlogsController < ApplicationController
 
   def by_year_and_month
     @page_title = t('pages.blog_posts.archives.title', year: params[:year], month: t('calendar.monthNames')[params[:month].to_i - 1])
-    @pagy, @blog_posts = pagy(@blog_posts.published.where('extract(year from created_at) = ? AND extract(month from created_at) = ? ', params[:year], params[:month]).order('created_at DESC'), items: COMMENTS_PER_PAGE)
+    @pagy, @blog_posts = pagy(:offset, @blog_posts.published.where('extract(year from created_at) = ? AND extract(month from created_at) = ? ', params[:year], params[:month]).order('created_at DESC'), limit: COMMENTS_PER_PAGE)
 
     respond_to do |format|
       format.html

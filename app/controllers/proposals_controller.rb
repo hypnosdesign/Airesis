@@ -423,7 +423,7 @@ class ProposalsController < ApplicationController
   # @return [void]
   def query_index
     @search = populate_search
-    @pagy, @proposals = pagy(@search.results, items: @search.per_page || 10)
+    @pagy, @proposals = pagy(:offset, @search.results, limit: @search.per_page || 10)
   end
 
   # Salva o aggiorna il ranking dell'utente sulla proposta.

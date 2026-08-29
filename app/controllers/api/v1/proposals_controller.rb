@@ -11,7 +11,7 @@ module Api
                                          :users,
                                          :quorum,
                                          sections: :paragraphs, solutions: { sections: :paragraphs })
-        @pagy, @proposals = pagy(@proposals, items: 20)
+        @pagy, @proposals = pagy(:offset, @proposals, limit: 20)
       end
 
       def show; end

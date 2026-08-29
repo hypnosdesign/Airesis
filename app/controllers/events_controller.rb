@@ -25,7 +25,7 @@ class EventsController < ApplicationController
     authorize! :view_data, @group if @group
     @page_title = @event.title
     @event_comment = @event.event_comments.new
-    @pagy, @event_comments = pagy(@event.event_comments.includes(:user).order('created_at DESC'), items: COMMENTS_PER_PAGE)
+    @pagy, @event_comments = pagy(:offset, @event.event_comments.includes(:user).order('created_at DESC'), limit: COMMENTS_PER_PAGE)
     respond_to do |format|
       format.html do
         if @event.votation?

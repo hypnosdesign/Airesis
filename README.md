@@ -1,8 +1,10 @@
 # Airesis - The Social Network for E-Democracy
 
-[![Ruby](https://img.shields.io/badge/Ruby-3.4.4-CC342D?logo=ruby&logoColor=white)](https://www.ruby-lang.org/)
-[![Rails](https://img.shields.io/badge/Rails-8.1.3-D30001?logo=rubyonrails&logoColor=white)](https://rubyonrails.org/)
-[![PostgreSQL](https://img.shields.io/badge/PostgreSQL-17-4169E1?logo=postgresql&logoColor=white)](https://www.postgresql.org/)
+[![Ruby](https://img.shields.io/badge/Ruby-4.0.6-CC342D?logo=ruby&logoColor=white)](https://www.ruby-lang.org/)
+[![Rails](https://img.shields.io/badge/Rails-8.1.3.1-D30001?logo=rubyonrails&logoColor=white)](https://rubyonrails.org/)
+[![PostgreSQL](https://img.shields.io/badge/PostgreSQL-18.6-4169E1?logo=postgresql&logoColor=white)](https://www.postgresql.org/)
+[![Node.js](https://img.shields.io/badge/Node.js-24.20.0_LTS-5FA04E?logo=nodedotjs&logoColor=white)](https://nodejs.org/)
+[![Yarn](https://img.shields.io/badge/Yarn-4.18.0-2C8EBB?logo=yarn&logoColor=white)](https://yarnpkg.com/)
 [![Tailwind CSS](https://img.shields.io/badge/Tailwind-v4-06B6D4?logo=tailwindcss&logoColor=white)](https://tailwindcss.com/)
 [![DaisyUI](https://img.shields.io/badge/DaisyUI-5-5A0EF8?logo=daisyui&logoColor=white)](https://daisyui.com/)
 [![Hotwire](https://img.shields.io/badge/Hotwire-Turbo%20%2B%20Stimulus-9333EA?logo=hotwire&logoColor=white)](https://hotwired.dev/)
@@ -15,7 +17,7 @@ The first open source web application for eDemocracy.
 
 Airesis is a platform for participatory democracy that allows citizens, groups, and organizations to create proposals, discuss them in forums and blogs, organize events, and make collective decisions using the Schulze voting method.
 
-> **Current version: 6.1.3** — Rails 8.1.3 · Ruby 3.4.4 · Tailwind v4 + DaisyUI 5 · Hotwire (Turbo + Stimulus)
+> **Current version: 6.1.3** — Rails 8.1.3.1 · Ruby 4.0.6 · PostgreSQL 18.6 · Node.js 24.20 LTS · Yarn 4.18
 >
 > This is a fork of the original [Airesis](https://github.com/airesis/airesis) project by Alessandro Rodi ([coorasse/airesis](https://github.com/coorasse/airesis)).
 
@@ -91,6 +93,16 @@ This project underwent a comprehensive modernization starting from a legacy Rail
 - **Action Cable**: Warden/Devise connection, real-time ProposalComment broadcasts
 - **`private_pub` (Faye)** fully replaced by Action Cable + Turbo Streams
 
+### Phase 8 — Runtime refresh (August 2026)
+
+- Ruby 3.4.4 → **4.0.6**, with `resolv` 0.7.2 for the August 2026 security fixes
+- Rails 8.1.3 → **8.1.3.1**
+- PostgreSQL 17 → **18.6**; Docker uses the versioned PostgreSQL 18 data layout
+- Node.js 18 → **24.20.0 LTS**, Yarn Classic → **4.18.0** via Corepack, Bundler → **4.0.19**
+- Full Ruby and JavaScript dependency refresh; vulnerable Turbo, DOMPurify and Immutable transitive copies are overridden with patched releases
+- Pagy 9 → **43.6.2**, with controllers and the DaisyUI navigation partial migrated to the current offset API
+- Docker services pinned to PostgreSQL 18.6 and Mailpit 1.30.0; obsolete `thin`, `rails_12factor`, Code Climate reporter, Crowdin client and SDoc dependencies removed
+
 ### Version history
 
 | Version | Milestone |
@@ -109,9 +121,12 @@ This project underwent a comprehensive modernization starting from a legacy Rail
 
 | Component | Version |
 |-----------|---------|
-| Ruby | 3.4.4 |
-| Rails | 8.1.3 |
-| PostgreSQL | 17+ |
+| Ruby | 4.0.6 |
+| Bundler | 4.0.19 |
+| Rails | 8.1.3.1 |
+| PostgreSQL | 18.6 |
+| Node.js | 24.20.0 LTS |
+| Yarn | 4.18.0 |
 | Job queue | Solid Queue (DB-backed, no Redis) |
 | WebSocket | Action Cable + Solid Cable |
 | CSS | Tailwind v4 + DaisyUI 5 |
@@ -121,11 +136,11 @@ This project underwent a comprehensive modernization starting from a legacy Rail
 | Authorization | CanCanCan 3 |
 | Voting | Schulze method (`vote-schulze`) |
 | Search | `pg_search` |
-| Pagination | Pagy |
+| Pagination | Pagy 43.6 |
 | Forms | SimpleForm (DaisyUI wrapper) |
 | Admin | rails_admin 3 |
 | Icons | Font Awesome 6 (`font-awesome-sass`) |
-| Monitoring | Sentry (`sentry-rails` 6.5) |
+| Monitoring | Sentry (`sentry-rails` 6.7) |
 
 ---
 
@@ -133,8 +148,9 @@ This project underwent a comprehensive modernization starting from a legacy Rail
 
 ### Requirements
 
-- PostgreSQL 17+ with `hstore` extension enabled
-- Node.js 18+ and Yarn (for JS bundling)
+- Ruby 4.0.6 with Bundler 4.0.19
+- PostgreSQL 18.6 with `hstore` extension enabled
+- Node.js 24.20.x LTS and Yarn 4.18.x (via Corepack)
 
 ### Docker (recommended)
 
@@ -151,9 +167,19 @@ docker compose up
 ```
 
 Services:
-- `airesis` — Rails app (port 3000)
-- `db` — PostgreSQL 17 (port 5433)
+- `airesis` — Rails app (host port 3001 by default; configurable with `AIRESIS_WEB_PORT`)
+- `db` — PostgreSQL 18.6 (host port 5434 by default; configurable with `AIRESIS_POSTGRES_PORT`)
 - `solid_queue` — background job worker
+- `mailpit` — local SMTP and web inbox (ports 1025 and 8025)
+
+PostgreSQL 18 uses a different data-directory layout from PostgreSQL 17. The
+Compose configuration therefore uses the `airesisDB18` volume. During the
+August 2026 migration the previous `airesisDB` volume was verified as empty and
+removed; the PostgreSQL 18 development database was initialized from the
+current schema and project seeds.
+
+Yarn 4 uses the `node_modulesYarn4` volume. The previous Yarn Classic volume
+was removed after an immutable install, asset build and HTTP smoke test passed.
 
 ### Useful commands
 
@@ -163,6 +189,10 @@ docker compose run --rm airesis bundle exec rails db:migrate
 
 # Compile assets
 docker compose run --rm airesis bundle exec rails assets:precompile
+
+# Check dependency advisories
+docker compose run --rm airesis bundle exec bundle-audit check --update
+docker compose run --rm airesis yarn npm audit --all --recursive
 
 # Run tests
 docker compose run --rm -e RAILS_ENV=test airesis bundle exec rspec
@@ -177,6 +207,9 @@ docker compose run --rm -e RAILS_ENV=test airesis bundle exec rspec --exclude-pa
 git clone https://github.com/hypnosdesign/Airesis.git
 cd airesis
 bundle install
+corepack enable
+corepack install --global yarn@4.18.0
+yarn install --immutable
 cp config/application.example.yml config/application.yml
 # Edit config/application.yml with your values
 bundle exec rails db:setup

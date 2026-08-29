@@ -16,10 +16,10 @@ module Abilities
       merge Abilities::Blogs.new(user)
       merge Abilities::Events.new(user)
       merge Abilities::Forums.new(user)
-
     end
 
     def user_profile_permissions(user)
+      can :update, User, id: user.id
       can :show_tooltips, User, show_tooltips: true
       can :change_rotp_enabled, User if user.email
       can %i[read check], Alert, user_id: user.id

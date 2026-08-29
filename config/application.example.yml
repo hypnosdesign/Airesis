@@ -108,13 +108,6 @@ ALLOWED_CORS_ORIGINS: ""
 NEW_RELIC_LICENSE_KEY: 'FROM NEW RELCI'
 NEW_RELIC_APP_NAME: 'YOUR NEW RELIC APP NAME'
 
-#####################
-#crowdin integration (optional)
-#####################
-CROWDIN_API: ""
-CROWDIN_PROJECT_ID: ""
-CROWDIN_ACCOUNT_KEY: ""
-
 ##############
 #sentry settings. remove these keys to not use it (leaving them empty will throw an error)
 #############
@@ -242,4 +235,3 @@ MAILMAN_SENDER: 'Airesis Forum'
 
 # if the user does not access the platform for this number of days, his session will be destroyed
 SESSION_DAYS: '14'
-

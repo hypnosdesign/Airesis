@@ -28,7 +28,7 @@ Devise.setup do |config|
   require 'omniauth-facebook'
   config.omniauth :facebook, ENV['FACEBOOK_APP_ID'], ENV['FACEBOOK_APP_SECRET'],
                   scope: 'email',
-                  client_options: { ssl: { verify: false, ca_path: '/etc/ssl/certs' } },
+                  client_options: { ssl: { verify: true } },
                   secure_image_url: true
 
   require 'omniauth-google-oauth2'

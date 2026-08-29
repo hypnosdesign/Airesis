@@ -1,8 +1,9 @@
-source 'http://rubygems.org'
+source 'https://rubygems.org'
 
 ruby File.read(File.join(__dir__, '.ruby-version'))
 
-gem 'rails', '~> 8.0'
+gem 'rails', '~> 8.1.3'
+gem 'resolv', '>= 0.7.2'
 
 gem 'aws-sdk-s3'
 gem 'bootsnap'
@@ -18,7 +19,7 @@ gem 'globalize'
 gem 'httparty'
 gem 'icalendar'
 gem 'jbuilder'
-gem 'pagy', '~> 9.0'
+gem 'pagy', '~> 43.6'
 gem 'koala'
 gem 'mustache'
 gem 'nickname_generator'
@@ -61,7 +62,7 @@ gem 'pg_search'
 gem 'puma'
 gem 'rack-attack'
 gem 'sshkit'
-gem 'workflow', '~> 1.2'
+gem 'workflow', '~> 3.1'
 
 group :development do
   gem 'awesome_print'
@@ -75,7 +76,6 @@ group :development do
   gem 'pry-rails'
   gem 'rack-mini-profiler', require: false
   gem 'spring'
-  gem 'thin', require: false
 end
 
 group :test do
@@ -88,6 +88,8 @@ group :test do
 end
 
 group :development, :test do
+  gem 'brakeman', require: false
+  gem 'bundler-audit', require: false
   gem 'byebug'
   gem 'rubocop', require: false
   gem 'rubocop-performance', require: false
@@ -97,25 +99,14 @@ group :development, :test do
 end
 
 group :test do
-  gem 'codeclimate-test-reporter', require: nil
   gem 'email_spec'
   gem 'rspec-retry'
   gem 'ruby-prof'
   gem 'simplecov', require: false
 end
 
-group :development do
-  gem 'crowdin-api'
-  gem 'rubyzip'
-end
-
 group :production do
   gem 'lograge'
-  gem 'rails_12factor'
   gem 'sentry-ruby'
   gem 'sentry-rails'
-end
-
-group :doc do
-  gem 'sdoc', require: false
 end

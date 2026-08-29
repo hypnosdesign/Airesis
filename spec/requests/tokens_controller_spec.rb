@@ -29,9 +29,17 @@ RSpec.describe TokensController, seeds: true do
     end
 
     it 'returns 401 for invalid password' do
-      post tokens_path, params: { email: user.email, password: 'wrongpassword' }.to_json,
+      submitted_password = 'wrongpassword-that-must-not-be-logged'
+      log_output = StringIO.new
+      logger = ActiveSupport::Logger.new(log_output)
+      allow(Rails).to receive(:logger).and_return(logger)
+
+      post tokens_path, params: { email: user.email, password: submitted_password }.to_json,
            headers: { 'Accept' => 'application/json', 'Content-Type' => 'application/json' }
-      expect([401, 406]).to include(response.status)
+
+      expect(response).to have_http_status(:unauthorized)
+      expect(log_output.string).to include("user_id=#{user.id}")
+      expect(log_output.string).not_to include(submitted_password)
     end
   end
 

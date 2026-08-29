@@ -12,7 +12,7 @@ class GroupParticipationsController < ApplicationController
     @page_title = t('pages.group_participations.index.title')
     @search_participant = @group.search_participants.build(search_participant_params)
     @unscoped_group_participations = @search_participant.results
-    @pagy, @group_participations = pagy(@unscoped_group_participations, items: GroupParticipation::PER_PAGE)
+    @pagy, @group_participations = pagy(:offset, @unscoped_group_participations, limit: GroupParticipation::PER_PAGE)
 
     respond_to do |format|
       format.html

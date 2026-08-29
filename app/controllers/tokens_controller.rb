@@ -19,7 +19,7 @@ class TokensController < ApplicationController
     @user = User.where(['lower(email) = :value', { value: email.downcase }]).first
 
     if @user.nil?
-      logger.info("User #{email} failed signin, user cannot be found.")
+      log_failed_sign_in
       render status: 401, json: { message: 'Invalid email or password.' }
       return
     end
@@ -30,7 +30,7 @@ class TokensController < ApplicationController
     if @user.valid_password? password
       render status: 200, json: { token: @user.authentication_token }
     else
-      logger.info("User #{email} failed signin, password \"#{password}\" is invalid")
+      log_failed_sign_in(@user)
       render status: 401, json: { message: 'Invalid email or password.' }
     end
   end
@@ -44,5 +44,11 @@ class TokensController < ApplicationController
       @user.reset_authentication_token!
       render status: 200, json: { token: params[:id] }
     end
+  end
+
+  private
+
+  def log_failed_sign_in(user = nil)
+    Rails.logger.info("API token sign-in failed for user_id=#{user&.id || 'unknown'} ip=#{request.remote_ip}")
   end
 end

@@ -34,7 +34,7 @@ class GroupsController < ApplicationController
 
     params[:interest_border] ||= InterestBorder.to_key(current_domain.territory)
 
-    @pagy, @groups = pagy(Group.look(params), items: 30)
+    @pagy, @groups = pagy(:offset, Group.look(params), limit: 30)
     respond_to do |format|
       format.html
       format.turbo_stream do
@@ -59,11 +59,11 @@ class GroupsController < ApplicationController
           return
         end
         @page_title = @group.name
-        @pagy, @group_posts = pagy(@group_posts, items: COMMENTS_PER_PAGE)
+        @pagy, @group_posts = pagy(:offset, @group_posts, limit: COMMENTS_PER_PAGE)
         load_page_data
       end
       format.turbo_stream do
-        @pagy, @group_posts = pagy(@group_posts, items: COMMENTS_PER_PAGE)
+        @pagy, @group_posts = pagy(:offset, @group_posts, limit: COMMENTS_PER_PAGE)
       end
       format.atom
       format.json
@@ -77,7 +77,7 @@ class GroupsController < ApplicationController
                    order('post_publishings.featured desc, published_at DESC').
                    select('post_publishings.*, published_at').
                    distinct
-    @pagy, @group_posts = pagy(@group_posts, items: COMMENTS_PER_PAGE)
+    @pagy, @group_posts = pagy(:offset, @group_posts, limit: COMMENTS_PER_PAGE)
 
     respond_to do |format|
       format.html do
