@@ -1,40 +1,46 @@
-<%= form_with url: groups_path, method: :get do |f| %>
-  <div class="flex flex-wrap">
-    <div class="w-full">
-      <%= f.label t('buttons.search'), t('pages.groups.index.search_with_query') %>
-    </div>
+<% match_all_words = params[:and].nil? || ActiveModel::Type::Boolean.new.cast(params[:and]) %>
+<%= form_with url: groups_path, method: :get, class: 'space-y-4' do |f| %>
+  <div class="form-control">
+    <%= f.label :search, t('pages.groups.index.search_with_query'), class: 'label label-text font-semibold' %>
+    <%= f.search_field :search,
+                       value: params[:search],
+                       minlength: 2,
+                       class: 'input input-bordered min-h-11 w-full',
+                       placeholder: t('pages.groups.index.find_title'),
+                       autocomplete: 'off' %>
   </div>
-  <div class="flex flex-wrap">
-    <div class="w-3/4">
-      <%= text_field_tag :search, params[:search], title: t('pages.groups.index.find_title'), minlength: 2 %>
-    </div>
-    <div class="w-1/4">
-      <div class="search_words">
-        <%= check_box_tag :and, params[:and], title: "Scegli se cercare tutte le parole o almeno una" %>
+
+  <details class="border-2 border-base-content/15 bg-base-100" <%= 'open' if params[:interest_border].present? || params[:area].present? || params[:and].present? %>>
+    <summary class="flex min-h-11 cursor-pointer items-center px-3 py-2 font-bold">
+      <%= t('pages.groups.index.advanced_filters', default: 'Advanced filters') %>
+    </summary>
+    <div class="space-y-4 border-t border-base-content/15 p-3">
+      <label class="flex min-h-11 cursor-pointer items-center gap-3">
+        <%= hidden_field_tag :and, '0' %>
+        <%= check_box_tag :and, '1', match_all_words, class: 'checkbox checkbox-primary' %>
+        <span class="text-sm"><%= t('pages.groups.index.match_all_words', default: 'Match all words') %></span>
+      </label>
+      <div class="form-control">
+        <%= f.label :interest_border, t('pages.groups.index.search_with_place'), class: 'label label-text font-semibold' %>
+        <%= select_tag :interest_border,
+                       options_for_select(InterestBorder.all.map { |border| [border.text, border.key] }, params[:interest_border]),
+                       include_blank: t('pages.groups.index.any_place', default: 'Any territory'),
+                       class: 'select select-bordered min-h-11 w-full' %>
       </div>
+      <label class="flex min-h-11 cursor-pointer items-center gap-3">
+        <%= check_box_tag :area, '1', params[:area].present?, class: 'checkbox checkbox-primary' %>
+        <span class="text-sm"><%= t('pages.groups.index.include_subareas', default: 'Include territories within this area') %></span>
+      </label>
     </div>
-  </div>
-  <div class="flex flex-wrap">
-    <div class="w-full">
-      <%= f.label :interest_border, t('pages.groups.index.search_with_place') %>
-    </div>
-  </div>
-  <div class="flex flex-wrap">
-    <div class="w-3/4">
-      <%= text_field_tag :interest_border, params[:interest_border], title: t('pages.groups.index.find_title'), data: {pre: [InterestBorder.key_to_json(params[:interest_border])]} %>
-    </div>
-    <div class="w-1/4">
-      <div class="search_borders">
-        <%= check_box_tag :area, params[:area], title: "Scegli se cercare in maniera precisa o all'interno dell'area indicata" %>
-      </div>
-    </div>
-  </div>
-  <div class="flex flex-wrap">
-    <div class="w-full">
-      <%= f.button class: 'btn', data: {disable_with: t('loading')} do %>
-        <i class="fa-solid fa-search"></i>
-        <%= t('buttons.search') %>
-      <% end %>
-    </div>
+  </details>
+
+  <div class="flex flex-wrap gap-2">
+    <%= f.button class: 'btn btn-primary min-h-11', data: { disable_with: t('loading') } do %>
+      <i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i>
+      <%= t('buttons.search') %>
+    <% end %>
+    <% if params.values_at(:search, :interest_border, :area, :and).any?(&:present?) %>
+      <%= link_to t('buttons.cancel'), groups_path, class: 'btn btn-ghost min-h-11' %>
+    <% end %>
   </div>
 <% end %>

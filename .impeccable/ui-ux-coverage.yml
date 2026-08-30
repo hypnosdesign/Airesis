@@ -4,8 +4,8 @@ minimum_score: 33
 score_maximum: 40
 
 route_snapshot:
-  total_controller_routes: 548
-  assigned_ui_routes: 505
+  total_controller_routes: 527
+  assigned_ui_routes: 484
   excluded_non_visual_routes: 43
 
 completion_evidence_required:
@@ -150,8 +150,8 @@ groups:
   G05:
     name: "Gruppi: scoperta, profilo e membership"
     mode: operate
-    route_count: 55
-    get_route_count: 24
+    route_count: 34
+    get_route_count: 14
     controllers:
       - groups
       - group_participations
@@ -167,10 +167,10 @@ groups:
       - /groups/:id
       - /groups/:id/edit
       - /groups/:group_id/group_participations
-      - /groups/:group_id/group_invitations
-    status: not_started
-    iterations: 0
-    score: null
+      - /groups/:group_id/group_invitations/new
+    status: passed
+    iterations: 2
+    score: 33
 
   G06:
     name: "Governance gruppi: aree, ruoli e permessi"

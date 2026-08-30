@@ -1,0 +1,34 @@
+<nav aria-label="<%= t('pages.groups.layout.navigation', default: "Navigation for #{@group.name}") %>" class="border-b-2 border-base-content/15 bg-base-100">
+  <div class="mx-auto max-w-[1400px] px-4 lg:px-8">
+    <div class="flex min-w-0 items-center gap-3 border-b border-base-content/10 py-3">
+      <%= @group.group_image_tag 36 %>
+      <p class="min-w-0 truncate text-sm font-extrabold"><%= @group.name %></p>
+    </div>
+    <ul class="flex max-w-full gap-1 overflow-x-auto py-2" role="list" data-controller="active-navigation">
+      <% items = [] %>
+      <% items << [group_path(@group), 'fa-house', t('pages.groups.layout.home_button'), controller_name == 'groups' && %w[show by_year_and_month].include?(action_name)] %>
+      <% items << [group_proposals_path(@group), 'fa-lightbulb', t('pages.groups.layout.proposals_button'), %w[proposals proposal_revisions].include?(controller_name)] %>
+      <% items << [group_events_path(@group), 'fa-calendar', t('pages.groups.layout.calendar'), controller_name == 'events'] if ::Configuration::groups_calendar %>
+      <% if ::Configuration::documents_active && !@group.disable_documents && can?(:view_documents, @group) %>
+        <% items << [group_documents_path(@group), 'fa-folder', t('pages.groups.header.documents'), controller_name == 'documents'] %>
+      <% end %>
+      <% items << [group_forums_path(@group), 'fa-comment', t('pages.groups.header.forums'), controller_path.start_with?('frm/') && !controller_path.start_with?('frm/admin')] unless @group.disable_forums %>
+      <% items << [group_group_participations_path(@group), 'fa-users', t('pages.groups.show.participants_list'), controller_name == 'group_participations'] %>
+      <% if can? :update, @group %>
+        <% settings_active = (controller_name == 'groups' && !%w[show by_year_and_month].include?(action_name)) || %w[group_areas search_participants quorums participation_roles].include?(controller_name) || controller_path.start_with?('frm/admin') %>
+        <% items << [edit_group_path(@group), 'fa-gear', t('pages.groups.header.settings'), settings_active] %>
+      <% end %>
+      <% items.each do |path, icon, label, active| %>
+        <li class="shrink-0">
+          <%= link_to path,
+                      class: "btn min-h-11 border-0 px-3 #{active ? 'btn-primary' : 'btn-ghost'}",
+                      data: (active ? { active_navigation_target: 'active' } : {}),
+                      aria: (active ? { current: 'page' } : {}) do %>
+            <i class="fa-solid <%= icon %>" aria-hidden="true"></i>
+            <span><%= label %></span>
+          <% end %>
+        </li>
+      <% end %>
+    </ul>
+  </div>
+</nav>

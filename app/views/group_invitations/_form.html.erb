@@ -1,12 +1,29 @@
-<h2><%= t('pages.groups.invite_your_friends.title') %></h2>
-<%= simple_form_for [@group, @group_invitation] do |f| %>
-  <%= f.input :emails_list, as: :string %>
-  <%= f.input :testo, as: :text, placeholder: t('pages.groups.invite_your_friends.text_to_send') %>
-  <%= f.hidden_field :group_id %>
-  <%= link_to t('buttons.cancel'), '#', class: 'btn', data: { action: 'click->modal#close' } %>
-  <%= link_to t('buttons.go_back'), :back, class: 'btn', data: { back: '' } %>
-  <%= f.button :button, class: "btn btn-primary" do %>
-    <i class="fa-solid fa-envelope"></i>
-    <%= t('buttons.send') %>
-  <% end %>
+<% modal = local_assigns.fetch(:modal, false) %>
+<%= simple_form_for [@group, @group_invitation], html: { class: 'space-y-5' } do |f| %>
+  <%= f.error_notification %>
+  <div class="form-control">
+    <%= f.label :emails_list, class: 'label label-text font-semibold' %>
+    <%= f.text_field :emails_list,
+                     required: true,
+                     class: 'input input-bordered min-h-11 w-full',
+                     placeholder: 'name@example.org, another@example.org',
+                     autocomplete: 'off',
+                     aria: { describedby: 'invitation-emails-hint' } %>
+    <p id="invitation-emails-hint" class="mt-2 text-sm text-base-content/65"><%= t('pages.groups.invite_your_friends.type_email_addresses') %></p>
+    <% @group_invitation.errors.full_messages_for(:emails_list).each do |message| %>
+      <p class="mt-1 text-sm text-error"><%= message %></p>
+    <% end %>
+  </div>
+  <%= f.input :testo,
+              as: :text,
+              label: t('pages.groups.invite_your_friends.text_to_send'),
+              input_html: { rows: 6, class: 'textarea textarea-bordered w-full' } %>
+  <div class="flex flex-wrap justify-end gap-2 border-t border-base-content/10 pt-5">
+    <% if modal %>
+      <button type="button" class="btn btn-ghost min-h-11" data-action="click->modal#close"><%= t('buttons.cancel') %></button>
+    <% else %>
+      <%= link_to t('buttons.cancel'), group_path(@group), class: 'btn btn-ghost min-h-11' %>
+    <% end %>
+    <%= f.submit t('buttons.send'), class: 'btn btn-primary min-h-11', data: { disable_with: t('sending') } %>
+  </div>
 <% end %>

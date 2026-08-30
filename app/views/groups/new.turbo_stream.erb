@@ -1,0 +1,6 @@
+<%= turbo_stream.replace "group_form" do %>
+  <div id="group_form" class="min-w-0 max-w-3xl border-2 border-base-content/15 bg-base-100 p-4 sm:p-6">
+    <%= render partial: @group, locals: { button_name: t('pages.groups.new.create_button') } %>
+  </div>
+<% end %>
+<%= render partial: "layouts/flash_stream" %>

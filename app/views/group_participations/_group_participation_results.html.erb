@@ -1,75 +1,96 @@
 <% @group_participations.each do |participant| %>
-  <li>
-    <div class="card bg-base-200 p-4 cool left">
-      <div class="image" style="background: url('<%= participant.user.user_image_url(120, force_size: false) %>'); background-size: cover;">
-      </div>
-    </div>
-    <div class="info">
-      <div class="name">
-        <%= link_to_user participant.user, full_name: true %>
-      </div>
-      <div>
-        <% if participant.created_at %>
-          <%= l participant.created_at %>
-        <% else %>
-          -
-        <% end %>
-      </div>
-      <div>
-        <% if defined? participant.acceptor %>
-          <% if participant.acceptor %>
-            <%= link_to_user participant.acceptor, full_name: true %>
-          <% else %>
-            -
-          <% end %>
-        <% else %>
-          <% if can? :accept_requests, @group %>
-            <% if @group.request_by_vote? %>
-              <%# link_to 'Accetta la richiesta e procedi con la votazione.', url_for(action: "participation_request_confirm", controller: "groups", id: @group.id, request_id: request.id) %>
-            <% elsif @group.request_by_portavoce? %>
-              <%= link_to participation_request_confirm_group_url(@group, request_id: participant.id, from_list: true), data: { turbo_method: :put }, class: 'btn btn-primary btn-sm', style: "float:left", data: {disable_with: t('loading')} do %>
-                <i class="fa-solid fa-check"></i>
-                <%= t('pages.groups.show.accept_request_button') %>
-              <% end %>
-              <%= link_to participation_request_decline_group_url(@group, request_id: participant.id, from_list: true), data: { turbo_method: :put , turbo_confirm: 'Sei sicuro di volere declinare questa richiesta?', disable_with: t('loading')}, class: 'btn btn-sm', style: "float:left" do %>
-                <i class="fa-solid fa-xmark"></i>
-                <%= t('pages.groups.show.reject_request_button') %>
-              <% end %>
+  <% membership = participant.is_a?(GroupParticipation) %>
+  <% user = participant.user %>
+  <li class="min-w-0 border-2 border-base-content/15 bg-base-100 p-4">
+    <article aria-labelledby="participant-<%= participant.id %>-name">
+      <div class="flex min-w-0 items-center gap-3">
+        <%= image_tag user.user_image_url(96, force_size: false), alt: '', class: 'h-14 w-14 shrink-0 rounded-full object-cover' %>
+        <div class="min-w-0">
+          <h3 id="participant-<%= participant.id %>-name" class="truncate font-extrabold"><%= link_to user.fullname, user_path(user), class: 'inline-flex min-h-11 items-center' %></h3>
+          <p class="mt-1 text-sm text-base-content/60">
+            <% if membership %>
+              <%= participant.participation_role.name %>
+            <% else %>
+              <%= t('pages.groups.show.waiting_participation_requests') %>
             <% end %>
-          <% end %>
-        <% end %>
+          </p>
+        </div>
       </div>
-      <% if can? :update, @group %>
-        <td>
-          <%= link_to group_group_participation_path(@group, participant), data: { turbo_method: :delete }, class: "btn", data: {turbo_confirm: t('pages.groups.edit.remove_user_confirm', name: participant.user.fullname)} do %>
-            <i class="fa-regular fa-trash-can"></i>
-            <%= t('pages.groups.edit_permissions.remove_user') %>
+
+      <dl class="mt-4 border-t border-base-content/10 pt-3 text-sm">
+        <div class="flex justify-between gap-3">
+          <dt class="text-base-content/60"><%= t('pages.groups.participations.member_since') %></dt>
+          <dd class="text-right"><%= participant.created_at ? l(participant.created_at) : '–' %></dd>
+        </div>
+        <% if membership && participant.acceptor %>
+          <div class="mt-2 flex justify-between gap-3">
+            <dt class="text-base-content/60"><%= t('pages.groups.participations.accepted_by', default: 'Accepted by') %></dt>
+            <dd class="text-right"><%= link_to participant.acceptor.fullname, user_path(participant.acceptor), class: 'inline-flex min-h-11 items-center' %></dd>
+          </div>
+        <% end %>
+      </dl>
+
+      <% if membership && can?(:update, @group) %>
+        <div class="mt-4 space-y-3 border-t border-base-content/10 pt-4">
+          <%= form_with url: change_user_permission_group_group_participation_path(@group, participant),
+                        method: :post,
+                        data: {
+                          controller: 'autosubmit',
+                          turbo_confirm: t('pages.groups.edit_permissions.confirm_role_change', name: user.fullname, default: "Change %{name}'s role?")
+                        } do %>
+            <%= label_tag "participation_role_id_#{participant.id}", t('pages.groups.participations.role'), class: 'label label-text font-semibold' %>
+            <%= select_tag :participation_role_id,
+                           options_from_collection_for_select([OpenStruct.new(id: ParticipationRole.admin.id, name: @group.admin_title.presence || t('pages.groups.default_admin_title'))] + @group.participation_roles, :id, :name, participant.participation_role.id),
+                           id: "participation_role_id_#{participant.id}",
+                           class: 'select select-bordered min-h-11 w-full',
+                           data: { action: 'change->autosubmit#submit' } %>
           <% end %>
-        </td>
-      <% end %>
-      <div class="bottom">
-        <% if defined? participant.participation_role %>
-          <% if can? :update, @group %>
-            <%= select_tag "user_role", options_from_collection_for_select([OpenStruct.new({id: ParticipationRole.admin.id, name: @group.admin_title || t('pages.groups.default_admin_title')})] + @group.participation_roles, :id, :name, participant.participation_role.id), data: {id: participant.id, fullname: participant.user.fullname}, class: "user_role_changer" %>
-            <% if @group.group_areas.size > 0 %>
-              <%= link_to t('pages.groups.administration_panel.areas'), '#', class: 'btn areas_button', data: {m_id: participant.id} %>
-              <div class="areas_list shadow-box">
-                <ul>
-                  <% @group.group_areas.each do |area| %>
-                    <li>
-                      <input type="checkbox" data-user_id="<%= participant.user.id %>" data-group_area_id="<%= area.id %>" data-change-area-participation <% area_participation = area.area_participations.find_by(user_id: participant.user.id) %><% if area_participation %> checked='checked' <% end %>>
-                      <%= area.name %>
-                    </li>
+
+          <% if @group.group_areas.any? %>
+            <details class="border border-base-content/10">
+              <summary class="flex min-h-11 cursor-pointer items-center px-3 py-2 font-bold"><%= t('pages.groups.administration_panel.areas') %></summary>
+              <div class="space-y-2 border-t border-base-content/10 p-3">
+                <% @group.group_areas.each do |area| %>
+                  <% area_participation = area.area_participations.find_by(user_id: user.id) %>
+                  <% area_path = area_participation ? group_group_area_area_participation_path(@group, area, area_participation) : group_group_area_area_participations_path(@group, area) %>
+                  <%= form_with url: area_path,
+                                method: (area_participation ? :delete : :post),
+                                scope: :area_participation,
+                                data: { controller: 'autosubmit' } do |f| %>
+                    <%= f.hidden_field :user_id, value: user.id %>
+                    <label class="flex min-h-11 cursor-pointer items-center gap-3">
+                      <%= check_box_tag "area_#{area.id}_user_#{user.id}", '1', area_participation.present?, class: 'checkbox checkbox-primary', data: { action: 'change->autosubmit#submit' } %>
+                      <span class="text-sm"><%= area.name %></span>
+                    </label>
                   <% end %>
-                </ul>
+                <% end %>
               </div>
-              <div style="clear:both;"></div>
-            <% end %>
-          <% else %>
-            <%= participant.participation_role.name %>
+            </details>
           <% end %>
-        <% end %>
-      </div>
-    </div>
+
+          <% if user != current_user %>
+            <%= link_to group_group_participation_path(@group, participant),
+                        data: { turbo_method: :delete, turbo_confirm: t('pages.groups.edit.remove_user_confirm', name: user.fullname) },
+                        class: 'btn btn-ghost min-h-11 w-full text-error' do %>
+              <i class="fa-regular fa-trash-can" aria-hidden="true"></i>
+              <%= t('pages.groups.edit_permissions.remove_user') %>
+            <% end %>
+          <% end %>
+        </div>
+      <% elsif !membership && can?(:accept_requests, @group) %>
+        <div class="mt-4 flex flex-wrap gap-2 border-t border-base-content/10 pt-4">
+          <%= link_to participation_request_confirm_group_path(@group, request_id: participant.id), data: { turbo_method: :put }, class: 'btn btn-primary btn-sm min-h-11' do %>
+            <i class="fa-solid fa-check" aria-hidden="true"></i>
+            <%= t('pages.groups.show.accept_request_button') %>
+          <% end %>
+          <%= link_to participation_request_decline_group_path(@group, request_id: participant.id),
+                      data: { turbo_method: :put, turbo_confirm: t('pages.groups.show.confirm_decline_request', default: 'Reject this request?') },
+                      class: 'btn btn-ghost btn-sm min-h-11' do %>
+            <i class="fa-solid fa-xmark" aria-hidden="true"></i>
+            <%= t('pages.groups.show.reject_request_button') %>
+          <% end %>
+        </div>
+      <% end %>
+    </article>
   </li>
 <% end %>

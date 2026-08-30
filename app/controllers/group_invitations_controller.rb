@@ -2,6 +2,9 @@
 class GroupInvitationsController < ApplicationController
   layout 'groups'
 
+  before_action :enable_content_landmark
+  before_action :authenticate_user!
+
   load_and_authorize_resource :group
   load_and_authorize_resource through: :group
 
@@ -16,22 +19,29 @@ class GroupInvitationsController < ApplicationController
 
   def create
     @group_invitation.inviter = current_user
-    @group_invitation.save!
-
-    respond_to do |format|
-      if @group_invitation.group_invitation_emails.any?
+    if @group_invitation.save
+      respond_to do |format|
         flash[:notice] = t('info.group_invitations.create',
                            count: @group_invitation.group_invitation_emails.count,
                            email_addresses: @group_invitation.group_invitation_emails.pluck(:email).join(', '))
-      else
-        flash[:error] = t('error.group_invitations.create')
+        format.turbo_stream { redirect_to @group, status: :see_other }
+        format.html { redirect_to @group }
       end
-      format.turbo_stream
-      format.html { redirect_to @group }
+    else
+      @page_title = t('pages.groups.invite_your_friends.title')
+      flash.now[:error] = t('error.group_invitations.create')
+      respond_to do |format|
+        format.turbo_stream { render :new, status: :unprocessable_content }
+        format.html { render :new, status: :unprocessable_content }
+      end
     end
   end
 
   protected
+
+  def enable_content_landmark
+    @content_landmark = true
+  end
 
   def group_invitation_params
     params.require(:group_invitation).permit(:emails_list, :testo)

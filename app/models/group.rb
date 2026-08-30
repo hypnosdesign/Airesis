@@ -259,7 +259,7 @@ class Group < ApplicationRecord
   # @return [ActiveRecord::Relation<Group>]
   def self.look(params)
     query = params[:search]
-    params[:and] = params[:and].nil? || params[:and]
+    match_all_words = params[:and].nil? || ActiveModel::Type::Boolean.new.cast(params[:and])
     tag = params[:tag]
 
     if tag
@@ -268,7 +268,7 @@ class Group < ApplicationRecord
       groups = if query.blank?
                  Group.order(group_participations_count: :desc, created_at: :desc)
                else
-                 search(query, !params[:and])
+                 search(query, !match_all_words)
                end
       if params[:interest_border]
         groups = if params[:area]

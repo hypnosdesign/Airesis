@@ -1,31 +1,35 @@
-<% requests = @group.participation_requests.pending %>
-<% if requests.count > 0 %>
-  <div class="card bg-base-200 p-4">
-    <h4><%= t('pages.groups.show.waiting_participation_requests') %></h4>
-    <% requests.limit(5).each do |request| %>
-      <%= user_tag request.user, nil, true, false %>
-      <% if can? :accept_requests, @group %>
-        <div>
-          <% if @group.request_by_vote? %>
-            <%= link_to 'Accetta la richiesta e procedi con la votazione.', url_for(action: "participation_request_confirm", controller: "groups", id: @group.id, request_id: request.id) %>
-          <% elsif @group.request_by_portavoce? %>
-            <%= link_to participation_request_confirm_group_url(@group, request_id: request.id), data: { turbo_method: :put }, class: 'btn btn-primary btn-sm btn-participation', data: {disable_with: t('loading')} do %>
-              <i class="fa-solid fa-check"></i>
+<% requests = @group.participation_requests.pending.includes(:user) %>
+<% if requests.any? && can?(:accept_requests, @group) %>
+  <section class="border-2 border-warning/40 bg-warning/5 p-4" aria-labelledby="pending-requests-title">
+    <div class="mb-3 flex items-center justify-between gap-3">
+      <h2 id="pending-requests-title" class="font-extrabold"><%= t('pages.groups.show.waiting_participation_requests') %></h2>
+      <span class="badge badge-warning"><%= requests.count %></span>
+    </div>
+    <ul class="space-y-3" role="list">
+      <% requests.limit(5).each do |participation_request| %>
+        <li class="border border-base-content/10 bg-base-100 p-3">
+          <p class="mb-3 text-sm font-semibold"><%= link_to participation_request.user.fullname, user_path(participation_request.user), class: 'inline-flex min-h-11 items-center' %></p>
+          <div class="flex flex-wrap gap-2">
+            <%= link_to participation_request_confirm_group_path(@group, request_id: participation_request.id),
+                        data: { turbo_method: :put, disable_with: t('loading') },
+                        class: 'btn btn-primary btn-sm min-h-11' do %>
+              <i class="fa-solid fa-check" aria-hidden="true"></i>
               <%= t('pages.groups.show.accept_request_button') %>
             <% end %>
-            <%= link_to participation_request_decline_group_url(@group, request_id: request.id), data: { turbo_method: :put , turbo_confirm: 'Sei sicuro di volere declinare questa richiesta?', disable_with: t('loading')}, class: 'btn btn-sm btn-participation' do %>
-              <i class="fa-solid fa-xmark"></i>
+            <%= link_to participation_request_decline_group_path(@group, request_id: participation_request.id),
+                        data: { turbo_method: :put, turbo_confirm: t('pages.groups.show.confirm_decline_request', default: 'Reject this request?'), disable_with: t('loading') },
+                        class: 'btn btn-ghost btn-sm min-h-11' do %>
+              <i class="fa-solid fa-xmark" aria-hidden="true"></i>
               <%= t('pages.groups.show.reject_request_button') %>
             <% end %>
-          <% end %>
-        </div>
+          </div>
+        </li>
       <% end %>
-    <% end %>
+    </ul>
     <% if requests.count > 5 %>
-      <%= link_to group_group_participations_url(@group, 'search_participant[status_id]' => 1), class: "btn" do %>
-        <i class="fa-solid fa-user"></i>
+      <%= link_to group_group_participations_path(@group, 'search_participant[status_id]' => 1), class: 'btn btn-ghost mt-3 min-h-11 w-full' do %>
         <%= t('pages.groups.show.show_all_requests', count: requests.count) %>
       <% end %>
     <% end %>
-  </div>
+  </section>
 <% end %>

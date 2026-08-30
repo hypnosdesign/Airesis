@@ -1,4 +1,8 @@
 <% @page_title = t('pages.groups.show.list_permissions.title') %>
-<h1><%= @page_title %></h1>
-<br>
-<%= render 'permissions_list_panel' %>
+<header class="mb-6 max-w-3xl">
+  <h1 class="mb-2 text-2xl font-extrabold lg:text-3xl"><%= @page_title %></h1>
+  <p class="text-sm text-base-content/65"><%= @group.name %></p>
+</header>
+<div class="max-w-3xl border-2 border-base-content/15 bg-base-100 p-4 sm:p-6">
+  <%= render 'permissions_list_panel', heading_level: 2 %>
+</div>

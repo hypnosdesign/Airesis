@@ -22,18 +22,21 @@ RSpec.describe GroupParticipationsController, seeds: true do
         sign_in member
       end
 
-      it 'returns 200 or 500 (view may have rendering issues in test env)' do
+      it 'renders the member directory' do
         get group_group_participations_path(group)
-        expect([200, 500]).to include(response.status)
+        expect(response).to have_http_status(:ok)
+        expect(response.body).to include('<main')
+        expect(response.body).to safe_include(member.fullname)
       end
     end
 
     context 'when authenticated as the group owner' do
       before { sign_in owner }
 
-      it 'returns 200 or 500 (view may have rendering issues in test env)' do
+      it 'renders the member directory' do
         get group_group_participations_path(group)
-        expect([200, 500]).to include(response.status)
+        expect(response).to have_http_status(:ok)
+        expect(response.body).to safe_include(I18n.t('pages.groups.participations.list_participations'))
       end
     end
 
@@ -44,7 +47,7 @@ RSpec.describe GroupParticipationsController, seeds: true do
 
       it 'is forbidden (redirects or 403)' do
         get group_group_participations_path(group)
-        expect([302, 403, 500]).to include(response.status)
+        expect([302, 403]).to include(response.status)
       end
     end
   end
@@ -95,7 +98,7 @@ RSpec.describe GroupParticipationsController, seeds: true do
       it 'is forbidden (redirects or 403)' do
         participation = GroupParticipation.find_by(user: member, group: group)
         delete group_group_participation_path(group, participation)
-        expect([302, 403, 500]).to include(response.status)
+        expect([302, 403]).to include(response.status)
       end
     end
   end
@@ -141,6 +144,19 @@ RSpec.describe GroupParticipationsController, seeds: true do
            xhr: true, params: { participation_role_id: role.id }
       expect([200, 302, 403, 500]).to include(response.status)
     end
+
+    it 'rejects a role that belongs to another group' do
+      participation = GroupParticipation.find_by(user: member, group: group)
+      other_group = create(:group)
+      foreign_role = create(:participation_role, group: other_group)
+
+      expect do
+        post change_user_permission_group_group_participation_path(group, participation),
+             params: { participation_role_id: foreign_role.id }
+      end.not_to(change { participation.reload.participation_role_id })
+
+      expect(response).to have_http_status(:not_found)
+    end
   end
 
   describe 'POST destroy_all' do
@@ -158,7 +174,39 @@ RSpec.describe GroupParticipationsController, seeds: true do
       p2 = GroupParticipation.find_by(user: member2, group: group)
       post destroy_all_group_group_participations_path(group),
            params: { destroy: { ids: "#{p1.id},#{p2.id}" } }
-      expect([200, 302, 500]).to include(response.status)
+      expect(response).to have_http_status(:found)
+      expect(GroupParticipation.where(id: [p1.id, p2.id])).to be_empty
+    end
+
+    it 'does not let an outsider remove group members' do
+      outsider = create(:user)
+      p1 = GroupParticipation.find_by(user: member, group: group)
+      sign_out owner
+      sign_in outsider
+
+      post destroy_all_group_group_participations_path(group), params: { destroy: { ids: p1.id.to_s } }
+
+      expect([302, 403]).to include(response.status)
+      expect(GroupParticipation.exists?(p1.id)).to be(true)
+    end
+  end
+
+  describe 'POST send_email' do
+    let!(:member) { create(:user) }
+
+    before { create_participation(member, group) }
+
+    it 'does not let an outsider send to group members' do
+      outsider = create(:user)
+      sign_in outsider
+      allow(ResqueMailer).to receive(:massive_email)
+
+      post send_email_group_group_participations_path(group), params: {
+        message: { receiver_ids: member.id.to_s, subject: 'Test', body: 'Body' }
+      }
+
+      expect([302, 403]).to include(response.status)
+      expect(ResqueMailer).not_to have_received(:massive_email)
     end
   end
 end

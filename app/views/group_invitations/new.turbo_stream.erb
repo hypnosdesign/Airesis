@@ -1,10 +1,6 @@
-<%= turbo_stream.replace "invitation_modal" do %>
-  <dialog id="invitation_modal" data-controller="modal" class="modal">
-    <div class="modal-box shadow-brutal border-2 border-base-content">
-      <%= render "group_invitations/form" %>
-    </div>
-    <form method="dialog" class="modal-backdrop" data-action="click->modal#backdropClose">
-      <button>close</button>
-    </form>
-  </dialog>
+<%= turbo_stream.replace "group_invitation_form" do %>
+  <div id="group_invitation_form" class="max-w-2xl border-2 border-base-content/15 bg-base-100 p-4 sm:p-6">
+    <%= render "group_invitations/form", modal: false %>
+  </div>
 <% end %>
+<%= render partial: "layouts/flash_stream" %>

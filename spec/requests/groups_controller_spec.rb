@@ -8,26 +8,34 @@ RSpec.describe GroupsController, seeds: true do
   describe 'GET index' do
     it 'returns a response for unauthenticated users' do
       get groups_path
-      expect([200, 500]).to include(response.status)
+      expect(response).to have_http_status(:ok)
+      expect(response.body).to include('<main')
+      expect(response.parsed_body.at_css('details')&.key?('open')).to be(false)
     end
 
     it 'returns a response for authenticated users' do
       sign_in user
       get groups_path
-      expect([200, 500]).to include(response.status)
+      expect(response).to have_http_status(:ok)
+      expect(response.body).to safe_include(group.name)
     end
   end
 
   describe 'GET show' do
     it 'returns a response for unauthenticated users' do
       get group_path(group)
-      expect([200, 500]).to include(response.status)
+      expect(response).to have_http_status(:ok)
+      expect(response.body).to include('<main')
+      expect(response.body).to safe_include(group.name)
     end
 
     it 'returns a response for authenticated users' do
       sign_in user
       get group_path(group)
-      expect([200, 500]).to include(response.status)
+      expect(response).to have_http_status(:ok)
+      expect(response.body).to safe_include(I18n.t('pages.groups.show.participants_list'))
+      expect(response.body).to include('id="participants_container"')
+      expect(response.body).to include('id="participation_requests_container"')
     end
 
     it 'returns 404 for a non-existent group' do
@@ -52,7 +60,9 @@ RSpec.describe GroupsController, seeds: true do
 
       it 'returns a response' do
         get new_group_path
-        expect([200, 500]).to include(response.status)
+        expect(response).to have_http_status(:ok)
+        expect(response.body).to include('<main')
+        expect(response.body).to safe_include(I18n.t('pages.groups.new.new_group'))
       end
     end
   end
@@ -96,6 +106,21 @@ RSpec.describe GroupsController, seeds: true do
           expect([200, 302, 403]).to include(response.status)
         end
       end
+
+      it 'replaces the form with validation errors for an invalid Turbo request' do
+        invalid_params = { group: valid_params.fetch(:group).merge(name: '') }
+
+        expect do
+          post groups_path,
+               params: invalid_params,
+               headers: { 'ACCEPT' => 'text/vnd.turbo-stream.html' }
+        end.not_to change(Group, :count)
+
+        expect(response).to have_http_status(:unprocessable_content)
+        expect(response.media_type).to eq('text/vnd.turbo-stream.html')
+        expect(response.body).to include('target="group_form"')
+        expect(response.body).to safe_include(I18n.t('error.groups.creation'))
+      end
     end
   end
 
@@ -113,7 +138,9 @@ RSpec.describe GroupsController, seeds: true do
 
       it 'returns a response' do
         get edit_group_path(group)
-        expect([200, 500]).to include(response.status)
+        expect(response).to have_http_status(:ok)
+        expect(response.body).to include('<main')
+        expect(response.body).to safe_include(group.name)
       end
     end
 
@@ -124,7 +151,7 @@ RSpec.describe GroupsController, seeds: true do
 
       it 'is forbidden (redirects or 403)' do
         get edit_group_path(group)
-        expect([302, 403, 500]).to include(response.status)
+        expect([302, 403]).to include(response.status)
       end
     end
   end
@@ -162,6 +189,14 @@ RSpec.describe GroupsController, seeds: true do
         expect(group.reload.name).to eq('Updated Group Name')
         expect(response).to redirect_to(edit_group_url(group))
       end
+
+      it 'renders edit with validation errors instead of raising' do
+        patch group_path(group), params: { group: { name: '' } }
+
+        expect(response).to have_http_status(:unprocessable_content)
+        expect(response.body).to safe_include(I18n.t('pages.groups.edit.modify_group'))
+        expect(group.reload.name).not_to be_blank
+      end
     end
 
     context 'when authenticated as a different user (non-admin)' do
@@ -171,7 +206,7 @@ RSpec.describe GroupsController, seeds: true do
 
       it 'is forbidden (redirects or 403)' do
         patch group_path(group), params: update_params
-        expect([302, 403, 500]).to include(response.status)
+        expect([302, 403]).to include(response.status)
       end
     end
   end
@@ -244,8 +279,32 @@ RSpec.describe GroupsController, seeds: true do
 
     it 'returns a response for group owner' do
       sign_in user
-      get permissions_list_group_path(group), xhr: true
-      expect([200, 302, 403, 500]).to include(response.status)
+      get permissions_list_group_path(group)
+      expect(response).to have_http_status(:ok)
+      expect(response.body).to safe_include(I18n.t('pages.groups.show.list_permissions.title'))
+    end
+  end
+
+  describe 'G05 route contract' do
+    it 'exposes only implemented invitation and participation actions' do
+      routes = Rails.application.routes.routes.select do |route|
+        route.defaults[:controller].to_s.in?(%w[groups group_participations group_invitations group_invitation_emails])
+      end
+      actions = routes.map { |route| [route.defaults[:controller].to_s, route.defaults[:action].to_s] }
+
+      expect(routes.count).to eq(34)
+      expect(actions).not_to include(
+        ['groups', 'create_event'],
+        ['group_participations', 'new'],
+        ['group_participations', 'create'],
+        ['group_participations', 'edit'],
+        ['group_participations', 'update'],
+        ['group_invitations', 'index'],
+        ['group_invitations', 'show'],
+        ['group_invitations', 'destroy'],
+        ['group_invitation_emails', 'index'],
+        ['group_invitation_emails', 'create']
+      )
     end
   end
 
@@ -317,13 +376,13 @@ RSpec.describe GroupsController, seeds: true do
   describe 'GET by_year_and_month' do
     it 'returns a response when not authenticated' do
       get posts_by_year_and_month_group_path(group, year: Time.current.year, month: Time.current.month)
-      expect([200, 302, 500]).to include(response.status)
+      expect([200, 302]).to include(response.status)
     end
 
     it 'returns a response when authenticated' do
       sign_in user
       get posts_by_year_and_month_group_path(group, year: Time.current.year, month: Time.current.month)
-      expect([200, 302, 500]).to include(response.status)
+      expect([200, 302]).to include(response.status)
     end
   end
 
@@ -459,7 +518,7 @@ RSpec.describe GroupsController, seeds: true do
     end
   end
 
-  describe 'PUT participation_request_confirm (JS format)' do
+  describe 'PUT participation_request_confirm (Turbo Stream format)' do
     let!(:other_user) { create(:user) }
     let!(:pending_request) do
       GroupParticipationRequest.create!(
@@ -469,15 +528,20 @@ RSpec.describe GroupsController, seeds: true do
       )
     end
 
-    it 'returns a JS response for group owner' do
+    it 'updates both membership panels for the group owner' do
       sign_in user
       put participation_request_confirm_group_path(group),
-          params: { request_id: pending_request.id }, xhr: true
-      expect([200, 302, 403, 500]).to include(response.status)
+          params: { request_id: pending_request.id },
+          headers: { 'ACCEPT' => 'text/vnd.turbo-stream.html' }
+
+      expect(response).to have_http_status(:ok)
+      expect(response.media_type).to eq('text/vnd.turbo-stream.html')
+      expect(response.body).to include('target="participants_container"')
+      expect(response.body).to include('target="participation_requests_container"')
     end
   end
 
-  describe 'PUT participation_request_decline (JS format)' do
+  describe 'PUT participation_request_decline (Turbo Stream format)' do
     let!(:other_user) { create(:user) }
     let!(:pending_request) do
       GroupParticipationRequest.create!(
@@ -487,11 +551,16 @@ RSpec.describe GroupsController, seeds: true do
       )
     end
 
-    it 'returns a JS response for group owner' do
+    it 'updates both membership panels for the group owner' do
       sign_in user
       put participation_request_decline_group_path(group),
-          params: { request_id: pending_request.id }, xhr: true
-      expect([200, 302, 403, 500]).to include(response.status)
+          params: { request_id: pending_request.id },
+          headers: { 'ACCEPT' => 'text/vnd.turbo-stream.html' }
+
+      expect(response).to have_http_status(:ok)
+      expect(response.media_type).to eq('text/vnd.turbo-stream.html')
+      expect(response.body).to include('target="participants_container"')
+      expect(response.body).to include('target="participation_requests_container"')
     end
 
     it 'handles non-existent request' do

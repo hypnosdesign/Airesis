@@ -15,7 +15,6 @@
   <%# Hero banner %>
   <div class="bg-primary text-primary-content p-6 lg:p-8 mb-6 border-2 border-base-content/15 relative overflow-hidden">
     <div class="relative z-10 max-w-xl">
-      <p class="text-[11px] font-bold tracking-widest text-primary-content/50 uppercase mb-3"><%= t('pages.sidebar.groups', default: 'Gruppi') %></p>
       <h1 class="text-2xl lg:text-3xl font-extrabold leading-tight mb-2"><%= @group.name %></h1>
       <% if @group.interest_border.present? %>
         <p class="text-primary-content/60 text-sm">
@@ -34,7 +33,7 @@
       </div>
       <div>
         <p class="text-lg font-extrabold"><%= @group.group_participations_count %></p>
-        <p class="text-[11px] text-base-content/40"><%= t('pages.groups.index.participants_number', default: 'Membri') %></p>
+        <p class="text-xs font-medium text-base-content/70"><%= t('pages.groups.index.participants_number', default: 'Members') %></p>
       </div>
     </div>
     <div class="bg-base-100 p-4 flex items-center gap-4 border-2 border-base-content/15">
@@ -43,7 +42,7 @@
       </div>
       <div>
         <p class="text-lg font-extrabold"><%= @group.proposals_count %></p>
-        <p class="text-[11px] text-base-content/40"><%= t('pages.groups.index.proposals_number', default: 'Proposte') %></p>
+        <p class="text-xs font-medium text-base-content/70"><%= t('pages.groups.index.proposals_number', default: 'Proposals') %></p>
       </div>
     </div>
     <div class="bg-base-100 p-4 flex items-center gap-4 border-2 border-base-content/15">
@@ -52,7 +51,7 @@
       </div>
       <div>
         <p class="text-lg font-extrabold"><%= @next_events_count %></p>
-        <p class="text-[11px] text-base-content/40"><%= t('pages.groups.index.events_number', default: 'Eventi') %></p>
+        <p class="text-xs font-medium text-base-content/70"><%= t('pages.groups.index.events_number', default: 'Events') %></p>
       </div>
     </div>
     <div class="bg-base-100 p-4 flex items-center gap-4 border-2 border-base-content/15">
@@ -61,7 +60,7 @@
       </div>
       <div>
         <p class="text-lg font-extrabold"><%= @pagy.count %></p>
-        <p class="text-[11px] text-base-content/40"><%= t('pages.groups.show.no_blogs_yet', default: 'Post blog') %></p>
+        <p class="text-xs font-medium text-base-content/70"><%= t('pages.groups.show.blog_posts', default: 'Blog posts') %></p>
       </div>
     </div>
   </div>
@@ -75,7 +74,7 @@
             <i class="fa-solid fa-calendar-days text-sm"></i>
           </div>
           <div>
-            <h2 class="font-bold text-sm"><%= t('pages.groups.archives.page_title', year: params[:year], month: month_long(params[:month])) %></h2>
+            <h2 class="font-bold text-sm"><%= t('pages.groups.archives.page_title', year: params[:year], month: month_long(params[:month]), default: 'Archive for %{month} %{year}') %></h2>
           </div>
         </div>
       <% else %>
@@ -84,7 +83,7 @@
             <div class="w-8 h-8 flex items-center justify-center bg-primary/10 text-primary">
               <i class="fa-solid fa-circle-info text-sm"></i>
             </div>
-            <h2 class="font-bold text-sm"><%= t('pages.groups.show.rules_button', default: 'Descrizione') %></h2>
+              <h2 class="font-bold text-sm"><%= t('activerecord.attributes.group.description', default: 'Descrizione') %></h2>
           </div>
           <div class="prose max-w-none text-sm"><%= @group.description %></div>
         </div>
@@ -102,7 +101,7 @@
           <% if @group_posts.any? %>
             <%= render collection: @group_posts, partial: 'blog_posts/group_blog_post', as: 'post_publishing' %>
           <% else %>
-            <p class="text-[11px] text-base-content/40"><%= t('pages.groups.show.no_blogs_yet') %></p>
+            <p class="text-sm text-base-content/70"><%= t('pages.groups.show.no_blogs_yet') %></p>
           <% end %>
         </div>
 
@@ -115,14 +114,24 @@
     </div>
 
     <%# Sidebar portlets %>
-    <div class="hidden lg:block space-y-4">
-      <%# Attività gruppo — donut chart %>
+    <aside class="space-y-4" aria-label="<%= t('pages.groups.show.community', default: 'Group community') %>">
+      <div id="participants_container">
+        <%= render partial: 'groups/participants_panel' %>
+      </div>
+
+      <% unless @group.disable_participation_requests %>
+        <div id="participation_requests_container" class="participation_requests_container">
+          <%= render partial: 'groups/participation_requests_panel' %>
+        </div>
+      <% end %>
+
+      <%# Group activity — donut chart %>
       <div class="bg-base-100 border-2 border-base-content/15">
         <div class="p-4 border-b-2 border-base-content/15 flex items-center gap-3">
           <div class="bg-primary/10 text-primary w-8 h-8 flex items-center justify-center">
             <i class="fa-solid fa-chart-pie text-sm"></i>
           </div>
-          <h2 class="font-bold text-sm"><%= t('pages.groups.show.activity', default: 'Attività') %></h2>
+          <h2 class="font-bold text-sm"><%= t('pages.groups.show.activity', default: 'Activity') %></h2>
         </div>
         <div class="p-2">
           <% group_chart_data = {
@@ -146,17 +155,15 @@
       <% end %>
       <%= render partial: "groups/portlets/topics", layout: "layouts/portlet" %>
       <%= render partial: "groups/portlets/events", layout: "layouts/portlet" %>
-    </div>
+    </aside>
   </div>
 <% end %>
 
 <%= render 'rules_panel' %>
-<%= render 'left_panel' %>
 
 <div id="quorum_modal"></div>
 <div id="quorum_help_modal"></div>
 <div id="permissions_list_modal"></div>
-<div id="invitation_modal"></div>
 <div id="area_role_modal"></div>
 <div id="participation_role_modal"></div>
 <div id="group_area_modal"></div>

@@ -1,6 +1,7 @@
 class GroupParticipationsController < ApplicationController
   layout 'groups'
 
+  before_action :enable_content_landmark
   before_action :load_group
 
   before_action :authenticate_user!
@@ -36,8 +37,14 @@ class GroupParticipationsController < ApplicationController
 
   def change_user_permission
     @group_participation = @group.group_participations.find(params[:id])
-    @group_participation.participation_role = ParticipationRole.find(params[:participation_role_id])
     authorize! :change_user_permission, @group_participation
+    requested_role_id = params[:participation_role_id].to_i
+    requested_role = if requested_role_id == ParticipationRole.admin.id
+                       ParticipationRole.admin
+                     else
+                       @group.participation_roles.find(requested_role_id)
+                     end
+    @group_participation.participation_role = requested_role
     @group_participation.save!
     flash[:notice] = t('info.participation_roles.role_changed')
     respond_to do |format|
@@ -49,9 +56,10 @@ class GroupParticipationsController < ApplicationController
   # send a massive email to all users
 
   def send_email
-    ids = params[:message][:receiver_ids]
-    subject = params[:message][:subject]
-    body = params[:message][:body]
+    authorize! :update, @group
+    ids = @group.group_participations.where(user_id: receiver_ids).pluck(:user_id)
+    subject = params.dig(:message, :subject).to_s
+    body = params.dig(:message, :body).to_s
     ResqueMailer.massive_email(current_user.id, ids, @group.id, subject, body).deliver_later
     flash[:notice] = t('info.message_sent')
     respond_to do |format|
@@ -63,23 +71,21 @@ class GroupParticipationsController < ApplicationController
   # destroy all selected participations
 
   def destroy_all
-    ids = params[:destroy][:ids].split(',')
-    GroupParticipation.transaction do
-      ids.each do |id|
-        group_participation = GroupParticipation.find(id)
-        next unless group_participation.group == @group
-        next if group_participation.user == current_user
+    authorize! :update, @group
+    begin
+      ids = params.dig(:destroy, :ids).to_s.split(',')
+      GroupParticipation.transaction do
+        @group.group_participations.where(id: ids).find_each do |group_participation|
+          next if group_participation.user == current_user
 
-        group_participation_request = GroupParticipationRequest.find_by(user_id: group_participation.user_id, group_id: group_participation.group_id)
-        group_participation_request.destroy
-        group_participation.destroy
-        AreaParticipation.joins(group_area: :group).where(['groups.id = ? AND area_participations.user_id = ?', group_participation.group_id, group_participation.user_id]).readonly(false).destroy_all
+          group_participation.destroy
+        end
       end
+      flash[:notice] = t('info.participations_destroyed')
+    rescue ActiveRecord::ActiveRecordError
+      flash[:error] = t('error.participations_destroyed')
     end
-    flash[:notice] = t('info.participations_destroyed')
-  rescue StandardError
-    flash[:error] = t('error.participations_destroyed')
-  ensure
+
     respond_to do |format|
       format.turbo_stream { render partial: 'layouts/flash_stream' }
       format.html { redirect_back fallback_location: group_path(@group) }
@@ -97,6 +103,14 @@ class GroupParticipationsController < ApplicationController
   end
 
   protected
+
+  def enable_content_landmark
+    @content_landmark = true
+  end
+
+  def receiver_ids
+    params.dig(:message, :receiver_ids).to_s.split(',')
+  end
 
   def search_participant_params
     params[:search_participant] ? params.require(:search_participant).permit(:keywords, :role_id, :status_id) : {}

@@ -9,6 +9,7 @@
 class GroupsController < ApplicationController
   layout :choose_layout
 
+  before_action :enable_content_landmark
   before_action :authenticate_user!, except: %i[index show by_year_and_month]
 
   before_action :load_group, except: %i[index new create ask_for_multiple_follow]
@@ -31,8 +32,6 @@ class GroupsController < ApplicationController
 
   def index
     @tags = Tag.most_groups(current_domain.territory, 10).shuffle unless request.xhr?
-
-    params[:interest_border] ||= InterestBorder.to_key(current_domain.territory)
 
     @pagy, @groups = pagy(:offset, Group.look(params), limit: 30)
     respond_to do |format|
@@ -81,7 +80,10 @@ class GroupsController < ApplicationController
 
     respond_to do |format|
       format.html do
-        @page_title = t('pages.groups.archives.title', group: @group.name, year: params[:year], month: t('calendar.monthNames')[params[:month].to_i - 1])
+        @page_title = t('pages.groups.archives.title',
+                        group: @group.name,
+                        year: params[:year],
+                        month: t('calendar.monthNames')[params[:month].to_i - 1])
         load_page_data
         render 'show'
       end
@@ -116,6 +118,7 @@ class GroupsController < ApplicationController
     authorize! :create, Group
     @group = Group.new(accept_requests: 'p')
     @group.default_role_actions = DEFAULT_GROUP_ACTIONS
+    @page_title = t('pages.groups.new.title')
   end
 
   def edit
@@ -131,9 +134,11 @@ class GroupsController < ApplicationController
         format.html { redirect_to group_url(@group) }
       end
     else
+      @page_title = t('pages.groups.new.title')
+      flash.now[:error] = t('error.groups.creation')
       respond_to do |format|
-        format.html { render :new }
-        format.turbo_stream { render partial: 'layouts/flash_stream', status: :unprocessable_entity }
+        format.html { render :new, status: :unprocessable_content }
+        format.turbo_stream { render :new, status: :unprocessable_content }
       end
     end
   end
@@ -144,7 +149,8 @@ class GroupsController < ApplicationController
       redirect_to edit_group_url @group
     else
       flash[:error] = t('error.groups.update')
-      render action: ' edit '
+      @page_title = t('pages.groups.edit.title')
+      render :edit, status: :unprocessable_content
     end
   end
 
@@ -439,6 +445,10 @@ class GroupsController < ApplicationController
   end
 
   private
+
+  def enable_content_landmark
+    @content_landmark = true
+  end
 
   def choose_layout
     @group ? 'groups' : 'open_space'

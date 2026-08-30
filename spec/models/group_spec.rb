@@ -80,6 +80,14 @@ RSpec.describe Group do
       it 'returns all groups that match any of the words' do
         expect(described_class.look(search: 'title description', and: false)).to eq [groups[1], groups[0]]
       end
+
+      it 'does not mutate the search parameters while applying the default match mode' do
+        search_params = { search: 'rodi' }
+
+        described_class.look(search_params)
+
+        expect(search_params).to eq(search: 'rodi')
+      end
     end
 
     context 'search by interest border' do

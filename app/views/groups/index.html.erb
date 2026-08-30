@@ -1,32 +1,36 @@
 <% @extend = true %>
 <% @page_title = t('pages.groups.index.title') %>
 
-<%# Hero banner %>
-<div class="bg-primary text-primary-content p-6 lg:p-8 mb-6 border-2 border-base-content/15 relative overflow-hidden">
-  <div class="relative z-10 max-w-xl">
-    <p class="text-[11px] font-bold tracking-widest text-primary-content/50 uppercase mb-3"><%= t('pages.sidebar.groups', default: 'Gruppi') %></p>
-    <h1 class="text-2xl lg:text-3xl font-extrabold leading-tight mb-2"><%= t('pages.groups.index.find_group_label') %></h1>
-    <p class="text-primary-content/60 text-sm"><%= t('pages.groups.index.title') %></p>
+<header class="mb-6 flex flex-col gap-4 border-2 border-base-content/15 bg-primary p-6 text-primary-content lg:flex-row lg:items-end lg:justify-between lg:p-8">
+  <div class="max-w-2xl">
+    <h1 class="mb-2 text-2xl font-extrabold leading-tight lg:text-3xl"><%= t('pages.groups.index.find_group_label') %></h1>
+    <p class="text-sm text-primary-content/75"><%= t('pages.groups.index.title') %></p>
   </div>
-  <i class="fa-solid fa-people-group absolute right-6 lg:right-12 top-1/2 -translate-y-1/2 text-[7rem] lg:text-[9rem] text-primary-content/[0.06] hidden md:block"></i>
-</div>
+  <% if !current_user || can?(:create, Group) %>
+    <%= link_to new_group_path, class: 'btn min-h-11 border-0 bg-primary-content text-primary hover:bg-primary-content/90' do %>
+      <i class="fa-solid fa-plus" aria-hidden="true"></i>
+      <%= t('pages.groups.index.create_group_button') %>
+    <% end %>
+  <% end %>
+</header>
 
 <%# Search & Tags %>
-<div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+<div class="mb-8 grid grid-cols-1 gap-6 <%= 'lg:grid-cols-2' if @tags.present? %>">
   <div id="group_search_form">
     <div class="bg-base-100 border-2 border-base-content/15 p-4">
-      <div class="flex items-center gap-3 mb-4">
+      <div class="mb-4 flex items-center gap-3">
         <div class="w-8 h-8 flex items-center justify-center bg-primary/10 text-primary">
           <i class="fa-solid fa-magnifying-glass text-sm"></i>
         </div>
-        <h2 class="font-bold text-sm"><%= t('buttons.search', default: 'Cerca') %></h2>
+        <h2 class="font-bold text-sm"><%= t('buttons.search', default: 'Search') %></h2>
       </div>
       <%= render 'groups/search_form' %>
     </div>
   </div>
+  <% if @tags.present? %>
   <div class="hidden lg:block">
     <div class="bg-base-100 border-2 border-base-content/15 p-4" data-tag-cloud="">
-      <div class="flex items-center gap-3 mb-4">
+      <div class="mb-4 flex items-center gap-3">
         <div class="w-8 h-8 flex items-center justify-center bg-secondary/10 text-secondary">
           <i class="fa-solid fa-tags text-sm"></i>
         </div>
@@ -39,13 +43,18 @@
       </div>
     </div>
   </div>
+  <% end %>
 </div>
 
-<%# Groups grid %>
+<div class="mb-4 flex items-center justify-between gap-4">
+  <h2 class="text-lg font-extrabold"><%= t('pages.groups.index.results', default: 'Available groups') %></h2>
+  <p class="text-sm text-base-content/60" aria-live="polite"><%= t('pages.groups.index.results_count', count: @pagy.count, default: "%{count} results") %></p>
+</div>
+
 <% if @groups.any? %>
-  <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-4" id="groups_list">
+  <ul class="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4" id="groups_list" role="list">
     <%= render partial: "group_tag", collection: @groups, as: :group %>
-  </div>
+  </ul>
 <% else %>
   <div class="bg-base-100 border-2 border-base-content/15 p-8 text-center">
     <i class="fa-solid fa-people-group text-4xl text-base-content/20 mb-3"></i>
@@ -56,17 +65,3 @@
 <div id="more_groups_container">
   <%= render partial: 'more_groups' %>
 </div>
-
-<% content_for :left_panel do %>
-  <div class="bg-base-100 border-2 border-base-content/15 p-3 mb-2">
-    <% if !current_user || (can? :create, Group) %>
-      <%= link_to new_group_path, class: "btn btn-primary font-bold w-full" do %>
-        <i class="fa-solid fa-plus"></i> <%= t('pages.groups.index.create_group_button') %>
-      <% end %>
-    <% else %>
-      <p class="text-[11px] text-base-content/40"><%= t('pages.groups.index.limit_reached') %></p>
-    <% end %>
-  </div>
-  <%= render partial: 'users/user_groups_panel' %>
-<% end %>
-

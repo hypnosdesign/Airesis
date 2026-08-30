@@ -178,8 +178,8 @@ Rails.application.routes.draw do
   put '/votation/vote_schulze', to: 'votations#vote_schulze', as: :votation_vote_schulze
 
   concern :group_invitations do
-    resources :group_invitations do
-      resources :group_invitation_emails, param: :token do
+    resources :group_invitations, only: %i[new create] do
+      resources :group_invitation_emails, param: :token, only: [] do
         member do
           get :accept
           get :reject
@@ -233,7 +233,6 @@ Rails.application.routes.draw do
       post :ask_for_participation
       put :participation_request_confirm
       put :participation_request_decline
-      post :create_event
       post :change_default_anonima
       post :change_default_visible_outside
       post :change_advanced_options
@@ -301,7 +300,7 @@ Rails.application.routes.draw do
 
     concerns :group_invitations
 
-    resources :group_participations do
+    resources :group_participations, only: %i[index destroy] do
       collection do
         post :send_email
         post :destroy_all

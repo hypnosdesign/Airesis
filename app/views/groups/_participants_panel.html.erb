@@ -1,50 +1,81 @@
-<h4><%= @group.admin_title || t('pages.groups.default_admin_title') %></h4>
-<% @admins = @group.portavoce %>
-<% @admins.includes(:image).limit(5).each do |user| %>
-  <%= user_tag(user, nil, true, false) %>
-<% end %>
-<% if @admins.size > 5 %>
-  <%= link_to group_group_participations_url(@group, 'search_participant[role_id]' => ParticipationRole.admin.id), class: "btn" do %>
-    <i class="fa-solid fa-user"></i>
-    <%= t('pages.groups.show.show_all_admins', count: @admins.size) %>
-  <% end %>
-<% end %>
+<section class="border-2 border-base-content/15 bg-base-100" aria-labelledby="group-community-title">
+  <div class="border-b-2 border-base-content/15 p-4">
+    <h2 id="group-community-title" class="font-extrabold"><%= t('pages.groups.show.community', default: 'Group community') %></h2>
+    <p class="mt-1 text-sm text-base-content/60"><%= t('pages.groups.show.community_hint', count: @group.group_participations_count, default: "%{count} members") %></p>
+  </div>
 
-<h4><%= t('pages.groups.show.participants_list') %></h4>
-<% if user_signed_in? %>
-  <% @participation_request = current_user.has_asked_for_participation?(@group.id) %>
-<% end %>
-<% unless @participation_request %>
-  <% unless @group.disable_participation_requests %>
-    <%= link_to ask_for_participation_group_url(@group), data: { turbo_method: :post }, class: "btn btn-primary" do %>
-      <i class="fa-solid fa-pencil"></i>
-      <%= t('pages.groups.show.ask_participate_button') %>
+  <div class="space-y-4 p-4">
+    <div class="grid grid-cols-2 gap-2">
+      <%= link_to group_group_participations_path(@group), class: 'btn btn-outline min-h-11' do %>
+        <i class="fa-solid fa-users" aria-hidden="true"></i>
+        <%= t('pages.groups.show.participants_list') %>
+      <% end %>
+      <button type="button"
+              class="btn btn-outline min-h-11"
+              aria-haspopup="dialog"
+              aria-controls="rules_modal"
+              data-controller="dialog-trigger"
+              data-dialog-trigger-dialog-id-value="rules_modal"
+              data-action="click->dialog-trigger#open">
+        <i class="fa-solid fa-book" aria-hidden="true"></i>
+        <%= t('pages.groups.show.rules_button') %>
+      </button>
+      <% if can? :accept_requests, @group %>
+        <%= link_to new_group_group_invitation_path(@group), class: 'btn btn-outline min-h-11' do %>
+          <i class="fa-solid fa-envelope" aria-hidden="true"></i>
+          <%= t('pages.groups.show.invite_button') %>
+        <% end %>
+      <% end %>
+      <% if can? :update, @group %>
+        <%= link_to edit_group_path(@group), class: 'btn btn-outline min-h-11' do %>
+          <i class="fa-solid fa-gear" aria-hidden="true"></i>
+          <%= t('pages.groups.header.settings') %>
+        <% end %>
+      <% end %>
+    </div>
+
+    <% participation = current_user && @group.group_participations.find_by(user_id: current_user.id) %>
+    <% participation_request = current_user && current_user.has_asked_for_participation?(@group.id) %>
+    <% if participation %>
+      <div class="border-t border-base-content/10 pt-4">
+        <p class="mb-3 text-sm font-semibold"><%= t('pages.groups.show.member_status', default: 'You are a member of this group.') %></p>
+        <div class="flex flex-wrap gap-2">
+          <%= link_to permissions_list_group_path(@group), class: 'btn btn-ghost min-h-11' do %>
+            <i class="fa-solid fa-circle-info" aria-hidden="true"></i>
+            <%= t('pages.groups.show.list_permissions.button') %>
+          <% end %>
+          <% if can? :destroy, participation %>
+            <%= link_to group_group_participation_path(@group, participation),
+                        data: { turbo_method: :delete, turbo_confirm: t('pages.users.show.get_out_of_group_confermation') },
+                        class: 'btn btn-ghost min-h-11 text-error' do %>
+              <i class="fa-solid fa-right-from-bracket" aria-hidden="true"></i>
+              <%= t('pages.users.show.get_out_of_group_button') %>
+            <% end %>
+          <% end %>
+        </div>
+      </div>
+    <% elsif participation_request %>
+      <div class="alert alert-info py-3 text-sm" role="status">
+        <i class="fa-solid fa-clock" aria-hidden="true"></i>
+        <span><%= t('info.group_participations.request_alredy_sent') %></span>
+      </div>
+    <% elsif user_signed_in? && !@group.disable_participation_requests %>
+      <%= link_to ask_for_participation_group_path(@group), data: { turbo_method: :post }, class: 'btn btn-primary min-h-11 w-full' do %>
+        <i class="fa-solid fa-user-plus" aria-hidden="true"></i>
+        <%= t('pages.groups.show.ask_participate_button') %>
+      <% end %>
     <% end %>
-  <% end %>
-<% end %>
 
-<% if @group.group_participations.size > 1 %>
-  <% @group_participations = @group.group_participations.includes(:participation_role, user: [:image]) %>
-  <% @group_participations.limit(5).each do |participant| %>
-    <% next if participant.as_admin? %>
-    <%= user_tag participant.user, nil, true, false, title: participant.participation_role.name %>
-  <% end %>
-  <% if @group_participations.size > 5 %>
-    <%= link_to group_group_participations_url(@group), class: "btn" do %>
-      <i class="fa-solid fa-user"></i>
-      <%= t('pages.groups.show.show_all_participants', count: @group.group_participations.count) %>
+    <% admins = @group.portavoce.includes(:image).limit(5) %>
+    <% if admins.any? %>
+      <div class="border-t border-base-content/10 pt-4">
+        <h3 class="mb-2 text-sm font-bold"><%= @group.admin_title.presence || t('pages.groups.default_admin_title') %></h3>
+        <ul class="space-y-1 text-sm" role="list">
+          <% admins.each do |admin| %>
+            <li><%= link_to admin.fullname, user_path(admin), class: 'inline-flex min-h-11 items-center' %></li>
+          <% end %>
+        </ul>
+      </div>
     <% end %>
-  <% end %>
-<% else %>
-  <p>
-    <b><%= t('pages.groups.show.no_participants') %></b>
-  </p>
-<% end %>
-
-<% if can? :accept_requests, @group %>
-  <%= link_to new_group_group_invitation_path(@group), class: "btn" do %>
-    <i class="fa-solid fa-envelope"></i>
-    <%= t('pages.groups.show.invite_button') %>
-  <% end %>
-  <div id="new_invitation_container"></div>
-<% end %>
+  </div>
+</section>

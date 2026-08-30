@@ -88,7 +88,7 @@ en-EU:
       send_message:
         subject_label: "Subject"
         body_label: "Body"
-        massive_email: "Sending massive mail"
+        massive_email: "Email filtered participants"
       left_panel:
         general_info: "General information"
         alarm_and_notifications: "Alarm and notifications"
@@ -216,6 +216,7 @@ en-EU:
         tags:
           title: "Tags (separated by comma)"
       edit:
+        editor_toolbar_hint: "Swipe the formatting toolbar to see every option."
         title: 'Edit Group Settings'
         change_permissions: "In Roles and Permissions Settings you can always change the members permissions."
         remove_user_confirm: "Are you sure you want to remove %{name} from the group?"
@@ -231,6 +232,12 @@ en-EU:
         proposals_button: "PROPOSALS"
         calendar: "CALENDAR"
       show:
+        community: "Group community"
+        community_hint:
+          one: "%{count} member"
+          other: "%{count} members"
+        activity: "Activity"
+        blog_posts: "Blog posts"
         rules_button: "Rules"
         post_button: "Post on the group wall"
         blog_button: "Create my Blog"
@@ -252,7 +259,7 @@ en-EU:
         list_permissions:
           title: "List of your permissions inside the group"
           button: "Permissions list"
-        print_all_participants: "Print participants list"
+        print_all_participants: "Export participants (CSV)"
         last_proposals: "Recently added proposals"
         last_topics: "Last topic created"
         next_events: "Next events"
@@ -355,6 +362,7 @@ en-EU:
       statistics:
         title: "Average values calculated (last update on %{date})"
       archives:
+        title: "%{group} — archive for %{month}, %{year}"
         page_title: "Archive for %{month}, %{year}"
     login:
       title: 'Login'

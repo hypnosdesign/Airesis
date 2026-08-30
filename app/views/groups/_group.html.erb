@@ -1,68 +1,114 @@
-<%= simple_form_for @group, validate: true, html: { multipart: true } do |f| %>
+<%= simple_form_for @group, validate: true, html: { multipart: true, class: 'min-w-0 space-y-6' } do |f| %>
   <%= f.error_notification %>
+
   <% if @group.is_private? %>
-    <div class="alert alert-info">
+    <div class="alert alert-info" role="status">
+      <i class="fa-solid fa-circle-info" aria-hidden="true"></i>
       <p><%= t('pages.groups.edit.private_warning_html', link: (link_to t('pages.groups.administration_panel.proposals'), group_quorums_url(@group))) %></p>
     </div>
   <% end %>
-  <%= f.input :name, placeholder: t('activerecord.attributes.group.name_placeholder'), input_html: { data: { fv_remote_id: @group.id } } %>
-  <div class="form-control mb-4">
-    <%= f.label :description, class: "label" %>
-    <%= f.rich_text_area :description, class: "trix-content w-full" %>
-  </div>
-  <% if ['edit', 'update'].include? action_name %>
-    <div class="form-control mb-4">
-      <%= f.label :rule_book, class: "label" %>
-      <%= f.rich_text_area :rule_book, class: "trix-content w-full" %>
+
+  <fieldset class="min-w-0 space-y-4">
+    <legend class="mb-3 text-lg font-extrabold"><%= t('pages.groups.edit.general_information', default: 'Group information') %></legend>
+    <%= f.input :name,
+                placeholder: t('activerecord.attributes.group.name_placeholder'),
+                input_html: { class: 'input input-bordered min-h-11 w-full', data: { fv_remote_id: @group.id } } %>
+
+    <div class="form-control min-w-0">
+      <%= f.label :description, class: 'label label-text font-semibold' %>
+      <p class="mb-2 text-xs text-base-content/70 sm:hidden"><%= t('pages.groups.edit.editor_toolbar_hint', default: 'Swipe the formatting toolbar to see every option.') %></p>
+      <%= f.rich_text_area :description, class: 'trix-content min-w-0 w-full' %>
     </div>
-  <% end %>
-  <%= f.input :tags_list, label: t('pages.groups.new.tags.title') %>
-  <%= f.input :image, input_html: { accept: "image/jpeg,image/png", data: { fv_trigger: 'change', fv_file: true, fv_file_maxsize: UPLOAD_LIMIT_IMAGES } } %>
-  <%= f.input :interest_border_tkn, collection: (@group.interest_border.present? ? [[@group.interest_border.text, @group.interest_border.key]] : []), selected: (@group.interest_border.present? ? @group.interest_border.key : nil), as: :select, required: true %>
-  <% if ['new', 'create'].include? action_name %>
-    <%= f.input :default_role_name, placeholder: t('activerecord.attributes.group.default_role_name_placeholder') %>
-    <a href="#"-id="permessi"><%= t('pages.groups.new.change_permissions_button') %></a>
-    <div id="permessi" class="">
-      <h2><%= t('pages.groups.new.change_permissions_title') %></h2>
-      <div class="alert alert-info">
-        <%= t('pages.groups.new.change_permissions_description') %>
+
+    <% if @group.persisted? %>
+      <div class="form-control min-w-0">
+        <%= f.label :rule_book, class: 'label label-text font-semibold' %>
+        <p class="mb-2 text-xs text-base-content/70 sm:hidden"><%= t('pages.groups.edit.editor_toolbar_hint', default: 'Swipe the formatting toolbar to see every option.') %></p>
+        <%= f.rich_text_area :rule_book, class: 'trix-content min-w-0 w-full' %>
       </div>
-      <% GroupAction::LIST.each do |action| %>
-        <%= f.label action do %>
-          <%= f.check_box :default_role_actions, { multiple: true }, action, nil %>
-          <%= I18n.t("db.group_actions.#{action}.description") %>
-        <% end %>
-      <% end %>
-      <a id="default_permissions_button" class="btn" href="#">Default</a>
-      <a id="change_permissions_button" class="btn btn-primary" href="#">Ok</a>
-    </div>
-    <%= f.input :admin_title, placeholder: t('activerecord.attributes.group.admin_title_placeholder') %>
-    <%= f.submit button_name, class: 'btn btn-primary', data: { disable_with: t('saving') } %>
+    <% end %>
+
+    <%= f.input :tags_list,
+                label: t('pages.groups.new.tags.title'),
+                input_html: { class: 'input input-bordered min-h-11 w-full' } %>
+    <%= f.input :image,
+                input_html: {
+                  accept: 'image/jpeg,image/png',
+                  class: 'file-input file-input-bordered min-h-11 w-full',
+                  data: { fv_trigger: 'change', fv_file: true, fv_file_maxsize: UPLOAD_LIMIT_IMAGES }
+                } %>
+    <%= f.input :interest_border_tkn,
+                collection: InterestBorder.all.map { |border| [border.text, border.key] },
+                selected: (@group.interest_border&.key || @group.interest_border_tkn),
+                include_blank: t('pages.groups.index.any_place', default: 'Select a territory'),
+                required: true,
+                input_html: { class: 'select select-bordered min-h-11 w-full' } %>
+    <%= f.input :admin_title,
+                placeholder: t('activerecord.attributes.group.admin_title_placeholder'),
+                input_html: { class: 'input input-bordered min-h-11 w-full' } %>
+  </fieldset>
+
+  <% if @group.new_record? %>
+    <fieldset class="space-y-4 border-t-2 border-base-content/10 pt-6">
+      <legend class="text-lg font-extrabold"><%= t('pages.groups.new.membership_setup', default: 'Roles and participation') %></legend>
+      <%= f.input :default_role_name,
+                  placeholder: t('activerecord.attributes.group.default_role_name_placeholder'),
+                  input_html: { class: 'input input-bordered min-h-11 w-full' } %>
+
+      <details class="border-2 border-base-content/15 bg-base-200/40">
+        <summary class="flex min-h-11 cursor-pointer items-center px-4 py-3 font-bold">
+          <%= t('pages.groups.new.change_permissions_button') %>
+        </summary>
+        <div class="space-y-3 border-t border-base-content/15 p-4">
+          <p class="text-sm text-base-content/70"><%= t('pages.groups.new.change_permissions_description') %></p>
+          <fieldset>
+            <legend class="sr-only"><%= t('pages.groups.new.change_permissions_title') %></legend>
+            <div class="grid gap-2 sm:grid-cols-2">
+              <% GroupAction::LIST.each do |action| %>
+                <label class="flex min-h-11 cursor-pointer items-start gap-3 border border-base-content/10 bg-base-100 p-3 text-sm">
+                  <%= f.check_box :default_role_actions, { multiple: true, class: 'checkbox checkbox-primary mt-0.5' }, action, nil %>
+                  <span><%= t("db.group_actions.#{action}.description") %></span>
+                </label>
+              <% end %>
+            </div>
+          </fieldset>
+        </div>
+      </details>
+    </fieldset>
   <% else %>
-    <%= f.input :admin_title, placeholder: t('activerecord.attributes.group.admin_title_placeholder') %>
-    <%= f.label :private, title: "Chi non è membro del gruppo può visualizzare solo il regolamento e le proposte pubbliche" do %>
-      <%= f.check_box :private %>
-      <%= t('activerecord.attributes.group.private') %>
-    <% end %>
-    <%= link_to t('pages.groups.edit.change_permissions'), group_participation_roles_path(@group) %>
-    <div>
-      <%= f.submit button_name, class: 'btn btn-primary', data: { disable_with: t('updating') } %>
-    </div>
-    <br>
-    <br>
-    <% if can? :destroy, @group %>
-      <div class="alert alert-warning" data-alert>
-        <%= t('.delete_group_warning_html') %>
-        <%= link_to @group, data: { turbo_method: :delete, turbo_confirm: t('pages.groups.show.confirm_destroy') }, class: 'btn btn-error' do %>
-          <i class="fa-regular fa-trash-can"></i>
-          <%= t('pages.groups.show.destroy_button') %>
-        <% end %>
-      </div>
-    <% end %>
+    <fieldset class="space-y-4 border-t-2 border-base-content/10 pt-6">
+      <legend class="text-lg font-extrabold"><%= t('pages.groups.edit.visibility_and_roles', default: 'Visibility and roles') %></legend>
+      <label class="flex min-h-11 cursor-pointer items-center gap-3 border border-base-content/10 p-3">
+        <%= f.check_box :private, class: 'checkbox checkbox-primary' %>
+        <span>
+          <span class="block font-semibold"><%= t('activerecord.attributes.group.private') %></span>
+          <span class="block text-sm text-base-content/60"><%= t('pages.groups.edit.private_hint', default: 'Non-members can only see the rules and public content.') %></span>
+        </span>
+      </label>
+      <%= link_to group_participation_roles_path(@group), class: 'btn btn-outline h-auto min-h-11 whitespace-normal py-2 text-center leading-snug' do %>
+        <i class="fa-solid fa-user-shield" aria-hidden="true"></i>
+        <%= t('pages.groups.edit.change_permissions') %>
+      <% end %>
+    </fieldset>
   <% end %>
-<% end %>
-<% if ['new', 'create'].include?(params[:action]) %>
-  <% _role_actions_js = @group.default_role_actions.to_a.map { |id| "var cb = document.getElementById('group_default_role_actions_#{id}'); if (cb) cb.checked = true;" }.join(" ") %>
-<% else %>
-  <% _role_actions_js = "" %>
+
+  <div class="flex flex-wrap items-center gap-3 border-t-2 border-base-content/10 pt-6">
+    <%= f.submit button_name,
+                 class: 'btn btn-primary min-h-11',
+                 data: { disable_with: (@group.new_record? ? t('saving') : t('updating')) } %>
+    <%= link_to t('buttons.cancel'), (@group.persisted? ? group_path(@group) : groups_path), class: 'btn btn-ghost min-h-11' %>
+  </div>
+
+  <% if @group.persisted? && can?(:destroy, @group) %>
+    <section class="border-2 border-error/30 bg-error/5 p-4" aria-labelledby="delete-group-title">
+      <h2 id="delete-group-title" class="mb-2 text-base font-extrabold text-error"><%= t('pages.groups.edit.danger_zone', default: 'Delete group') %></h2>
+      <p class="mb-4 text-sm text-base-content/70"><%= t('.delete_group_warning_html') %></p>
+      <%= link_to @group,
+                  data: { turbo_method: :delete, turbo_confirm: t('pages.groups.show.confirm_destroy') },
+                  class: 'btn btn-error min-h-11' do %>
+        <i class="fa-regular fa-trash-can" aria-hidden="true"></i>
+        <%= t('pages.groups.show.destroy_button') %>
+      <% end %>
+    </section>
+  <% end %>
 <% end %>

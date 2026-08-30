@@ -7,11 +7,17 @@ import { application } from "./application"
 import AutosubmitController from "./autosubmit_controller"
 application.register("autosubmit", AutosubmitController)
 
+import ActiveNavigationController from "./active_navigation_controller"
+application.register("active-navigation", ActiveNavigationController)
+
 import CountdownController from "./countdown_controller"
 application.register("countdown", CountdownController)
 
 import DropdownController from "./dropdown_controller"
 application.register("dropdown", DropdownController)
+
+import DialogTriggerController from "./dialog_trigger_controller"
+application.register("dialog-trigger", DialogTriggerController)
 
 import FlashController from "./flash_controller"
 application.register("flash", FlashController)
