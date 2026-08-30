@@ -1,0 +1,30 @@
+<div class="relative">
+<nav aria-label="<%= t('pages.users.settings_navigation', default: 'Account settings') %>"
+     aria-describedby="settings-scroll-hint"
+     class="w-full overflow-x-auto pr-10 sm:pr-0"
+     tabindex="0">
+  <p id="settings-scroll-hint" class="sr-only"><%= t('pages.users.settings_scroll_hint', default: 'Scroll horizontally to see every settings section.') %></p>
+  <ul class="flex min-w-max items-center gap-1">
+    <% settings_links = [
+      [t('pages.users.left_panel.general_info'), user_path(current_user), current_page?(user_path(current_user))],
+      [t('pages.users.account_settings', default: 'Login & password'), edit_user_registration_path, current_page?(edit_user_registration_path)],
+      [t('pages.users.left_panel.alarm_and_notifications'), alarm_preferences_users_path, current_page?(alarm_preferences_users_path)],
+      [t('pages.users.notification_inbox', default: 'Notification inbox'), alerts_path, current_page?(alerts_path) || current_page?(notifications_path)],
+      [t('pages.users.left_panel.geographic_borders'), border_preferences_users_path, current_page?(border_preferences_users_path)],
+      [t('pages.users.left_panel.account_and_privacy'), privacy_preferences_users_path, current_page?(privacy_preferences_users_path)],
+      [t('pages.users.left_panel.statistics'), statistics_users_path, current_page?(statistics_users_path)]
+    ] %>
+    <% settings_links.each do |label, path, active| %>
+      <li>
+        <%= link_to label,
+                    path,
+                    class: "inline-flex min-h-11 items-center border-2 px-3 text-sm font-semibold #{active ? 'border-primary bg-primary text-primary-content' : 'border-transparent text-base-content/75 hover:border-base-content/20 hover:bg-base-200'}",
+                    aria: { current: (active ? 'page' : nil) } %>
+      </li>
+    <% end %>
+  </ul>
+</nav>
+<span class="pointer-events-none absolute inset-y-0 right-0 flex w-10 items-center justify-end bg-gradient-to-l from-base-200 via-base-200/90 to-transparent pr-1 sm:hidden" aria-hidden="true">
+  <i class="fa-solid fa-chevron-right text-xs text-base-content/75"></i>
+</span>
+</div>

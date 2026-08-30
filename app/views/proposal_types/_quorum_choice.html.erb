@@ -5,7 +5,7 @@
 <% end %>
 
 <fieldset class="fieldset">
-  <label class="fieldset-label font-medium"><%= t('activerecord.attributes.proposal.quorum_id', default: 'Quorum') %></label>
+  <%= f.label :quorum_id, t('activerecord.attributes.proposal.quorum_id', default: 'Quorum'), class: 'fieldset-label font-medium' %>
   <%= f.select :quorum_id,
       @quorum_collection.collect { |p| [p.name, p.id, { 'data-description' => p.description, 'data-explanation' => p.explanation, 'data-time_fixed' => p.time_fixed?, 'data-minutes' => p.minutes }] },
       { include_blank: t('pages.proposals.new.quorum_prompt') },

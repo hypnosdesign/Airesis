@@ -57,7 +57,11 @@ class AlertsController < ApplicationController
 
   def check_all
     current_user.unread_alerts.check_all
-    head :ok
+    respond_to do |format|
+      format.html { redirect_to alerts_path, notice: t('pages.alerts.index.marked_all_read', default: 'All notifications marked as read.') }
+      format.turbo_stream { redirect_to alerts_path, status: :see_other }
+      format.json { head :no_content }
+    end
   end
 
   # return notification tooltip for a specific proposal and user

@@ -1,30 +1,30 @@
 <% @page_title = t("pages.password.title") %>
 
 <main class="flex-1 flex items-center justify-center px-4 py-12">
-  <div class="flex w-full max-w-5xl bg-base-100 shadow-xl overflow-hidden">
+  <div class="auth-card">
 
     <%# — Left: illustration — %>
     <div class="hidden lg:flex flex-1 bg-primary/10 items-center justify-center p-12">
       <div class="text-center">
         <i class="fa-solid fa-key text-[120px] text-primary/30"></i>
-        <h2 class="text-2xl font-bold text-primary mt-6"><%= t('pages.password.illustration_title', default: 'Password dimenticata?') %></h2>
-        <p class="text-base-content/50 mt-2 max-w-xs mx-auto"><%= t('pages.password.illustration_desc', default: 'Nessun problema. Ti invieremo un link per reimpostarla.') %></p>
+        <p class="text-2xl font-bold text-primary mt-6"><%= t('pages.password.illustration_title', default: 'Forgot your password?') %></p>
+        <p class="auth-copy mt-2 max-w-xs mx-auto"><%= t('pages.password.illustration_desc', default: 'We will send a secure reset link to your email address.') %></p>
       </div>
     </div>
 
     <%# — Right: form — %>
     <div class="flex-1 p-8 sm:p-12 lg:p-16">
       <h1 class="text-3xl font-extrabold mb-2"><%= @page_title %></h1>
-      <p class="text-base-content/50 mb-8"><%= t('pages.password.subtitle', default: 'Inserisci la tua email e ti invieremo le istruzioni per reimpostare la password.') %></p>
+      <p class="auth-copy mb-8"><%= t('pages.password.subtitle', default: 'Enter your email address to receive reset instructions.') %></p>
 
       <%= simple_form_for(@user, url: user_password_path, html: { class: 'space-y-5', data: { turbo_method: :post } }) do |f| %>
         <fieldset class="fieldset">
-          <label class="fieldset-label font-medium"><%= t('activerecord.attributes.user.email') %></label>
-          <%= f.input_field :email, required: true, placeholder: 'nome@esempio.it',
+          <%= f.label :email, t('activerecord.attributes.user.email'), class: 'fieldset-label font-medium' %>
+          <%= f.input_field :email, required: true, autocomplete: 'email', placeholder: 'name@example.com',
               class: 'input input-bordered w-full' %>
         </fieldset>
 
-        <button type="submit" class="btn btn-primary w-full font-bold text-base mt-2">
+        <button type="submit" class="btn btn-primary min-h-11 h-auto w-full whitespace-normal py-2 font-bold text-base mt-2">
           <i class="fa-solid fa-paper-plane mr-2"></i>
           <%= t("pages.password.submit") %>
         </button>

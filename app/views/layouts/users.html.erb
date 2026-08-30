@@ -48,4 +48,19 @@
   </nav>
 <% end %>
 
-<%= render 'layouts/general' %>
+<% settings_surface = current_user && (
+     %w[alerts notifications].include?(controller_name) ||
+     (controller_name == 'users' && (@user == current_user || %w[alarm_preferences border_preferences privacy_preferences statistics].include?(action_name))) ||
+     (controller_name == 'registrations' && action_name == 'edit')
+   ) %>
+<% if settings_surface %>
+  <% content_for :page_header, flush: true do %>
+    <div class="bg-base-100 border-b-2 border-base-content/15 px-4 lg:px-8 py-2">
+      <div class="max-w-[1400px] mx-auto">
+        <%= render 'users/settings_nav' %>
+      </div>
+    </div>
+  <% end %>
+<% end %>
+
+<%= render 'layouts/general', content_landmark: true %>

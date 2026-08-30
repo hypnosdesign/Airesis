@@ -8,17 +8,23 @@ RSpec.describe SearchesController, seeds: true do
   describe 'GET index' do
     it 'requires authentication when not authenticated' do
       get searches_path, params: { term: 'test', format: :json }
-      expect([302, 401, 406, 500]).to include(response.status)
+      expect(response).to have_http_status(:unauthorized)
     end
 
     it 'returns JSON when authenticated' do
       sign_in user
       get searches_path, params: { term: group.name, format: :json }
-      expect([200, 500]).to include(response.status)
-      if response.status == 200
-        json = JSON.parse(response.body)
-        expect(json).to be_an(Array)
-      end
+      expect(response).to have_http_status(:ok)
+      json = JSON.parse(response.body)
+      expect(json).to be_an(Array)
+    end
+
+    it 'renders a labelled HTML search surface when authenticated' do
+      sign_in user
+      get searches_path, params: { term: group.name }
+      expect(response).to have_http_status(:ok)
+      expect(response.body).to include('search-results-title')
+      expect(response.body).to include(group.name)
     end
   end
 end

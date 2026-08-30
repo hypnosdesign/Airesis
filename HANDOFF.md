@@ -1,22 +1,69 @@
 # Handoff operativo — Airesis
 
-> Aggiornato il 2026-08-29. Questo è il punto di ripresa corrente.
+> Aggiornato il 2026-08-30. Questo è il punto di ripresa corrente.
 > La prossima sessione deve leggere questo file prima di modificare il repository, senza chiedere all'utente di ricostruire il contesto.
 
 ## Stato in breve
 
 - Repository: `/Users/mattia/Projects/Airesis_Site/airesis-develop`
-- Branch: `main`; HEAD di partenza del lavoro locale: `0692178`
+- Branch: `main`; il blocco fino alla chiusura UI/UX G03 è consolidato e pubblicato su `origin/main`.
 - Versione applicativa: 6.1.3
 - Stack aggiornato localmente: Ruby 4.0.6, Bundler 4.0.19, Rails 8.1.3.1, PostgreSQL 18.6, Node.js 24.20.0 LTS e Yarn 4.18.0
-- Il worktree contiene sia la remediation P0 precedente sia il refresh completo dello stack di agosto 2026.
-- Lo stato operativo consolidato comprende remediation P0, refresh dello stack e inizializzazione PostgreSQL 18; verificare `git log` e `git status` per l'identificativo del commit corrente.
+- Remediation P0, refresh dello stack e inizializzazione PostgreSQL 18 sono consolidati e pubblicati su `origin/main`.
+- La remediation P1 A1-A4 e il programma UI/UX fino a G03 sono completati, verificati, consolidati e pubblicati; la rimozione della credenziale A1 resta inclusa nella history riscritta.
 - PostgreSQL 18 è ora inizializzato sul volume persistente `airesisDB18`; app e database sono attivi rispettivamente sulle porte host 3001 e 5434.
 - Il volume sorgente PostgreSQL 17 è risultato vuoto: non esistevano dati applicativi storici da trasferire. Il database corrente contiene schema e seed ufficiali del progetto.
 - I volumi legacy PostgreSQL 17/Yarn 1 e le immagini non più usate sono stati rimossi dopo backup, restore di prova e controlli di integrità.
 - Audit applicativo e stato remediation: [`audit_sicurezza.md`](audit_sicurezza.md)
 
-## Blocco appena completato — inizializzazione PostgreSQL 18 e cleanup
+## Punto di ripresa — UI/UX G04 deliberazione, commenti, quorum e voto
+
+- Per istruzione dell'utente il lavoro si è fermato subito dopo la chiusura di G03; **G04 non è ancora iniziato**.
+- G03 ha superato il gate Impeccable all'iterazione 4: **37/40**, P0=0, P1=0; il detector finale ha anche P2=0. Snapshot finale: `.impeccable/critique/2026-08-30T00-42-19Z__app-views-proposals.md`; baseline: `.impeccable/critique/2026-08-29T23-58-01Z__app-views-proposals.md`.
+- Listing, new, show ed edit pubblico/gruppo sono stati verificati a 1440×900 e 390×844. Card, filtri/drawer, sort, label, landmark, copy, stati, commento, banner e progressive disclosure non presentano blocker o overflow.
+- L'editor persiste `content_dirty` lato server senza dipendere dal JavaScript legacy; 12 Trix sono nominati e operabili da tastiera con roving tabindex, target 44×44 px, scrollbar mobile, Expand/Collapse all e barra azioni sticky.
+- Gli href sort restano sugli index pubblico/gruppo; il click conserva shell, `main`, H1 e title. Il criterio attivo misura 5,04:1 e gli anchor sono alti 44 px.
+- `/proposal_categories.json`, `/banner`, `/test_banner` e `tab_list` sono stati verificati; le route REST morte restano potate. Inventario: **637** route controller, **594** UI assegnate e **43** tecniche escluse; G03 conta 47 route.
+- Verifiche finali G03: **107 spec helper/request, 0 failure**; build esbuild e Tailwind verdi; `git diff --check` pulito; Chrome reale ripristinato su `/events/new` con sessione autenticata.
+- Dati di sviluppo riconoscibili e reversibili da conservare durante G04: gruppo id 1 `[UI AUDIT] Civic Lab`, proposta pubblica id 1 `[UI AUDIT] Safer routes to public services`, proposta di gruppo id 2 `[UI AUDIT] Shared neighbourhood mobility plan`. Sono validi, con quattro sezioni e una soluzione ciascuna e associazioni gruppo/autore coerenti. Rimuoverli soltanto nel cleanup finale esplicito.
+- Prossimo blocco: baseline dual-agent G04 sulle 125 route assegnate ai controller `proposal_comments`, `proposal_revisions`, `proposal_lives`, `proposal_supports`, `quorums`, `votations`, `candidates`, `elections` e `proposal_nicknames`, senza ripetere l'audit G03.
+- G01 resta separatamente `blocked_pending_legal_authority`; non inventare testi o identità legali per sbloccarlo.
+
+## Blocco appena completato — remediation P1 A1-A4
+
+### A1 — credenziali Facebook storiche
+
+- Rimossa da `config/initializers/omniauth.rb` la vecchia configurazione commentata con app ID e secret hard-coded.
+- `config/initializers/devise.rb` continua a caricare le credenziali soltanto da `FACEBOOK_APP_ID` e `FACEBOOK_APP_SECRET`; una regressione impedisce di reintrodurre credenziali letterali nel vecchio initializer.
+- Senza esporne i valori, è stato verificato che app ID e secret presenti nella configurazione locale sono entrambi diversi dai valori storici.
+- L'utente ha confermato che la vecchia credenziale non esiste più su Meta.
+- Bonificata tutta la history raggiungibile: riscritti con push atomico forzato `main`, `claude/refine-dashboard-design-6gaR1`, `v6.0.0` e `v6.1.0`. Nuovi riferimenti: `cfb2695`, `49292c4`, `616ffe9` e `719d1a9`.
+- Un clone mirror fresco da GitHub non contiene né app ID né secret storici in nessuno dei 5.664 oggetti; anche il fetch diretto del vecchio commit non è più disponibile dal server.
+- Il bundle di sicurezza e il clone temporaneo usati per il confronto sono stati eliminati definitivamente; reflog scaduti e garbage collection locale completata, con il vecchio commit non più presente nell'object database locale.
+- I cloni esistenti devono riallinearsi alla nuova history senza ri-pubblicare vecchi branch o tag, altrimenti la credenziale revocata potrebbe essere reintrodotta nella cronologia raggiungibile.
+
+### A2/A3 — stored XSS
+
+- `ImageHelper#group_image_tag` usa ora il tag builder Rails; `group.name` viene escaped nell'attributo `alt`.
+- La costruzione HTML è stata rimossa da `Taggable`: il nuovo `tag_links_for` usa `safe_join`, `link_to` e route Rails.
+- Le tre view blog non usano più `raw` né `tags_with_links`.
+- Le regressioni costruiscono payload con chiusura dell'attributo e tag `script`, poi verificano il DOM prodotto e l'assenza di nodi eseguibili.
+
+### A4 — emissione token e rate limiting
+
+- `TokensController#create` normalizza l'email, verifica prima la password e chiama `ensure_authentication_token!` solo per credenziali valide.
+- Rack::Attack limita `POST /tokens` a 5 richieste/20 secondi per IP e 5 richieste/minuto per email normalizzata, anche per body JSON e IP distribuiti.
+- Le spec provano sia il `429` per IP/email sia l'assenza di scritture del token dopo una password errata.
+
+### Verifiche del blocco
+
+- Suite P1 + integrazione blog/tag: **57 esempi, 0 failure** con `NO_COVERAGE=1` (la soglia SimpleCov globale non è significativa su una selezione mirata).
+- Brakeman 8.0.6: i finding A2/A3 non sono più presenti. Il report completo conserva 28 warning estranei al blocco e l'errore di parsing già noto su `app/views/frm/admin/categories/_categories.html.erb`.
+- RuboCop sui file Ruby toccati: nessuna nuova offense; resta il warning preesistente per l'argomento `vars` inutilizzato in `ApplicationHelper#pagy_nav`.
+- `git diff --check`: pulito.
+- Container applicativo riavviato per ricaricare l'initializer Rack::Attack; smoke test finale: HTTP 200 su `http://localhost:3001/`.
+
+## Blocco precedente — inizializzazione PostgreSQL 18 e cleanup
 
 ### Sorgente e destinazione
 
@@ -109,7 +156,7 @@ Sostituire `mailman` o `wkhtmltopdf` è un intervento architetturale separato: e
 
 RuboCop 1.90 sui 27 file Ruby modificati segnala quattro offense preesistenti, tutte fuori dalle righe di questo upgrade: due suggerimenti `params.expect`, uno spazio doppio e l'argomento legacy `vars` del wrapper `pagy_nav`.
 
-Brakeman 8.0.6 termina con 6 warning applicativi e un errore di parsing su una view legacy. I due XSS sui tag corrispondono al finding A3 già presente nell'audit; gli altri warning richiedono analisi nel filone sicurezza e non sono stati modificati implicitamente durante l'upgrade.
+Il controllo Brakeman corrente, successivo alla remediation P1, è riportato nel blocco iniziale di questo handoff; i warning residui appartengono a filoni di sicurezza separati.
 
 L'unico warning di compatibilità osservato al boot proviene da RailsAdmin 3.3.0 e riguarda stringhe che Ruby renderà frozen in futuro; non impedisce l'avvio su Ruby 4.0.6.
 
@@ -133,7 +180,7 @@ Lo stesso `ManagerActions` blocca il `zeitwerk:check` completo. Questi guasti no
 
 ## Remediation P0 preservata
 
-Le correzioni precedenti sono ancora presenti sopra il worktree sporco:
+Le correzioni precedenti sono presenti nel baseline committato e riscritto `cfb2695`:
 
 - `TokensController` non registra più credenziali nei login API falliti;
 - `UsersController#update` autorizza l'utente e impedisce l'IDOR/account takeover;
@@ -155,24 +202,34 @@ Resta separata la validazione semantica dell'IPN PayPal: destinatario, valuta/im
 
 ## Worktree da preservare
 
-Non usare restore/reset/clean. Oltre ai file runtime, Docker, Gemfile/lock, package/lock e alla migrazione Pagy, il worktree contiene ancora intenzionalmente:
+Non usare restore/reset/clean. Rispetto al baseline `cfb2695`, il worktree contiene intenzionalmente la remediation P1 A1-A4, il programma UI/UX in corso e la relativa documentazione:
 
-- i controller, initializer, ability e test della remediation P0;
-- `audit_sicurezza.md`;
-- `spec/config/omniauth_security_spec.rb`;
-- `spec/controllers/users/facebook_controller_spec.rb`;
-- questo `HANDOFF.md` e `AGENTS.md`.
+- autenticazione token: `app/controllers/tokens_controller.rb`, `config/initializers/rack_attack.rb` e `spec/requests/tokens_controller_spec.rb`;
+- escaping immagini/tag: `lib/image_helper.rb`, `app/helpers/application_helper.rb`, `app/models/concerns/taggable.rb`, le tre view blog e le relative spec;
+- credenziali Facebook: regressione in `spec/config/omniauth_security_spec.rb`; l'initializer bonificato è già nel baseline riscritto;
+- stato operativo: `audit_sicurezza.md` e questo `HANDOFF.md`.
+- programma UI/UX: `.impeccable/ui-ux-coverage.yml`, snapshot in `.impeccable/critique`, token e componenti condivisi in `app/assets/tailwind/application.css`, controller Stimulus per drawer/dialog e modifiche G01 nelle view `home`, `devise`, `layouts` ed `errors`;
+- regressioni G01: request spec di `HomeController`/`GroupsController` e spec helper per il contatto pubblico configurato.
 
 `.claude/settings.local.json` e `meta.json` restano materiale locale e non devono essere aggiunti al repository.
 
-## Prossimo blocco consigliato — P1 sicurezza
+## Programma attivo — revisione UI/UX completa
 
-Procedere in piccoli cambiamenti indipendenti, con una regressione per ogni fix:
+- Obiettivo richiesto: critique Impeccable, applicazione dei rilievi e nuova critique fino ad almeno 33/40 per ogni gruppo; chiusura con `animate`, `typeset`, `colorize` e `overdrive`.
+- Inventario persistente: `.impeccable/ui-ux-coverage.yml`.
+- Copertura corrente: 10 gruppi, 594 route UI assegnate e 43 endpoint tecnici non visuali esclusi esplicitamente; totale controller riconciliato 637/637 dopo la rimozione delle route REST morte emersa in G02 e G03.
+- Autorizzazione sub-agent Impeccable ricevuta dall'utente; ogni iterazione critique usa due assessment indipendenti e read-only, A design/Nielsen e B detector/browser.
+- G01 — pubblico, accesso e onboarding: baseline **17/40**, iterazione 3 **28/40**, iterazione 4 **28/40**. Le correzioni successive hanno chiuso contrasto (6,20:1 misurato), drawer modale, nomi/focus dei dialog, target secondari, landmark, empty state e 404. Il detector dell'iterazione 4 ha restituito `[]`, ma in fallback regex perché mancano `htmlparser2`, `css-select`, `css-tree` e `domutils`; il risultato è un undercount dichiarato.
+- G01 resta `blocked_pending_legal_authority`: il gate 33/40 richiede zero P1, ma Privacy 2018, Termini solo italiani e consenso obbligatorio necessitano testo approvato, data effettiva, identità del titolare/operatore, contatto reale e provider di deployment. Il repository e la history non contengono una fonte più autorevole. Il vecchio `info@airesis.it` non viene più presentato come contatto corrente: è usato solo `APP_EMAIL_ADDRESS` se valido e non-placeholder, altrimenti l'interfaccia dichiara che il contatto non è configurato.
+- Evidenza G01: build esbuild e Tailwind verdi; **73 request spec + 2 spec helper, 0 failure** con `NO_COVERAGE=1`; 13 route guest verificate a 1440×900 e 390×844 senza overflow, con redirect `/landing` e 404 reale. La suite helper più ampia ha un test preesistente dipendente dal cambio data a mezzanotte (`30.minutes.ago` cade nel giorno precedente).
+- Snapshot persistiti: `.impeccable/critique/2026-08-29T20-41-55Z__app-views-devise.md`, `.impeccable/critique/2026-08-29T22-07-25Z__app-views-devise.md` e `.impeccable/critique/2026-08-29T22-21-39Z__app-views-devise.md`.
+- G02 — shell, dashboard, identità e notifiche: **passed 33/40**, iterazione 4, P0/P1 zero. Baseline 13/40, iterazione 2 29/40, iterazione 3 31/40. Corrette route morte/rotte, notifiche con lettura esplicita, ricerca HTML/JSON, dashboard first-run, profilo e preferenze, statistiche senza `NaN`, navigazione locale, contrasto, dialog/drawer/popup, nomi accessibili, skip link e pagine archivio italiane dichiarate. Le 14 superfici HTML passano a desktop/mobile senza overflow, errori runtime, H1/main mancanti o traduzioni assenti; gli endpoint geografici sono JSON di supporto. Build esbuild/Tailwind verdi; **88 request spec, 0 failure, 1 pending noto** per fixture Alert. La system spec Selenium è bloccata nel container ARM dall'assenza di ChromeDriver, mentre i flussi tastiera/focus sono passati nella sessione Chrome reale.
+- Snapshot G02: `.impeccable/critique/2026-08-29T22-42-52Z__app-views-users.md`, `2026-08-29T23-11-56Z__app-views-users.md`, `2026-08-29T23-34-22Z__app-views-users.md` e `2026-08-29T23-42-03Z__app-views-users.md`.
+- G03 — proposte, scoperta, creazione e lettura: **passed 37/40**, iterazione 4, P0/P1 zero; il detector finale ha P2 zero. Baseline 15/40, iterazione 2 29/40, iterazione 3 33/40 ma gate fallito per il sort verso la partial. Listing, new, show, edit, JSON categorie, banner/test banner, Trix e drawer sono stati verificati a desktop/mobile. Build verdi; **107 spec helper/request, 0 failure**.
+- Snapshot G03: `.impeccable/critique/2026-08-29T23-58-01Z__app-views-proposals.md` e `.impeccable/critique/2026-08-30T00-42-19Z__app-views-proposals.md`.
+- Prossimo passo operativo: iniziare G04 dalla baseline dual-agent già descritta nella coverage, preservando le fixture `[UI AUDIT]` fino al cleanup finale. Per istruzione dell'utente G04 non è stato avviato in questo blocco. G01 resta in attesa dell'autorità legale.
 
-1. rimuovere il secret Facebook storico commentato; rotazione e bonifica Git richiedono un'azione esterna;
-2. correggere lo stored XSS via `group.name` in `lib/image_helper.rb`;
-3. correggere lo stored XSS via tag in `app/models/concerns/taggable.rb` e relative view;
-4. aggiungere throttle Rack::Attack a `/tokens` e spostare la generazione token dopo la verifica della password.
+Il finding sicurezza A5 sulla moderazione forum resta separato e non va corretto implicitamente durante una modifica puramente visuale.
 
 ## Vincoli per la ripresa
 

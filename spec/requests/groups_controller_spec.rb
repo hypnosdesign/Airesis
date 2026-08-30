@@ -32,7 +32,9 @@ RSpec.describe GroupsController, seeds: true do
 
     it 'returns 404 for a non-existent group' do
       get group_path('non-existent-group-slug')
-      expect([404, 500]).to include(response.status)
+      expect(response).to have_http_status(:not_found)
+      expect(response.body).to safe_include(I18n.t('error.error_404.title'))
+      expect(response.body).not_to safe_include(I18n.t('error.error_404.groups.title'))
     end
   end
 

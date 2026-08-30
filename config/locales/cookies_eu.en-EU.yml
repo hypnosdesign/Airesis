@@ -1,5 +1,6 @@
 en-EU:
   cookies_eu:
+    banner_label: "Cookie notice"
     cookies_text: "This website uses cookies to ensure you get the best experience."
     learn_more: "Learn more"
-    ok: "Got it!"
+    ok: "Accept cookies"

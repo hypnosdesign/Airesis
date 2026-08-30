@@ -26,10 +26,17 @@ RSpec.describe HomeController, seeds: true do
     end
   end
 
+  describe 'GET landing' do
+    it 'redirects the legacy landing URL to the homepage' do
+      get landing_path
+      expect(response).to redirect_to(root_path)
+    end
+  end
+
   describe 'GET public (open_space)' do
     it 'returns a response' do
       get open_space_path
-      expect([200, 500]).to include(response.status)
+      expect(response).to have_http_status(:ok)
     end
   end
 
@@ -44,59 +51,65 @@ RSpec.describe HomeController, seeds: true do
     it 'returns a response when authenticated' do
       sign_in user
       get home_path
-      expect([200, 302, 500]).to include(response.status)
+      expect(response).to have_http_status(:ok)
+      expect(response.body).to include('aria-controls="notifications-popover"', 'aria-controls="account-popover"')
     end
   end
 
   describe 'GET privacy / terms / cookie_law' do
     it 'returns a response for privacy page' do
       get privacy_path
-      expect([200, 500]).to include(response.status)
+      expect(response).to have_http_status(:ok)
     end
 
     it 'returns a response for terms page' do
       get terms_path
-      expect([200, 500]).to include(response.status)
+      expect(response).to have_http_status(:ok)
     end
 
     it 'returns a response for cookie_law page' do
       get cookie_law_path
-      expect([200, 500]).to include(response.status)
+      expect(response).to have_http_status(:ok)
     end
   end
 
   describe 'GET statistics' do
     it 'returns a response' do
       get statistics_path
-      expect([200, 500]).to include(response.status)
+      expect(response).to have_http_status(:ok)
+      expect(response.body).to include('Community statistics')
     end
   end
 
   describe 'GET press' do
     it 'returns a response' do
       get press_path
-      expect([200, 500]).to include(response.status)
+      expect(response).to have_http_status(:ok)
     end
   end
 
   describe 'GET school' do
     it 'returns a response' do
       get school_path
-      expect([200, 500]).to include(response.status)
+      expect(response).to have_http_status(:ok)
+      expect(response.body).to include('main lang="it"')
+      expect(response.body).to include('preserved in Italian only')
     end
   end
 
   describe 'GET municipality' do
     it 'returns a response' do
       get municipality_path
-      expect([200, 500]).to include(response.status)
+      expect(response).to have_http_status(:ok)
+      expect(response.body).to include('main lang="it"')
+      expect(response.body).to include('preserved in Italian only')
     end
   end
 
   describe 'GET intro (edemocracy)' do
     it 'returns a response' do
       get edemocracy_path
-      expect([200, 500]).to include(response.status)
+      expect(response).to have_http_status(:ok)
     end
   end
 

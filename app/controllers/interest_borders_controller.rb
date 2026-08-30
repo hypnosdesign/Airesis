@@ -5,10 +5,7 @@ class InterestBordersController < ApplicationController
     hint = "#{params[:q]}%"
     @results = by_hint(hint)
 
-    respond_to do |format|
-      format.html
-      format.json { render json: @results }
-    end
+    render json: @results
   end
 
   protected

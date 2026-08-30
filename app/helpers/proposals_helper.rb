@@ -1,4 +1,20 @@
 module ProposalsHelper
+  PROPOSAL_STATE_I18N_KEYS = {
+    ProposalState::VALUTATION => 'in_discussion',
+    ProposalState::WAIT_DATE => 'awaiting_voting_date',
+    ProposalState::WAIT => 'voting_scheduled',
+    ProposalState::VOTING => 'voting',
+    ProposalState::REJECTED => 'rejected',
+    ProposalState::ACCEPTED => 'accepted',
+    ProposalState::REVISION => 'revision',
+    ProposalState::ABANDONED => 'abandoned'
+  }.freeze
+
+  def proposal_state_label(state)
+    key = PROPOSAL_STATE_I18N_KEYS[state.id]
+    key ? t("pages.proposals.states.#{key}", default: state.description) : state.description
+  end
+
   def navigator_actions(args = {})
     classes = "action #{args[:classes]}"
     (link_to '#', onclick: 'return false', class: "#{classes} move_up" do

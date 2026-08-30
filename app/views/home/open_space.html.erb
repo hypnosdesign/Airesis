@@ -1,20 +1,46 @@
 <% @extend = true %>
 
+<main>
+
 <%# ===== HERO BANNER ===== %>
 <div class="bg-primary text-primary-content p-6 lg:p-8 mb-6 border-2 border-base-content/15 relative overflow-hidden">
   <div class="relative z-10">
     <h1 class="text-2xl lg:text-3xl font-bold mb-1">
       <%= t('pages.open_space.layout.title', default: 'Open Space') %>
     </h1>
-    <p class="text-primary-content/70 text-sm">
+    <p class="text-primary-content/90 text-sm">
       <%= t('pages.open_space.layout.subtitle', default: 'Proposte, blog, gruppi ed eventi aperti a tutta la community') %>
     </p>
   </div>
   <i class="fa-solid fa-globe absolute -right-4 -bottom-4 text-[120px] text-primary-content/5"></i>
 </div>
 
+<% has_public_activity = @proposals.any? || @blog_posts.any? || @most_active_groups.any? || @events.any? %>
+
+<%# ===== GUEST ORIENTATION ===== %>
+<% unless user_signed_in? %>
+  <section class="mb-6 rounded-2xl border border-primary/25 bg-base-100 p-5 sm:p-6" aria-labelledby="public-start-title">
+    <div class="flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between">
+      <div class="max-w-2xl">
+        <h2 id="public-start-title" class="text-xl font-bold tracking-tight"><%= t('pages.open_space.start_title') %></h2>
+        <p class="mt-2 text-sm leading-relaxed text-base-content/70"><%= t('pages.open_space.start_description') %></p>
+        <ol class="mt-4 flex flex-col gap-2 text-sm sm:flex-row sm:gap-5" aria-label="<%= t('pages.open_space.start_steps_label') %>">
+          <li class="flex items-center gap-2"><i class="fa-solid fa-eye text-primary" aria-hidden="true"></i><%= t('pages.open_space.step_explore') %></li>
+          <li class="flex items-center gap-2"><i class="fa-solid fa-comments text-primary" aria-hidden="true"></i><%= t('pages.open_space.step_discuss') %></li>
+          <li class="flex items-center gap-2"><i class="fa-solid fa-check-to-slot text-primary" aria-hidden="true"></i><%= t('pages.open_space.step_decide') %></li>
+        </ol>
+      </div>
+      <div class="flex shrink-0 flex-col gap-2 sm:flex-row lg:flex-col xl:flex-row">
+        <%= link_to t('pages.open_space.how_it_works'), edemocracy_path, class: 'btn btn-primary font-bold' %>
+        <%= link_to t('pages.home.index.register'), new_user_registration_path, class: 'btn btn-outline font-bold' %>
+      </div>
+    </div>
+  </section>
+<% end %>
+
 <%# ===== STATS ROW ===== %>
-<div class="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-6">
+<% if has_public_activity %>
+<div class="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-6" aria-label="<%= t('pages.open_space.activity_summary') %>">
   <div class="bg-base-100 p-4 flex items-center gap-4 border-2 border-base-content/15">
     <div class="bg-primary/10 text-primary w-10 h-10 flex items-center justify-center">
       <i class="fa-solid fa-file-lines text-lg"></i>
@@ -52,8 +78,20 @@
     </div>
   </div>
 </div>
+<% else %>
+  <div class="mb-6 flex items-start gap-4 rounded-2xl border border-base-content/15 bg-base-100 p-5" role="status">
+    <div class="flex size-10 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary">
+      <i class="fa-solid fa-seedling" aria-hidden="true"></i>
+    </div>
+    <div>
+      <h2 class="font-bold"><%= t('pages.open_space.ready_title') %></h2>
+      <p class="mt-1 text-sm leading-relaxed text-base-content/70"><%= t('pages.open_space.ready_description') %></p>
+    </div>
+  </div>
+<% end %>
 
 <%# ===== MAIN GRID ===== %>
+<% if has_public_activity %>
 <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
 
   <%# LEFT: 2 columns - proposals + blog %>
@@ -71,7 +109,7 @@
             <p class="text-[11px] text-base-content/40"><%= t('pages.home.index.proposals_subtitle', default: 'Le proposte piu recenti nello spazio pubblico') %></p>
           </div>
         </div>
-        <%= link_to t('pages.home.open_space.proceed_to_proposals', default: 'Vedi tutte'), proposals_path, class: 'text-xs text-primary font-bold hover:underline' %>
+        <%= link_to t('pages.open_space.proceed_to_proposals'), proposals_path, class: 'text-xs text-primary font-bold hover:underline' %>
       </div>
       <div class="p-4">
         <% if @proposals.empty? %>
@@ -128,7 +166,7 @@
             <p class="text-[11px] text-base-content/40"><%= t('pages.home.index.blogs_subtitle', default: 'Gli ultimi post dalla community') %></p>
           </div>
         </div>
-        <%= link_to t('pages.home.open_space.proceed_to_blogs', default: 'Vedi tutti'), blogs_path, class: 'text-xs text-primary font-bold hover:underline' %>
+        <%= link_to t('pages.open_space.proceed_to_blogs'), blogs_path, class: 'text-xs text-primary font-bold hover:underline' %>
       </div>
       <div class="p-4">
         <% if @blog_posts.empty? %>
@@ -262,28 +300,7 @@
       </div>
     </div>
 
-    <%# CTA for guests %>
-    <% unless user_signed_in? %>
-      <div class="bg-base-100 border-2 border-base-content/15">
-        <div class="p-4 border-b-2 border-base-content/15 flex items-center gap-3">
-          <div class="bg-primary/10 text-primary w-8 h-8 flex items-center justify-center">
-            <i class="fa-solid fa-user-plus"></i>
-          </div>
-          <h2 class="font-bold text-sm"><%= t('pages.home.index.join_us', default: 'Unisciti a noi') %></h2>
-        </div>
-        <div class="p-4 space-y-2">
-          <p class="text-sm text-base-content/60 mb-3">
-            <%= t('pages.home.index.join_description', default: 'Registrati per partecipare alle proposte e unirti ai gruppi') %>
-          </p>
-          <%= link_to new_user_registration_path, class: 'btn btn-primary font-bold w-full' do %>
-            <i class="fa-solid fa-user-plus mr-1"></i> <%= t('pages.home.index.register', default: 'Registrati') %>
-          <% end %>
-          <%= link_to new_user_session_path, class: 'btn btn-outline font-bold w-full' do %>
-            <i class="fa-solid fa-right-to-bracket mr-1"></i> <%= t('pages.home.index.login', default: 'Accedi') %>
-          <% end %>
-        </div>
-      </div>
-    <% end %>
-
   </div>
 </div>
+<% end %>
+</main>

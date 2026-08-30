@@ -1,21 +1,35 @@
-<div class="card bg-base-200 p-4">
-  <h2>Resend unlock instructions</h2>
-  <%= form_with model: resource, as: resource_name, url: unlock_path(resource_name), data: { turbo_method: :post } do |f| %>
-    <% if resource.errors.any? %>
-      <div role="alert" class="alert alert-error">
-        <ul class="list-disc list-inside text-sm">
-          <% resource.errors.full_messages.each do |msg| %><li><%= msg %></li><% end %>
-        </ul>
+<% @page_title = t('pages.unlock.title', default: 'Unlock your account') %>
+
+<main class="flex-1 flex items-center justify-center px-4 py-12">
+  <div class="auth-card max-w-2xl">
+    <div class="w-full p-8 sm:p-12">
+      <div class="mb-8 flex items-start gap-4">
+        <div class="flex size-12 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary">
+          <i class="fa-solid fa-lock-open" aria-hidden="true"></i>
+        </div>
+        <div>
+          <h1 class="text-3xl font-extrabold"><%= @page_title %></h1>
+          <p class="auth-copy mt-2"><%= t('pages.unlock.subtitle', default: 'Enter your email to receive new unlock instructions.') %></p>
+        </div>
       </div>
-    <% end %>
-    <div class="form-control">
-      <%= f.label :email %>
-      <br>
-      <%= f.email_field :email, class: 'input input-bordered w-full' %>
+
+      <%= form_with model: resource, as: resource_name, url: unlock_path(resource_name), data: { turbo_method: :post }, class: 'space-y-5' do |f| %>
+        <% if resource.errors.any? %>
+          <div role="alert" class="alert alert-error">
+            <ul class="list-disc list-inside text-sm">
+              <% resource.errors.full_messages.each do |msg| %><li><%= msg %></li><% end %>
+            </ul>
+          </div>
+        <% end %>
+        <fieldset class="fieldset">
+          <%= f.label :email, t('activerecord.attributes.user.email'), class: 'fieldset-label font-medium' %>
+          <%= f.email_field :email, required: true, autocomplete: 'email', placeholder: 'name@example.com', class: 'input input-bordered w-full' %>
+        </fieldset>
+        <%= f.submit t('pages.unlock.submit', default: 'Send unlock instructions'), class: 'btn btn-primary min-h-11 h-auto w-full whitespace-normal py-2 font-bold' %>
+      <% end %>
+
+      <div class="divider mt-8"></div>
+      <%= render partial: 'devise/shared/links' %>
     </div>
-    <div class="mt-4">
-      <%= f.submit "Resend unlock instructions", class: 'btn btn-primary' %>
-    </div>
-  <% end %>
-  <%= render partial: "devise/shared/links" %>
-</div>
+  </div>
+</main>

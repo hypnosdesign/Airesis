@@ -1,92 +1,86 @@
 <% @page_title = t('.title') %>
 <% @meta_description = t('.description') %>
 
-<div class="max-w-5xl mx-auto px-4 py-8">
-  <!-- Sub-navigation -->
-  <div class="flex flex-wrap gap-2 justify-center mb-12">
-    <a class="btn btn-sm btn-outline" href="#characteristics_features"><%= t('home.intro.paragraph_5.title') %></a>
-    <a class="btn btn-sm btn-outline" href="#basic_features"><%= t('home.intro.paragraph_6.title') %></a>
-    <a class="btn btn-sm btn-outline" href="#technical_specs"><%= t('home.intro.technical_specs.title') %></a>
-  </div>
+<main class="content-shell">
+  <header class="mx-auto mb-8 max-w-3xl text-center sm:mb-12">
+    <h1 id="edemocracy" class="text-4xl font-extrabold tracking-tight sm:text-5xl"><%= t('.paragraph_1.title') %></h1>
+    <p class="mx-auto mt-4 max-w-2xl text-lg leading-relaxed text-base-content/70"><%= @meta_description %></p>
+  </header>
 
-  <div class="space-y-12">
-    <section class="bg-error/10 p-8 md:p-12">
-      <div class="max-w-3xl mx-auto text-center">
-        <h1 id="edemocracy" class="text-3xl md:text-4xl font-bold mb-6"><%= t('.paragraph_1.title') %></h1>
-        <div class="prose prose-lg mx-auto"><%= t('.paragraph_1.content_html') %></div>
+  <nav class="mx-auto mb-8 max-w-4xl rounded-2xl border border-base-content/15 bg-base-100 p-4 sm:p-5" aria-label="<%= t('home.intro.on_this_page', default: 'On this page') %>">
+    <div class="flex flex-wrap gap-2">
+      <a class="btn btn-sm btn-outline min-h-11" href="#principles"><%= t('.paragraph_3.title') %></a>
+      <a class="btn btn-sm btn-outline min-h-11" href="#characteristics_features"><%= t('.paragraph_5.title') %></a>
+      <a class="btn btn-sm btn-outline min-h-11" href="#basic_features"><%= t('.paragraph_6.title') %></a>
+      <a class="btn btn-sm btn-outline min-h-11" href="#proposal_tool"><%= t('.paragraph_7.title') %></a>
+      <a class="btn btn-sm btn-outline min-h-11" href="#voting"><%= t('.paragraph_8.title') %></a>
+    </div>
+    <details class="mt-3 rounded-xl bg-base-200 px-4 py-3">
+      <summary class="inline-flex min-h-11 w-full cursor-pointer items-center font-semibold"><%= t('home.intro.more_topics', default: 'More topics') %></summary>
+      <div class="mt-3 flex flex-wrap gap-x-5 gap-y-2 text-sm">
+        <a class="inline-flex min-h-11 items-center link link-primary" href="#goal"><%= t('.paragraph_4.title') %></a>
+        <a class="inline-flex min-h-11 items-center link link-primary" href="#promoting_proposals"><%= t('.paragraph_9.title') %></a>
+        <a class="inline-flex min-h-11 items-center link link-primary" href="#temporary_anonymity"><%= t('.paragraph_10.title') %></a>
+        <a class="inline-flex min-h-11 items-center link link-primary" href="#group_management"><%= t('.paragraph_11.title') %></a>
+        <a class="inline-flex min-h-11 items-center link link-primary" href="#groups"><%= t('.paragraph_12.title') %></a>
       </div>
+    </details>
+  </nav>
+
+  <div class="space-y-6 sm:space-y-8">
+    <section id="overview" class="info-section scroll-mt-24">
+      <h2 class="sr-only"><%= t('home.intro.overview', default: 'Overview') %></h2>
+      <div class="article-body"><%= t('.paragraph_1.content_html') %></div>
     </section>
 
-    <section class="bg-warning/10 p-8 md:p-12">
-      <div class="max-w-3xl mx-auto text-center">
-        <div id="principles"></div>
-        <h1 class="text-3xl md:text-4xl font-bold mb-6"><%= t('.paragraph_3.title') %></h1>
-        <div class="prose prose-lg mx-auto"><%= t('.paragraph_3.content_html') %></div>
-      </div>
+    <section id="principles" class="info-section scroll-mt-24">
+      <h2><%= t('.paragraph_3.title') %></h2>
+      <div class="article-body"><%= t('.paragraph_3.content_html') %></div>
     </section>
 
-    <section class="bg-secondary/10 p-8 md:p-12">
-      <div class="max-w-3xl mx-auto text-center">
-        <h1 id="Obiettivo" class="text-3xl md:text-4xl font-bold mb-6"><%= t('.paragraph_4.title') %></h1>
-        <div class="prose prose-lg mx-auto"><%= t('.paragraph_4.content_html') %></div>
-      </div>
+    <section id="goal" class="info-section scroll-mt-24">
+      <h2><%= t('.paragraph_4.title') %></h2>
+      <div class="article-body"><%= t('.paragraph_4.content_html') %></div>
     </section>
 
-    <section class="bg-base-200 p-8 md:p-12">
-      <div class="max-w-3xl mx-auto text-center">
-        <div id="characteristics_features"></div>
-        <h1 class="text-3xl md:text-4xl font-bold mb-6"><%= t('.paragraph_5.title') %></h1>
-        <div class="prose prose-lg mx-auto"><%= t('.paragraph_5.content_html') %></div>
-      </div>
+    <section id="characteristics_features" class="info-section scroll-mt-24">
+      <h2><%= t('.paragraph_5.title') %></h2>
+      <div class="article-body"><%= t('.paragraph_5.content_html') %></div>
     </section>
 
-    <section class="bg-warning/10 p-8 md:p-12">
-      <div class="max-w-3xl mx-auto text-center">
-        <h2 id="funzioni_base" class="text-2xl md:text-3xl font-bold mb-6"><%= t('.paragraph_6.title') %></h2>
-        <div class="prose prose-lg mx-auto"><%= t('.paragraph_6.content_html') %></div>
-      </div>
+    <section id="basic_features" class="info-section scroll-mt-24">
+      <h2><%= t('.paragraph_6.title') %></h2>
+      <div class="article-body"><%= t('.paragraph_6.content_html') %></div>
     </section>
 
-    <section class="bg-info/10 p-8 md:p-12">
-      <div class="max-w-3xl mx-auto text-center">
-        <h2 id="strumento_proposte" class="text-2xl md:text-3xl font-bold mb-6"><%= t('.paragraph_7.title') %></h2>
-        <div class="prose prose-lg mx-auto"><%= t('.paragraph_7.content_html') %></div>
-      </div>
+    <section id="proposal_tool" class="info-section scroll-mt-24">
+      <h2><%= t('.paragraph_7.title') %></h2>
+      <div class="article-body"><%= t('.paragraph_7.content_html') %></div>
     </section>
 
-    <section class="bg-secondary/10 p-8 md:p-12">
-      <div class="max-w-3xl mx-auto text-center">
-        <h2 id="votazione" class="text-2xl md:text-3xl font-bold mb-6"><%= t('.paragraph_8.title') %></h2>
-        <div class="prose prose-lg mx-auto"><%= t('.paragraph_8.content_html') %></div>
-      </div>
+    <section id="voting" class="info-section scroll-mt-24">
+      <h2><%= t('.paragraph_8.title') %></h2>
+      <div class="article-body"><%= t('.paragraph_8.content_html') %></div>
     </section>
 
-    <section class="bg-success/10 p-8 md:p-12">
-      <div class="max-w-3xl mx-auto text-center">
-        <h2 id="promozione_proposte" class="text-2xl md:text-3xl font-bold mb-6"><%= t('.paragraph_9.title') %></h2>
-        <div class="prose prose-lg mx-auto"><%= t('.paragraph_9.content_html') %></div>
-      </div>
+    <section id="promoting_proposals" class="info-section scroll-mt-24">
+      <h2><%= t('.paragraph_9.title') %></h2>
+      <div class="article-body"><%= t('.paragraph_9.content_html') %></div>
     </section>
 
-    <section class="bg-error/10 p-8 md:p-12">
-      <div class="max-w-3xl mx-auto text-center">
-        <h2 id="Anonimato_temporaneo" class="text-2xl md:text-3xl font-bold mb-6"><%= t('.paragraph_10.title') %></h2>
-        <div class="prose prose-lg mx-auto"><%= t('.paragraph_10.content_html') %></div>
-      </div>
+    <section id="temporary_anonymity" class="info-section scroll-mt-24">
+      <h2><%= t('.paragraph_10.title') %></h2>
+      <div class="article-body"><%= t('.paragraph_10.content_html') %></div>
     </section>
 
-    <section class="bg-warning/10 p-8 md:p-12">
-      <div class="max-w-3xl mx-auto text-center">
-        <h2 id="Gestione_gruppi" class="text-2xl md:text-3xl font-bold mb-6"><%= t('.paragraph_11.title') %></h2>
-        <div class="prose prose-lg mx-auto"><%= t('.paragraph_11.content_html') %></div>
-      </div>
+    <section id="group_management" class="info-section scroll-mt-24">
+      <h2><%= t('.paragraph_11.title') %></h2>
+      <div class="article-body"><%= t('.paragraph_11.content_html') %></div>
     </section>
 
-    <section class="bg-base-200 p-8 md:p-12">
-      <div class="max-w-3xl mx-auto text-center">
-        <h2 id="Gruppi" class="text-2xl md:text-3xl font-bold mb-6"><%= t('.paragraph_12.title') %></h2>
-        <div class="prose prose-lg mx-auto"><%= t('.paragraph_12.content_html') %></div>
-      </div>
+    <section id="groups" class="info-section scroll-mt-24">
+      <h2><%= t('.paragraph_12.title') %></h2>
+      <div class="article-body"><%= t('.paragraph_12.content_html') %></div>
     </section>
   </div>
-</div>
+</main>

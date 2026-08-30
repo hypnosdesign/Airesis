@@ -10,6 +10,210 @@
   border-radius: 0 !important;
 }
 
+@layer base {
+  html {
+    --ui-link-color: color-mix(in oklab, var(--color-primary) 50%, var(--color-base-content) 50%);
+    --ui-danger-color: color-mix(in oklab, var(--color-error) 45%, var(--color-base-content) 55%);
+    scroll-behavior: smooth;
+    scroll-padding-top: 5rem;
+  }
+
+  body {
+    caret-color: var(--color-primary);
+  }
+
+  ::selection {
+    color: var(--color-primary-content);
+    background: var(--color-primary);
+  }
+
+  :where(a, button, input, select, textarea, summary, [tabindex]):focus-visible {
+    outline: 3px solid color-mix(in oklab, var(--color-primary) 72%, white);
+    outline-offset: 3px;
+  }
+
+  a {
+    text-underline-offset: 0.2em;
+  }
+
+  * {
+    scrollbar-color: color-mix(in oklab, var(--color-primary) 55%, var(--color-base-content)) var(--color-base-200);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    html {
+      scroll-behavior: auto;
+    }
+
+    *, *::before, *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      scroll-behavior: auto !important;
+      transition-duration: 0.01ms !important;
+    }
+  }
+}
+
+.link.link-primary,
+.article-body a,
+a.text-primary,
+button.link-primary {
+  color: var(--ui-link-color);
+}
+
+.ui-danger-text,
+a.text-error:not(.btn-error) {
+  color: var(--ui-danger-color);
+}
+
+.btn.btn-outline.btn-error {
+  color: var(--ui-danger-color);
+  border-color: var(--ui-danger-color);
+}
+
+.label,
+.label-text,
+.fieldset-label {
+  color: var(--color-base-content);
+}
+
+[data-controller~="dropdown"]:not(.dropdown-open) > .dropdown-content {
+  opacity: 0 !important;
+  pointer-events: none !important;
+  visibility: hidden !important;
+}
+
+[data-controller~="dropdown"].dropdown-open > .dropdown-content {
+  opacity: 1 !important;
+  pointer-events: auto !important;
+  visibility: visible !important;
+}
+
+@layer components {
+  .btn {
+    min-height: 2.75rem;
+  }
+
+  .btn-circle {
+    min-width: 2.75rem;
+  }
+
+  .auth-card {
+    @apply flex w-full max-w-5xl overflow-hidden border border-base-content/15 bg-base-100;
+    box-shadow: 0 20px 55px -24px color-mix(in oklab, var(--color-base-content) 42%, transparent);
+  }
+
+  .auth-card :where(.btn, .input) {
+    min-height: 2.75rem;
+  }
+
+  .sidebar-nav .menu :where(a, button) {
+    min-height: 2.75rem;
+  }
+
+  .tap-target {
+    @apply inline-flex size-11 shrink-0 items-center justify-center;
+  }
+
+  .press-archive a {
+    @apply flex min-h-11 items-center;
+  }
+
+  .auth-copy {
+    @apply text-base-content/70;
+  }
+
+  .content-shell {
+    @apply mx-auto w-full max-w-5xl px-4 py-8 sm:py-12;
+  }
+
+  .article-body {
+    color: color-mix(in oklab, var(--color-base-content) 88%, transparent);
+    font-size: 1rem;
+    line-height: 1.75;
+    margin-inline: auto;
+    max-width: 72ch;
+    overflow-wrap: anywhere;
+  }
+
+  .article-body > * + * {
+    margin-top: 1rem;
+  }
+
+  .article-body h1,
+  .article-body h2,
+  .article-body h3,
+  .article-body h4 {
+    color: var(--color-base-content);
+    font-weight: 700;
+    letter-spacing: -0.025em;
+    line-height: 1.2;
+    text-wrap: balance;
+  }
+
+  .article-body h1 {
+    font-size: clamp(2rem, 5vw, 3.5rem);
+    margin-bottom: 1.25rem;
+  }
+
+  .article-body h2 {
+    font-size: clamp(1.4rem, 3vw, 2rem);
+    margin-top: 3rem;
+  }
+
+  .article-body h3 {
+    font-size: 1.2rem;
+    margin-top: 2rem;
+  }
+
+  .article-body h4 {
+    font-size: 1.05rem;
+    margin-top: 1.75rem;
+  }
+
+  .article-body ul,
+  .article-body ol {
+    padding-left: 1.4rem;
+  }
+
+  .article-body ul {
+    list-style: disc;
+  }
+
+  .article-body ol {
+    list-style: decimal;
+  }
+
+  .article-body li + li {
+    margin-top: 0.55rem;
+  }
+
+  .article-body a {
+    color: var(--color-primary);
+    font-weight: 600;
+    text-decoration: underline;
+  }
+
+  .article-body strong {
+    color: var(--color-base-content);
+  }
+
+  .info-section {
+    @apply border border-base-content/15 bg-base-100 p-6 sm:p-8;
+    box-shadow: 0 16px 42px -30px color-mix(in oklab, var(--color-base-content) 48%, transparent);
+  }
+
+  .info-section h2 {
+    @apply mb-4 text-2xl font-bold tracking-tight sm:text-3xl;
+    text-wrap: balance;
+  }
+
+  .error-shell {
+    @apply mx-auto flex max-w-3xl flex-col items-center border border-base-content/15 bg-base-100 px-6 py-12 text-center sm:px-12;
+    box-shadow: 0 20px 55px -30px color-mix(in oklab, var(--color-base-content) 50%, transparent);
+  }
+}
+
 /* ============================
    Leaflet overrides
    (Tailwind preflight può sovrascrivere alcune proprietà di Leaflet)
@@ -64,14 +268,38 @@ trix-toolbar {
   border-bottom: none;
   background: oklch(var(--b1));
   padding: 0.5rem;
+  max-width: 100%;
+  overflow-x: auto;
+  scrollbar-color: oklch(var(--p)) oklch(var(--b2));
+  scrollbar-width: thin;
+}
+
+trix-toolbar::-webkit-scrollbar {
+  height: 0.5rem;
+}
+
+trix-toolbar::-webkit-scrollbar-track {
+  background: oklch(var(--b2));
+}
+
+trix-toolbar::-webkit-scrollbar-thumb {
+  background: oklch(var(--p));
 }
 
 trix-toolbar .trix-button-row {
+  display: flex;
   gap: 0.25rem;
+  min-width: 100%;
+  width: max-content;
+}
+
+.order_option > a {
+  @apply inline-flex min-h-11 items-center;
 }
 
 trix-toolbar .trix-button-group {
   border: 2px solid oklch(var(--bc) / 0.15);
+  flex-shrink: 0;
   margin-bottom: 0;
 }
 
@@ -85,8 +313,10 @@ trix-toolbar .trix-button {
   border: none;
   border-bottom: none;
   padding: 0 0.5em;
-  height: 2.25rem;
-  width: 2.25rem;
+  height: 2.75rem;
+  min-height: 2.75rem;
+  min-width: 2.75rem;
+  width: 2.75rem;
 }
 
 trix-toolbar .trix-button:not(:first-child) {
@@ -190,6 +420,10 @@ trix-editor {
   font-size: 0.9375rem;
   line-height: 1.7;
   outline: none;
+}
+
+trix-editor.proposal-editor {
+  min-height: 12rem !important;
 }
 
 trix-editor:focus {

@@ -1,0 +1,312 @@
+version: 1
+generated_on: 2026-08-29
+minimum_score: 33
+score_maximum: 40
+
+route_snapshot:
+  total_controller_routes: 637
+  assigned_ui_routes: 594
+  excluded_non_visual_routes: 43
+
+completion_evidence_required:
+  - baseline dual-agent impeccable critique persisted for every group
+  - deterministic detector run over every listed source target
+  - representative browser routes checked at desktop and mobile widths
+  - every priority finding implemented or explicitly disproved with evidence
+  - post-fix dual-agent critique scoring at least 33/40
+  - cross-surface animate, typeset, colorize, and overdrive passes
+  - final route inventory reports zero unassigned controller routes
+
+groups:
+  G01:
+    name: Publico, accesso e onboarding
+    mode: persuade-operate
+    route_count: 42
+    get_route_count: 24
+    controllers:
+      - sessions
+      - registrations
+      - passwords
+      - confirmations
+      - authentications
+      - users/omniauth_callbacks
+      - home#index,landing,public,intro,press,privacy,terms,cookie_law,feedback
+    source_targets:
+      - app/views/devise
+      - app/views/home
+      - app/views/layouts/landing.html.erb
+      - app/views/layouts/users.html.erb
+      - app/views/errors
+    representative_paths:
+      - /
+      - /landing
+      - /public
+      - /edemocracy
+      - /users/sign_in
+      - /users/sign_up
+      - /users/password/new
+      - /privacy
+    status: blocked_pending_legal_authority
+    iterations: 4
+    score: 28
+    remaining_gate:
+      priority: P1
+      reason: current mandatory legal consent requires owner-approved policy text, operator identity, deployment contact and actual providers
+
+  G02:
+    name: Shell, dashboard, identita e notifiche
+    mode: operate
+    route_count: 45
+    get_route_count: 25
+    controllers:
+      - users
+      - notifications
+      - alerts
+      - blocked_proposal_alerts
+      - searches
+      - interest_borders
+      - municipalities
+      - home#show,statistics,school,municipality
+    source_targets:
+      - app/views/layouts
+      - app/views/home/show.html.erb
+      - app/views/home/portlets
+      - app/views/users
+      - app/views/alerts
+      - app/views/blocked_proposal_alerts
+      - app/views/searches
+    representative_paths:
+      - /home
+      - /users/1-administrator-administrator
+      - /users/edit
+      - /notifications
+      - /alerts
+      - /searches
+    status: passed
+    iterations: 4
+    score: 33
+
+  G03:
+    name: "Proposte: scoperta, creazione e lettura"
+    mode: operate
+    route_count: 47
+    get_route_count: 37
+    controllers:
+      - proposals
+      - proposal_categories
+      - proposal_presentations
+      - steps
+      - search_participants
+    source_targets:
+      - app/views/proposals
+      - app/views/proposal_types
+      - app/views/proposalcategories
+      - app/views/proposal_presentations
+      - app/views/search_participants
+      - app/views/steps
+    representative_paths:
+      - /proposals
+      - /proposals/new
+      - /proposals/:id
+      - /proposals/:id/edit
+      - /proposal_categories
+      - /groups/:group_id/proposals
+    status: passed
+    iterations: 4
+    score: 37
+
+  G04:
+    name: Deliberazione, commenti, quorum e voto
+    mode: operate
+    route_count: 125
+    get_route_count: 62
+    controllers:
+      - proposal_comments
+      - proposal_revisions
+      - proposal_lives
+      - proposal_supports
+      - quorums
+      - votations
+      - candidates
+      - elections
+      - proposal_nicknames
+    source_targets:
+      - app/views/proposal_comments
+      - app/views/proposal_revisions
+      - app/views/proposal_lives
+      - app/views/proposal_supports
+      - app/views/quorums
+      - app/views/votations
+    representative_paths:
+      - /proposals/:proposal_id/proposal_comments
+      - /proposals/:proposal_id/proposal_revisions
+      - /proposals/:proposal_id/proposal_supports
+      - /quorums
+      - /groups/:group_id/quorums
+      - /votations
+    status: not_started
+    iterations: 0
+    score: null
+
+  G05:
+    name: "Gruppi: scoperta, profilo e membership"
+    mode: operate
+    route_count: 55
+    get_route_count: 24
+    controllers:
+      - groups
+      - group_participations
+      - group_invitations
+      - group_invitation_emails
+    source_targets:
+      - app/views/groups
+      - app/views/group_participations
+      - app/views/group_invitations
+    representative_paths:
+      - /groups
+      - /groups/new
+      - /groups/:id
+      - /groups/:id/edit
+      - /groups/:group_id/group_participations
+      - /groups/:group_id/group_invitations
+    status: not_started
+    iterations: 0
+    score: null
+
+  G06:
+    name: "Governance gruppi: aree, ruoli e permessi"
+    mode: operate
+    route_count: 33
+    get_route_count: 12
+    controllers:
+      - group_areas
+      - area_roles
+      - area_participations
+      - participation_roles
+      - user_likes
+    source_targets:
+      - app/views/group_areas
+      - app/views/area_roles
+      - app/views/participation_roles
+      - app/views/groups/_permissions_list_panel.html.erb
+    representative_paths:
+      - /groups/:group_id/group_areas
+      - /groups/:group_id/group_areas/new
+      - /groups/:group_id/group_areas/:id
+      - /groups/:group_id/group_areas/:group_area_id/area_roles
+      - /groups/:group_id/participation_roles
+    status: not_started
+    iterations: 0
+    score: null
+
+  G07:
+    name: Eventi e calendario
+    mode: operate
+    route_count: 42
+    get_route_count: 18
+    controllers:
+      - events
+      - event_comments
+      - meeting_participations
+    source_targets:
+      - app/views/events
+      - app/views/event_comments
+      - app/views/meeting_participations
+    representative_paths:
+      - /events
+      - /events/new
+      - /events/:id
+      - /events/:id/edit
+      - /groups/:group_id/events
+      - /events/:event_id/event_comments
+    status: not_started
+    iterations: 0
+    score: null
+
+  G08:
+    name: Blog, tag, documenti e contenuti
+    mode: read-operate
+    route_count: 89
+    get_route_count: 48
+    controllers:
+      - blogs
+      - blog_posts
+      - blog_comments
+      - tags
+      - documents
+      - announcements
+    source_targets:
+      - app/views/blogs
+      - app/views/blog_posts
+      - app/views/blog_comments
+      - app/views/tags
+      - app/views/documents
+      - app/views/announcements
+    representative_paths:
+      - /blogs
+      - /blogs/:id
+      - /blog_posts/:id
+      - /blog_posts/new
+      - /tags
+      - /tags/:id
+      - /documents
+    status: not_started
+    iterations: 0
+    score: null
+
+  G09:
+    name: Forum e moderazione
+    mode: operate-read
+    route_count: 83
+    get_route_count: 43
+    controllers:
+      - frm/*
+    source_targets:
+      - app/views/frm
+    representative_paths:
+      - /groups/:group_id/forum
+      - /groups/:group_id/forum/forums/:id
+      - /groups/:group_id/forum/forums/:forum_id/topics/:id
+      - /groups/:group_id/forum/admin
+    status: not_started
+    iterations: 0
+    score: null
+
+  G10:
+    name: Amministrazione e strumenti operativi
+    mode: operate
+    route_count: 33
+    get_route_count: 13
+    controllers:
+      - admin/*
+      - elfinder
+      - rails_admin
+    source_targets:
+      - app/views/admin
+      - app/views/rails_admin
+      - app/views/ckeditor
+      - app/views/layouts/admin.html.erb
+    representative_paths:
+      - /admin/panel
+      - /admin/newsletters
+      - /admin/users
+      - /admin
+    status: not_started
+    iterations: 0
+    score: null
+
+excluded_controllers:
+  rationale: Endpoints without an end-user HTML interface; covered by security/API tests rather than UI scoring.
+  route_count: 43
+  names:
+    - action_mailbox/ingresses/*
+    - active_storage/*
+    - api/v1/*
+    - rails/conductor/*
+    - rails/info
+    - rails/mailers
+    - rails/welcome
+    - sys_payment_notifications
+    - tokens
+    - turbo/native/navigation
+    - validators/uniqueness

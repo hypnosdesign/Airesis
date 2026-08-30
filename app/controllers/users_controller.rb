@@ -12,7 +12,7 @@ class UsersController < ApplicationController
 
   before_action :authenticate_user!, except: %i[index show confirm_credentials join_accounts]
 
-  before_action :load_user, only: %i[show update show_message send_message]
+  before_action :load_user, only: %i[show edit update show_message send_message]
 
   # Step 1 del flusso di account-linking.
   # `User.new_with_session(nil, session)` ricostruisce un User temporaneo dai dati OAuth
@@ -68,15 +68,20 @@ class UsersController < ApplicationController
 
   def show
     respond_to do |format|
-      flash.now[:info] = t('info.user.click_to_change') if current_user == @user
       format.html # show.html.erb
     end
+  end
+
+  # The profile is edited in accessible, field-specific dialogs on #show.
+  # Keep the conventional REST route useful for bookmarks and assistive tools.
+  def edit
+    authorize! :update, @user
+    redirect_to user_path(@user)
   end
 
   def alarm_preferences
     @user = current_user
     respond_to do |format|
-      flash.now[:info] = t('info.user.click_to_change') if current_user == @user
       format.html # show.html.erb
     end
   end
@@ -100,6 +105,12 @@ class UsersController < ApplicationController
     @contributes_count = @user.proposal_comments.contributes.count
     @comments_count = @user.proposal_comments.comments.count
     @proposals_count = @user.proposals.count
+    @voted_count = @user.proposals.voted.count
+    @voted_rank = @user.proposals.accepted.average(:rank).to_f.round(2)
+    @accepted_count = @user.proposals.accepted.count
+    @abandoned_count = @user.proposals.abandoned.count
+    @good_writer_score = good_writer_score
+    @good_proposals_writer_score = good_proposals_writer_score
   end
 
   def change_show_tooltips
@@ -241,6 +252,22 @@ class UsersController < ApplicationController
   end
 
   protected
+
+  def good_writer_score
+    return 0.0 if @contributes_count.zero? || @comments_count.zero?
+
+    score = ((1 + ((@integrated_count.to_f / @contributes_count)**0.5 -
+                    (@spam_count.to_f / @comments_count)**(1.0 / 3))) / 2) * 100
+    score.clamp(0, 100).round(1)
+  end
+
+  def good_proposals_writer_score
+    denominator = @voted_count + @abandoned_count
+    return 0.0 if denominator.zero?
+
+    score = ((1 + (((0.8 * @accepted_count) + (0.2 * (@voted_count - @abandoned_count))) / denominator)) / 2) * 100
+    score.clamp(0, 100).round(1)
+  end
 
   # Pattern comune per le azioni di preferenza utente.
   # Turbo Stream: flash in-page. HTML: redirect back (restando sulla stessa pagina di preferenze).

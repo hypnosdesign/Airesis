@@ -1,5 +1,12 @@
 <div class="article-body">
-  <h1>Privacy Policy</h1>
+  <aside class="mb-6 border border-warning/40 bg-warning/10 p-4 text-sm" role="note" aria-label="Policy status">
+    This legal text was last updated on 20 June 2018 and requires review by the service owner. The current application build does not load Google Analytics.
+    <% if service_contact_email.present? %>
+      Confirm deployment-specific providers with <%= mail_to service_contact_email %> before accepting if you need clarification.
+    <% else %>
+      The service operator has not configured a public contact address for this environment.
+    <% end %>
+  </aside>
   <p>
     Our Privacy Policy was posted on 20 June 2018 and last updated on 20 June 2018. It governs the privacy terms of our website, located at airesis.eu, and the services and applications we provide you (the "Service"), located at
     <a href="https://airesis.it">airesis.it</a>, and
@@ -19,7 +26,7 @@
     <li><strong>Data Subject:</strong> Data Subject is any living individual who is the subject of Personal Data.</li>
     <li><strong>User:</strong> The User is the individual using our website or Services. The User corresponds to the Data Subject, who is the subject of Personal Data.</li>
   </ul>
-  <h2>Information Collection And Use</h2>
+  <h2 id="privacy-collection">Information Collection And Use</h2>
   <p>We collect several different types of information for various purposes to provide and improve our Service to you.</p>
   <h3>Types of Data Collected</h3>
   <ul>
@@ -75,7 +82,7 @@
     <li>You have given us permission to do so</li>
     <li>To comply with the law</li>
   </ul>
-  <h2>Your Data Protection Rights Under General Data Protection Regulation (GDPR)</h2>
+  <h2 id="privacy-rights">Your Data Protection Rights Under General Data Protection Regulation (GDPR)</h2>
   <p>If you are a resident of the European Economic Area (EEA), Data Subjects have certain data protection rights. Airesis aims to take reasonable steps to allow you to correct, amend, delete, or limit the use of Personal Data.</p>
   <p>If you wish to be informed what Personal Data we hold about a Data Subject and if you want it to be removed from our systems, please contact us.</p>
   <p>In certain circumstances, Data Subjects have the following data protection rights:</p>
@@ -89,7 +96,7 @@
   </ul>
   <p>Please note that we may ask you to verify your identity before responding to such requests.</p>
   <p>You have the right to complain to a Data Protection Authority about our collection and use of your Personal Data. For more information, please contact your local data protection authority in the European Economic Area (EEA).</p>
-  <h2>Service Providers</h2>
+  <h2 id="privacy-providers">Service Providers</h2>
   <p>We employ third party companies and individuals to facilitate our Service ("Service Providers") to perform App-related services or to assist us in analyzing how our Service is used.</p>
   <p>These third parties have access to your Personal Data only to perform these tasks on our behalf and are obligated not to disclose or use it for any other purpose.</p>
   <h3>Analytics</h3>
@@ -99,7 +106,7 @@
       <p><strong>Google Analytics</strong></p>
       <p>Google Analytics is a web analytics service offered by Google that tracks and reports website traffic. Google uses the data collected to track and monitor the use of our Service. This data is shared with other Google services. Google may use the collected data to contextualize and personalize the ads of its own advertising network.</p>
       <p>You can opt-out of having made your activity on the Service available to Google Analytics by installing the Google Analytics opt-out browser add-on. The add-on prevents the Google Analytics JavaScript (ga.js, analytics.js, and dc.js) from sharing information with Google Analytics about visits activity.</p>
-      <p>For more information on the privacy practices of Google, please visit the Google Privacy &amp; Terms web page: <a href="http://www.google.com/intl/en/policies/privacy/">http://www.google.com/intl/en/policies/privacy/</a></p>
+      <p>For more information on the privacy practices of Google, please visit the Google Privacy &amp; Terms web page: <a href="https://policies.google.com/privacy">https://policies.google.com/privacy</a></p>
     </li>
   </ul>
   <h3>Payments</h3>
@@ -120,6 +127,10 @@
   <p>We may update our Privacy Policy from time to time. We will notify you of any changes by posting the new Privacy Policy on this page.</p>
   <p>We will let you know via email and/or a prominent notice on our applications, prior to the change becoming effective and update the "effective date" at the top of this Privacy Policy.</p>
   <p>You are advised to review this Privacy Policy periodically for any changes. Changes to this Privacy Policy are effective when they are posted on this page.</p>
-  <h2>Contact Us</h2>
-  <p>If you have any questions about this Privacy Policy, please contact us at <a href="mailto:info@airesis.it">info@airesis.it</a>.</p>
+  <h2 id="privacy-contact">Contact Us</h2>
+  <% if service_contact_email.present? %>
+    <p>If you have any questions about this Privacy Policy, contact us at <%= mail_to service_contact_email %>.</p>
+  <% else %>
+    <p>The service operator has not configured a public contact address for this environment.</p>
+  <% end %>
 </div>

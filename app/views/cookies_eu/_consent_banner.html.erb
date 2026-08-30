@@ -1,8 +1,10 @@
 <% unless cookies['cookie_eu_consented'] == 'true' %>
-  <div class="fixed bottom-0 left-0 right-0 z-50 p-4 bg-base-300 border-t border-base-content/20 shadow-lg"
-       data-controller="cookie-consent">
-    <div class="container mx-auto flex flex-col sm:flex-row items-center justify-between gap-3">
-      <p class="text-sm text-base-content">
+  <aside class="relative z-20 border-t border-base-content/20 bg-base-300 px-4 py-3"
+         data-controller="cookie-consent"
+         role="region"
+         aria-label="<%= t('cookies_eu.banner_label', default: 'Cookie notice') %>">
+    <div class="mx-auto flex max-w-7xl flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+      <p class="max-w-3xl text-sm leading-relaxed text-base-content/80">
         <%= t('cookies_eu.cookies_text') %>
         <% if defined?(link) && link.present? %>
           <a href="<%= link %>" class="link link-primary"><%= t('cookies_eu.learn_more') %></a>
@@ -13,5 +15,5 @@
         <%= t('cookies_eu.ok') %>
       </button>
     </div>
-  </div>
+  </aside>
 <% end %>

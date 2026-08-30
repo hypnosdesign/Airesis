@@ -18,6 +18,34 @@ module Rack
       req.ip if req.path == '/users/sign_in' && req.post?
     end
 
+    token_request = ->(req) { req.path == '/tokens' && req.post? }
+
+    normalized_token_email = lambda do |req|
+      next unless token_request.call(req)
+
+      email = req.params['email']
+      if email.blank? && req.media_type == 'application/json'
+        body = req.body.read
+        req.body.rewind
+        email = JSON.parse(body)['email'] if body.present?
+      end
+      email.to_s.strip.downcase.presence
+    rescue JSON::ParserError
+      nil
+    ensure
+      req.body.rewind if req.body.respond_to?(:rewind)
+    end
+
+    # Protegge l'endpoint che emette token sia dagli attacchi distribuiti su
+    # uno stesso account sia dai tentativi concentrati da un singolo IP.
+    Rack::Attack.throttle('tokens/ip', limit: 5, period: 20.seconds) do |req|
+      req.ip if token_request.call(req)
+    end
+
+    Rack::Attack.throttle('tokens/email', limit: 5, period: 1.minute) do |req|
+      normalized_token_email.call(req)
+    end
+
     # Throttle registrazione: max 5 tentativi per ora per IP
     Rack::Attack.throttle('registrations/ip', limit: 5, period: 1.hour) do |req|
       req.ip if req.path == '/users' && req.post?

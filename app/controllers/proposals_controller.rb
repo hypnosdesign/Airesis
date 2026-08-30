@@ -28,7 +28,9 @@ class ProposalsController < ApplicationController
   # usano la route non-nested `/proposals/:id`, mentre index/new restano nested.
   # `except: tab_list/similar/endless_index` → queste azioni gestiscono la propria autorizzazione.
   load_and_authorize_resource through: %i[group group_area], shallow: true, except: %i[tab_list similar endless_index]
-  skip_authorize_resource only: :vote_results
+  skip_authorize_resource only: %i[banner test_banner vote_results]
+
+  before_action :enable_content_landmark
 
   layout :choose_layout
 
@@ -109,7 +111,7 @@ class ProposalsController < ApplicationController
 
   def test_banner
     @proposal = Proposal.find(params[:id])
-    authorize! :show, @proposal
+    authorize! :update, @proposal
     respond_to do |format|
       format.html
     end
@@ -406,6 +408,10 @@ class ProposalsController < ApplicationController
 
   protected
 
+  def enable_content_landmark
+    @content_landmark = true
+  end
+
   # Una proposta privata deve essere sempre accessibile via URL nested (`/groups/:id/proposals/:id`).
   # Se l'utente accede a `/proposals/:id` per una proposta privata, reindirizzo alla URL canonica.
   # Previene anche la discovery indiretta di proposte private tramite ID progressivo.
@@ -578,18 +584,38 @@ class ProposalsController < ApplicationController
   end
 
   def proposal_params
-    params.require(:proposal).permit(:proposal_category_id, :content, :title, :interest_borders_tkn, :tags_list,
-                                     :private, :anonima, :quorum_id, :visible_outside, :secret_vote, :vote_period_id, :group_area_id, :topic_id,
-                                     :proposal_type_id, :proposal_votation_type_id,
-                                     :integrated_contributes_ids_list, :signatures, :petition_phase,
-                                     votation: %i[later start start_edited end],
-                                     sections_attributes:
-                                       [:id, :seq, :_destroy, :title, paragraphs_attributes:
-                                         %i[id seq content content_dirty]],
-                                     solutions_attributes:
-                                       [:id, :seq, :_destroy, :title, sections_attributes:
-                                         [:id, :seq, :_destroy, :title, paragraphs_attributes:
-                                           %i[id seq content content_dirty]]])
+    permitted = params.require(:proposal).permit(:proposal_category_id, :content, :title, :interest_borders_tkn, :tags_list,
+                                                 :private, :anonima, :quorum_id, :visible_outside, :secret_vote, :vote_period_id, :group_area_id, :topic_id,
+                                                 :proposal_type_id, :proposal_votation_type_id,
+                                                 :integrated_contributes_ids_list, :signatures, :petition_phase,
+                                                 votation: %i[later start start_edited end],
+                                                 sections_attributes:
+                                                   [:id, :seq, :_destroy, :title, paragraphs_attributes:
+                                                     %i[id seq content content_dirty]],
+                                                 solutions_attributes:
+                                                   [:id, :seq, :_destroy, :title, sections_attributes:
+                                                     [:id, :seq, :_destroy, :title, paragraphs_attributes:
+                                                       %i[id seq content content_dirty]]])
+    sync_editor_content!(permitted)
+  end
+
+  # Trix aggiorna `content_dirty`; il vecchio editor copiava il valore anche in `content`
+  # lato client. Normalizzarlo qui rende il salvataggio indipendente dal JavaScript e mantiene
+  # `content_dirty` disponibile alla cronologia delle revisioni.
+  def sync_editor_content!(proposal_attributes)
+    sync_section_content!(proposal_attributes[:sections_attributes])
+    proposal_attributes[:solutions_attributes]&.each_value do |solution_attributes|
+      sync_section_content!(solution_attributes[:sections_attributes])
+    end
+    proposal_attributes
+  end
+
+  def sync_section_content!(section_attributes)
+    section_attributes&.each_value do |section|
+      section[:paragraphs_attributes]&.each_value do |paragraph|
+        paragraph[:content] = paragraph[:content_dirty] if paragraph.key?(:content_dirty)
+      end
+    end
   end
 
   # I campi strutturali (titolo, territorio, quorum, anonimato, visibilità, voto segreto) possono essere

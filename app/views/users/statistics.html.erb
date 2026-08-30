@@ -1,35 +1,72 @@
 <% @page_title = t('.title') %>
 
-<div class="card bg-base-200 p-4 mb-4">
-  <h1 class="text-2xl font-bold mb-4"><%= @page_title %></h1>
+<div class="space-y-6">
+  <header>
+    <p class="text-xs font-bold uppercase tracking-widest text-[var(--ui-link-color)] mb-2"><%= t('pages.users.left_panel.title') %></p>
+    <h1 class="text-3xl font-extrabold"><%= @page_title %></h1>
+    <p class="mt-2 max-w-2xl text-sm text-base-content/75"><%= t('users.statistics.description', default: 'A private summary of your participation and proposal activity.') %></p>
+  </header>
 
-  <p class="mb-2"><b><%= t('.last_login') %></b> <span class="info"><%= @user.last_sign_in_at %></span></p>
-  <p class="mb-2"><b><%= t('.integrated_count') %></b> <span class="info"><%= @integrated_count %></span></p>
-  <p class="mb-2"><b><%= t('.spam_count') %></b> <span class="info"><%= @spam_count %></span></p>
-  <p class="mb-2"><b><%= t('.noisy_count') %></b> <span class="info"><%= @noisy_count %></span></p>
-  <p class="mb-2"><b><%= t('.total_count') %></b> <span class="info"><%= @contributes_count %></span></p>
-  <p class="mb-2"><b><%= t('.total_comments_count') %></b> <span class="info"><%= @comments_count %></span></p>
-  <p class="mb-2"><b><%= t('.proposals_editor') %></b> <span class="info"><%= @proposals_count %></span></p>
-  <p class="mb-2"><b><%= t('.proposals_voted') %></b> <span class="info"><%= @voted_count = @user.proposals.voted.count %></span></p>
-  <p class="mb-2"><b><%= t('.average_rank_voted_proposals') %></b> <span class="info"><%= @voted_rank = @user.proposals.accepted.average(:rank).to_f.round(2) %></span></p>
-  <p class="mb-2"><b><%= t('.proposals_accepted_count') %></b> <span class="info"><%= @accepted_count = @user.proposals.accepted.count %></span></p>
-  <p class="mb-2"><b><%= t('.proposals_abandonend_count') %></b> <span class="info"><%= @abandoned_count = @user.proposals.abandoned.count %></span></p>
+<% statistic_groups = [
+  [t('.contributions_group'), [
+    [t('.integrated_count'), @integrated_count],
+    [t('.spam_count'), @spam_count],
+    [t('.noisy_count'), @noisy_count],
+    [t('.total_count'), @contributes_count],
+    [t('.total_comments_count'), @comments_count]
+  ]],
+  [t('.proposals_group'), [
+    [t('.proposals_editor'), @proposals_count],
+    [t('.proposals_voted'), @voted_count],
+    [t('.average_rank_voted_proposals'), @voted_rank],
+    [t('.proposals_accepted_count'), @accepted_count],
+    [t('.proposals_abandonend_count'), @abandoned_count]
+  ]]
+] %>
 
-  <p class="mb-2">
-    <b><%= t('.good_writer') %></b>
-    <span class="info">
-      <progress class="progress progress-primary w-32" value="<%= ((1+((@integrated_count.to_f/@contributes_count.to_f)**(0.5) - (@spam_count.to_f/@comments_count.to_f)**(1.to_f/3.to_f)))/2)*100 %>" max="100"></progress>
-      <%= ((1+((@integrated_count.to_f/@contributes_count.to_f)**(0.5) - (@spam_count.to_f/@comments_count.to_f)**(1.to_f/3.to_f)))/2)*100 %> %
-    </span>
-  </p>
+<div class="grid gap-4 lg:grid-cols-2">
+  <section class="bg-base-100 border-2 border-base-content/15 p-5 sm:p-6 lg:col-span-2" aria-labelledby="account-activity-title">
+    <h2 id="account-activity-title" class="text-lg font-bold"><%= t('.account_group') %></h2>
+    <dl class="mt-4 flex flex-wrap items-baseline justify-between gap-2 border-t border-base-content/15 pt-4">
+      <dt class="font-semibold"><%= t('.last_login') %></dt>
+      <dd class="text-sm text-base-content/75">
+        <% if @user.last_sign_in_at.present? %>
+          <time datetime="<%= @user.last_sign_in_at.iso8601 %>"><%= l(@user.last_sign_in_at, format: :long) %></time>
+        <% else %>
+          <%= t('.not_available') %>
+        <% end %>
+      </dd>
+    </dl>
+  </section>
 
-  <p class="mb-2">
-    <b><%= t('.good_proposals_writer') %></b>
-    <span class="info">
-      <progress class="progress progress-primary w-32" value="<%= ((1+(((0.8*@accepted_count)+(0.2*(@voted_count - @abandoned_count)))/(@voted_count+@abandoned_count)))/2)*100 %>" max="100"></progress>
-      <%= ((1+(((0.8*@accepted_count)+(0.2*(@voted_count - @abandoned_count)))/(@voted_count+@abandoned_count)))/2)*100 %> %
-    </span>
-  </p>
+  <% statistic_groups.each_with_index do |(title, statistics), index| %>
+    <section class="bg-base-100 border-2 border-base-content/15 p-5 sm:p-6" aria-labelledby="activity-group-<%= index %>">
+      <h2 id="activity-group-<%= index %>" class="text-lg font-bold"><%= title %></h2>
+      <dl class="mt-4 divide-y divide-base-content/10 border-t border-base-content/15">
+        <% statistics.each do |label, value| %>
+          <div class="flex items-start justify-between gap-4 py-3">
+            <dt class="text-sm text-base-content/75"><%= label %></dt>
+            <dd class="shrink-0 text-lg font-extrabold"><%= value %></dd>
+          </div>
+        <% end %>
+      </dl>
+    </section>
+  <% end %>
+
+  <section class="bg-base-100 border-2 border-base-content/15 p-5 sm:p-6 lg:col-span-2" aria-labelledby="quality-scores-title">
+    <h2 id="quality-scores-title" class="text-lg font-bold"><%= t('.quality_group') %></h2>
+    <dl class="mt-4 grid gap-5 sm:grid-cols-2">
+      <% [[t('.good_writer'), @good_writer_score], [t('.good_proposals_writer'), @good_proposals_writer_score]].each do |label, score| %>
+        <div>
+          <div class="mb-2 flex items-center justify-between gap-4">
+            <dt class="text-sm font-semibold"><%= label %></dt>
+            <dd class="font-extrabold"><%= score %>%</dd>
+          </div>
+          <progress class="progress progress-primary h-3 w-full" value="<%= score %>" max="100" aria-label="<%= label %>: <%= score %>%"></progress>
+        </div>
+      <% end %>
+    </dl>
+  </section>
 </div>
 
 <% if @user == current_user && @user.user_votes.count > 0 %>
@@ -37,17 +74,19 @@
     <h2 class="text-xl font-bold mb-2"><%= t('pages.users.show.votations_title') %></h2>
     <table id="votations_table" class="table">
       <thead>
-        <th><%= t('pages.users.show.proposal_column') %></th>
-        <th><%= t('pages.users.show.votation_date_column') %></th>
-        <th>vote_sortable</th>
-        <th><%= t('pages.users.show.vote_column') %></th>
+        <tr>
+          <th><%= t('pages.users.show.proposal_column') %></th>
+          <th><%= t('pages.users.show.votation_date_column') %></th>
+          <th class="hidden">vote_sortable</th>
+          <th><%= t('pages.users.show.vote_column') %></th>
+        </tr>
       </thead>
       <tbody>
         <% @user.user_votes.includes(:vote_type, proposal: :groups).each do |vote| %>
           <tr>
             <td><%= vote.proposal ? (link_to_proposal vote.proposal) : '' %></td>
             <td><%= l vote.created_at %></td>
-            <td><%= vote.created_at.to_i %></td>
+            <td class="hidden"><%= vote.created_at.to_i %></td>
             <td><%= vote.vote_type ? vote.vote_type.description : t('pages.users.show.secret_vote') %></td>
           </tr>
         <% end %>
@@ -56,6 +95,7 @@
 
   </div>
 <% end %>
+</div>
 
 <% content_for :left_panel do %>
   <% if current_user %>

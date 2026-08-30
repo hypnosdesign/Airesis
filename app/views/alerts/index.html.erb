@@ -1,47 +1,67 @@
-<div class="card bg-base-200 p-4">
-  <h1 class="text-xl font-bold mb-4"><%= t('pages.alerts.index.new_not_read') %></h1>
-  <ul class="list-disc pl-4 mb-4">
-    <% if @new_alerts.any? %>
-      <% @new_alerts.each do |alert| %>
-        <li>
-          <%= link_to calculate_alert_path(alert) do %>
-            <%= alert.created_at.strftime("%d/%m/%Y %H:%M") %> - <%= sanitize alert.message %>
-          <% end %>
-        </li>
-      <% end %>
-    <% else %>
-      <b><%= t('pages.alerts.index.no_new') %></b>
-    <% end %>
-  </ul>
+<% @page_title = t('pages.header.notifications', default: 'Notifications') %>
 
-  <h1 class="text-xl font-bold mb-4"><%= t('pages.alerts.index.old_not_read') %></h1>
-  <ul class="list-disc pl-4">
-    <% if @old_alerts.any? %>
-      <% @old_alerts.each do |alert| %>
-        <li>
-          <%= link_to calculate_alert_path(alert) do %>
-            <%= alert.created_at.strftime("%d/%m/%Y %H:%M") %> - <%= sanitize alert.message %>
-          <% end %>
-        </li>
+<div class="space-y-6">
+  <header class="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">
+    <div>
+      <p class="text-xs font-bold uppercase tracking-widest text-[var(--ui-link-color)] mb-2"><%= t('pages.users.left_panel.title') %></p>
+      <h1 class="text-3xl font-extrabold"><%= @page_title %></h1>
+      <p class="mt-2 text-sm text-base-content/75"><%= t('pages.alerts.index.description', default: 'Review activity that needs your attention and your notification history.') %></p>
+    </div>
+    <% if @new_alerts.any? %>
+      <%= button_to check_all_alerts_path, method: :post, class: 'btn btn-outline min-h-11', form: { data: { turbo: true } }, data: { turbo_submits_with: t('loading', default: 'Loading…') } do %>
+        <i class="fa-solid fa-check-double" aria-hidden="true"></i>
+        <%= t('pages.alerts.index.mark_all_read', default: 'Mark all as read') %>
       <% end %>
-    <% else %>
-      <b><%= t('pages.alerts.index.no_old') %></b>
     <% end %>
-  </ul>
+  </header>
+
+  <section class="bg-base-100 border-2 border-base-content/15" aria-labelledby="unread-alerts-title">
+    <div class="p-4 border-b-2 border-base-content/10 flex items-center justify-between gap-3">
+      <h2 id="unread-alerts-title" class="text-lg font-bold"><%= t('pages.alerts.index.new_not_read') %></h2>
+      <span class="badge badge-primary"><%= @new_alerts.size %></span>
+    </div>
+    <% if @new_alerts.any? %>
+      <ul class="divide-y divide-base-content/10">
+        <% @new_alerts.each do |alert| %>
+          <li>
+            <%= link_to calculate_alert_path(alert), class: 'flex min-h-14 items-start gap-3 p-4 hover:bg-base-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-primary' do %>
+              <i class="fa-solid fa-bell text-primary mt-1" aria-hidden="true"></i>
+              <span><span class="block text-sm"><%= sanitize alert.message %></span><time datetime="<%= alert.created_at.iso8601 %>" class="block mt-1 text-xs text-base-content/75"><%= l alert.created_at, format: :short %></time></span>
+            <% end %>
+          </li>
+        <% end %>
+      </ul>
+    <% else %>
+      <div class="p-8 text-center" role="status">
+        <i class="fa-solid fa-circle-check text-3xl text-success mb-3" aria-hidden="true"></i>
+        <p class="font-bold"><%= t('pages.alerts.index.no_new') %></p>
+        <p class="mt-1 text-sm text-base-content/75"><%= t('pages.alerts.index.no_new_description', default: 'You are all caught up. New activity will appear here.') %></p>
+      </div>
+    <% end %>
+  </section>
+
+  <section class="bg-base-100 border-2 border-base-content/15" aria-labelledby="read-alerts-title">
+    <div class="p-4 border-b-2 border-base-content/10 flex items-center justify-between gap-3">
+      <h2 id="read-alerts-title" class="text-lg font-bold"><%= t('pages.alerts.index.old_not_read') %></h2>
+      <span class="badge badge-ghost"><%= @old_alerts.size %></span>
+    </div>
+    <% if @old_alerts.any? %>
+      <ul class="divide-y divide-base-content/10">
+        <% @old_alerts.each do |alert| %>
+          <li>
+            <%= link_to calculate_alert_path(alert), class: 'flex min-h-14 items-start gap-3 p-4 hover:bg-base-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-primary' do %>
+              <i class="fa-regular fa-bell text-base-content/75 mt-1" aria-hidden="true"></i>
+              <span><span class="block text-sm"><%= sanitize alert.message %></span><time datetime="<%= alert.created_at.iso8601 %>" class="block mt-1 text-xs text-base-content/75"><%= l alert.created_at, format: :short %></time></span>
+            <% end %>
+          </li>
+        <% end %>
+      </ul>
+    <% else %>
+      <p class="p-6 text-sm text-base-content/75" role="status"><%= t('pages.alerts.index.no_old') %></p>
+    <% end %>
+  </section>
 </div>
 
 <% content_for :left_panel do %>
-  <% if current_user %>
-    <%= render partial: 'users/preferences_panel' %>
-  <% end %>
+  <%= render partial: 'users/preferences_panel' %>
 <% end %>
-
-<script type="text/javascript">
-  document.addEventListener('turbo:load', () => {
-    const token = document.querySelector('meta[name="csrf-token"]')?.content;
-    fetch('/alerts/check_all', {
-      method: 'POST',
-      headers: { 'X-CSRF-Token': token || '' }
-    });
-  }, { once: true });
-</script>

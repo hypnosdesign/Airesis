@@ -3,5 +3,9 @@
     <%= render 'proposals/proposal_list_element', proposal_list_element_for_mustache(proposal) %>
   <% end %>
 <% else %>
-  <%= t('pages.proposals.list.no_proposals') %>
+  <li class="col-span-full list-none border-2 border-dashed border-base-content/20 bg-base-100 px-6 py-12 text-center">
+    <i class="fa-regular fa-lightbulb mb-3 text-3xl text-base-content/35" aria-hidden="true"></i>
+    <h2 class="text-lg font-bold"><%= t('pages.proposals.list.no_proposals') %></h2>
+    <p class="mt-2 text-sm text-base-content/70"><%= t('pages.proposals.list.no_proposals_hint', default: 'Try another state or adjust the filters.') %></p>
+  </li>
 <% end %>

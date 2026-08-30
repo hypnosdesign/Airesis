@@ -6,7 +6,7 @@
     <h1 class="text-2xl lg:text-3xl font-bold mb-1">
       <%= t('pages.home.show.welcome_back', name: current_user.name, default: "Bentornato, #{current_user.name}!") %>
     </h1>
-    <p class="text-primary-content/70 text-sm">
+    <p class="text-primary-content/90 text-sm">
       <%= t('pages.home.show.dashboard_subtitle', default: 'Ecco cosa succede nella tua community') %>
     </p>
   </div>
@@ -20,7 +20,37 @@
   user_groups = current_user.groups
   user_topics = @user.viewed_topics.order('created_at desc').limit(10)
   unread_notifications = Alert.unscoped.where(user_id: current_user.id, checked: false).count
+  first_run = user_proposals.empty? && voting_proposals.empty? && user_groups.empty? && user_topics.empty? && unread_notifications.zero?
 %>
+<% if first_run %>
+  <section class="bg-base-100 border-2 border-base-content/15 p-6 sm:p-8" aria-labelledby="first-run-title">
+    <div class="max-w-3xl">
+      <p class="text-xs font-bold uppercase tracking-widest text-[var(--ui-link-color)] mb-2"><%= t('pages.home.show.first_run_eyebrow') %></p>
+      <h2 id="first-run-title" class="text-2xl sm:text-3xl font-extrabold"><%= t('pages.home.show.first_run_title') %></h2>
+      <p class="mt-3 text-base-content/70"><%= t('pages.home.show.first_run_description') %></p>
+    </div>
+    <ol class="grid grid-cols-1 md:grid-cols-3 gap-4 mt-7" aria-label="<%= t('pages.home.show.first_run_steps_label') %>">
+      <li class="border-2 border-base-content/15 p-5">
+        <span class="inline-flex size-9 items-center justify-center bg-primary text-primary-content font-extrabold">1</span>
+        <h3 class="mt-4 font-bold"><%= t('pages.home.show.first_run_explore_title') %></h3>
+        <p class="mt-2 text-sm text-base-content/75"><%= t('pages.home.show.first_run_explore_description') %></p>
+        <%= link_to t('pages.home.show.first_run_explore_action'), open_space_path, class: 'btn btn-outline w-full min-h-11 mt-5' %>
+      </li>
+      <li class="border-2 border-base-content/15 p-5">
+        <span class="inline-flex size-9 items-center justify-center bg-primary text-primary-content font-extrabold">2</span>
+        <h3 class="mt-4 font-bold"><%= t('pages.home.show.first_run_groups_title') %></h3>
+        <p class="mt-2 text-sm text-base-content/75"><%= t('pages.home.show.first_run_groups_description') %></p>
+        <%= link_to t('pages.home.show.first_run_groups_action'), groups_path, class: 'btn btn-outline w-full min-h-11 mt-5' %>
+      </li>
+      <li class="border-2 border-primary/30 bg-primary/5 p-5">
+        <span class="inline-flex size-9 items-center justify-center bg-primary text-primary-content font-extrabold">3</span>
+        <h3 class="mt-4 font-bold"><%= t('pages.home.show.first_run_proposal_title') %></h3>
+        <p class="mt-2 text-sm text-base-content/75"><%= t('pages.home.show.first_run_proposal_description') %></p>
+        <%= link_to t('pages.home.show.first_run_proposal_action'), new_proposal_path, class: 'btn btn-primary w-full min-h-11 mt-5' %>
+      </li>
+    </ol>
+  </section>
+<% else %>
 <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-6">
   <div class="bg-base-100 p-4 flex items-center gap-4 border-2 border-base-content/15">
     <div class="bg-primary/10 text-primary w-10 h-10 flex items-center justify-center">
@@ -28,7 +58,7 @@
     </div>
     <div>
       <div class="text-2xl font-bold"><%= user_proposals.size %></div>
-      <div class="text-[11px] text-base-content/40 uppercase tracking-wider font-bold"><%= t('pages.home.show.your_proposals', default: 'Le tue proposte') %></div>
+      <div class="text-[11px] text-base-content/75 uppercase tracking-wider font-bold"><%= t('pages.home.show.your_proposals', default: 'Le tue proposte') %></div>
     </div>
   </div>
   <div class="bg-base-100 p-4 flex items-center gap-4 border-2 border-base-content/15">
@@ -37,7 +67,7 @@
     </div>
     <div>
       <div class="text-2xl font-bold"><%= voting_proposals.size %></div>
-      <div class="text-[11px] text-base-content/40 uppercase tracking-wider font-bold"><%= t('pages.home.show.proposals_now_voting', default: 'In votazione') %></div>
+      <div class="text-[11px] text-base-content/75 uppercase tracking-wider font-bold"><%= t('pages.home.show.proposals_now_voting', default: 'In votazione') %></div>
     </div>
   </div>
   <div class="bg-base-100 p-4 flex items-center gap-4 border-2 border-base-content/15">
@@ -46,7 +76,7 @@
     </div>
     <div>
       <div class="text-2xl font-bold"><%= user_groups.size %></div>
-      <div class="text-[11px] text-base-content/40 uppercase tracking-wider font-bold"><%= t('pages.groups.index.groups_list', default: 'I tuoi gruppi') %></div>
+      <div class="text-[11px] text-base-content/75 uppercase tracking-wider font-bold"><%= t('pages.groups.index.groups_list', default: 'I tuoi gruppi') %></div>
     </div>
   </div>
   <div class="bg-base-100 p-4 flex items-center gap-4 border-2 border-base-content/15">
@@ -55,7 +85,7 @@
     </div>
     <div>
       <div class="text-2xl font-bold"><%= unread_notifications %></div>
-      <div class="text-[11px] text-base-content/40 uppercase tracking-wider font-bold"><%= t('pages.home.show.unread_notifications', default: 'Non lette') %></div>
+      <div class="text-[11px] text-base-content/75 uppercase tracking-wider font-bold"><%= t('pages.home.show.unread_notifications', default: 'Non lette') %></div>
     </div>
   </div>
 </div>
@@ -75,14 +105,14 @@
           </div>
           <div>
             <h2 class="font-bold text-sm"><%= t('pages.home.show.proposals_now_voting', default: 'Proposte in votazione') %></h2>
-            <p class="text-[11px] text-base-content/40"><%= t('pages.home.show.voting_subtitle', default: 'Esprimi il tuo voto su queste proposte') %></p>
+            <p class="text-[11px] text-base-content/75"><%= t('pages.home.show.voting_subtitle', default: 'Esprimi il tuo voto su queste proposte') %></p>
           </div>
         </div>
         <%= link_to t('pages.home.show.see_all', default: 'Vedi tutte'), proposals_path(state: 'voting'), class: 'text-xs text-primary font-bold hover:underline' %>
       </div>
       <div class="p-4">
         <% if voting_proposals.empty? %>
-          <p class="text-sm text-base-content/40 py-4 text-center">
+          <p class="text-sm text-base-content/75 py-4 text-center">
             <i class="fa-solid fa-inbox mr-1"></i>
             <%= t('pages.home.show.no_proposals_voting', default: 'Nessuna proposta in votazione al momento') %>
           </p>
@@ -127,14 +157,14 @@
           </div>
           <div>
             <h2 class="font-bold text-sm"><%= t('pages.home.show.your_proposals', default: 'Le tue proposte') %></h2>
-            <p class="text-[11px] text-base-content/40"><%= t('pages.home.show.proposals_subtitle', default: 'Proposte a cui stai partecipando') %></p>
+            <p class="text-[11px] text-base-content/75"><%= t('pages.home.show.proposals_subtitle', default: 'Proposte a cui stai partecipando') %></p>
           </div>
         </div>
         <%= link_to t('pages.home.show.see_all', default: 'Vedi tutte'), proposals_path, class: 'text-xs text-primary font-bold hover:underline' %>
       </div>
       <div class="p-4">
         <% if user_proposals.empty? %>
-          <p class="text-sm text-base-content/40 py-4 text-center">
+          <p class="text-sm text-base-content/75 py-4 text-center">
             <i class="fa-solid fa-inbox mr-1"></i>
             <%= t('pages.home.show.no_proposals', default: 'Non stai partecipando a nessuna proposta') %>
           </p>
@@ -150,7 +180,7 @@
                     <% if current_user %>
                       <%= user_valutation_image(current_user, proposal) %>
                     <% end %>
-                    <%= link_to_proposal proposal, style: (proposal.rejected? ? 'text-decoration: line-through;' : ''), title: (proposal.rejected? ? 'Rifiutata' : nil), class: 'hover:text-primary' %>
+                    <%= link_to_proposal proposal, style: (proposal.rejected? ? 'text-decoration: line-through;' : ''), title: (proposal.rejected? ? t('pages.home.show.rejected', default: 'Rejected') : nil), class: 'hover:text-primary' %>
                   </div>
                   <% unless proposal.is_petition? %>
                     <% mustache_proposal = proposal_for_mustache(proposal) %>
@@ -192,13 +222,13 @@
           </div>
           <div>
             <h2 class="font-bold text-sm"><%= t('home.portlets.topics.title', default: 'Discussioni recenti') %></h2>
-            <p class="text-[11px] text-base-content/40"><%= t('home.portlets.topics.subtitle', default: 'Le ultime discussioni che hai seguito') %></p>
+            <p class="text-[11px] text-base-content/75"><%= t('home.portlets.topics.subtitle', default: 'Le ultime discussioni che hai seguito') %></p>
           </div>
         </div>
       </div>
       <div class="p-4">
         <% if user_topics.empty? %>
-          <p class="text-sm text-base-content/40 py-4 text-center">
+          <p class="text-sm text-base-content/75 py-4 text-center">
             <i class="fa-solid fa-inbox mr-1"></i>
             <%= t('home.portlets.topics.empty', default: 'Nessuna discussione recente') %>
           </p>
@@ -256,7 +286,7 @@
         </div>
         <div>
           <div class="font-bold"><%= current_user.fullname %></div>
-          <div class="text-[11px] text-base-content/40"><%= current_user.email %></div>
+          <div class="text-[11px] text-base-content/75"><%= current_user.email %></div>
         </div>
       </div>
       <div class="px-4 pb-4 flex gap-2">
@@ -284,8 +314,8 @@
       </div>
       <div class="p-4">
         <% if user_groups.empty? %>
-          <p class="text-sm text-base-content/40 py-2 text-center">
-            <%= raw t('pages.groups.index.no_groups_yet', name: (link_to t('group', default: 'gruppo'), groups_path, class: 'text-primary font-bold hover:underline')) %>
+          <p class="text-sm text-base-content/75 py-2 text-center">
+            <%= raw t('pages.groups.index.no_groups_yet', name: (link_to t('group', default: 'group'), groups_path, class: 'text-primary font-bold hover:underline')) %>
           </p>
         <% else %>
           <div class="divide-y divide-base-content/10">
@@ -320,7 +350,7 @@
              <%= tag.attributes("data-map-query-value": @territory_query) if @territory_query %>>
         </div>
         <% if @territory_query.nil? %>
-          <p class="text-xs text-base-content/50 mt-2">
+          <p class="text-xs text-base-content/75 mt-2">
             <%= link_to t('pages.users.edit.interest_borders', default: 'Imposta il tuo territorio'), edit_user_registration_path, class: "link link-primary" %>
           </p>
         <% end %>
@@ -347,6 +377,7 @@
 
   </div>
 </div>
+<% end %>
 
 <%# Keep the left panel for the sidebar layout %>
 <%= content_for :left_panel do %>

@@ -36,6 +36,27 @@ module ApplicationHelper
     "<div id='calendar'></div>"
   end
 
+  def tag_links_for(taggable)
+    safe_join(
+      taggable.tags.map do |tag_record|
+        tag_text = tag_record.text.to_s.strip
+        link_to(tag_text, tag_path(tag_text))
+      end,
+      ', '
+    )
+  end
+
+  def service_contact_email
+    email = ENV['APP_EMAIL_ADDRESS'].to_s.strip
+    placeholder_domains = %w[localhost example.com example.org example.net]
+    domain = email.split('@', 2).last.to_s.downcase
+
+    return if email.blank? || placeholder_domains.include?(domain)
+    return unless email.match?(URI::MailTo::EMAIL_REGEXP)
+
+    email
+  end
+
   def resource_name
     :user
   end
@@ -102,6 +123,6 @@ module ApplicationHelper
 
   def order_arrow
     css_class = params[:order] == 'a' ? 'fa-solid fa-arrow-up' : 'fa-solid fa-arrow-down'
-    content_tag :i, nil, class: css_class
+    content_tag :i, nil, class: css_class, aria: { hidden: true }
   end
 end

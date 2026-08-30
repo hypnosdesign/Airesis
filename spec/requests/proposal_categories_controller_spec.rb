@@ -5,14 +5,16 @@ RSpec.describe ProposalCategoriesController, seeds: true do
   describe 'GET index' do
     it 'responds to the index request' do
       get proposal_categories_path, params: { format: :json }
-      # controller returns JSON; may return 406 if format negotiation fails in test env
-      expect([200, 406, 500]).to include(response.status)
+      expect(response).to have_http_status(:ok)
+      expect(response.media_type).to eq('application/json')
+      expect(JSON.parse(response.body)).to all(include('id', 'description'))
     end
 
     it 'returns 200 with JSON accept header' do
       get proposal_categories_path,
           headers: { 'Accept' => 'application/json' }
-      expect([200, 406, 500]).to include(response.status)
+      expect(response).to have_http_status(:ok)
+      expect(response.media_type).to eq('application/json')
     end
   end
 end

@@ -1,19 +1,32 @@
 <!DOCTYPE html>
-<% html_attrs = { 'xml:lang' => I18n.locale, 'lang' => I18n.locale }.merge(yield(:html_options).is_a?(Hash) ? yield(:html_options) : {}) %>
-<html <%= html_attrs.map { |k, v| "#{k}=\"#{v}\"" }.join(' ') %> data-controller="theme">
+<html xml:lang="<%= I18n.locale %>" lang="<%= I18n.locale %>" data-controller="theme">
 <head>
   <%# FOUC prevention: applica il tema salvato PRIMA che il CSS carichi, evitando il flash di tema sbagliato %>
   <script>(function(){var t=localStorage.getItem('theme')||'nord';document.documentElement.setAttribute('data-theme',t);}());</script>
   <title><%= (@page_title || t('open_space')) + ' - ' + APP_SHORT_NAME %></title>
   <%= render 'layouts/head' %>
 </head>
-<body class="min-h-screen bg-base-200 opacity-0" data-page="<%= body_page_name %>">
+<body class="min-h-screen bg-base-200 opacity-0"
+      data-page="<%= body_page_name %>"
+      data-controller="right-drawer">
 
-  <div class="drawer lg:drawer-open">
-    <input id="sidebar-drawer" type="checkbox" class="drawer-toggle" />
+  <div class="drawer lg:drawer-open"
+       data-controller="sidebar-drawer"
+       data-right-drawer-target="background">
+    <input id="sidebar-drawer"
+           type="checkbox"
+           class="drawer-toggle"
+           tabindex="-1"
+           aria-hidden="true"
+           data-sidebar-drawer-target="checkbox"
+           data-action="change->sidebar-drawer#sync" />
 
     <%# ===== DRAWER CONTENT (navbar + page) ===== %>
-    <div class="drawer-content flex flex-col">
+    <div class="drawer-content flex flex-col" data-sidebar-drawer-target="background">
+
+      <a href="#main-content" class="sr-only focus:not-sr-only fixed left-4 top-4 z-[100] bg-base-content px-4 py-3 font-bold text-base-100 shadow-lg">
+        <%= t('pages.accessibility.skip_to_content', default: 'Skip to main content') %>
+      </a>
 
       <%# Navbar %>
       <%= render 'layouts/top_menu' %>
@@ -21,22 +34,32 @@
       <%# Page header strip (opzionale, configurato dalle singole view via content_for :page_header) %>
       <%= yield(:page_header) if content_for?(:page_header) %>
 
-      <%# Page content %>
-      <div class="max-w-[1400px] mx-auto px-4 lg:px-8 py-6 lg:py-8 w-full">
+      <%# Page content. Layouts opt in when their child views do not already own <main>. %>
+      <% content_element = local_assigns.fetch(:content_landmark, @content_landmark || false) ? :main : :div %>
+      <%= content_tag content_element,
+                      id: 'main-content',
+                      tabindex: -1,
+                      class: 'max-w-[1400px] mx-auto px-4 lg:px-8 py-6 lg:py-8 w-full' do %>
         <div id="flash_messages">
           <%= render partial: 'layouts/flash', locals: { flash: flash } %>
         </div>
         <%= render partial: 'layouts/tutorials' %>
         <%= yield %>
-      </div>
+      <% end %>
 
       <%# Footer %>
       <%= render partial: "layouts/footer" %>
     </div>
 
     <%# ===== DRAWER SIDEBAR ===== %>
-    <div class="drawer-side is-drawer-close:overflow-visible z-40">
-      <label for="sidebar-drawer" aria-label="chiudi sidebar" class="drawer-overlay"></label>
+    <div class="drawer-side is-drawer-close:overflow-visible z-40"
+         aria-hidden="true"
+         data-sidebar-drawer-target="panel">
+      <button type="button"
+              aria-label="<%= t('pages.header.close_navigation', default: 'Close navigation') %>"
+              class="drawer-overlay"
+              tabindex="-1"
+              data-action="sidebar-drawer#close"></button>
       <%= render 'layouts/sidebar' %>
     </div>
 
@@ -45,13 +68,21 @@
   <%# ===== RIGHT DRAWER (filtri — contenuto da content_for :filter_drawer) ===== %>
   <% if content_for?(:filter_drawer) %>
     <div id="right-drawer"
-         data-controller="right-drawer"
+         data-right-drawer-target="panel"
          class="fixed top-0 right-0 h-full w-80 bg-base-100 border-l-2 border-base-content/15 z-50 translate-x-full transition-transform duration-300 overflow-y-auto"
-         aria-hidden="true">
+         role="dialog"
+         aria-modal="true"
+         aria-labelledby="right-drawer-title"
+         aria-hidden="true"
+         inert>
       <div class="flex items-center justify-between p-4 border-b-2 border-base-content/15 sticky top-0 bg-base-100 z-10">
-        <span class="font-bold text-sm"><%= t('pages.proposals.index.filters', default: 'Filtri') %></span>
-        <button data-action="right-drawer#close" class="btn btn-ghost btn-sm btn-circle">
-          <i class="fa-solid fa-xmark"></i>
+        <h2 id="right-drawer-title" class="font-bold text-sm"><%= t('pages.proposals.index.filters', default: 'Filters') %></h2>
+        <button type="button"
+                aria-label="<%= t('pages.proposals.index.close_filters', default: 'Close filters') %>"
+                data-right-drawer-target="close"
+                data-action="right-drawer#close"
+                class="btn btn-ghost btn-sm btn-circle">
+          <i class="fa-solid fa-xmark" aria-hidden="true"></i>
         </button>
       </div>
       <div class="p-4 space-y-3">
@@ -60,6 +91,7 @@
     </div>
     <div data-right-drawer-target="overlay"
          class="fixed inset-0 bg-base-content/30 z-40 hidden"
+         aria-hidden="true"
          data-action="click->right-drawer#close"></div>
   <% end %>
 

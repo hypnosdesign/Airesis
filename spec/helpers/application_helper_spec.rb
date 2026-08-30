@@ -42,6 +42,37 @@ RSpec.describe ApplicationHelper, type: :helper do
     end
   end
 
+  describe '#tag_links_for' do
+    it 'escapes tag text and URL attributes' do
+      malicious_text = %q{"><script>alert(1)</script>}
+      taggable = Struct.new(:tags).new([Tag.new(text: malicious_text)])
+
+      result = helper.tag_links_for(taggable)
+      fragment = Nokogiri::HTML.fragment(result)
+
+      expect(fragment.css('script')).to be_empty
+      expect(fragment.at_css('a').text).to eq(malicious_text)
+      expect(result).not_to include('<script>')
+      expect(result).to be_html_safe
+    end
+  end
+
+  describe '#service_contact_email' do
+    it 'returns the configured public contact address' do
+      allow(ENV).to receive(:[]).with('APP_EMAIL_ADDRESS').and_return('operator@community.test')
+
+      expect(helper.service_contact_email).to eq('operator@community.test')
+    end
+
+    it 'rejects missing, malformed, local and example addresses' do
+      ['', 'missing', 'info@localhost', 'info@example.com'].each do |value|
+        allow(ENV).to receive(:[]).with('APP_EMAIL_ADDRESS').and_return(value)
+
+        expect(helper.service_contact_email).to be_nil
+      end
+    end
+  end
+
   describe '#resource_name' do
     it 'returns :user' do
       expect(helper.resource_name).to eq(:user)

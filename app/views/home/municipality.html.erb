@@ -1,6 +1,12 @@
 <% @page_title = "Una scelta in comune" %>
 <% @meta_description = "Un comune che coinvolge i cittadini, un comune che ascolta i cittadini" %>
 
+<div class="alert border-2 border-base-content/15 bg-base-100 max-w-4xl mx-auto mt-8" role="note">
+  <i class="fa-solid fa-box-archive" aria-hidden="true"></i>
+  <span><%= t('home.archived_italian_notice') %></span>
+</div>
+
+<main lang="it">
 <div class="py-12">
   <div class="max-w-4xl mx-auto px-4 text-center">
     <h1 class="text-3xl font-bold mb-8"><%= @page_title %></h1>
@@ -61,10 +67,12 @@
   <div class="max-w-4xl mx-auto px-4 text-center">
     <h2 class="text-2xl font-bold mb-4">Contatti</h2>
     <p>
-      Alessandro Rodi<br>
-      Head Developer Airesis - The Social Network for E-Democracy<br>
-      Email: coorasse@gmail.com<br>
-      Tel: +41779877458<br>
+      <% if service_contact_email.present? %>
+        Email: <%= mail_to service_contact_email, service_contact_email, class: 'underline font-semibold' %>
+      <% else %>
+        Le informazioni di contatto dell'istanza non sono configurate.
+      <% end %>
     </p>
   </div>
 </div>
+</main>

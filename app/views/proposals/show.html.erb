@@ -30,7 +30,7 @@
     <%# Badges %>
     <div class="flex flex-wrap items-center gap-2 mb-3">
       <span class="badge bg-primary-content/20 text-primary-content border-0 badge-sm font-bold">
-        <%= @proposal.state.description %>
+        <%= proposal_state_label(@proposal.state) %>
       </span>
       <span class="badge bg-primary-content/10 text-primary-content/80 border-0 badge-sm">
         <%= @proposal.proposal_type.description %>
@@ -46,10 +46,10 @@
     <h1 class="text-2xl lg:text-3xl font-extrabold mb-3"><%= h @proposal.title %></h1>
 
     <%# Metadata %>
-    <div class="flex flex-wrap items-center gap-4 text-sm text-primary-content/60 mb-4">
+    <div class="flex flex-wrap items-center gap-4 text-sm text-primary-content/85 mb-4">
       <span><i class="fa-regular fa-calendar"></i> <%= l @proposal.created_at, format: :long %></span>
-      <span><i class="fa-regular fa-eye"></i> <%= @proposal.views_count || 0 %> <%= t('pages.proposals.show.views') rescue 'visualizzazioni' %></span>
-      <span><i class="fa-regular fa-comments"></i> <%= @proposal.proposal_contributes_count || 0 %> contributi</span>
+      <span><i class="fa-regular fa-eye"></i> <%= @proposal.views_count || 0 %> <%= t('pages.proposals.show.views', default: 'views') %></span>
+      <span><i class="fa-regular fa-comments"></i> <%= @proposal.proposal_contributes_count || 0 %> <%= t('pages.proposals.show.contributions', default: 'contributions') %></span>
       <% unless @proposal.interest_borders.empty? %>
         <span><i class="fa-solid fa-map-marker-alt"></i> <%= @proposal.interest_borders.map(&:description).join(', ') %></span>
       <% end %>
@@ -97,7 +97,7 @@
         </div>
         <div>
           <p class="font-bold text-sm"><%= t('pages.proposals.show.during_debate') rescue 'Fase dibattito' %></p>
-          <p class="text-[11px] text-base-content/40"><%= @proposal.quorum.explanation %></p>
+          <p class="text-xs text-base-content/70"><%= @proposal.quorum.explanation %></p>
         </div>
       </div>
       <div class="flex items-center gap-4">
@@ -106,7 +106,7 @@
                   max="<%= [@proposal.quorum.valutations, 1].max %>"></progress>
         <div class="text-right">
           <span class="text-lg font-bold"><%= @proposal.valutations %></span>
-          <span class="text-[11px] text-base-content/40">/ <%= @proposal.quorum.valutations %> valutazioni</span>
+          <span class="text-xs text-base-content/70">/ <%= @proposal.quorum.valutations %> <%= t('pages.proposals.show.evaluations', default: 'evaluations') %></span>
         </div>
       </div>
     </div>
@@ -154,7 +154,7 @@
           <%= render partial: 'proposals/abandoned_header' %>
         </div>
       </div>
-      <p class="text-[11px] text-base-content/40 mt-2">
+      <p class="text-xs text-base-content/70 mt-2">
         <%= t('pages.proposals.show.abandoned_message', ago: time_ago_in_words(@proposal.updated_at)) %>: <%= l @proposal.updated_at %>
       </p>
     </div>
@@ -165,7 +165,7 @@
           <div class="bg-<%= @proposal.accepted? ? 'success' : 'error' %>/10 text-<%= @proposal.accepted? ? 'success' : 'error' %> p-2 flex items-center justify-center">
             <i class="fa-solid fa-<%= @proposal.accepted? ? 'check-circle' : 'times-circle' %> text-lg"></i>
           </div>
-          <p class="font-bold"><%= @proposal.state.description %></p>
+          <p class="font-bold"><%= proposal_state_label(@proposal.state) %></p>
         </div>
         <%= link_to(vote_results_proposal_url(@proposal), class: 'btn btn-outline btn-sm font-bold') do %>
           <%= t('pages.proposals.show.votation_results') %>
@@ -211,7 +211,7 @@
       </div>
       <div>
         <p class="font-bold text-sm">Firme</p>
-        <p class="text-[11px] text-base-content/40"><%= @proposal.vote.number %> / <%= @proposal.signatures %></p>
+        <p class="text-xs text-base-content/70"><%= @proposal.vote.number %> / <%= @proposal.signatures %></p>
       </div>
     </div>
     <progress class="progress progress-success w-full mb-4"
@@ -237,7 +237,7 @@
           <div class="bg-primary/10 text-primary p-2 flex items-center justify-center">
             <i class="fa-solid fa-file-lines"></i>
           </div>
-          <h3 class="text-lg font-bold text-base-content"><%= section.title %></h3>
+          <h2 class="text-lg font-bold text-base-content"><%= section.title %></h2>
         </div>
         <% unless @proposal.voting? %>
           <% contributes_num = section.proposal_comments.listable.count %>
@@ -262,15 +262,15 @@
       <i class="fa-solid fa-lightbulb text-lg"></i>
     </div>
     <div>
-      <h2 class="text-xl font-bold"><%= solutions.count > 1 ? 'Soluzioni' : 'Soluzione' %></h2>
-      <p class="text-[11px] text-base-content/40"><%= solutions.count %> <%= solutions.count > 1 ? 'proposte' : 'proposta' %></p>
+      <h2 class="text-xl font-bold"><%= t('pages.proposals.show.solutions', count: solutions.count, default: solutions.count > 1 ? 'Solutions' : 'Solution') %></h2>
+      <p class="text-xs text-base-content/70"><%= t('pages.proposals.show.solution_count', count: solutions.count, default: '%{count} voting option') %></p>
     </div>
   </div>
   <div class="space-y-4 mb-6">
     <% solutions.each_with_index do |solution, i| %>
       <div class="bg-base-100 border-2 border-base-content/15 p-6">
-        <h3 class="text-base font-bold text-primary mb-4">
-          <%= t("pages.proposals.edit.new_solution_title.#{@proposal.proposal_type.name.downcase}", num: i + 1, default: "#{i + 1}.") %>
+        <h3 class="text-base font-bold text-base-content mb-4">
+          <%= strip_tags(t("pages.proposals.edit.new_solution_title.#{@proposal.proposal_type.name.downcase}", num: i + 1, default: "#{i + 1}.")) %>
           <%= solution.title %>
         </h3>
         <% solution.sections.each do |section| %>
@@ -296,7 +296,7 @@
   <% unless @proposal.is_petition? %>
     <div class="bg-base-100 border-2 border-base-content/15 p-6 mb-6 text-center">
       <i class="fa-solid fa-lock text-2xl text-base-content/20 mb-2"></i>
-      <p class="text-[11px] text-base-content/40"><%= t('pages.proposals.show.no_contributes') %></p>
+      <p class="text-xs text-base-content/70"><%= t('pages.proposals.show.no_contributes') %></p>
     </div>
   <% end %>
 <% else %>
@@ -306,8 +306,8 @@
         <i class="fa-regular fa-comments text-lg"></i>
       </div>
       <div>
-        <h2 class="text-xl font-bold">Contributi</h2>
-        <p class="text-[11px] text-base-content/40">Discussione e suggerimenti</p>
+        <h2 class="text-xl font-bold"><%= t('pages.proposals.show.contributions_heading', default: 'Contributions') %></h2>
+        <p class="text-xs text-base-content/70"><%= t('pages.proposals.show.contributions_description', default: 'Discussion and suggested improvements') %></p>
       </div>
     </div>
 
@@ -333,7 +333,7 @@
         <% end %>
       <% else %>
         <div class="bg-base-100 border-2 border-base-content/15 p-6 text-center">
-          <p class="text-[11px] text-base-content/40"><%= t('pages.proposals.show.no_contributes') %></p>
+          <p class="text-xs text-base-content/70"><%= t('pages.proposals.show.no_contributes') %></p>
         </div>
       <% end %>
     </div>
@@ -369,10 +369,10 @@
 
     <%# Authors %>
     <div class="bg-base-100 border-2 border-base-content/15 p-4">
-      <h4 class="text-[10px] font-bold text-base-content/30 uppercase tracking-wider mb-3">
+      <h3 class="text-xs font-bold text-base-content/70 uppercase tracking-wider mb-3">
         <i class="fa-solid fa-users"></i>
         <%= @proposal.abandoned? ? t('pages.proposals.show.old_editors_title') : t('pages.proposals.show.editors_title') %>
-      </h4>
+      </h3>
       <% if @proposal.abandoned? %>
         <div id="old_authors_list"><%= render partial: 'proposals/old_authors_list_panel' %></div>
       <% else %>
@@ -386,10 +386,10 @@
 
     <%# Dates %>
     <div id="dates" class="bg-base-100 border-2 border-base-content/15 p-4">
-      <h4 class="text-[10px] font-bold text-base-content/30 uppercase tracking-wider mb-3">
+      <h3 class="text-xs font-bold text-base-content/70 uppercase tracking-wider mb-3">
         <i class="fa-regular fa-calendar"></i>
         Date
-      </h4>
+      </h3>
       <%= render partial: 'proposals/dates' %>
     </div>
 
@@ -403,10 +403,10 @@
     <%# Tags %>
     <% if @proposal.tags.any? && ::Configuration.folksonomy %>
       <div class="bg-base-100 border-2 border-base-content/15 p-4">
-        <h4 class="text-[10px] font-bold text-base-content/30 uppercase tracking-wider mb-3">
+        <h3 class="text-xs font-bold text-base-content/70 uppercase tracking-wider mb-3">
           <i class="fa-solid fa-tags"></i>
           <%= t('pages.proposals.show.tags_title') %>
-        </h4>
+        </h3>
         <div class="flex flex-wrap gap-1">
           <% @proposal.tags.each do |tag| %>
             <%= link_to tag.text, tag_path(tag.text), class: 'badge badge-primary badge-sm font-bold' %>

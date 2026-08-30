@@ -4,7 +4,7 @@
 
 <% if @group && @group.enable_areas && @group.group_areas.length > 0 && ::Configuration.group_areas %>
   <div class="card bg-base-200 p-3 mb-2">
-    <h4 class="font-semibold mb-2"><%= t('pages.proposals.index.group_areas_title') %></h4>
+    <h3 class="font-semibold mb-2"><%= t('pages.proposals.index.group_areas_title') %></h3>
     <ul class="menu menu-sm">
       <li>
         <% if params[:group_area_id] %>
@@ -26,7 +26,7 @@
   </div>
 <% else %>
   <div class="card bg-base-200 p-3 mb-2">
-    <h4 class="font-semibold mb-2"><%= t('pages.proposals.index.territory') %></h4>
+    <h3 class="font-semibold mb-2"><%= t('pages.proposals.index.territory') %></h3>
     <%= form_tag current_url, method: :get do %>
       <% if @search.interest_border %>
         <%= select_tag :interest_border, options_for_select([[@search.interest_border.text, @search.interest_border.key]], @search.interest_border.key), title: t('buttons.search'), class: 'select select-bordered select-sm w-full interest_borders' %>
@@ -39,7 +39,7 @@
 
 <% if ::Configuration.proposal_categories %>
   <div class="card bg-base-200 p-3 mb-2">
-    <h4 class="font-semibold mb-2 <%= 'text-primary' if params[:category] %>"><%= t('pages.proposals.index.categories_title') %></h4>
+    <h3 class="font-semibold mb-2 <%= 'text-primary' if params[:category] %>"><%= t('pages.proposals.index.categories_title') %></h3>
     <ul class="menu menu-sm">
       <li>
         <% if params[:category] %>
@@ -66,7 +66,7 @@
 
 <% if @group %>
   <div class="card bg-base-200 p-3 mb-2">
-    <h4 class="font-semibold mb-2 <%= 'text-primary' if params[:type] %>"><%= t('pages.proposals.index.proposal_types_title') %></h4>
+    <h3 class="font-semibold mb-2 <%= 'text-primary' if params[:type] %>"><%= t('pages.proposals.index.proposal_types_title') %></h3>
     <ul class="menu menu-sm">
       <li>
         <% if params[:type] %>
@@ -92,7 +92,7 @@
 <% end %>
 
 <div class="card bg-base-200 p-3 mb-2">
-  <h4 class="font-semibold mb-2"><%= t('pages.proposals.left_panel.creation_date') %></h4>
+  <h3 class="font-semibold mb-2"><%= t('pages.proposals.left_panel.creation_date') %></h3>
   <ul class="menu menu-sm">
     <li><%= link_to t('pages.proposals.left_panel.any_date'), current_url(time: nil), class: 'menu_item', data: { type: 'w' } %></li>
     <li><%= link_to t('pages.proposals.left_panel.last_hour'), current_url({time: {start: (Time.now - 1.hour).to_i * 1000, end: Time.now.to_i * 1000, type: '1h'}}), class: 'menu_item', data: { type: '1h' } %></li>
@@ -108,12 +108,12 @@
   </ul>
 </div>
 
-<dialog id="choose_dates" class="modal">
+<dialog id="choose_dates" class="modal" aria-labelledby="choose-dates-title">
   <div class="modal-box">
     <form method="dialog">
-      <button class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2">✕</button>
+      <button class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2" aria-label="<%= t('buttons.close', default: 'Close') %>">✕</button>
     </form>
-    <h2 class="text-xl font-bold mb-4"><%= t('pages.proposals.left_panel.choose_creation_date') %></h2>
+    <h2 id="choose-dates-title" class="text-xl font-bold mb-4"><%= t('pages.proposals.left_panel.choose_creation_date') %></h2>
     <%= form_with url: (@group ? group_proposals_url(@group) : proposals_url), method: :get do |f| %>
       <%= hidden_field_tag :type, params[:type] if params[:type] %>
       <%= hidden_field_tag :category, params[:category] if params[:category] %>
@@ -142,7 +142,7 @@
 
 <% if @group && (can? :view_proposal, @group) %>
   <div class="card bg-base-200 p-3 mb-2">
-    <h4 class="font-semibold mb-2"><%= t('pages.proposals.index.search_title') %></h4>
+    <h3 class="font-semibold mb-2"><%= t('pages.proposals.index.search_title') %></h3>
     <%= render partial: 'search_form' %>
   </div>
 <% end %>

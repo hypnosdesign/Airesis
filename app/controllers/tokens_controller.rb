@@ -16,23 +16,17 @@ class TokensController < ApplicationController
       return
     end
 
-    @user = User.where(['lower(email) = :value', { value: email.downcase }]).first
+    @user = User.where(['lower(email) = :value', { value: email.to_s.strip.downcase }]).first
 
-    if @user.nil?
-      log_failed_sign_in
+    unless @user&.valid_password?(password)
+      log_failed_sign_in(@user)
       render status: 401, json: { message: 'Invalid email or password.' }
       return
     end
 
     # http://rdoc.info/github/plataformatec/devise/master/Devise/Models/TokenAuthenticatable
     @user.ensure_authentication_token!
-
-    if @user.valid_password? password
-      render status: 200, json: { token: @user.authentication_token }
-    else
-      log_failed_sign_in(@user)
-      render status: 401, json: { message: 'Invalid email or password.' }
-    end
+    render status: 200, json: { token: @user.authentication_token }
   end
 
   def destroy

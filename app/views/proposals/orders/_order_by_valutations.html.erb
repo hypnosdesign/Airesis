@@ -1,10 +1,10 @@
 <% if params[:view] == SearchProposal::ORDER_BY_VOTES %>
-  <span class="order_option sel">
-    <%= link_to t('pages.proposals.tabs.most_valutated'), current_url(action: :tab_list, view: SearchProposal::ORDER_BY_VOTES, order: params[:order] == 'a' ? nil : 'a'), title: "Ordina le proposte per numero di valutazioni ricevute", data: { disable_with: t('loading') } %>
+  <span class="order_option sel inline-flex min-h-11 items-center gap-2 border-2 border-primary bg-primary px-3 py-2 font-bold text-primary-content">
+    <%= link_to t('pages.proposals.tabs.most_valutated'), current_url(action: :index, view: SearchProposal::ORDER_BY_VOTES, order: params[:order] == 'a' ? nil : 'a'), title: t('pages.proposals.index.sort_ratings', default: 'Sort by number of ratings'), aria: { current: 'page' }, data: { disable_with: t('loading') } %>
     <%= order_arrow %>
   </span>
 <% else %>
-  <span class="order_option">
-    <%= link_to t('pages.proposals.tabs.most_valutated'), current_url(action: :tab_list, view: SearchProposal::ORDER_BY_VOTES), title: "Ordina le proposte per numero di valutazioni ricevute", data: { disable_with: t('loading') } %>
+  <span class="order_option inline-flex min-h-11 items-center border-2 border-base-content/20 px-3 py-2 hover:border-primary hover:text-primary">
+    <%= link_to t('pages.proposals.tabs.most_valutated'), current_url(action: :index, view: SearchProposal::ORDER_BY_VOTES), title: t('pages.proposals.index.sort_ratings', default: 'Sort by number of ratings'), data: { disable_with: t('loading') } %>
   </span>
 <% end %>

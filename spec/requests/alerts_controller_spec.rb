@@ -15,18 +15,17 @@ RSpec.describe AlertsController, seeds: true do
     context 'when authenticated' do
       before { sign_in user }
 
-      it 'returns 200 or 500' do
+      it 'returns the accessible notification inbox' do
         get alerts_path
-        expect([200, 500]).to include(response.status)
+        expect(response).to have_http_status(:ok)
+        expect(response.body.scan('<h1').size).to eq(1)
       end
 
       it 'returns JSON with alert data' do
         get alerts_path, headers: { 'Accept' => 'application/json' }
-        expect([200, 500]).to include(response.status)
-        if response.status == 200
-          json = JSON.parse(response.body)
-          expect(json).to have_key('count')
-        end
+        expect(response).to have_http_status(:ok)
+        json = JSON.parse(response.body)
+        expect(json).to have_key('count')
       end
     end
   end

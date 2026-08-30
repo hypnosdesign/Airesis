@@ -1,11 +1,11 @@
-<% @page_title = t('pages.registration.edit_title') rescue "Edit #{resource_name.to_s.humanize}" %>
+<% @page_title = t('pages.registration.edit_title') %>
 
 <%# — Hero Banner — %>
 <div class="bg-primary text-primary-content p-6 lg:p-8 mb-6 border-2 border-base-content/15 relative overflow-hidden">
   <i class="fa-solid fa-user-gear absolute right-6 top-1/2 -translate-y-1/2 text-[120px] opacity-10"></i>
   <div class="relative z-10">
     <h1 class="text-3xl lg:text-4xl font-extrabold"><%= @page_title %></h1>
-    <p class="text-primary-content/60 mt-1"><%= t('pages.registration.edit_subtitle', default: 'Gestisci il tuo profilo, la password e le impostazioni del tuo account.') %></p>
+    <p class="text-primary-content mt-1"><%= t('pages.registration.edit_subtitle') %></p>
   </div>
 </div>
 
@@ -30,14 +30,14 @@
           <i class="fa-solid fa-user"></i>
         </div>
         <div>
-          <h2 class="font-bold text-lg"><%= t('pages.registration.profile_section', default: 'Profilo') %></h2>
-          <p class="text-[11px] text-base-content/40"><%= t('pages.registration.profile_desc', default: 'Le tue informazioni di base.') %></p>
+          <h2 class="font-bold text-lg"><%= t('pages.registration.profile_section') %></h2>
+          <p class="text-xs text-base-content/70"><%= t('pages.registration.profile_desc') %></p>
         </div>
       </div>
 
       <fieldset class="fieldset mb-4">
-        <label class="fieldset-label font-medium">Email</label>
-        <%= f.email_field :email, class: 'input input-bordered w-full' %>
+        <%= f.label :email, t('activerecord.attributes.user.email'), class: 'fieldset-label font-medium' %>
+        <%= f.email_field :email, class: 'input input-bordered w-full min-h-11', autocomplete: 'email' %>
       </fieldset>
     </div>
 
@@ -48,19 +48,19 @@
           <i class="fa-solid fa-lock"></i>
         </div>
         <div>
-          <h2 class="font-bold text-lg"><%= t('pages.registration.password_section', default: 'Password') %></h2>
-          <p class="text-[11px] text-base-content/40"><%= t('pages.registration.password_desc', default: 'Lascia vuoto se non vuoi cambiarla.') %></p>
+          <h2 class="font-bold text-lg"><%= t('pages.registration.password_section') %></h2>
+          <p class="text-xs text-base-content/70"><%= t('pages.registration.password_desc') %></p>
         </div>
       </div>
 
       <fieldset class="fieldset mb-4">
-        <label class="fieldset-label font-medium"><%= t('pages.registration.new_password', default: 'Nuova password') %></label>
-        <%= f.password_field :password, class: 'input input-bordered w-full' %>
+        <%= f.label :password, t('pages.registration.new_password'), class: 'fieldset-label font-medium' %>
+        <%= f.password_field :password, class: 'input input-bordered w-full min-h-11', autocomplete: 'new-password' %>
       </fieldset>
 
       <fieldset class="fieldset">
-        <label class="fieldset-label font-medium"><%= t('pages.registration.confirm_password', default: 'Conferma password') %></label>
-        <%= f.password_field :password_confirmation, class: 'input input-bordered w-full' %>
+        <%= f.label :password_confirmation, t('pages.registration.confirm_password'), class: 'fieldset-label font-medium' %>
+        <%= f.password_field :password_confirmation, class: 'input input-bordered w-full min-h-11', autocomplete: 'new-password' %>
       </fieldset>
     </div>
   </div>
@@ -72,18 +72,18 @@
         <i class="fa-solid fa-shield-halved"></i>
       </div>
       <div>
-        <h2 class="font-bold text-lg"><%= t('pages.registration.confirm_section', default: 'Conferma modifiche') %></h2>
-        <p class="text-[11px] text-base-content/40"><%= t('pages.registration.confirm_desc', default: 'Inserisci la password attuale per salvare le modifiche.') %></p>
+        <h2 class="font-bold text-lg"><%= t('pages.registration.confirm_section') %></h2>
+        <p class="text-xs text-base-content/70"><%= t('pages.registration.confirm_desc') %></p>
       </div>
     </div>
 
     <div class="max-w-md">
       <fieldset class="fieldset mb-4">
-        <label class="fieldset-label font-medium"><%= t('pages.registration.current_password', default: 'Password attuale') %></label>
-        <%= f.password_field :current_password, class: 'input input-bordered w-full' %>
+        <%= f.label :current_password, t('pages.registration.current_password'), class: 'fieldset-label font-medium' %>
+        <%= f.password_field :current_password, class: 'input input-bordered w-full min-h-11', autocomplete: 'current-password' %>
       </fieldset>
 
-      <%= f.submit t('buttons.save', default: 'Salva'), class: 'btn btn-primary font-bold w-full' %>
+      <%= f.submit t('buttons.save'), class: 'btn btn-primary min-h-11 font-bold w-full' %>
     </div>
   </div>
 <% end %>
@@ -95,16 +95,16 @@
       <i class="fa-solid fa-triangle-exclamation"></i>
     </div>
     <div>
-      <h2 class="font-bold text-lg text-error"><%= t('pages.registration.danger_zone', default: 'Zona pericolosa') %></h2>
-      <p class="text-[11px] text-base-content/40"><%= t('pages.registration.danger_desc', default: 'Questa azione e irreversibile. Il tuo account sara eliminato permanentemente.') %></p>
+      <h2 class="font-bold text-lg ui-danger-text"><%= t('pages.registration.danger_zone') %></h2>
+      <p class="text-xs text-base-content/70"><%= t('pages.registration.danger_desc') %></p>
     </div>
   </div>
-  <%= link_to registration_path(resource_name), data: { turbo_confirm: t('pages.registration.cancel_confirm', default: 'Sei sicuro? Questa azione non puo essere annullata.'), turbo_method: :delete }, class: 'btn btn-outline btn-error font-bold' do %>
+  <%= link_to registration_path(resource_name), data: { turbo_confirm: t('pages.registration.cancel_confirm'), turbo_method: :delete }, class: 'btn btn-outline btn-error font-bold' do %>
     <i class="fa-solid fa-trash mr-1"></i>
-    <%= t('pages.registration.cancel_account', default: 'Elimina il mio account') %>
+    <%= t('pages.registration.cancel_account') %>
   <% end %>
 </div>
 
 <div class="mt-6">
-  <%= link_to t('buttons.back', default: 'Indietro'), :back, class: 'btn btn-outline font-bold' %>
+  <%= link_to t('buttons.back'), user_path(resource), class: 'btn btn-outline font-bold' %>
 </div>

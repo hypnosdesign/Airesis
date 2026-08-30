@@ -1,2 +1,20 @@
-<div id="airesis_p_<%= @proposal.id %>"></div>
-<script type="text/javascript" src="<%= banner_proposal_url(@proposal) %>"></script>
+<% @page_title = t('pages.proposals.banner.preview_title', default: 'Proposal banner preview') %>
+
+<div class="mx-auto max-w-4xl space-y-6">
+  <header>
+    <p class="mb-2 text-sm font-bold uppercase tracking-wide text-primary"><%= t('pages.proposals.banner.kicker', default: 'Proposal on %{app}', app: APP_SHORT_NAME) %></p>
+    <h1 class="text-2xl font-extrabold sm:text-3xl"><%= @page_title %></h1>
+    <p class="mt-2 max-w-2xl text-sm text-base-content/70">
+      <%= t('pages.proposals.banner.preview_help', default: 'This is how the compact proposal banner adapts to the available width.') %>
+    </p>
+  </header>
+
+  <section aria-labelledby="banner-preview-heading" class="border-2 border-base-content/15 bg-base-200 p-4 sm:p-6">
+    <h2 id="banner-preview-heading" class="sr-only"><%= t('pages.proposals.banner.preview', default: 'Banner preview') %></h2>
+    <%= render partial: 'banner' %>
+  </section>
+
+  <div>
+    <%= link_to t('buttons.back', default: 'Back to proposal'), @proposal.private ? group_proposal_path(@proposal.groups.first, @proposal) : proposal_path(@proposal), class: 'btn btn-outline' %>
+  </div>
+</div>

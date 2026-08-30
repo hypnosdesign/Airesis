@@ -54,6 +54,7 @@ docs/
 CLAUDE.md
 DESIGNSYSTEM.md
 llms.md
+.impeccable/hook.cache.json
 
 # Cookie jar curl (dati di sessione locali)
 cookie_jar

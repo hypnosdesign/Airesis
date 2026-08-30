@@ -1,32 +1,32 @@
 <div class="card bg-base-200 p-4" data-ijs="settings-menu">
-  <h4 class="font-bold mb-2"><%= t('pages.users.left_panel.title') %></h4>
+  <h2 class="font-bold mb-2"><%= t('pages.users.left_panel.title') %></h2>
   <ul class="menu">
     <li class="general_info">
-      <%= link_to user_url(current_user) do %>
+      <%= link_to user_path(current_user), class: ('active font-semibold' if current_page?(user_path(current_user))), aria: { current: ('page' if current_page?(user_path(current_user))) } do %>
         <i class="fa-solid fa-gears"></i>
         <%= t('pages.users.left_panel.general_info') %>
       <% end %>
     </li>
     <li class="alarm_and_notifications">
-      <%= link_to alarm_preferences_users_url do %>
+      <%= link_to alarm_preferences_users_path, class: ('active font-semibold' if current_page?(alarm_preferences_users_path)), aria: { current: ('page' if current_page?(alarm_preferences_users_path)) } do %>
         <i class="fa-solid fa-bell"></i>
         <%= t('pages.users.left_panel.alarm_and_notifications') %>
       <% end %>
     </li>
     <li class="geographic_borders">
-      <%= link_to border_preferences_users_url do %>
+      <%= link_to border_preferences_users_path, class: ('active font-semibold' if current_page?(border_preferences_users_path)), aria: { current: ('page' if current_page?(border_preferences_users_path)) } do %>
         <i class="fa-solid fa-image"></i>
         <%= t('pages.users.left_panel.geographic_borders') %>
       <% end %>
     </li>
     <li class="account_and_policy">
-      <%= link_to privacy_preferences_users_url do %>
+      <%= link_to privacy_preferences_users_path, class: ('active font-semibold' if current_page?(privacy_preferences_users_path)), aria: { current: ('page' if current_page?(privacy_preferences_users_path)) } do %>
         <i class="fa-solid fa-key"></i>
         <%= t('pages.users.left_panel.account_and_privacy') %>
       <% end %>
     </li>
     <li class="statistics">
-      <%= link_to statistics_users_url do %>
+      <%= link_to statistics_users_path, class: ('active font-semibold' if current_page?(statistics_users_path)), aria: { current: ('page' if current_page?(statistics_users_path)) } do %>
         <i class="fa-solid fa-chart-bar"></i>
         <%= t('pages.users.left_panel.statistics') %>
       <% end %>

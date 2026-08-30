@@ -30,25 +30,39 @@ RSpec.describe UsersController, seeds: true do
     # guests can show users (can :show, User in guest ability)
     it 'returns a response for unauthenticated visitors' do
       get user_path(other_user)
-      expect([200, 500]).to include(response.status)
+      expect(response).to have_http_status(:ok)
     end
 
     it 'returns a response for an authenticated user viewing another profile' do
       sign_in user
       get user_path(other_user)
-      expect([200, 500]).to include(response.status)
+      expect(response).to have_http_status(:ok)
     end
 
     it 'returns a response for an authenticated user viewing their own profile' do
       sign_in user
       get user_path(user)
-      expect([200, 500]).to include(response.status)
+      expect(response).to have_http_status(:ok)
     end
 
     it 'includes the user name in the response body' do
       sign_in user
       get user_path(other_user)
       expect(response.body).to include(other_user.name) if response.status == 200
+    end
+  end
+
+  describe 'GET edit' do
+    it 'redirects the owner to the inline profile editor' do
+      sign_in user
+      get edit_user_path(user)
+      expect(response).to redirect_to(user_path(user))
+    end
+
+    it 'does not let a user open another account editor' do
+      sign_in user
+      get edit_user_path(other_user)
+      expect(response).to have_http_status(:forbidden)
     end
   end
 
@@ -93,7 +107,8 @@ RSpec.describe UsersController, seeds: true do
     it 'returns a response for an authenticated user' do
       sign_in user
       get alarm_preferences_users_path
-      expect([200, 500]).to include(response.status)
+      expect(response).to have_http_status(:ok)
+      expect(response.body).to include('Alarm and notifications')
     end
   end
 
@@ -106,7 +121,8 @@ RSpec.describe UsersController, seeds: true do
     it 'returns a response for an authenticated user' do
       sign_in user
       get privacy_preferences_users_path
-      expect([200, 500]).to include(response.status)
+      expect(response).to have_http_status(:ok)
+      expect(response.body).to include('Account and privacy')
     end
   end
 
@@ -119,7 +135,10 @@ RSpec.describe UsersController, seeds: true do
     it 'returns a response for an authenticated user' do
       sign_in user
       get statistics_users_path
-      expect([200, 500]).to include(response.status)
+      expect(response).to have_http_status(:ok)
+      expect(response.body).not_to include('NaN')
+      expect(response.body).to include('Account activity', 'Contributions', 'Proposals', 'Writing quality')
+      expect(response.body).not_to match(/\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2} [+-]\d{4}/)
     end
   end
 
@@ -132,7 +151,7 @@ RSpec.describe UsersController, seeds: true do
     it 'returns a response for an authenticated user' do
       sign_in user
       get show_message_user_path(other_user)
-      expect([200, 500]).to include(response.status)
+      expect(response).to have_http_status(:ok)
     end
   end
 
@@ -145,7 +164,8 @@ RSpec.describe UsersController, seeds: true do
     it 'returns 200 for an authenticated user' do
       sign_in user
       get border_preferences_users_path
-      expect([200, 500]).to include(response.status)
+      expect(response).to have_http_status(:ok)
+      expect(response.body).to include('Geographic borders')
     end
   end
 

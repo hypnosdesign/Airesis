@@ -31,14 +31,6 @@ RSpec.describe Taggable, seeds: true do
     end
   end
 
-  describe '#tags_with_links' do
-    it 'returns HTML links for each tag' do
-      result = proposal.tags_with_links
-      expect(result).to include('<a href="/tags/')
-      expect(result).to include('ruby')
-    end
-  end
-
   describe '#save_tags' do
     it 'creates tags from the tags_list string' do
       new_proposal = create(:public_proposal, current_user_id: user.id, tags_list: 'newtag1,newtag2')

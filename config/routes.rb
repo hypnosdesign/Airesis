@@ -65,7 +65,7 @@ Rails.application.routes.draw do
     resources :proposal_revisions
     resources :proposal_lives
     resources :proposal_supports
-    resources :proposal_presentations
+    resources :proposal_presentations, only: :destroy
 
     resources :blocked_proposal_alerts do
       collection do
@@ -106,10 +106,9 @@ Rails.application.routes.draw do
     end
   end
 
-  resources :alerts do
+  resources :alerts, only: [:index] do
     member do
       get :check
-      get :check_alert
     end
 
     collection do
@@ -118,8 +117,8 @@ Rails.application.routes.draw do
     end
   end
 
-  resources :interest_borders
-  resources :municipalities
+  resources :interest_borders, only: [:index], defaults: { format: :json }
+  resources :municipalities, only: [:index], defaults: { format: :json }
 
   get 'elfinder' => 'elfinder#elfinder'
   post 'elfinder' => 'elfinder#elfinder'
@@ -130,7 +129,7 @@ Rails.application.routes.draw do
     get '/users/auth/:provider' => 'users/omniauth_callbacks#passthru'
   end
 
-  resources :users do
+  resources :users, only: %i[index show edit update] do
     collection do
       get :confirm_credentials
       get :alarm_preferences
@@ -154,7 +153,7 @@ Rails.application.routes.draw do
     resources :authentications
   end
 
-  resources :notifications do
+  resources :notifications, only: [:index] do
     collection do
       post :change_notification_block
       post :change_email_notification_block
@@ -234,10 +233,6 @@ Rails.application.routes.draw do
         post 'login' => 'sessions#create', as: :login
       end
     end
-  end
-
-  resources :proposal_categories do
-    get :index, scope: :collection
   end
 
   resources :groups do
@@ -329,7 +324,7 @@ Rails.application.routes.draw do
 
     concerns :participation_roles
 
-    resources :search_participants
+    resources :search_participants, only: :create
 
     resources :proposals do
       collection do

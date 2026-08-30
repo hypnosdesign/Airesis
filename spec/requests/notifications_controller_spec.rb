@@ -7,6 +7,19 @@ RSpec.describe NotificationsController, seeds: true do
   # Find any seeded notification type to use as the :id param
   let(:notification_type_id) { NotificationType.first.id }
 
+  describe 'GET index' do
+    it 'redirects authenticated users to the alerts inbox' do
+      sign_in user
+      get notifications_path
+      expect(response).to redirect_to(alerts_path)
+    end
+
+    it 'requires authentication' do
+      get notifications_path
+      expect(response).to redirect_to(new_user_session_path)
+    end
+  end
+
   describe 'POST change_notification_block' do
     context 'when not authenticated' do
       it 'redirects to sign in' do

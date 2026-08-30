@@ -39,14 +39,6 @@ module Taggable
 
   attr_writer :tags_list
 
-  # HTML con i tag come link cliccabili alla pagina di listing per tag.
-  # Restituisce HTML non escaped — usare solo in contesti trusted (view ERB con `html_safe`).
-  #
-  # @return [String] HTML
-  def tags_with_links
-    tags.collect { |t| "<a href=\"/tags/#{t.text.strip}\">#{t.text.strip}</a>" }.join(', ')
-  end
-
   # Sincronizza i tag del record dalla stringa `@tags_list` (assegnata dal form).
   # Normalizza ogni tag: trim, lowercase, rimozione punti.
   # Usa `find_or_create_by` per evitare duplicati: i tag sono condivisi tra tutti i record.

@@ -1,38 +1,30 @@
-<h2>Cookie Policy</h2>
+<div class="article-body">
+  <p class="text-sm text-base-content/70">
+    Technical cookie behavior reviewed against this application build on 29 August 2026. This note describes the software behavior; the service owner remains responsible for legal approval and deployment-specific additions.
+  </p>
 
-<h4>About cookies</h4>
-<p>
-  This website uses cookies. By using this website and agreeing to this policy, you consent to Airesis the use of
-  cookies in accordance with the terms of this policy.
-  Cookies are files sent by web servers to web browsers, and stored by the web browsers.
-  The information is then sent back to the server each time the browser requests a page from the server.
-  This enables a web server to identify and track web browsers.
-  There are two main kinds of cookies: session cookies and persistent cookies.
-  Session cookies are deleted from your computer when you close your browser, whereas persistent cookies
-  remain stored on your computer until deleted, or until they reach their expiry date.
-</p>
+  <h2>Essential cookies</h2>
+  <p>
+    This application uses essential cookies to keep a signed-in session active, protect forms against forged requests, retain the selected language and remember interface preferences. These cookies support features requested by the user and are not an advertising profile.
+  </p>
+  <p>
+    Session cookies normally expire when the browser session ends. A small number of preference cookies can remain longer so the interface does not ask for the same setting on every visit.
+  </p>
 
-<h4>Cookies on our website</h4>
-<p>
-  Airesis uses the following cookies on this website, for the following purposes:
-  Keep you session active
-  Remember if you already saw an advice so we don't show it everytime
-</p>
+  <h2>Optional analytics</h2>
+  <p>
+    The current application code does not load an optional analytics script. If an instance operator adds analytics or another third-party tracker, that operator must update this page and provide an appropriate choice before enabling it.
+  </p>
 
-<h4>Google cookies</h4>
-<p>
-  Airesis uses Google Analytics to analyse the use of this website.
-  Google Analytics generates statistical and other information about website use by means of cookies, which are stored on users' computers.
-  The information generated relating to our website is used to create reports about the use of the website.
-  Google will store and use this information.
-  Google's privacy policy is available at: http://www.google.com/privacypolicy.html.
-</p>
+  <h2>Manage cookies</h2>
+  <p>
+    You can inspect, delete or block cookies in your browser privacy settings. Blocking essential cookies can prevent sign-in, form submission and saved preferences from working correctly.
+  </p>
 
-<h4>Refusing cookies</h4>
-<p>Most browsers allow you to refuse to accept cookies.</p>
-<p>In Internet Explorer, you can refuse all cookies by clicking "Tools", "Internet Options", "Privacy", and selecting "Block all cookies" using the sliding selector.</p>
-<p>In Firefox, you can adjust your cookies settings by clicking "Tools", "Options" and "Privacy".</p>
-<p>Blocking cookies will have a negative impact upon the usability of some websites.</p>
-
-<h4>Credit</h4>
-<p>This document was created using a Contractology template available at http://www.freenetlaw.com.</p>
+  <h2>Questions</h2>
+  <% if service_contact_email.present? %>
+    <p>For questions about this instance, contact <%= mail_to service_contact_email %> before continuing.</p>
+  <% else %>
+    <p>The service operator has not configured a public contact address for this environment.</p>
+  <% end %>
+</div>

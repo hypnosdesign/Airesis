@@ -1,8 +1,17 @@
-<dialog id="language" class="modal">
+<dialog id="language"
+        class="modal"
+        aria-labelledby="language_modal_title"
+        data-controller="modal"
+        data-modal-open-on-connect-value="false"
+        data-modal-remove-on-close-value="false">
   <div class="modal-box bg-base-100 max-w-3xl">
     <form method="dialog">
-      <button class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2">✕</button>
+      <button class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2"
+              aria-label="<%= t('buttons.close') %>"
+              data-modal-target="initialFocus">✕</button>
     </form>
+
+    <h2 id="language_modal_title" class="mb-4 pr-12 text-xl font-bold"><%= t('pages.home.index.change_language') %></h2>
 
     <div class="tabs tabs-border mb-4">
       <input type="radio" name="lang_tabs" class="tab" aria-label="Europe" checked>

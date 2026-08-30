@@ -20,7 +20,9 @@ class HomeController < ApplicationController
     render 'open_space'
   end
 
-  def landing; end
+  def landing
+    redirect_to root_path
+  end
 
   def intro; end
 

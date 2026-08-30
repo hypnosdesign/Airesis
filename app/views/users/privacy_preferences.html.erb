@@ -1,29 +1,35 @@
 <% @page_title = t('pages.user.privacy') %>
 
-<%= render layout: "layouts/page_title", locals: { title: t('pages.user.privacy') } do %>
-  <div class="card bg-base-200 p-4 mb-4">
-    <h2 class="text-lg font-bold mb-2"><%= t('pages.users.privacy_preferences.options') %></h2>
+<div class="space-y-6">
+  <header>
+    <p class="text-xs font-bold uppercase tracking-widest text-[var(--ui-link-color)] mb-2"><%= t('pages.users.left_panel.title') %></p>
+    <h1 class="text-3xl font-extrabold"><%= @page_title %></h1>
+    <p class="mt-2 max-w-2xl text-sm text-base-content/75"><%= t('pages.users.privacy_preferences.description', default: 'Manage account behavior, security, language and connected sign-in providers.') %></p>
+  </header>
+
+  <section class="bg-base-100 border-2 border-base-content/15 p-5 sm:p-6" aria-labelledby="preference-options-title">
+    <h2 id="preference-options-title" class="text-lg font-bold mb-2"><%= t('pages.users.privacy_preferences.options') %></h2>
     <div class="flex flex-col gap-2">
-      <label class="tooltips flex items-center gap-2">
-        <%= check_box :user, :show_tooltips, value: current_user.show_tooltips, onclick: "return change_show_tooltips(this);" %>
+      <label class="tooltips flex min-h-11 items-center gap-3">
+        <%= check_box :user, :show_tooltips, value: current_user.show_tooltips, class: 'toggle toggle-primary', onclick: "return change_show_tooltips(this);" %>
         <%= t('pages.users.privacy_preferences.tooltips') %>
       </label>
       <% if ::Configuration::socialnetwork_active %>
-        <label class="show_urls flex items-center gap-2">
-          <%= check_box :user, :show_urls, value: current_user.show_urls, onclick: "return change_show_urls(this);" %>
+        <label class="show_urls flex min-h-11 items-center gap-3">
+          <%= check_box :user, :show_urls, value: current_user.show_urls, class: 'toggle toggle-primary', onclick: "return change_show_urls(this);" %>
           <%= t('pages.users.privacy_preferences.show_urls') %>
         </label>
       <% end %>
       <% if ::Configuration::user_messages %>
-        <label class="messages flex items-center gap-2">
-          <%= check_box :user, :receive_messages, value: current_user.receive_messages, onclick: "return change_receive_messages(this);" %>
+        <label class="messages flex min-h-11 items-center gap-3">
+          <%= check_box :user, :receive_messages, value: current_user.receive_messages, class: 'toggle toggle-primary', onclick: "return change_receive_messages(this);" %>
           <%= t('pages.users.privacy_preferences.private_messages') %>
         </label>
       <% end %>
       <% if ::Configuration.rotp %>
         <h2 class="text-lg font-bold mt-4 mb-2"><%= t('pages.users.privacy_preferences.rotp_title') %></h2>
-        <label class="rotp flex items-center gap-2">
-          <%= check_box :user, :rotp_enabled, value: current_user.rotp_enabled, onclick: "return change_rotp_enabled(this);" %>
+        <label class="rotp flex min-h-11 items-center gap-3">
+          <%= check_box :user, :rotp_enabled, value: current_user.rotp_enabled, class: 'toggle toggle-primary', onclick: "return change_rotp_enabled(this);" %>
           <%= t('pages.users.privacy_preferences.rotp') %>
         </label>
         <div id="rotp_container">
@@ -31,23 +37,25 @@
         </div>
       <% end %>
     </div>
-  </div>
+  </section>
 
-  <div class="card bg-base-200 p-4 mb-4">
-    <h2 class="text-lg font-bold mb-2"><%= t('pages.users.privacy_preferences.mail_language') %></h2>
+  <section class="bg-base-100 border-2 border-base-content/15 p-5 sm:p-6" aria-labelledby="mail-language-title">
+    <h2 id="mail-language-title" class="text-lg font-bold mb-2"><%= t('pages.users.privacy_preferences.mail_language') %></h2>
     <div class="email_locale mb-4">
-      <%= select_tag 'locale', options_for_select(SysLocale.all.collect { |p| [I18n.t("db.sys_locales.#{p.key}.description"), p.id] }, selected: current_user.sys_locale_id), class: 'select select-bordered' %>
+      <label for="locale" class="sr-only"><%= t('pages.users.privacy_preferences.mail_language') %></label>
+      <%= select_tag 'locale', options_for_select(SysLocale.all.collect { |p| [I18n.t("db.sys_locales.#{p.key}.description"), p.id] }, selected: current_user.sys_locale_id), class: 'select select-bordered min-h-11 w-full max-w-md' %>
     </div>
-    <h2 class="text-lg font-bold mb-2"><%= t('pages.users.privacy_preferences.time_zone') %></h2>
+    <h2 id="time-zone-title" class="text-lg font-bold mb-2"><%= t('pages.users.privacy_preferences.time_zone') %></h2>
     <div class="time_zone">
-      <%= select_tag 'time_zone', options_for_select(ActiveSupport::TimeZone.all.collect { |p| [p, p.name] }, selected: current_user.time_zone), class: 'select select-bordered' %>
+      <label for="time_zone" class="sr-only"><%= t('pages.users.privacy_preferences.time_zone') %></label>
+      <%= select_tag 'time_zone', options_for_select(ActiveSupport::TimeZone.all.collect { |p| [p, p.name] }, selected: current_user.time_zone), class: 'select select-bordered min-h-11 w-full max-w-md' %>
     </div>
-  </div>
+  </section>
 
-  <div class="card bg-base-200 p-4 mb-4">
+  <section class="bg-base-100 border-2 border-base-content/15 p-5 sm:p-6" aria-labelledby="connected-accounts-title">
     <% if ::Configuration::socialnetwork_active %>
-      <h2 class="text-lg font-bold mb-2"><%= t('pages.users.privacy_preferences.join_accounts') %></h2>
-      <h5 class="mb-4"><%= raw t('pages.users.privacy_preferences.join_accounts_description', app_short_name: APP_SHORT_NAME) %></h5>
+      <h2 id="connected-accounts-title" class="text-lg font-bold mb-2"><%= t('pages.users.privacy_preferences.join_accounts') %></h2>
+      <p class="mb-4 text-sm text-base-content/75"><%= sanitize t('pages.users.privacy_preferences.join_accounts_description', app_short_name: APP_SHORT_NAME) %></p>
       <% authentications = current_user.authentications %>
       <% alreadyproviders = current_user.authentications.pluck(:provider) %>
       <% if alreadyproviders.size == 3 %>
@@ -55,19 +63,19 @@
       <% end %>
       <div class="providers flex flex-col gap-2 mb-4">
         <% unless alreadyproviders.include? Authentication::FACEBOOK %>
-          <%= link_to omniauth_authorize_path(:user, :facebook), class: 'btn btn-sm' do %>
+          <%= link_to omniauth_authorize_path(:user, :facebook), class: 'btn min-h-11' do %>
             <i class="fa-brands fa-facebook fa-social"></i>
             <%= t('pages.users.privacy_preferences.join_facebook') %>
           <% end %>
         <% end %>
         <% unless alreadyproviders.include? Authentication::GOOGLE %>
-          <%= link_to omniauth_authorize_path(:user, :google_oauth2), class: 'btn btn-sm' do %>
+          <%= link_to omniauth_authorize_path(:user, :google_oauth2), class: 'btn min-h-11' do %>
             <i class="fa-brands fa-google fa-social"></i>
             <%= t('pages.users.privacy_preferences.join_google') %>
           <% end %>
         <% end %>
         <% unless alreadyproviders.include? Authentication::TWITTER %>
-          <%= link_to omniauth_authorize_path(:user, :twitter), class: 'btn btn-sm' do %>
+          <%= link_to omniauth_authorize_path(:user, :twitter), class: 'btn min-h-11' do %>
             <i class="fa-brands fa-twitter fa-social"></i>
             <%= t('pages.users.privacy_preferences.join_twitter') %>
           <% end %>
@@ -85,16 +93,19 @@
               <i class="fa-brands fa-twitter fa-social"></i> Twitter
             <% end %>
             <% if @user.email %>
-              <%= link_to t('buttons.detach'), [@user, authentication], data: { turbo_method: :delete, turbo_confirm: t('confirm_detach') }, class: 'btn btn-sm btn-error' %>
+              <%= link_to t('buttons.detach'), [@user, authentication], data: { turbo_method: :delete, turbo_confirm: t('confirm_detach') }, class: 'btn btn-error min-h-11' %>
             <% else %>
-              <%= link_to t('buttons.detach'), '#', data: { detach_disabled: true }, class: 'btn btn-sm btn-disabled' %>
+              <%= link_to t('buttons.detach'), '#', data: { detach_disabled: true }, class: 'btn btn-disabled min-h-11' %>
             <% end %>
           </div>
         <% end %>
       <% end %>
+    <% else %>
+      <h2 id="connected-accounts-title" class="text-lg font-bold"><%= t('pages.users.privacy_preferences.join_accounts') %></h2>
+      <p class="mt-2 text-sm text-base-content/75"><%= t('pages.users.privacy_preferences.providers_unavailable', default: 'External sign-in providers are not enabled on this instance.') %></p>
     <% end %>
-  </div>
-<% end %>
+  </section>
+</div>
 
 <% if can?(:change_rotp_enabled, current_user) %>
   <% _rotp_js = "var confirm_msg = el.checked ? \"#{j t('pages.users.privacy_preferences.rotp_confirm_enable')}\" : '#{j t('pages.users.privacy_preferences.rotp_confirm_disable')}'; if (!confirm(confirm_msg)) { return false; } postPreference('/users/change_rotp_enabled', { active: el.checked ? 'true' : 'false' }); " %>

@@ -1,32 +1,32 @@
 <% @page_title = t("pages.confirmation.title") %>
 
 <main class="flex-1 flex items-center justify-center px-4 py-12">
-  <div class="flex w-full max-w-5xl bg-base-100 shadow-xl overflow-hidden">
+  <div class="auth-card">
 
     <%# — Left: illustration — %>
     <div class="hidden lg:flex flex-1 bg-primary/10 items-center justify-center p-12">
       <div class="text-center">
         <i class="fa-solid fa-envelope-circle-check text-[120px] text-primary/30"></i>
-        <h2 class="text-2xl font-bold text-primary mt-6"><%= t('pages.confirmation.illustration_title', default: 'Conferma il tuo account') %></h2>
-        <p class="text-base-content/50 mt-2 max-w-xs mx-auto"><%= t('pages.confirmation.illustration_desc', default: 'Inserisci la tua email per ricevere nuovamente le istruzioni di conferma.') %></p>
+        <p class="text-2xl font-bold text-primary mt-6"><%= t('pages.confirmation.illustration_title', default: 'Confirm your account') %></p>
+        <p class="auth-copy mt-2 max-w-xs mx-auto"><%= t('pages.confirmation.illustration_desc', default: 'Request a fresh confirmation link for your email address.') %></p>
       </div>
     </div>
 
     <%# — Right: form — %>
     <div class="flex-1 p-8 sm:p-12 lg:p-16">
       <h1 class="text-3xl font-extrabold mb-2"><%= @page_title %></h1>
-      <p class="text-base-content/50 mb-8"><%= t('pages.confirmation.subtitle', default: 'Ricevi nuovamente le istruzioni per confermare il tuo account.') %></p>
+      <p class="auth-copy mb-8"><%= t('pages.confirmation.subtitle', default: 'We will send new confirmation instructions to your inbox.') %></p>
 
       <%= simple_form_for(@user, url: user_confirmation_path, html: { class: 'space-y-5', data: { turbo_method: :post } }) do |f| %>
         <%= render partial: 'fragments/error_messages', locals: { resource: @user } %>
 
         <fieldset class="fieldset">
-          <label class="fieldset-label font-medium"><%= t('activerecord.attributes.user.email') %></label>
-          <%= f.input_field :email, required: true, placeholder: 'nome@esempio.it',
+          <%= f.label :email, t('activerecord.attributes.user.email'), class: 'fieldset-label font-medium' %>
+          <%= f.input_field :email, required: true, autocomplete: 'email', placeholder: 'name@example.com',
               class: 'input input-bordered w-full' %>
         </fieldset>
 
-        <button type="submit" class="btn btn-primary w-full font-bold text-base mt-2">
+        <button type="submit" class="btn btn-primary min-h-11 h-auto w-full whitespace-normal py-2 font-bold text-base mt-2">
           <i class="fa-solid fa-paper-plane mr-2"></i>
           <%= t("pages.confirmation.submit") %>
         </button>

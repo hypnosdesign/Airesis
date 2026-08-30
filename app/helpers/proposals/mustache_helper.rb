@@ -48,17 +48,13 @@ module Proposals
                                        interest_border: (proposal.interest_borders.first.territory.description if proposal.interest_borders.any?),
                                        type_description: proposal.proposal_type.description.upcase,
                                        group_image_tag: proposal_group_image_tag(proposal),
-                                       status: proposal_status(proposal),
+                                       status: strip_tags(proposal_status(proposal)),
                                        short_content: proposal.short_content,
                                        vote_url: (proposal.private ? group_proposal_url(proposal.groups.first, proposal) : proposal_url(proposal)),
-                                       title_link: link_to_proposal(proposal, style: (proposal.rejected? ? 'text-decoration: line-through;' : ''), title: proposal.title))
-      ret[:mustache][:images] = {
-        time_description: (image_tag 'plist/stopwatch.png'),
-        group_participants: (image_tag 'group_participants.png'),
-        group_proposals: (image_tag 'group_proposals.png'),
-        rank: (image_tag 'plist/gradimento.png'),
-        place: (image_tag 'place.png')
-      }
+                                       title_link: link_to_proposal(proposal,
+                                                                    class: 'text-lg font-bold leading-snug text-base-content hover:text-primary hover:underline',
+                                                                    style: (proposal.rejected? ? 'text-decoration: line-through;' : ''),
+                                                                    title: proposal.title))
       ret[:mustache][:texts].merge!(
         conditions_left: t('pages.proposals.list.condition_left').upcase,
         time_left: t('pages.proposals.list.time_left').upcase,
@@ -66,6 +62,8 @@ module Proposals
         rank: t('pages.proposals.index.rank'),
         participants_number: t('pages.proposals.index.participants_number'),
         contributes_number: t('pages.proposals.index.contributes_number'),
+        territory: t('pages.proposals.list.interest_borders'),
+        notifications: t('pages.header.notifications', default: 'Notifications'),
         vote: t('pages.proposals.list.vote')
       )
       ret[:mustache][:current_user] = {
@@ -81,9 +79,14 @@ module Proposals
     def section_for_mustache(section, i)
       { mustache: {
         section: { id: i,
+                   expanded: i.zero?,
+                   recordId: section.id,
                    seq: section.seq,
                    removeSection: t('pages.proposals.edit.remove_section'),
+                   editSection: t('pages.proposals.edit.edit_section', default: 'Edit section'),
                    title: section.title,
+                   titleLabel: t('pages.proposals.edit.section_title', default: 'Section title'),
+                   contentLabel: t('pages.proposals.edit.section_content', title: section.title, default: 'Content for %{title}'),
                    paragraphId: section.paragraph.id,
                    content: section.paragraph.content,
                    contentDirty: section.paragraph.content_dirty,
@@ -92,15 +95,19 @@ module Proposals
     end
 
     def solution_for_mustache(solution, i)
-      title_interpolation = "pages.proposals.edit.new_solution_title.#{solution.proposal.proposal_type.name.downcase}"
-      placeholder_interpolation = "pages.proposals.edit.insert_title.#{solution.proposal.proposal_type.name.downcase}"
+      proposal_type = solution.proposal.proposal_type.name.downcase
+      title_interpolation = "pages.proposals.edit.new_solution_title.#{proposal_type}"
+      placeholder_interpolation = "pages.proposals.edit.insert_title.#{proposal_type}"
+      label_interpolation = "pages.proposals.edit.solution_title.#{proposal_type}"
       { mustache: {
         solution: { id: i,
+                    recordId: solution.id,
                     seq: solution.seq,
                     persisted: true,
                     title_placeholder: t(placeholder_interpolation),
                     solution_title: t(title_interpolation, num: i + 1),
                     title: solution.title,
+                    titleLabel: t(label_interpolation, default: 'Solution title'),
                     removeSolution: t('pages.proposals.edit.remove_solution'),
                     addParagraph: t('pages.proposals.edit.add_paragraph_to_solution'),
                     sections: solution.sections.map.with_index do |section, j|
@@ -113,10 +120,14 @@ module Proposals
       { mustache: {
         section: { idx: j,
                    id: section.id,
+                   expanded: j.zero?,
                    data_id: (i + 1) * 100 + j,
                    seq: section.seq,
                    removeSection: t('pages.proposals.edit.remove_section'),
+                   editSection: t('pages.proposals.edit.edit_section', default: 'Edit section'),
                    title: section.title,
+                   titleLabel: t('pages.proposals.edit.section_title', default: 'Section title'),
+                   contentLabel: t('pages.proposals.edit.section_content', title: section.title, default: 'Content for %{title}'),
                    paragraphId: section.paragraph.id,
                    content: section.paragraph.content,
                    contentDirty: section.paragraph.content_dirty,

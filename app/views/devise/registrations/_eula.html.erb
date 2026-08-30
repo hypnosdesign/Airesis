@@ -1,4 +1,3 @@
-<h2><%= t('words.terms_of_service') %></h2>
 <ol style="padding-left:10px">
   <li>
     <b>Accettazione delle Condizioni d'Uso e sue modifiche.</b>
@@ -79,7 +78,11 @@
   <li>
     <b>Avviso di violazione del Copyright.</b>
     Se credi beni di tua propriet&agrave; siano stati usati in un modo che costituisce violazione del Copyright o della tua propriet&agrave; intellettuale, puoi contattare il responsabile web (webmaster) all'indirizzo
-    <%= mail_to ENV['APP_EMAIL_ADDRESS'] %>
+    <% if service_contact_email.present? %>
+      <%= mail_to service_contact_email %>
+    <% else %>
+      <span class="font-semibold">non configurato per questa istanza</span>
+    <% end %>
   </li>
   <li>
     <b>Legge applicabile e Foro competente.</b>

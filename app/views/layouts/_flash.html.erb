@@ -1,4 +1,4 @@
-<div id="flash-container" class="toast toast-top toast-end z-50 mt-16">
+<div id="flash-container" class="mb-5 space-y-3">
   <% flash.each do |key, value| %>
     <% alert_class = case key
                      when 'info' then 'alert-info'
@@ -7,6 +7,7 @@
                      else 'alert-error'
                      end %>
     <div class="alert <%= alert_class %> shadow-brutal cursor-pointer"
+         role="<%= %w[error alert].include?(key.to_s) ? 'alert' : 'status' %>"
          data-controller="flash"
          data-flash-type-value="<%= key %>"
          data-flash-auto-dismiss-value="5000"
@@ -18,6 +19,7 @@
   <% Announcement.current(cookies.signed[:hidden_announcement_ids]).each do |announcement| %>
     <div id="announcement<%= announcement.id %>"
          class="alert alert-info shadow-brutal"
+         role="status"
          data-controller="flash"
          data-flash-auto-dismiss-value="0">
       <span><%= raw announcement.message %></span>

@@ -1,28 +1,32 @@
-<% @page_title = t('.title') %>
+<% @page_title = t('home.statistics.title') %>
 
-<div class="flex flex-wrap">
-  <div class="max-w-4xl mx-auto px-4 text-center">
-    <h2 id="statistics" class="text-2xl font-bold mb-6"><%= @page_title %></h2>
-    <div id="chart1" style="height: 400px; width: 600px;"></div>
+<main class="py-8 sm:py-12" aria-labelledby="community-statistics-title">
+  <div class="max-w-5xl mx-auto px-4">
+    <div class="text-center mb-8">
+      <p class="text-xs font-bold uppercase tracking-widest text-[var(--ui-link-color)] mb-2"><%= APP_SHORT_NAME %></p>
+      <h1 id="community-statistics-title" class="text-3xl sm:text-4xl font-extrabold"><%= @page_title %></h1>
+      <p class="mt-3 text-base-content/75"><%= t('home.statistics.description') %></p>
+    </div>
 
-    <h4><%= t('.proposals_number') %></h4>
-    <%= Proposal.count %>
-    <h4><%= t('.proposals_debate') %></h4>
-    <%= Proposal.in_valutation.count %>
-    <h4><%= t('.proposals_vote') %></h4>
-    <%= Proposal.in_votation.count %>
-    <h4><%= t('.proposals_voted') %></h4>
-    <%= Proposal.voted.count %>
-    <h4><%= t('.proposals_rejected') %></h4>
-    <%= Proposal.abandoned.count %>
-    <hr>
-    <h4><%= t('.users_count') %></h4>
-    <%= User.count %>
-    <h4><%= t('.users_lastmonth') %></h4>
-    <%= User.where(['last_sign_in_at > ?', Time.now - 1.month]).count %>
-    <hr>
-    <h4><%= t('.groups_count') %></h4>
-    <%= Group.count %>
+    <% statistics = [
+      [t('home.statistics.proposals_number'), Proposal.count, 'fa-file-lines'],
+      [t('home.statistics.proposals_debate'), Proposal.in_valutation.count, 'fa-comments'],
+      [t('home.statistics.proposals_vote'), Proposal.in_votation.count, 'fa-check-to-slot'],
+      [t('home.statistics.proposals_voted'), Proposal.voted.count, 'fa-circle-check'],
+      [t('home.statistics.proposals_rejected'), Proposal.abandoned.count, 'fa-box-archive'],
+      [t('home.statistics.users_count'), User.count, 'fa-users'],
+      [t('home.statistics.users_lastmonth'), User.where(['last_sign_in_at > ?', 1.month.ago]).count, 'fa-user-clock'],
+      [t('home.statistics.groups_count'), Group.count, 'fa-user-group']
+    ] %>
+
+    <dl class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+      <% statistics.each do |label, value, icon| %>
+        <div class="bg-base-100 border-2 border-base-content/15 p-5 text-center">
+          <i class="fa-solid <%= icon %> text-primary text-xl mb-3" aria-hidden="true"></i>
+          <dd class="text-3xl font-extrabold"><%= value %></dd>
+          <dt class="mt-1 text-sm text-base-content/75"><%= label %></dt>
+        </div>
+      <% end %>
+    </dl>
   </div>
-</div>
-
+</main>

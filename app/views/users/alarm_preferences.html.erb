@@ -1,54 +1,52 @@
 <% @page_title = t('pages.users.left_panel.alarm_and_notifications') %>
+<% blocked = current_user.blocked_notifications.all %>
+<% blocked_emails = current_user.blocked_email_notifications.all %>
 
-<%= render layout: "layouts/page_title", locals: { title: t('pages.users.notifications') } do %>
-  <% blocked = @current_user.blocked_notifications.all %>
-  <% blocked_emails = @current_user.blocked_email_notifications.all %>
+<div class="space-y-6">
+  <header>
+    <p class="text-xs font-bold uppercase tracking-widest text-[var(--ui-link-color)] mb-2"><%= t('pages.users.left_panel.title') %></p>
+    <h1 class="text-3xl font-extrabold"><%= @page_title %></h1>
+    <p class="mt-2 max-w-2xl text-sm text-base-content/75"><%= t('pages.users.alarm_preferences.description', default: 'Choose which activity appears in the app and which updates are also sent by email.') %></p>
+  </header>
 
-  <table class="table">
-    <% NotificationCategory.includes(:notification_types).order(:seq).each do |category| %>
-      <thead>
-        <tr>
-          <td class="hidden md:table-cell">
-            <%= image_tag "notification_categories/#{category.short.downcase}.png" %>
-          </td>
-          <td><%= category.description %></td>
-          <td class="alerts"><%= t('pages.users.alarm_preferences.alerts') %></td>
-          <td class="emails"><%= t('pages.users.alarm_preferences.emails') %></td>
-        </tr>
-      </thead>
-      <% category.notification_types.where('id not in (8,15)').each do |type| %>
-        <tr>
-          <td class="hidden md:table-cell"></td>
-          <td><%= type.description %></td>
-          <td style="text-align: center">
-            <input type="checkbox" value="<%= type.id %>" id="block_alert_<%= type.id %>"
-              <% unless blocked.include? type %> checked="true" class="block_alert" <% end %>
-              data-change-notification-block />
-          </td>
-          <td style="text-align: center">
-            <input type="checkbox" value="<%= type.id %>" id="block_email_<%= type.id %>" class="block_email"
-              <% unless blocked_emails.include? type %> checked="true" class="block_email" <% end %>
-              <% if blocked.include? type %> disabled="disabled" title="<%= "Devi attivare la notifica per ricevere l'email" %>" <% end %>
-              data-change-email-notification-block />
-          </td>
-        </tr>
-      <% end %>
-    <% end %>
-    <tr>
-      <td class="hidden md:table-cell"><%= image_tag "newsletter.png" %></td>
-      <td><%= t('pages.users.alarm_preferences.receive_on_address', email: current_user.email) %></td>
-      <td></td>
-      <td style="text-align: center">
-        <input type="checkbox"
-          <% if current_user.receive_newsletter? %> checked="true" <% end %>
-          data-change-email-block />
-      </td>
-    </tr>
-  </table>
-<% end %>
+  <% NotificationCategory.includes(:notification_types).order(:seq).each do |category| %>
+    <section class="bg-base-100 border-2 border-base-content/15" aria-labelledby="notification-category-<%= category.id %>">
+      <div class="flex items-center gap-3 p-4 border-b-2 border-base-content/10">
+        <%= image_tag "notification_categories/#{category.short.downcase}.png", alt: '', class: 'size-9 object-contain' %>
+        <h2 id="notification-category-<%= category.id %>" class="text-lg font-bold"><%= category.description %></h2>
+      </div>
+      <div class="divide-y divide-base-content/10">
+        <% category.notification_types.where.not(id: [8, 15]).each do |type| %>
+          <div class="grid grid-cols-1 sm:grid-cols-[1fr_auto_auto] gap-3 sm:gap-6 items-center p-4">
+            <p id="notification-activity-<%= type.id %>" class="text-sm font-medium"><%= type.description %></p>
+            <label class="flex min-h-11 items-center justify-between sm:justify-start gap-2 text-sm font-semibold">
+              <span><%= t('pages.users.alarm_preferences.alerts') %></span>
+              <input type="checkbox" value="<%= type.id %>" id="block_alert_<%= type.id %>" class="toggle toggle-primary" aria-label="<%= "#{type.description} — #{t('pages.users.alarm_preferences.alerts')}" %>" <%= 'checked' unless blocked.include?(type) %> data-change-notification-block>
+            </label>
+            <label class="flex min-h-11 items-center justify-between sm:justify-start gap-2 text-sm font-semibold">
+              <span><%= t('pages.users.alarm_preferences.emails') %></span>
+              <input type="checkbox" value="<%= type.id %>" id="block_email_<%= type.id %>" class="toggle toggle-primary" aria-label="<%= "#{type.description} — #{t('pages.users.alarm_preferences.emails')}" %>" <%= 'checked' unless blocked_emails.include?(type) %> <%= 'disabled' if blocked.include?(type) %> title="<%= t('pages.users.alarm_preferences.email_requires_alert', default: 'Enable the in-app notification before enabling email.') if blocked.include?(type) %>" data-change-email-notification-block>
+            </label>
+          </div>
+        <% end %>
+      </div>
+    </section>
+  <% end %>
+
+  <section class="bg-base-100 border-2 border-base-content/15 p-4" aria-labelledby="newsletter-title">
+    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+      <div>
+        <h2 id="newsletter-title" class="font-bold"><%= t('pages.users.alarm_preferences.newsletter', default: 'Community newsletter') %></h2>
+        <p class="text-sm text-base-content/75"><%= t('pages.users.alarm_preferences.receive_on_address', email: current_user.email) %></p>
+      </div>
+      <label class="flex min-h-11 items-center gap-2 font-semibold">
+        <span class="sr-only"><%= t('pages.users.alarm_preferences.newsletter_toggle', default: 'Receive the newsletter by email') %></span>
+        <input type="checkbox" class="toggle toggle-primary" <%= 'checked' if current_user.receive_newsletter? %> data-change-email-block>
+      </label>
+    </div>
+  </section>
+</div>
 
 <% content_for :left_panel do %>
-  <% if current_user %>
-    <%= render partial: 'users/preferences_panel' %>
-  <% end %>
+  <%= render partial: 'users/preferences_panel' %>
 <% end %>

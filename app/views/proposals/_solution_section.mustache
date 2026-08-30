@@ -1,4 +1,10 @@
-<div class="section_container" data-section_id="{{section.data_id}}" data-persisted="{{section.persisted}}">
+<details class="section_container border-t border-base-content/15 first:border-t-0" data-section_id="{{section.data_id}}"
+         data-persisted="{{section.persisted}}" data-proposal-editor-target="section" {{#section.expanded}}open{{/section.expanded}}>
+    <summary class="flex min-h-12 cursor-pointer items-center justify-between gap-3 py-3 font-bold marker:text-primary">
+        <span>{{section.title}}</span>
+        <span class="text-xs font-semibold uppercase tracking-wide text-base-content/60">{{section.editSection}}</span>
+    </summary>
+    <div class="pb-5">
 
     <input name="proposal[solutions_attributes][{{solution.id}}][sections_attributes][{{section.idx}}][seq]"
            type="hidden" value="{{section.seq}}" data-section-seq>
@@ -9,23 +15,27 @@
     <input name="proposal[solutions_attributes][{{solution.id}}][sections_attributes][{{section.idx}}][id]"
            type="hidden" value="{{section.id}}">
 
-    <div class="clearboth"></div>
-    <input class="edit_label"
+    <label class="mb-2 block text-sm font-semibold"
+           for="proposal_solutions_attributes_{{solution.id}}_sections_attributes_{{section.idx}}_title">{{section.titleLabel}}</label>
+    <input class="edit_label input input-bordered mb-4 w-full"
+           id="proposal_solutions_attributes_{{solution.id}}_sections_attributes_{{section.idx}}_title"
            name="proposal[solutions_attributes][{{solution.id}}][sections_attributes][{{section.idx}}][title]"
-           type="text" value="{{section.title}}" data-validate="true">
-    <textarea
-            id="proposal_solutions_attributes_{{solution.id}}_sections_attributes_{{section.idx}}_paragraphs_attributes_0_content_dirty"
+           type="text" value="{{section.title}}"
+           data-validate="true">
+    <label id="proposal_solutions_attributes_{{solution.id}}_sections_attributes_{{section.idx}}_content_label"
+           class="mb-2 block text-sm font-semibold">{{section.contentLabel}}</label>
+    <input id="proposal_solutions_attributes_{{solution.id}}_sections_attributes_{{section.idx}}_paragraphs_attributes_0_content_dirty"
             name="proposal[solutions_attributes][{{solution.id}}][sections_attributes][{{section.idx}}][paragraphs_attributes][0][content_dirty]"
-            rows="5"
-            style="width: 98%; height: 280px; visibility: hidden;"
-            data-validate="true">{{section.contentDirty}}</textarea>
+            type="hidden"
+            value="{{section.contentDirty}}">
+    <trix-editor input="proposal_solutions_attributes_{{solution.id}}_sections_attributes_{{section.idx}}_paragraphs_attributes_0_content_dirty"
+                 aria-labelledby="proposal_solutions_attributes_{{solution.id}}_sections_attributes_{{section.idx}}_content_label"
+                 class="proposal-editor bg-base-100"></trix-editor>
 
     <input name="proposal[solutions_attributes][{{solution.id}}][sections_attributes][{{section.idx}}][paragraphs_attributes][0][id]"
            type="hidden" value="{{section.paragraphId}}">
 
-    <input name="proposal[solutions_attributes][{{solution.id}}][sections_attributes][{{section.idx}}][paragraphs_attributes][0][content]"
-           type="hidden" value="{{section.content}}">
-
     <input name="proposal[solutions_attributes][{{solution.id}}][sections_attributes][{{section.idx}}][paragraphs_attributes][0][seq]"
            type="hidden" value="0">
-</div>
+    </div>
+</details>

@@ -10,9 +10,9 @@ Base di partenza **buona**: gem aggiornate, `config/application.yml` mai committ
 
 Esito: **3 CRITICHE, ~8 ALTE, ~15 MEDIE, ~12 BASSE/INFO.**
 
-### Stato remediation locale — 2026-08-29
+### Stato remediation P0/P1 — 2026-08-29
 
-I tre finding P0 sono stati corretti nel worktree locale; le modifiche non risultano ancora committate o distribuite:
+I tre finding P0 sono stati corretti, verificati e pubblicati su `origin/main`:
 
 - **C1 risolto:** il login API non registra più email o password fornite; il log contiene soltanto ID utente (quando noto) e IP della richiesta.
 - **C2 risolto:** `UsersController#update` applica `authorize! :update, @user`; CanCanCan consente l'update esclusivamente sul proprio profilo. Aggiunta regressione che prova il tentativo di cambio nome, email e password di un altro utente.
@@ -20,6 +20,15 @@ I tre finding P0 sono stati corretti nel worktree locale; le modifiche non risul
 - **Hardening aggiuntivo:** la source Bundler è stata portata da HTTP a HTTPS.
 
 Verifiche eseguite: 70 spec di regressione mirate, 0 failure; RuboCop sui 12 file Ruby coinvolti, 0 offense. La suite non-system estesa esegue 1516 esempi ma conserva 15 failure preesistenti (helper/view obsolete e cache Rack::Attack condivisa tra test) e due file non caricabili già segnalati nell'audit (`ManagerActions` mancante e spec Resque obsoleta).
+
+I finding A1-A4 del primo blocco P1 sono corretti nel worktree e non ancora committati:
+
+- **A1 risolto:** rimossa la configurazione Facebook commentata con credenziali hard-coded; la configurazione effettiva usa esclusivamente `FACEBOOK_APP_ID` e `FACEBOOK_APP_SECRET` da ambiente. L'utente ha confermato che la vecchia credenziale non esiste più su Meta. `main`, il branch remoto aggiuntivo e i due tag sono stati riscritti e pubblicati atomicamente; un clone mirror fresco non contiene i valori storici e il vecchio commit non è più recuperabile dal server Git.
+- **A2 risolto:** `group_image_tag` genera ora l'elemento `img` con il tag builder Rails, che esegue escaping degli attributi.
+- **A3 risolto:** il model `Taggable` non produce più HTML; le view usano un helper basato su `safe_join` e `link_to`, senza `raw`.
+- **A4 risolto:** `/tokens` è limitato per IP e per email normalizzata; il token viene generato soltanto dopo la verifica della password.
+
+Verifiche P1: 57 spec mirate e di integrazione, 0 failure. Brakeman non segnala più i due XSS A2/A3; il report completo conserva finding estranei a questo blocco e un errore di parsing su una view legacy.
 
 ## 2. Punti di forza verificati
 
@@ -61,19 +70,19 @@ Verifiche eseguite: 70 spec di regressione mirate, 0 failure; RuboCop sui 12 fil
 
 ### ALTE
 
-**A1 — Credenziali Facebook reali committate**
-- `config/initializers/omniauth.rb:2` — app ID `[REDACTED_FACEBOOK_APP_ID]` + secret `effb2e9b...` in un commento, presenti da commit iniziale in tutta la storia git.
+**A1 — Credenziali Facebook reali committate — RISOLTO**
+- `config/initializers/omniauth.rb:2` — app ID e secret reali erano presenti in un commento dal commit iniziale e restano recuperabili dalla storia Git remota.
 - Fix: ruotare il secret, rimuovere la riga, aggiungere secret-scanning in CI.
 
-**A2 — Stored XSS via `group.name`**
+**A2 — Stored XSS via `group.name` — RISOLTO NEL WORKTREE**
 - `lib/image_helper.rb:8-9` — HTML costruito a mano `<img ... alt="#{group.name}">` + `.html_safe`, usato in liste gruppi/portlet/email/mustache. `Group` non restringe i caratteri del nome (`app/models/group.rb:44`). Nome `"><script>...` → XSS per tutti i visitatori. CSP con `'unsafe-inline'` non mitiga.
 - Fix: `content_tag`/`image_tag`/`CGI.escapeHTML`.
 
-**A3 — Stored XSS via tag**
+**A3 — Stored XSS via tag — RISOLTO NEL WORKTREE**
 - `app/models/concerns/taggable.rb:46-48` (`tags_with_links` senza escaping) + `raw` in `blog_posts/show.html.erb:55`, `_blog_post.html.erb:42`, `_group_blog_post.html.erb:50`. `Tag#escape_text` non rimuove `< > "`.
 - Fix: allowlist caratteri tag o `h()`/`sanitize`; rimuovere `raw`.
 
-**A4 — Brute force illimitato su `/tokens`**
+**A4 — Brute force illimitato su `/tokens` — RISOLTO NEL WORKTREE**
 - `app/controllers/tokens_controller.rb:1-48`; `config/initializers/rack_attack.rb:17-39`
 - Rack::Attack non copre `/tokens` (solo `/users/sign_in` e `/api/`). Inoltre `@user.ensure_authentication_token!` (`:28`) esegue write DB prima del check password.
 - Fix: throttle dedicato su `/tokens` (per-IP e per-email), verificare password prima di rigenerare token.
@@ -147,7 +156,7 @@ Verifiche eseguite: 70 spec di regressione mirate, 0 failure; RuboCop sui 12 fil
 ## 5. Priorità di remediation
 
 1. **P0** — C1 password nei log; C2 IDOR `users#update`; C3 TLS Facebook/PayPal.
-2. **P1** — A2/A3 XSS (group.name, tags); A4 throttle `/tokens`; A1 rotazione credenziali FB; A5 moderazione forum whitelist.
+2. **P1** — A1-A4 risolti; resta A5 moderazione forum whitelist.
 3. **P2** — A6 `config.hosts`; A7 `force_ssl`; A8 CSP nonce; sanitizer iframe; token API scadenza/rotazione + check blocked; CSRF JSON; cache Rack::Attack condivisa; `admin/unblock` POST.
 4. **P3** — password policy + lockable; scadenza sessioni; NewRelic capture_params; wkhtmltopdf; Docker hardening (trust auth, non-root); paginazione/limit su search e users index.
 

@@ -1,4 +1,6 @@
 class RegistrationsController < Devise::RegistrationsController
+  layout 'users', only: %i[edit update]
+
   def create
     session[:remote_ip] = request.remote_ip
     if session[:omniauth].nil?

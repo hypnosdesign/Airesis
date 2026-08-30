@@ -1,5 +1,5 @@
 <span class="badge badge-info" style="width:80px">
-  <h5 id="status"><%= @proposal.in_valutation? ? t('pages.proposals.show.during_debate') : @proposal.state.description %></h5>
+  <h5 id="status"><%= @proposal.in_valutation? ? t('pages.proposals.show.during_debate') : proposal_state_label(@proposal.state) %></h5>
 </span>
 <% if @proposal.is_anonima? %>
   <span class="badge badge-info" style="width:80px">

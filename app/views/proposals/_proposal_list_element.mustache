@@ -1,53 +1,57 @@
-<li id="proposal{{proposal.id}}" class="proposal_list">
-  <div class="proposal_cont card appear">
-    <div class="left_cont hide-for-small">
-      <div class="inner_cont">
-        <div class="model">
-            {{proposal.type_description}}
-        </div>
-        <div class="category_icon">
-            {{{proposal.group_image_tag}}}
-        </div>
-        <div class="status">
-            {{{proposal.status}}}
-        </div>
+<li id="proposal{{proposal.id}}" class="proposal_list list-none h-full">
+  <article class="flex h-full flex-col border-2 border-base-content/15 bg-base-100 p-5 shadow-sm transition-colors hover:border-primary/50">
+    <div class="flex items-start gap-4">
+      <div class="size-12 shrink-0 overflow-hidden border border-base-content/15 bg-base-200 [&_img]:size-12 [&_img]:object-cover">
+        {{{proposal.group_image_tag}}}
       </div>
+      <div class="min-w-0 flex-1">
+        <div class="mb-2 flex flex-wrap items-center gap-2 text-xs font-semibold text-base-content/70">
+          <span class="badge badge-outline badge-sm">{{proposal.type_description}}</span>
+          <span>{{proposal.status}}</span>
+        </div>
+        <h2>{{{proposal.title_link}}}</h2>
+      </div>
+      {{#current_user.signed_in?}}
+        <div class="shrink-0 [&_img]:size-8">{{{current_user.valutation_image}}}</div>
+      {{/current_user.signed_in?}}
     </div>
-    <div class="right_cont">
-      <div class="alerts_and_vote">
-        {{#current_user.signed_in?}}
-            {{#current_user.can_vote?}}
-                <a href="{{proposal.vote_url}}" class="btn blue vote-button">{{texts.vote}}</a>
-            {{/current_user.can_vote?}}
-            {{#current_user.show_alerts?}}
-                <a href="#" class="alert notify" data-load="true" data-proposal-id="{{proposal.id}}">{{current_user.notifications}}</a>
-            {{/current_user.show_alerts?}}
-        {{/current_user.signed_in?}}
-      </div>
-      <div style=" position: relative">
-        <div class="maintitle {{#current_user.can_vote?}}voteright{{/current_user.can_vote?}}">
-        {{#current_user.signed_in?}}
-            {{{current_user.valutation_image}}}
-        {{/current_user.signed_in?}}
-            {{{proposal.title_link}}}
-        </div>
-      </div>
 
-      <div class="text_content">
-        <p>
-            {{{proposal.short_content}}}
-        </p>
-      </div>
+    <p class="mt-4 line-clamp-3 text-sm leading-relaxed text-base-content/75">{{proposal.short_content}}</p>
+
+    <div class="mt-5">
       {{#proposal.voting_or_voted?}}
-          {{> proposals/_new_vote_bar}}
+        <div class="mb-1 flex justify-between text-xs font-semibold text-base-content/70">
+          <span>{{texts.voters}}</span><span>{{proposal.voters}}</span>
+        </div>
+        <progress class="progress progress-accent w-full" value="{{proposal.voters_percentage}}" max="100" aria-label="{{texts.voters}}"></progress>
       {{/proposal.voting_or_voted?}}
       {{^proposal.voting_or_voted?}}
-          {{> proposals/_new_rank_bar}}
+        <div class="mb-1 flex justify-between text-xs font-semibold text-base-content/70">
+          <span>{{texts.rank}}</span><span>{{proposal.rank}}%</span>
+        </div>
+        <progress class="progress progress-primary w-full" value="{{proposal.rank}}" max="100" aria-label="{{texts.rank}}"></progress>
       {{/proposal.voting_or_voted?}}
-
-      <div class="clearboth"></div>
-        {{> proposals/_list_element_bottom}}
     </div>
-    <div class="clearboth"></div>
-  </div>
+
+    <dl class="mt-4 grid grid-cols-2 gap-2 border-t border-base-content/15 pt-4 text-xs text-base-content/75 sm:grid-cols-3">
+      <div><dt class="font-semibold">{{texts.participants_number}}</dt><dd>{{proposal.participants}}</dd></div>
+      <div><dt class="font-semibold">{{texts.contributes_number}}</dt><dd>{{proposal.contributes_count}}</dd></div>
+      {{#proposal.has_interest_borders?}}
+        <div class="col-span-2 sm:col-span-1"><dt class="font-semibold">{{texts.territory}}</dt><dd class="truncate">{{proposal.interest_border}}</dd></div>
+      {{/proposal.has_interest_borders?}}
+    </dl>
+
+    {{#current_user.signed_in?}}
+      <div class="mt-auto flex flex-wrap justify-end gap-2 pt-4">
+        {{#current_user.can_vote?}}
+          <a href="{{proposal.vote_url}}" class="btn btn-primary btn-sm">{{texts.vote}}</a>
+        {{/current_user.can_vote?}}
+        {{#current_user.show_alerts?}}
+          <a href="#" class="btn btn-ghost btn-sm" data-load="true" data-proposal-id="{{proposal.id}}">
+            {{texts.notifications}}: {{current_user.notifications}}
+          </a>
+        {{/current_user.show_alerts?}}
+      </div>
+    {{/current_user.signed_in?}}
+  </article>
 </li>

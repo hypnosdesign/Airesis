@@ -5,7 +5,6 @@ module ImageHelper
     src = group.image.attached? ? Rails.application.routes.url_helpers.rails_blob_path(group.image, only_path: true) : '/img/gruppo-anonimo.png'
     src = "#{ENV['SITE']}#{src}" if url
     style = size ? "width:#{size}px;height:#{size}px;overflow:hidden;" : ''
-    ret = "<img src=\"#{src}\"  style=\"#{style}\" alt=\"#{group.name}\" />"
-    ret.html_safe
+    ActionController::Base.helpers.tag.img(src: src, style: style, alt: group.name)
   end
 end

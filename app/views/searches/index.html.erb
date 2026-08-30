@@ -1,0 +1,81 @@
+<% @page_title = t('pages.searches.title', default: 'Search') %>
+
+<section aria-labelledby="search-results-title" class="space-y-6">
+  <div class="bg-base-100 border-2 border-base-content/15 p-5 sm:p-6">
+    <p class="text-xs font-bold uppercase tracking-widest text-[var(--ui-link-color)] mb-2"><%= APP_SHORT_NAME %></p>
+    <h1 id="search-results-title" class="text-2xl sm:text-3xl font-extrabold"><%= @page_title %></h1>
+    <p class="mt-2 text-sm text-base-content/75"><%= t('pages.searches.description', default: 'Find proposals, groups and community blogs.') %></p>
+
+    <%= form_with url: searches_path, method: :get, class: 'mt-5 flex flex-col sm:flex-row gap-2', role: 'search' do %>
+      <div class="form-control flex-1">
+        <label for="search_term" class="label"><span class="label-text font-semibold"><%= t('pages.searches.query_label', default: 'What are you looking for?') %></span></label>
+        <input id="search_term"
+               name="term"
+               type="search"
+               value="<%= params[:term] %>"
+               autocomplete="off"
+               class="input input-bordered w-full min-h-11"
+               placeholder="<%= t('placeholder.find') %>">
+      </div>
+      <button type="submit" class="btn btn-primary min-h-11 sm:self-end">
+        <i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i>
+        <%= t('pages.searches.submit', default: 'Search') %>
+      </button>
+    <% end %>
+  </div>
+
+  <% searched = params[:term].present? || params.dig(:search, :q).present? %>
+  <% if searched && @groups.empty? && @proposals.empty? && @blogs.empty? %>
+    <div class="bg-base-100 border-2 border-base-content/15 p-8 text-center" role="status">
+      <i class="fa-solid fa-magnifying-glass text-3xl text-base-content/30 mb-3" aria-hidden="true"></i>
+      <h2 class="text-xl font-bold"><%= t('pages.searches.empty_title', default: 'No results found') %></h2>
+      <p class="mt-2 text-sm text-base-content/75"><%= t('pages.searches.empty_description', default: 'Try a shorter term or explore the public space.') %></p>
+      <%= link_to t('pages.searches.explore', default: 'Explore public space'), open_space_path, class: 'btn btn-outline mt-5 min-h-11' %>
+    </div>
+  <% elsif searched %>
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-5">
+      <section class="bg-base-100 border-2 border-base-content/15 p-5" aria-labelledby="search-groups-title">
+        <h2 id="search-groups-title" class="font-bold text-lg mb-4"><%= t('pages.searches.groups', default: 'Groups') %> <span class="badge badge-ghost"><%= @groups.size %></span></h2>
+        <% if @groups.any? %>
+          <ul class="space-y-2">
+            <% @groups.each do |group| %>
+              <li><%= link_to group.name, group_path(group), class: 'link link-primary inline-flex min-h-11 items-center' %></li>
+            <% end %>
+          </ul>
+        <% else %>
+          <p class="text-sm text-base-content/75"><%= t('pages.searches.no_groups', default: 'No matching groups.') %></p>
+        <% end %>
+      </section>
+
+      <section class="bg-base-100 border-2 border-base-content/15 p-5" aria-labelledby="search-proposals-title">
+        <h2 id="search-proposals-title" class="font-bold text-lg mb-4"><%= t('pages.searches.proposals', default: 'Proposals') %> <span class="badge badge-ghost"><%= @proposals.size %></span></h2>
+        <% if @proposals.any? %>
+          <ul class="space-y-2">
+            <% @proposals.each do |proposal| %>
+              <li><%= link_to proposal.title, proposal.private? ? group_proposal_path(proposal.groups.first, proposal) : proposal_path(proposal), class: 'link link-primary inline-flex min-h-11 items-center' %></li>
+            <% end %>
+          </ul>
+        <% else %>
+          <p class="text-sm text-base-content/75"><%= t('pages.searches.no_proposals', default: 'No matching proposals.') %></p>
+        <% end %>
+      </section>
+
+      <section class="bg-base-100 border-2 border-base-content/15 p-5" aria-labelledby="search-blogs-title">
+        <h2 id="search-blogs-title" class="font-bold text-lg mb-4"><%= t('pages.searches.blogs', default: 'Blogs') %> <span class="badge badge-ghost"><%= @blogs.size %></span></h2>
+        <% if @blogs.any? %>
+          <ul class="space-y-2">
+            <% @blogs.each do |blog| %>
+              <li><%= link_to blog.title, blog_path(blog), class: 'link link-primary inline-flex min-h-11 items-center' %></li>
+            <% end %>
+          </ul>
+        <% else %>
+          <p class="text-sm text-base-content/75"><%= t('pages.searches.no_blogs', default: 'No matching blogs.') %></p>
+        <% end %>
+      </section>
+    </div>
+  <% end %>
+</section>
+
+<% content_for :left_panel do %>
+  <%= render partial: 'users/preferences_panel' %>
+<% end %>

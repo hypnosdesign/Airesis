@@ -1,6 +1,12 @@
 class NotificationsController < ApplicationController
   before_action :authenticate_user!
 
+  # Compatibility endpoint for old bookmarks and links. Alerts are the single
+  # notification inbox; this controller only owns preference mutations.
+  def index
+    redirect_to alerts_path
+  end
+
   def change_notification_block
     respond_to_block change_block(current_user.blocked_alerts)
   end

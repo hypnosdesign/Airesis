@@ -1,7 +1,15 @@
 <% @page_title = t('pages.proposals.edit.title', title: @proposal.title) %>
 <h1 class="text-2xl font-bold mb-6"><%= @page_title %></h1>
 
-<%= simple_form_for (@group.present?) ? [@group, @proposal] : @proposal, html: { id: 'proposal_form', data: { turbo: false } } do |f| %>
+<%= simple_form_for (@group.present?) ? [@group, @proposal] : @proposal,
+                    html: {
+                      id: 'proposal_form',
+                      data: {
+                        turbo: false,
+                        controller: 'proposal-editor',
+                        proposal_editor_toolbar_label_value: t('pages.proposals.edit.formatting_toolbar', default: 'Formatting options for %{field}')
+                      }
+                    } do |f| %>
   <% if can? :destroy, @proposal %>
     <div class="card bg-info/10 border-2 border-info p-4 mb-4">
       <p>
@@ -18,15 +26,15 @@
       <%= f.input :title, input_html: { data: { fv_remote_id: @proposal.id } } %>
     </div>
 
-    <div class="mb-4">
-      <%= f.label :interest_borders_tkn %>
-      <%= f.text_field 'interest_borders_tkn', data: { pre: @proposal.interest_borders.to_json } %>
+    <div class="fieldset mb-4">
+      <%= f.label :interest_borders_tkn, class: 'fieldset-label font-medium' %>
+      <%= f.text_field 'interest_borders_tkn', class: 'input input-bordered w-full', data: { pre: @proposal.interest_borders.to_json } %>
     </div>
 
     <% if ::Configuration::folksonomy %>
-      <div class="mb-4">
-        <%= f.label :tags_list %>
-        <%= f.text_field :tags_list %>
+      <div class="fieldset mb-4">
+        <%= f.label :tags_list, class: 'fieldset-label font-medium' %>
+        <%= f.text_field :tags_list, class: 'input input-bordered w-full' %>
       </div>
     <% end %>
 
@@ -49,9 +57,9 @@
     <% end %>
   <% end %>
 
-  <div class="mb-4">
-    <%= f.label :proposal_category_id %>
-    <%= f.select :proposal_category_id, options_for_select(ProposalCategory.all.collect { |p| [p.description, p.id, {'data-imagesrc' => image_path("proposal_categories/#{p.name}_s.png")}] }, @proposal.proposal_category_id), {}, { style: 'width:100%' } %>
+  <div class="fieldset mb-4">
+    <%= f.label :proposal_category_id, class: 'fieldset-label font-medium' %>
+    <%= f.select :proposal_category_id, options_for_select(ProposalCategory.all.collect { |p| [p.description, p.id, {'data-imagesrc' => image_path("proposal_categories/#{p.name}_s.png")}] }, @proposal.proposal_category_id), {}, { class: 'select select-bordered w-full' } %>
   </div>
 
   <% if @proposal.vote_defined %>
@@ -75,18 +83,25 @@
 
   <div style="clear:both"></div>
 
+  <div class="mb-3 flex flex-wrap items-center justify-between gap-3">
+    <h2 class="text-lg font-bold"><%= t('pages.proposals.edit.proposal_sections', default: 'Proposal sections') %></h2>
+    <div class="flex flex-wrap gap-2" aria-label="<%= t('pages.proposals.edit.section_display_controls', default: 'Section display controls') %>">
+      <button type="button" class="btn btn-sm btn-outline" data-action="proposal-editor#expandAll">
+        <%= t('pages.proposals.edit.expand_all_sections', default: 'Expand all') %>
+      </button>
+      <button type="button" class="btn btn-sm btn-ghost" data-action="proposal-editor#collapseAll">
+        <%= t('pages.proposals.edit.collapse_all_sections', default: 'Collapse all') %>
+      </button>
+    </div>
+  </div>
+  <p class="sr-only" aria-live="polite" data-proposal-editor-target="status"></p>
+
   <div class="sections_column space-y-4">
     <% @proposal.sections.includes(:paragraphs).each_with_index do |section, i| %>
       <%= f.fields_for :sections, section do |s| %>
         <%= render 'section', section_for_mustache(section, i) %>
       <% end %>
     <% end %>
-  </div>
-
-  <div class="new_section mt-4">
-    <a class="btn btn-outline w-full" href="#" data-add-section>
-      <%= t('pages.proposals.edit.add_paragraph') %>
-    </a>
   </div>
 
   <hr class="my-6">
@@ -99,11 +114,7 @@
 
   <% unless @proposal.is_petition? %>
     <div data-hook="new-solution"></div>
-    <div class="new_section mt-4">
-      <a class="btn btn-outline w-full" href="#" data-add-solution>
-        <%= t("pages.proposals.edit.add_solution.#{@proposal.proposal_type.name.downcase}") %>
-      </a>
-      <br>
+    <div class="mt-4">
       <a class="text-sm link link-hover" href="#" onclick="document.getElementById('you_know').showModal(); return false;">
         <%= t('pages.proposals.edit.you_know_what_you_do') %>
       </a>
@@ -111,21 +122,22 @@
 
   <% end %>
 
-  <div class="flex gap-4 mt-6">
+  <div class="sticky bottom-0 z-20 -mx-4 mt-6 grid grid-cols-[minmax(0,1fr)_auto_auto] gap-2 border-t-2 border-base-content/15 bg-base-100/95 px-4 py-3 shadow-[0_-8px_24px_oklch(var(--bc)/0.08)] backdrop-blur sm:static sm:mx-0 sm:flex sm:flex-row sm:gap-3 sm:border-0 sm:bg-transparent sm:px-0 sm:py-4 sm:shadow-none sm:backdrop-blur-none">
     <%= f.hidden_field :integrated_contributes_ids_list %>
     <%= hidden_field_tag :subaction, 'save', id: 'subaction_field' %>
     <%= f.submit t('buttons.save_and_exit'), class: 'btn btn-primary', name: 'commit_exit' %>
     <%= f.submit t('buttons.save'), class: 'btn btn-outline', name: 'commit_continue' %>
+    <%= link_to t('buttons.cancel'), @proposal.private ? group_proposal_url(@proposal.groups.first, @proposal) : proposal_url(@proposal), class: 'btn btn-ghost sm:ml-auto' %>
   </div>
 <% end %>
 
 <% unless @proposal.is_petition? %>
-  <dialog id="you_know" class="modal">
+  <dialog id="you_know" class="modal" aria-labelledby="you-know-title">
     <div class="modal-box">
-      <h2 class="text-xl font-bold mb-4"><%= t('pages.proposals.edit.schulze_title') %></h2>
+      <h2 id="you-know-title" class="text-xl font-bold mb-4"><%= t('pages.proposals.edit.schulze_title') %></h2>
       <p><%= t('pages.proposals.edit.more_solutions_explained_html', app_short_name: APP_SHORT_NAME) %></p>
       <div class="modal-action">
-        <form method="dialog"><button class="btn">&times;</button></form>
+        <form method="dialog"><button class="btn" aria-label="<%= t('buttons.close', default: 'Close') %>">&times;</button></form>
       </div>
     </div>
   </dialog>
@@ -147,14 +159,6 @@
     </div>
   </div>
 <% end %>
-
-<script id="section_template" type="text/html"><%= render "section" %></script>
-<script id="solution_section_template" type="text/html"><%= render "solution_section" %></script>
-<script id="solution_template" type="text/html"><%= render "solution" %></script>
-<script id="section_navigator_template" type="text/html"><%= render "section_navigator" %></script>
-<script id="solution_navigator_template" type="text/html"><%= render "solution_navigator" %></script>
-
-<%# ProposalsEdit JS (jQuery legacy) rimosso — da convertire in Stimulus in Fase 7 %>
 
 <% content_for :left_panel do %>
   <div class="edit_proposal_panel space-y-2">

@@ -39,7 +39,7 @@
   <% unless blog_post.tags.blank? %>
     <div class="blogPostTags mt-2">
       <span class="tag_label font-semibold">Tags: </span>
-      <span class="tags_list"><%= raw blog_post.tags_with_links %></span>
+      <span class="tags_list"><%= tag_links_for(blog_post) %></span>
     </div>
   <% end %>
   <div style="clear: both;"></div>

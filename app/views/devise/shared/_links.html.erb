@@ -1,11 +1,11 @@
 <div class="flex flex-col gap-2 text-sm items-center">
   <% if controller_name != 'registrations' %>
-    <%= link_to t('pages.sessions.links.register'), new_registration_path(resource_name), class: 'link link-hover text-primary' %>
+    <%= link_to t('pages.sessions.links.register_action', default: 'Create an account'), new_registration_path(resource_name), class: 'inline-flex min-h-11 items-center px-2 link link-hover text-primary' %>
   <% end %>
   <% if controller_name != 'passwords' %>
-    <%= link_to t('pages.sessions.links.forgot_password'), new_password_path(resource_name), class: 'link link-hover text-primary' %>
+    <%= link_to t('pages.sessions.links.reset_action', default: 'Reset your password'), new_password_path(resource_name), class: 'inline-flex min-h-11 items-center px-2 link link-hover text-primary' %>
   <% end %>
   <% if controller_name != 'confirmations' %>
-    <%= link_to t('pages.sessions.links.havent_received_email'), new_confirmation_path(resource_name), class: 'link link-hover text-primary' %>
+    <%= link_to t('pages.sessions.links.confirmation_action', default: 'Resend confirmation email'), new_confirmation_path(resource_name), class: 'inline-flex min-h-11 items-center px-2 link link-hover text-primary' %>
   <% end %>
 </div>

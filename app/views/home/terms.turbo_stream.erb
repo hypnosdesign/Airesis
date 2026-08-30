@@ -1,14 +1,17 @@
 <%= turbo_stream.replace "terms_modal" do %>
-  <dialog id="terms_modal" data-controller="modal" class="modal">
-    <div class="modal-box shadow-brutal border-2 border-base-content max-w-3xl">
-      <h3 class="text-lg font-bold mb-4"><%= t('words.terms_of_service') %></h3>
-      <%= render partial: "devise/registrations/eula" %>
+  <dialog id="terms_modal" data-controller="modal" class="modal" aria-labelledby="terms_modal_title">
+    <div class="modal-box max-h-[85vh] max-w-3xl border border-base-content/15">
+      <h3 id="terms_modal_title" class="text-lg font-bold mb-2"><%= t('words.terms_of_service') %></h3>
+      <p class="mb-4 text-sm text-base-content/70"><%= t('pages.registration.terms_language_notice', default: 'This legal document is currently available in Italian.') %></p>
+      <div class="article-body max-h-[60vh] overflow-y-auto pr-2 text-sm" lang="it">
+        <%= render partial: "devise/registrations/eula" %>
+      </div>
       <div class="modal-action">
-        <button class="btn" data-action="click->modal#close"><%= t('buttons.close') %></button>
+        <button class="btn" data-action="click->modal#close" data-modal-target="initialFocus"><%= t('buttons.close') %></button>
       </div>
     </div>
     <form method="dialog" class="modal-backdrop" data-action="click->modal#backdropClose">
-      <button>close</button>
+      <button aria-label="<%= t('buttons.close') %>"></button>
     </form>
   </dialog>
 <% end %>

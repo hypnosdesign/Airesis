@@ -1,21 +1,29 @@
 <% @page_title = t('pages.users.left_panel.geographic_borders') %>
 
-<div class="card bg-base-200 p-4">
+<div class="space-y-6">
+  <header>
+    <p class="text-xs font-bold uppercase tracking-widest text-[var(--ui-link-color)] mb-2"><%= t('pages.users.left_panel.title') %></p>
+    <h1 class="text-3xl font-extrabold"><%= @page_title %></h1>
+    <p class="mt-2 max-w-2xl text-sm text-base-content/75"><%= t('pages.users.border_preferences.description', default: 'Choose the places whose public activity you want to follow.') %></p>
+  </header>
+
+  <div class="bg-base-100 border-2 border-base-content/15 p-5 sm:p-6">
   <%= simple_form_for current_user do |f| %>
-    <div id="border_fields">
-      <%= f.label t('pages.users.border_preferences.your_borders') %>
-      <%= f.text_field :interest_borders_tokens, data: { pre: current_user.interest_borders.to_json } %>
+    <div id="border_fields" class="form-control">
+      <%= f.label :interest_borders_tokens, t('pages.users.border_preferences.your_borders'), class: 'label font-semibold' %>
+      <%= f.text_field :interest_borders_tokens, class: 'input input-bordered w-full min-h-11', autocomplete: 'off', data: { pre: current_user.interest_borders.to_json } %>
     </div>
     <div id="loading_borders" style="margin:auto;text-align:center;display:none;">
-      <%= image_tag 'ajax-loader.gif' %>
+      <%= image_tag 'ajax-loader.gif', alt: '' %>
       <br>
       <b><%= t('pages.users.border_preferences.updating') %></b>
     </div>
-    <%= f.button :button, id: 'submit_borders', class: 'btn btn-primary mt-4', data: { disable_with: t('loading') } do %>
+    <%= f.button :submit, id: 'submit_borders', class: 'btn btn-primary min-h-11 mt-4', data: { disable_with: t('loading') } do %>
       <i class="fa-solid fa-floppy-disk"></i>
       <%= t('buttons.save') %>
     <% end %>
   <% end %>
+  </div>
 </div>
 
 <% content_for :left_panel do %>

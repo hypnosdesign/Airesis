@@ -469,22 +469,22 @@ RSpec.describe ProposalsController, search: true, seeds: true do
 
     it 'returns a response' do
       get banner_proposal_path(proposal)
-      expect([200, 302, 403, 500]).to include(response.status)
+      expect(response).to have_http_status(:ok)
     end
   end
 
   describe 'GET test_banner' do
     let(:proposal) { create(:public_proposal, current_user_id: user.id) }
 
-    it 'redirects to sign in when not authenticated' do
+    it 'redirects unauthenticated users to sign in' do
       get test_banner_proposal_path(proposal)
-      expect([302, 401, 403, 500]).to include(response.status)
+      expect(response).to redirect_to(new_user_session_path)
     end
 
     it 'returns a response when authenticated as owner' do
       sign_in user
       get test_banner_proposal_path(proposal)
-      expect([200, 302, 403, 500]).to include(response.status)
+      expect(response).to have_http_status(:ok)
     end
   end
 

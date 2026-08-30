@@ -4,13 +4,16 @@ en-EU:
       title: "The Social Network for E-Democracy"
       description: "A tool of direct democracy born to decide and act collectively on proposals and ideas generated anywhere for any theme."
       technical_specs:
-        title: 'Tecnical Specs'
+        title: 'Technical specifications'
+      on_this_page: 'On this page'
+      more_topics: 'More topics'
+      overview: 'Overview'
       paragraph_1:
         title: "The Social Network for E-Democracy"
         content_html: |
-          <p>Airesis is a <a href="http://en.wikipedia.org/wiki/Free_software">free software platform</a>, built
+          <p>Airesis is a <a href="https://en.wikipedia.org/wiki/Free_software">free software platform</a>, built
           by a team of Italian developers and contributors, to enable communities and groups to organize themselves
-          in a productive manner according to the principles of <a href="http://en.wikipedia.org/wiki/Direct_democracy"
+          in a productive manner according to the principles of <a href="https://en.wikipedia.org/wiki/Direct_democracy"
           target="_blank">direct democracy</a> and participation.</p>
 
           <p>To achieve this goal, the application has been designed as a multifunctional system, which integrates all
@@ -33,7 +36,7 @@ en-EU:
         content_html: |
           <p>Airesis is an open source decision-making tool for e-democracy,
           strongly oriented to problem-solving and designed to maximize the immense evolutionary power
-          of <a heref="http://en.wikipedia.org/wiki/Collective_intelligence" target="_blank">collective intelligence</a>.</p>
+          of <a href="https://en.wikipedia.org/wiki/Collective_intelligence" target="_blank" rel="noopener noreferrer">collective intelligence</a>.</p>
           <p>Entirely developed by volunteers according to non-profit principles, Airesis was created to take faster,
           informed, shared and participated decisions.<br/>
           It is based on the following principles:</p>
@@ -276,9 +279,9 @@ en-EU:
         title: "Build your group"
         content_html: |
           <p>
-            If you are an association, a company, a school or a party, Airesis is certanly appropriate for you!<br/>
+            If you are an association, a company, a school or a party, Airesis can support your decision process.<br/>
             Create in just a few minutes your group and try out all the available tools.<br/>
-            Creating a group is free, quick and easy and %{groups} groups are already active.<br/>
+            Creating a group is free, quick and easy.<br/>
             Please read our documents on policy to find out how to organize it better and discover how easy it is
             to organize your group with Airesis and provide e-democracy tools!
           </p>
@@ -286,8 +289,8 @@ en-EU:
         title: "Organize participants"
         content_html: |
           <p>
-            A powerful mechanism for handling <strong> roles and permissions </strong> will allow you to give your group the shape you prefer:
-            you may have users with more or less permissions depeding on their role, hierarchically organize the participants
+            A powerful mechanism for handling <strong>roles and permissions</strong> lets you give your group the shape you prefer:
+            you may have users with different permissions depending on their role, hierarchically organize the participants
             or provide everyone equal rights and duties. </br>
             This is the reason why Airesis is perfectly suited to the needs of a <strong> Company </strong>, as well as a <strong> Democratic Movement </strong> or an <strong> Association </strong>.
           </p>
@@ -295,10 +298,9 @@ en-EU:
         title: "Propose and deliberate"
         content_html: |
           <p>
-            The heart of Airesis are the proposals: you will have several templates using which you can engage people in the group and hear their opinion. <br/>
+            The heart of Airesis is its structured proposal process: use focused templates to engage people and understand their views. <br/>
             You can debate on individual topics, build an agenda in a shared way or vote for candidates in a democratic way. <br/>
-            The  Proposals tool of Airesis is now the most sophisticated and complete mass deliberative system available online! <br/>
-            At this very moment %{users} users are discussing %{proposals} proposals.
+            Contributions remain connected to the proposal, so the community can move from discussion to a documented decision.
           </p>
       paragraph_5:
         title: "Organize your events, increase participation"
@@ -346,7 +348,7 @@ en-EU:
     press:
       title: "Press Release"
     tags:
-      title: "Airesis - The Social Network for E-Democracy"
+      title: "Decidiamoci — participatory democracy powered by Airesis"
       description: "A decision making tool for direct democracy and e-government: participate in discussions, bring your ideas, suggest solutions and vote online"
     engage:
       title: "Participate in the project for a new democracy"

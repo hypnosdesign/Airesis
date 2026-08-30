@@ -16,13 +16,13 @@
       <div class="flex items-center gap-3 mb-2">
         <div class="w-10 h-10 bg-primary/10 flex items-center justify-center text-primary shrink-0"><i class="fa-solid fa-pen text-lg"></i></div>
         <div>
-          <h2 class="font-bold text-lg leading-tight"><%= t('pages.proposals.new.step_1_heading', default: 'Titolo e territorio') %></h2>
-          <p class="text-[11px] text-base-content/40"><%= t('pages.proposals.new.step_1_desc', default: 'Dai un nome alla tua proposta e definisci il territorio di interesse.') %></p>
+          <h2 class="font-bold text-lg leading-tight"><%= t('pages.proposals.new.step_1_heading', default: 'Title and area') %></h2>
+          <p class="text-xs text-base-content/70"><%= t('pages.proposals.new.step_1_desc', default: 'Give your proposal a clear name and define its area of interest.') %></p>
         </div>
       </div>
 
       <fieldset class="fieldset">
-        <label class="fieldset-label font-medium"><%= t('pages.proposals.new.title_synthetic') %></label>
+        <%= f.label :title, t('pages.proposals.new.title_synthetic'), class: 'fieldset-label font-medium' %>
         <%= f.input_field :title, placeholder: t('pages.proposals.new.title_placeholder'), autocomplete: :off,
             class: "input input-bordered w-full", data: { fv_trigger: 'keyup' } %>
       </fieldset>
@@ -31,18 +31,18 @@
         <% available_areas = current_user.scoped_areas(@group, :insert_proposals) %>
         <% if available_areas.any? %>
           <fieldset class="fieldset">
-            <label class="fieldset-label font-medium"><%= t('activerecord.attributes.proposal.group_area_id', default: 'Area di lavoro') %></label>
+            <%= f.label :group_area_id, t('activerecord.attributes.proposal.group_area_id', default: 'Work area'), class: 'fieldset-label font-medium' %>
             <%= f.select :group_area_id, available_areas.collect { |p| [p.name, p.id] },
                 { prompt: t('pages.proposals.new.no_work_area_selected') },
                 { class: 'select select-bordered w-full' } %>
           </fieldset>
         <% else %>
-          <p class="text-sm text-base-content/50"><%= t('pages.proposals.new.cannot_add_proposal_in_work_area') %></p>
+          <p class="text-sm text-base-content/70"><%= t('pages.proposals.new.cannot_add_proposal_in_work_area') %></p>
         <% end %>
       <% end %>
 
       <fieldset class="fieldset">
-        <label class="fieldset-label font-medium"><%= t('activerecord.attributes.proposal.interest_borders_tkn', default: 'Territorio di interesse') %></label>
+        <%= f.label :interest_borders_tkn, t('activerecord.attributes.proposal.interest_borders_tkn', default: 'Area of interest'), class: 'fieldset-label font-medium' %>
         <%= f.input_field 'interest_borders_tkn',
             class: 'input input-bordered w-full',
             "data-pre" => @proposal.interest_borders.to_json,
@@ -56,14 +56,14 @@
         <div class="flex items-center gap-3 mb-2">
           <div class="w-10 h-10 bg-secondary/10 flex items-center justify-center text-secondary shrink-0"><i class="fa-solid fa-tags text-lg"></i></div>
           <div>
-            <h2 class="font-bold text-lg leading-tight"><%= t('pages.proposals.new.step_2_heading', default: 'Categoria e tag') %></h2>
-            <p class="text-[11px] text-base-content/40"><%= t('pages.proposals.new.step_2_desc', default: 'Classifica la proposta per renderla più facile da trovare.') %></p>
+            <h2 class="font-bold text-lg leading-tight"><%= t('pages.proposals.new.step_2_heading', default: 'Category and tags') %></h2>
+            <p class="text-xs text-base-content/70"><%= t('pages.proposals.new.step_2_desc', default: 'Classify the proposal so people can find it more easily.') %></p>
           </div>
         </div>
 
         <% if ::Configuration.proposal_categories %>
           <fieldset class="fieldset">
-            <label class="fieldset-label font-medium"><%= t('activerecord.attributes.proposal.proposal_category_id', default: 'Categoria') %></label>
+            <%= f.label :proposal_category_id, t('activerecord.attributes.proposal.proposal_category_id', default: 'Category'), class: 'fieldset-label font-medium' %>
             <%= f.select :proposal_category_id,
                 options_for_select(ProposalCategory.all.collect { |p| [p.description, p.id, { 'data-imagesrc' => image_path("proposal_categories/#{p.name}_s.png") }] }, @proposal.proposal_category_id),
                 { include_blank: t('pages.proposals.new.category_prompt') },
@@ -73,7 +73,7 @@
 
         <% if ::Configuration::folksonomy %>
           <fieldset class="fieldset">
-            <label class="fieldset-label font-medium"><%= t('activerecord.attributes.proposal.tags_list', default: 'Tag') %></label>
+            <%= f.label :tags_list, t('activerecord.attributes.proposal.tags_list', default: 'Tags'), class: 'fieldset-label font-medium' %>
             <%= f.input_field :tags_list, class: 'input input-bordered w-full',
                 placeholder: t('pages.proposals.new.tags_list_placeholder') %>
           </fieldset>
@@ -87,7 +87,7 @@
         <div class="w-10 h-10 bg-accent/10 flex items-center justify-center text-accent shrink-0"><i class="fa-solid fa-align-left text-lg"></i></div>
         <div>
           <h2 class="font-bold text-lg leading-tight"><%= @proposal.sections.first.title %></h2>
-          <p class="text-[11px] text-base-content/40"><%= t('pages.proposals.new.step_3_desc', default: 'Descrivi nel dettaglio la tua proposta.') %></p>
+          <p class="text-xs text-base-content/70"><%= t('pages.proposals.new.step_3_desc', default: 'Describe your proposal in enough detail for others to discuss it.') %></p>
         </div>
       </div>
 
@@ -96,7 +96,7 @@
         <%= s.input :seq, as: :hidden %>
         <%= s.fields_for :paragraphs, @proposal.sections.first.paragraphs.build(seq: 1) do |p| %>
           <fieldset class="fieldset">
-            <label class="fieldset-label font-medium"><%= @proposal.sections.first.question %></label>
+            <%= p.label :content, @proposal.sections.first.question, class: 'fieldset-label font-medium' %>
             <%= p.text_area :content, rows: 8, class: 'textarea textarea-bordered w-full text-sm' %>
             <%= p.hidden_field :seq %>
           </fieldset>
@@ -109,14 +109,14 @@
       <div class="flex items-center gap-3 mb-2">
         <div class="w-10 h-10 bg-info/10 flex items-center justify-center text-info shrink-0"><i class="fa-solid fa-check-to-slot text-lg"></i></div>
         <div>
-          <h2 class="font-bold text-lg leading-tight"><%= t('pages.proposals.new.step_4_heading', default: 'Quorum e votazione') %></h2>
-          <p class="text-[11px] text-base-content/40"><%= t('pages.proposals.new.step_4_desc', default: 'Scegli le regole di votazione per la tua proposta.') %></p>
+          <h2 class="font-bold text-lg leading-tight"><%= t('pages.proposals.new.step_4_heading', default: 'Quorum and voting') %></h2>
+          <p class="text-xs text-base-content/70"><%= t('pages.proposals.new.step_4_desc', default: 'Choose the debate and voting rules for your proposal.') %></p>
         </div>
       </div>
 
       <%= render partial: '/proposal_types/quorum_choice', locals: { f: f } %>
 
-      <div class="text-sm text-base-content/50">
+      <div class="text-sm text-base-content/70">
         <%= t('pages.proposals.new.step_4_footer_html', app_short_name: APP_SHORT_NAME) %>
       </div>
 
@@ -150,7 +150,7 @@
 
     <%# Actions %>
     <div class="flex items-center justify-end gap-3">
-      <%= link_to t('buttons.cancel'), :back, class: 'btn btn-outline font-bold gap-2' unless request.xhr? %>
+      <%= link_to t('buttons.cancel'), (@group ? group_proposals_path(@group) : proposals_path), class: 'btn btn-outline font-bold gap-2' unless request.xhr? %>
       <%= f.submit t('pages.proposals.new.create_button'), class: 'btn btn-primary font-bold gap-2', data: { disable_with: t('loading') } %>
     </div>
 

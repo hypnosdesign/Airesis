@@ -1,24 +1,20 @@
-<div class="solution_main card" data-solution_id="{{solution.id}}" data-compressed="false"
+<section class="solution_main border-2 border-base-content/15 bg-base-100 p-5" data-solution_id="{{solution.id}}" data-compressed="false"
      data-persisted="{{solution.persisted}}">
-    <h3>
-        <div class="tit1 sol">
-            <div class="tit2">
-                <span class="title_placeholder">
-                    {{{solution.solution_title}}}
-                </span>
-
-                <div class="inputs">
+    <input name="proposal[solutions_attributes][{{solution.id}}][id]"
+           type="hidden" value="{{solution.recordId}}">
+    <div class="mb-4">
+        <h2 class="mb-3 text-lg font-bold">{{{solution.solution_title}}}</h2>
+        <div class="inputs">
+                    <label class="mb-2 block text-sm font-semibold"
+                           for="proposal_solutions_attributes_{{solution.id}}_title">{{solution.titleLabel}}</label>
                     <input id="proposal_solutions_attributes_{{solution.id}}_title"
                            name="proposal[solutions_attributes][{{solution.id}}][title]"
                            placeholder="{{solution.title_placeholder}}" type="text"
-                           value="{{solution.title}}" data-validate="true">
-                </div>
-            </div>
-          <span class="remove_sol_button">
-            <a href="#" data-remove-solution data-solution_id="{{solution.id}}">{{solution.removeSolution}}</a>
-          </span>
+                           value="{{solution.title}}"
+                           class="input input-bordered w-full"
+                           data-validate="true">
         </div>
-    </h3>
+    </div>
     <div class="sol_content">
         <div class="solutions_column" data-solution_id="{{solution.id}}">
             <input id="proposal_solutions_attributes_{{solution.id}}_seq"
@@ -33,10 +29,5 @@
                 {{> proposals/_solution_section}}
             {{/solution.sections}}
         </div>
-        <div class="new_section">
-            <a href="#" class="btn full-width" data-add-solution-section data-solution_id="{{solution.id}}">
-                {{solution.addParagraph}}
-            </a>
-        </div>
     </div>
-</div>
+</section>

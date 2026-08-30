@@ -1,30 +1,35 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
-       "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-
-<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
-
+<!DOCTYPE html>
+<html lang="en-EU">
 <head>
-  <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
-  <title>The change you wanted was rejected (422)</title>
-	<style type="text/css">
-		body { background-color: #fff; color: #666; text-align: center; font-family: arial, sans-serif; }
-		div.dialog {
-			width: 25em;
-			padding: 0 4em;
-			margin: 4em auto 0 auto;
-			border: 1px solid #ccc;
-			border-right-color: #999;
-			border-bottom-color: #999;
-		}
-		h1 { font-size: 100%; color: #f00; line-height: 1.5em; }
-	</style>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Request rejected</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root { color-scheme: light; font-family: "Sora", system-ui, sans-serif; }
+    * { box-sizing: border-box; }
+    body { align-items: center; background: #eceff4; color: #2e3440; display: flex; justify-content: center; margin: 0; min-height: 100vh; padding: 24px; }
+    main { background: #fff; border: 1px solid #d8dee9; border-radius: 16px; box-shadow: 0 24px 60px -36px rgba(46, 52, 64, .65); max-width: 640px; padding: clamp(32px, 7vw, 64px); text-align: center; width: 100%; }
+    .icon { align-items: center; background: #e5e9f0; border-radius: 16px; display: inline-flex; font-size: 20px; height: 56px; justify-content: center; width: 56px; }
+    h1 { font-size: clamp(32px, 7vw, 48px); letter-spacing: -.03em; line-height: 1.1; margin: 24px 0 0; text-wrap: balance; }
+    p { color: #4c566a; line-height: 1.65; margin: 16px auto 0; max-width: 48ch; }
+    nav { display: flex; flex-wrap: wrap; gap: 12px; justify-content: center; margin-top: 32px; }
+    a { border: 2px solid #5e81ac; border-radius: 10px; color: #2e3440; font-weight: 700; padding: 10px 16px; text-decoration: none; }
+    a:first-child { background: #5e81ac; color: #fff; }
+    a:focus-visible { outline: 3px solid #88c0d0; outline-offset: 3px; }
+  </style>
 </head>
-
 <body>
-  <!-- This file lives in public/422.html -->
-  <div class="dialog">
-    <h1>The change you wanted was rejected.</h1>
-    <p>Maybe you tried to change something you didn't have access to.</p>
-  </div>
+  <main>
+    <div class="icon" aria-hidden="true">!</div>
+    <h1>This request was rejected</h1>
+    <p>Your session may have expired, or you may not have access to change this resource. Return to a safe page and try again.</p>
+    <nav aria-label="Recovery options">
+      <a href="/">Go to the homepage</a>
+      <a href="/public">Explore public space</a>
+    </nav>
+  </main>
 </body>
 </html>

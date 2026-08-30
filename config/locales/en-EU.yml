@@ -8,16 +8,41 @@ en-EU:
   open_space: 'Open space'
   hello: 'Hello world'
   pages:
+    accessibility:
+      skip_to_content: "Skip to main content"
+    sidebar:
+      overview: "Overview"
+      messages: "Messages"
+      proposals: "Proposals"
+      groups: "Groups"
+      events: "Events"
+      quick_actions: "Create"
+      new_proposal: "New proposal"
+      new_group: "New group"
+      new_event: "New event"
+      all_groups: "All groups →"
+      settings: "Settings"
+      product_home: "%{app} homepage"
+      primary_navigation: "Primary navigation"
+    footer:
+      built_on_airesis: "Built on Airesis"
+    errors:
+      home_action: "Go to the homepage"
+      explore_action: "Explore public space"
     top_panel:
       login: 'Login or sign up'
-      facebook_login: 'Login with Facebook'
-      google_login: 'Login with Google'
-      twitter_login: "Login with Twitter"
+      facebook_login: 'Continue with Facebook'
+      google_login: 'Continue with Google'
+      twitter_login: "Continue with Twitter"
       find_groups: 'Search Groups'
     user:
       notifications: 'Alarms and Notifications'
       privacy: "Account and privacy"
     users:
+      settings_navigation: "Account settings"
+      settings_scroll_hint: "Scroll horizontally to see every settings section."
+      account_settings: "Login & password"
+      notification_inbox: "Notification inbox"
       index:
         title: 'User List'
       show:
@@ -51,6 +76,15 @@ en-EU:
         group_level_permission_title: "Group level permissions"
         admin_permissions: "You are administrator of this group and you have all permissions"
         twitter_url: "Twitter URL"
+        profile_info_desc: "Personal details and contact information."
+        edit_name: "Edit name"
+        edit_surname: "Edit last name"
+        edit_password: "Change password"
+        edit_email: "Edit email address"
+        proposals_count: "Proposals"
+        comments_count: "Comments"
+        events_count: "Events"
+        active_groups_count: "%{count} active groups"
       send_message:
         subject_label: "Subject"
         body_label: "Body"
@@ -66,7 +100,12 @@ en-EU:
         receive_on_address: "Get newsletter on %{email}"
         alerts: "Alerts"
         emails: "Emails"
+        description: "Choose which activity appears in the app and which updates are also sent by email."
+        email_requires_alert: "Enable the in-app notification before enabling email."
+        newsletter: "Community newsletter"
+        newsletter_toggle: "Receive the newsletter by email"
       privacy_preferences:
+        description: "Manage account behavior, security, language and connected sign-in providers."
         tooltips: "Show tooltips"
         show_urls: "Show Facebook and Google+ URLs to users"
         private_messages: "Receive private messages from other users"
@@ -84,10 +123,25 @@ en-EU:
         rotp_confirm_disable: "Are you sure you want to disable the security token?"
         mail_language: "Language for e-mails"
         time_zone: "Time Zone"
+        providers_unavailable: "External sign-in providers are not enabled on this instance."
       border_preferences:
         updating: "Please wait while we update your preferences according to your border preferences"
         your_borders: "Your geographical borders of interest"
       send_message_title: "Send a message to %{name}"
+    searches:
+      title: "Search"
+      description: "Find proposals, groups and community blogs."
+      query_label: "What are you looking for?"
+      submit: "Search"
+      empty_title: "No results found"
+      empty_description: "Try a shorter term or explore the public space."
+      explore: "Explore public space"
+      groups: "Groups"
+      proposals: "Proposals"
+      blogs: "Blogs"
+      no_groups: "No matching groups."
+      no_proposals: "No matching proposals."
+      no_blogs: "No matching blogs."
     groups:
       accept_requests:
         portavoce: "Administrator: when a user wants to join the group, only the administrator of the group can accept the request. When the administrator accepts the request, the user becomes an actual member of the group."
@@ -300,25 +354,71 @@ en-EU:
         page_title: "Archive for %{month}, %{year}"
     login:
       title: 'Login'
+      subtitle: 'Enter your details to continue.'
+      welcome_back: 'Welcome back'
+      welcome_desc: 'Sign in to take part in your community’s decisions.'
+      or_with_email: 'or use email'
+      your_password: 'Your password'
+      no_account: 'Need an account?'
     confirmation:
       title: 'Re-send Confirmation Instructions'
-      submit: 'Send me the instructions'
+      subtitle: 'We will send new confirmation instructions to your inbox.'
+      illustration_title: 'Confirm your account'
+      illustration_desc: 'Request a fresh confirmation link for your email address.'
+      submit: 'Send confirmation email'
     password:
       title: 'Have you forgotten your password?'
-      submit: 'Please send me the instructions to reset the password'
+      subtitle: 'Enter your email address to receive reset instructions.'
+      illustration_title: 'Forgot your password?'
+      illustration_desc: 'We will send a secure reset link to your email address.'
+      submit: 'Send reset link'
       edit:
         new_password: "New password"
         confirm_password: "Confirm the new password"
         confirm_button: "Change my password"
+    unlock:
+      title: 'Unlock your account'
+      subtitle: 'Enter your email to receive new unlock instructions.'
+      submit: 'Send unlock instructions'
     registration:
       title: 'Register'
+      edit_title: 'Account settings'
+      subtitle: 'Join the community and start participating.'
+      or_with_email: 'or use email'
       email_confirmed: "If you register with that email address you will not be asked to confirm your email address."
       choose_password: "Choose a password"
       confirm_password: "Confirm password"
+      repeat_password: 'Repeat your password'
+      min_chars: 'At least 6 characters'
+      password_hint: 'Use at least 6 characters.'
       accept_conditions: "Accept the Terms of Service"
+      i_accept: 'I accept the'
+      terms_link: 'Terms of Service'
+      conditions_title: 'Terms of Service'
+      terms_language_notice: 'This legal document is currently available in Italian.'
       register_button: "Register"
       identity_provviders_title: "Get in immediately with your favourite account"
       accept_privacy: "Accept Privacy Terms"
+      i_accept_privacy: 'I accept the'
+      privacy_link: 'Privacy Policy'
+      privacy_title: 'Privacy Policy'
+      already_have_account: 'Already have an account?'
+      join_us: 'Join the community'
+      join_desc: 'More than 20 languages, transparent deliberation and accountable voting.'
+      languages: 'Languages'
+      edit_subtitle: 'Manage your profile, password and account settings.'
+      profile_section: 'Profile'
+      profile_desc: 'Your basic account information.'
+      password_section: 'Password'
+      password_desc: 'Leave these fields blank if you do not want to change it.'
+      new_password: 'New password'
+      confirm_section: 'Confirm changes'
+      confirm_desc: 'Enter your current password to save these changes.'
+      current_password: 'Current password'
+      danger_zone: 'Delete account'
+      danger_desc: 'This permanently removes your account and cannot be undone.'
+      cancel_confirm: 'Delete this account permanently? This action cannot be undone.'
+      cancel_account: 'Delete my account'
     proposals:
       index:
         title: 'List of proposals'
@@ -360,6 +460,11 @@ en-EU:
         date_range: "created between %{start} and %{end}"
         proposal_types_title: "MODELS"
         all_proposal_types: "All models"
+        filters: "Filters"
+        close_filters: "Close filters"
+        state_navigation: "Proposal states"
+        proposals_description: "Explore proposals from the community"
+        group_proposals_description: "%{group} proposals"
         with_text: "containing '%{text}'"
         last_24h: "created in the last 24 hours"
         last_1h: "created in the last hour"
@@ -368,6 +473,17 @@ en-EU:
         last_1y: "created in the last year"
         territory: "Territory"
       show:
+        views: "views"
+        contributions: "contributions"
+        evaluations: "evaluations"
+        solutions:
+          one: "Solution"
+          other: "Solutions"
+        solution_count:
+          one: "%{count} voting option"
+          other: "%{count} voting options"
+        contributions_heading: "Contributions"
+        contributions_description: "Discussion and suggested improvements"
         random_stack: 'Smart sorting'
         most_recent: 'Most recent'
         most_ranked: 'Most evaluated'
@@ -476,6 +592,14 @@ en-EU:
         abandoned_message: "Abandoned %{ago}"
         start_votation_button: "Start Votation"
       new:
+        step_1_heading: "Title and area"
+        step_1_desc: "Give your proposal a clear name and define its area of interest."
+        step_2_heading: "Category and tags"
+        step_2_desc: "Classify the proposal so people can find it more easily."
+        step_3_desc: "Describe your proposal in enough detail for others to discuss it."
+        step_4_heading: "Quorum and voting"
+        step_4_desc: "Choose the debate and voting rules for your proposal."
+        step_4_footer_html: "The quorum determines when the debate is complete and how the proposal moves to a vote on %{app_short_name}."
         quorum_prompt: "Select quorum"
         quorum_help: "Help"
         step_classification: "Classification"
@@ -520,6 +644,7 @@ en-EU:
         authors: "Editors"
         support_group: "Support groups"
         no_proposals: "No proposals yet"
+        no_proposals_hint: "Try another state or adjust the filters."
         condition_left: "Condition to end the debate"
         time_left: "Time left"
         vote: "VOTE"
@@ -572,6 +697,15 @@ en-EU:
           If, on the contrary, you are searching for a poll or you want an alternative that is not integrable in the first solution then proceed.<br/>
           Remember that, before the debate ends, you will be able to add or remove solutions, modifying the method of vote used.
         paragraph: "Paragraph"
+        section_title: "Section title"
+        section_content: "Content for %{title}"
+        solution_title: "Solution title"
+        formatting_toolbar: "Formatting options for %{field}"
+        proposal_sections: "Proposal sections"
+        section_display_controls: "Section display controls"
+        expand_all_sections: "Expand all"
+        collapse_all_sections: "Collapse all"
+        edit_section: "Edit section"
         confirm_paragraph_deletion: "You sure you want to delete this paragraph?"
         confirm_solution_deletion: "You sure you want to delete this solution?"
         press_to_expand: "Click on the title to expand this solution"
@@ -584,6 +718,21 @@ en-EU:
         show_contributes: "Show contributions"
         cancel_confirm: "Cancel your operations and show the proposal?"
         update_confirm: "You have not integrated any contribution. Are you sure to continue?"
+      states:
+        in_discussion: "In discussion"
+        awaiting_voting_date: "Awaiting a voting date"
+        voting_scheduled: "Voting scheduled"
+        voting: "Voting"
+        rejected: "Rejected"
+        accepted: "Accepted"
+        revision: "Revision"
+        abandoned: "Abandoned"
+      banner:
+        label: "Airesis proposal"
+        kicker: "Proposal on %{app}"
+        preview_title: "Proposal banner preview"
+        preview_help: "This is how the compact proposal banner adapts to the available width."
+        preview: "Banner preview"
       manage_noise:
         available: "Contributions eligible for deletion"
         removed: "Contributions removed from discussion"
@@ -698,14 +847,19 @@ en-EU:
       polling:
         show_all: "Show all notifications"
       index:
+        description: "Review activity that needs your attention and your notification history."
         new_not_read: "New unread notifications"
         no_new: "No new notification"
+        no_new_description: "You are all caught up. New activity will appear here."
         old_not_read: "Old notifications already read"
         no_old: "No notification"
+        mark_all_read: "Mark all as read"
+        marked_all_read: "All notifications marked as read."
     blog_comments:
       new:
         insert_comment: "Insert comment"
     header:
+      member: "Member"
       groups:
         events: "EVENTS"
         proposals: "PROPOSALS"
@@ -736,6 +890,10 @@ en-EU:
       new_group: "Find groups"
       support_us: "SUPPORT US"
       no_alerts: "No alerts"
+      notifications: "Notifications"
+      notifications_count: "%{count} unread notifications"
+      see_all_notifications: "See all notifications"
+      account_menu: "Account menu for %{name}"
       read: "Read"
     blogs:
       show:
@@ -799,11 +957,53 @@ en-EU:
         most_active_groups: "Most active groups"
         show_groups: "Show all groups"
         last_proposals: "Last public proposals"
+        proposals_subtitle: "Recent proposals in the public space"
+        no_proposals: "No public proposals yet"
         from_blogs: "Last posts from blogs"
+        blogs_subtitle: "Recent writing from the community"
+        no_blog_posts: "No public blog posts yet"
+        no_groups: "No active public groups yet"
+        no_events: "No public events are scheduled"
+        no_tags: "No public tags yet"
         features: "Features"
         volunteers: "Volunteers"
+        testimonials_title: "Voices on democratic participation"
+        features_title: "From ideas to accountable decisions"
+        explore_public: "Explore public decisions"
+        how_decisions_work: "How decisions work"
+        member_title: "Already part of a community?"
+        member_description: "Sign in to continue a discussion, refine a proposal or take part in a vote."
+        new_here: "New here?"
+        explore_first: "Explore the public space first"
+        legal_navigation: "Legal information"
+        footer_description: "Open-source infrastructure for participatory democracy"
+        airesis_attribution: "Built on Airesis"
+        back_to_top: "Back to top"
       show:
+        welcome_back: "Welcome back, %{name}!"
+        dashboard_subtitle: "Here is what is happening in your community."
         your_proposals: "Proposals you participate in"
+        unread_notifications: "Unread"
+        voting_subtitle: "Take part in proposals that are ready for a decision."
+        see_all: "See all"
+        no_proposals_voting: "No proposals are in voting right now."
+        proposals_subtitle: "Proposals you are helping to shape."
+        no_proposals: "You are not participating in a proposal yet."
+        proposals_by_state: "Proposals by state"
+        quick_actions: "Quick actions"
+        first_run_eyebrow: "Start participating"
+        first_run_title: "Your civic workspace is ready"
+        first_run_description: "There is no activity in your workspace yet. Explore how decisions work, find a community or start the first proposal."
+        first_run_steps_label: "Three ways to get started"
+        first_run_explore_title: "Understand the process"
+        first_run_explore_description: "See the public space and learn how ideas move from discussion to decision."
+        first_run_explore_action: "Explore public space"
+        first_run_groups_title: "Find your community"
+        first_run_groups_description: "Join a group working on a place or topic you care about."
+        first_run_groups_action: "Browse groups"
+        first_run_proposal_title: "Put forward an idea"
+        first_run_proposal_description: "Create a proposal when you are ready to invite discussion and improve it together."
+        first_run_proposal_action: "Create a proposal"
         proposals:
           title: "Title"
           last_edit: "Last edit"
@@ -812,11 +1012,26 @@ en-EU:
         notifications:
           title: "Alerts"
         your_contributes: "Your last contributions"
-        your_territory: "Your territory (test)"
+        your_territory: "Your territory"
+        rejected: "Rejected"
         no_proposals_to_vote_now: "No proposals in the voting phase at the moment"
         proposals_now_voting: "Proposals to vote in now"
     open_space:
+      start_title: "Start by exploring"
+      start_description: "You can read public proposals, see how deliberation works and understand the community before creating an account."
+      start_steps_label: "How participation works"
+      step_explore: "Explore public work"
+      step_discuss: "Compare viewpoints"
+      step_decide: "Take part in decisions"
+      how_it_works: "See how it works"
+      activity_summary: "Public activity summary"
+      ready_title: "This public space is ready for its first activity"
+      ready_description: "There is no public content in this local environment yet. Use the guide above to learn the workflow, then create an account when you are ready to participate."
+      proceed_to_proposals: "View all proposals"
+      proceed_to_blogs: "View all blog posts"
       layout:
+        title: "Public space"
+        subtitle: "Public proposals, writing, groups and events in one place"
         proposals_button: "PROPOSALS"
         calendar_button: "CALENDAR"
         map_button: "MAP"
@@ -837,8 +1052,11 @@ en-EU:
         remember_me_label: "Remember me"
       links:
         register: "Not registered yet? Sign up!"
+        register_action: "Create an account"
         forgot_password: "Forgot your password?"
+        reset_action: "Reset your password"
         havent_received_email: "Haven't received confirmation email?"
+        confirmation_action: "Resend confirmation email"
     steps:
       next: "Continue"
       interest_borders:
@@ -942,6 +1160,7 @@ en-EU:
     passwords:
       edit:
         title: "Change your password"
+        subtitle: "Choose a new password for your account."
     event_comments:
       new:
         insert_comment: "Insert a comment"
@@ -1039,6 +1258,7 @@ en-EU:
       vote_here: "This proposal is in the voting phase. Read the solution(s) and %{link}."
   digit_tags: "Type the tags you want to add"
   buttons:
+    back: "Back"
     cancel: "Cancel"
     save: "Save"
     report: "Report"
@@ -1164,10 +1384,10 @@ en-EU:
         title: "This group doesn't exist"
         description: "The group you are looking for doesn't exist or has been deleted"
       title: "The page you are looking for doesn't exist"
-      description: "Your address might be wrong, or this page does no longer exist"
+      description: "The address may be incorrect, or the page may no longer exist."
     error_500:
       title: "Oops...our mistake"
-      description: "A  report has been sent and the problem will be fixed as soon as possible."
+      description: "We could not complete this request. The error has been recorded; return to a safe page and try again later."
     event:
       comment_added: "Error while entering the comment"
     participations_destroyed: "Error during operation"
@@ -1399,6 +1619,7 @@ en-EU:
       blog_post: "Look at this post on #%{app}! %{tags}"
       event: "There is a new event on #%{app}"
   home:
+    archived_italian_notice: "Historical Airesis project presentation, preserved in Italian only."
     portlets:
       last_proposals:
         proceed_to_proposals: "Proceed to proposals"
@@ -1406,6 +1627,19 @@ en-EU:
         proceed_to_blogs: "Proceed to blogs"
       topics:
         title: "Topics you are following"
+        subtitle: "The latest discussions you followed"
+        empty: "No recent discussions"
+    statistics:
+      title: "Community statistics"
+      description: "A current snapshot of participation across this instance."
+      proposals_number: "All proposals"
+      proposals_debate: "Proposals in debate"
+      proposals_vote: "Proposals in voting"
+      proposals_voted: "Completed votes"
+      proposals_rejected: "Archived proposals"
+      users_count: "Registered users"
+      users_lastmonth: "Active in the last month"
+      groups_count: "Groups"
   confirm_detach: "Are you sure to remove this Identity Provider? You will not be able to use it in the future."
   alert_detach: "You must provide a valid email address in order to remove this Identity Provider"
   users:
@@ -1417,14 +1651,20 @@ en-EU:
         If you do not remember the password, proceed to the 'Recover Password' page.
     statistics:
       title: "User statistics"
+      description: "A private summary of your participation and proposal activity."
+      account_group: "Account activity"
+      contributions_group: "Contributions"
+      proposals_group: "Proposals"
+      quality_group: "Writing quality"
+      not_available: "Not available"
       last_login: "Last login"
-      integrated_count: "Integrated contributions number"
+      integrated_count: "Integrated contributions"
       spam_count: "SPAM Contributions number"
-      noisy_count: "Noisy contributions number"
+      noisy_count: "Flagged as noisy"
       total_count: "Total contributions number"
       total_comments_count: "Total comments number"
       proposals_editor: "Number of proposals you have edited"
-      proposals_voted: "Number of proposals that have been voted"
+      proposals_voted: "Proposals voted on"
       average_rank_voted_proposals: "Average rank of proposals that have been voted"
       proposals_accepted_count: "Number of proposals that have been accepted"
       proposals_abandonend_count: "Number of proposals that have been abandoned"

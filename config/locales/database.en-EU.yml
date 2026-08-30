@@ -23,6 +23,8 @@ en-EU:
         description: English (South Africa)
       es-AR:
         description: Spanish (Argentina)
+      es-AC:
+        description: Spanish (Latin America)
       es-CL:
         description: Spanish (Chile)
       es-EC:

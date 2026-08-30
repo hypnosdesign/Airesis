@@ -18,15 +18,6 @@ RSpec.describe ProposalsHelper, type: :helper, seeds: true do
     end
   end
 
-  describe '#reload_message' do
-    it 'returns a JS toastr string' do
-      result = helper.reload_message
-      expect(result).to include('toastr')
-      expect(result).to include('reload_proposal')
-      expect(result).to include('Reload')
-    end
-  end
-
   describe '#proposal_tag' do
     let(:user) { create(:user) }
     let(:proposal) { create(:public_proposal, current_user_id: user.id) }
@@ -92,6 +83,14 @@ RSpec.describe ProposalsHelper, type: :helper, seeds: true do
       proposal.update_column(:proposal_state_id, ProposalState::ABANDONED)
       result = helper.proposal_status(proposal)
       expect(result).to be_a(String) if result
+    end
+  end
+
+  describe '#proposal_state_label' do
+    it 'localizes seeded proposal states instead of exposing database copy' do
+      state = ProposalState.find(ProposalState::VALUTATION)
+
+      expect(helper.proposal_state_label(state)).to eq('In discussion')
     end
   end
 

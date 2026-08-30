@@ -1,6 +1,6 @@
 <%= form_with model: [@proposal, proposal_comment], id: 'new_comment_form' do |f| %>
   <div class="space-y-3">
-    <label class="font-semibold text-base-content">
+    <label for="proposal_comment_content" class="font-semibold text-base-content">
       <i class="fa-solid fa-comment-dots"></i>
       <%= t('pages.proposals.show.add_contribute') %>
     </label>

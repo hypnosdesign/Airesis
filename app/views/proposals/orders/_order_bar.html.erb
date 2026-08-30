@@ -1,25 +1,19 @@
-<div class="order-options">
+<nav class="mb-4 flex flex-wrap items-center gap-2 text-sm" aria-label="<%= t('pages.proposals.index.sort_navigation', default: 'Sort proposals') %>">
+  <span class="font-bold"><%= t('pages.proposals.index.sort_by', default: 'Sort by:') %></span>
   <% if params[:state] == ProposalState::TAB_VOTATION.to_s %>
     <%= render partial: '/proposals/orders/order_by_votation_end' %>
-    <span class="order_separator">|</span>
     <%= render partial: '/proposals/orders/order_by_date' %>
   <% elsif params[:state] == ProposalState::TAB_VOTED.to_s %>
     <%= render partial: '/proposals/orders/order_by_votes_number' %>
-    <span class="order_separator">|</span>
     <%= render partial: '/proposals/orders/order_by_votation_end' %>
   <% elsif params[:state] == ProposalState::TAB_REVISION.to_s %>
     <%= render partial: '/proposals/orders/order_by_date' %>
-    <span class="order_separator">|</span>
     <%= render partial: '/proposals/orders/order_by_rank' %>
-    <span class="order_separator">|</span>
     <%= render partial: '/proposals/orders/order_by_valutations' %>
   <% else %>
     <%= render partial: '/proposals/orders/order_by_date' %>
-    <span class="order_separator">|</span>
     <%= render partial: '/proposals/orders/order_by_rank' %>
-    <span class="order_separator">|</span>
     <%= render partial: '/proposals/orders/order_by_valutations' %>
-    <span class="order_separator">|</span>
     <%= render partial: '/proposals/orders/order_by_debate_end' %>
   <% end %>
-</div>
+</nav>

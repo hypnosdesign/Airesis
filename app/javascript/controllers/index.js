@@ -10,6 +10,9 @@ application.register("autosubmit", AutosubmitController)
 import CountdownController from "./countdown_controller"
 application.register("countdown", CountdownController)
 
+import DropdownController from "./dropdown_controller"
+application.register("dropdown", DropdownController)
+
 import FlashController from "./flash_controller"
 application.register("flash", FlashController)
 
@@ -37,11 +40,17 @@ application.register("cookie-consent", CookieConsentController)
 import SidebarMenuController from "./sidebar_menu_controller"
 application.register("sidebar-menu", SidebarMenuController)
 
+import SidebarDrawerController from "./sidebar_drawer_controller"
+application.register("sidebar-drawer", SidebarDrawerController)
+
 import ChartController from "./chart_controller"
 application.register("chart", ChartController)
 
 import RightDrawerController from "./right_drawer_controller"
 application.register("right-drawer", RightDrawerController)
+
+import ProposalEditorController from "./proposal_editor_controller"
+application.register("proposal-editor", ProposalEditorController)
 
 import CalendarController from "./calendar_controller"
 application.register("calendar", CalendarController)

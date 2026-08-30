@@ -1,17 +1,36 @@
 <% @page_title = t('pages.passwords.edit.title') %>
-<div class="card bg-base-200 p-4">
-  <h2><%= @page_title %></h2>
 
-  <%= simple_form_for(@user, url: user_password_path, html: { data: { turbo_method: :put } }) do |f| %>
-    <%= render partial: 'fragments/error_messages', locals: { resource: resource } %>
+<main class="flex-1 flex items-center justify-center px-4 py-12">
+  <div class="auth-card max-w-2xl">
+    <div class="w-full p-8 sm:p-12">
+      <div class="mb-8 flex items-start gap-4">
+        <div class="flex size-12 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary">
+          <i class="fa-solid fa-key" aria-hidden="true"></i>
+        </div>
+        <div>
+          <h1 class="text-3xl font-extrabold"><%= @page_title %></h1>
+          <p class="auth-copy mt-2"><%= t('pages.passwords.edit.subtitle', default: 'Choose a new password for your account.') %></p>
+        </div>
+      </div>
 
-    <%= f.hidden_field :reset_password_token %>
-    <%= f.input :password, label: t('pages.password.edit.new_password'), required: true %>
-    <%= f.input :password_confirmation,
-                label: t('pages.password.edit.confirm_password'), required: true,
-                input_html: { data: { fv_identical_field: 'user[password]', fv_identical: true } } %>
-    <%= f.submit t('pages.password.edit.confirm_button'), class: 'btn btn-primary' %>
-  <% end %>
+      <%= simple_form_for(@user, url: user_password_path, html: { class: 'space-y-5', data: { turbo_method: :put } }) do |f| %>
+        <%= render partial: 'fragments/error_messages', locals: { resource: resource } %>
+        <%= f.hidden_field :reset_password_token %>
 
-  <%= render partial: 'devise/shared/links' %>
-</div>
+        <fieldset class="fieldset">
+          <%= f.label :password, t('pages.password.edit.new_password'), class: 'fieldset-label font-medium' %>
+          <%= f.input_field :password, as: :password, required: true, autocomplete: 'new-password', class: 'input input-bordered w-full' %>
+          <p class="mt-1 text-xs text-base-content/70"><%= t('pages.registration.password_hint', default: 'Use at least 6 characters.') %></p>
+        </fieldset>
+
+        <fieldset class="fieldset">
+          <%= f.label :password_confirmation, t('pages.password.edit.confirm_password'), class: 'fieldset-label font-medium' %>
+          <%= f.input_field :password_confirmation, as: :password, required: true, autocomplete: 'new-password',
+              data: { fv_identical_field: 'user[password]', fv_identical: true }, class: 'input input-bordered w-full' %>
+        </fieldset>
+
+        <%= f.submit t('pages.password.edit.confirm_button'), class: 'btn btn-primary min-h-11 h-auto w-full whitespace-normal py-2 font-bold' %>
+      <% end %>
+    </div>
+  </div>
+</main>

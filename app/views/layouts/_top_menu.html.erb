@@ -1,16 +1,25 @@
 <nav class="navbar bg-base-100 border-b-2 border-base-content/15 px-4 sticky top-0 z-30 min-h-16">
   <%# Sidebar toggle %>
-  <label for="sidebar-drawer" aria-label="apri sidebar" class="btn btn-ghost btn-circle">
+  <button type="button"
+          aria-label="<%= t('pages.header.open_navigation', default: 'Open navigation') %>"
+          aria-controls="sidebar-drawer"
+          aria-expanded="false"
+          class="btn btn-ghost btn-circle size-11 min-h-11"
+          data-sidebar-drawer-target="toggle"
+          data-open-label="<%= t('pages.header.open_navigation', default: 'Open navigation') %>"
+          data-close-label="<%= t('pages.header.close_navigation', default: 'Close navigation') %>"
+          data-action="sidebar-drawer#toggle">
     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" stroke-linejoin="round" stroke-linecap="round" stroke-width="2" fill="none" stroke="currentColor" class="size-5"><path d="M4 4m0 2a2 2 0 0 1 2 -2h12a2 2 0 0 1 2 2v12a2 2 0 0 1 -2 2h-12a2 2 0 0 1 -2 -2z"></path><path d="M9 4v16"></path><path d="M14 10l2 2l-2 2"></path></svg>
-  </label>
+  </button>
 
   <%# Search %>
   <div class="flex-1 px-4">
     <% if current_user %>
-      <%= simple_form_for Search.new, html: { class: 'm-0' } do |f| %>
+      <%= form_with url: searches_path, method: :get, html: { class: 'm-0', role: 'search' } do %>
         <div class="relative w-full max-w-sm hidden sm:block">
-          <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-base-content/30 text-sm"></i>
-          <%= f.text_field :q, placeholder: t('placeholder.find'), class: 'input input-bordered w-full pl-10 h-10 text-sm' %>
+          <label for="global_search_term" class="sr-only"><%= t('pages.searches.query_label', default: 'Search proposals, groups and blogs') %></label>
+          <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-base-content/75 text-sm" aria-hidden="true"></i>
+          <input id="global_search_term" name="term" type="search" autocomplete="off" placeholder="<%= t('placeholder.find') %>" class="input input-bordered w-full pl-10 h-11 text-sm">
         </div>
       <% end %>
     <% end %>
@@ -19,39 +28,64 @@
   <%# Right actions %>
   <div class="flex items-center gap-1">
     <%# Theme toggle %>
-    <label class="swap swap-rotate btn btn-ghost btn-circle">
-      <input type="checkbox" data-action="change->theme#toggle">
+    <label class="swap swap-rotate btn btn-ghost btn-circle size-11 min-h-11">
+      <input type="checkbox" data-action="change->theme#toggle" aria-label="<%= t('pages.header.toggle_theme', default: 'Toggle color theme') %>">
       <svg class="swap-off w-5 h-5 fill-current" viewBox="0 0 24 24"><path d="M21.64 13a1 1 0 00-1.05-.14 8.05 8.05 0 01-3.37.73A8.15 8.15 0 019.08 5.49a8.59 8.59 0 01.25-2 1 1 0 00-1.29-1.2A10 10 0 1021.64 13z"/></svg>
       <svg class="swap-on w-5 h-5 fill-current" viewBox="0 0 24 24"><path d="M12 3a1 1 0 011 1v1a1 1 0 01-2 0V4a1 1 0 011-1zm0 15a1 1 0 011 1v1a1 1 0 01-2 0v-1a1 1 0 011-1zm9-8a1 1 0 010 2h-1a1 1 0 010-2h1zM5 11a1 1 0 010 2H4a1 1 0 010-2h1zm13.66-5.66a1 1 0 010 1.41l-.71.71a1 1 0 01-1.41-1.41l.71-.71a1 1 0 011.41 0zM7.05 16.95a1 1 0 010 1.41l-.71.71a1 1 0 01-1.41-1.41l.71-.71a1 1 0 011.41 0zm11.9 0a1 1 0 01-1.41 0l-.71-.71a1 1 0 011.41-1.41l.71.71a1 1 0 010 1.41zM7.05 7.05a1 1 0 01-1.41 0l-.71-.71a1 1 0 011.41-1.41l.71.71a1 1 0 010 1.41zM16 12a4 4 0 11-8 0 4 4 0 018 0z"/></svg>
     </label>
 
     <% if current_user %>
       <%# Notifiche %>
-      <div class="dropdown dropdown-end">
-        <div tabindex="0" role="button" class="btn btn-ghost btn-circle indicator" id="alerts_link">
-          <i class="fa-solid fa-bell text-lg"></i>
-          <% unread_count = Alert.unscoped.where(user_id: current_user.id, checked: false).count %>
-          <span id="notification_badge" class="indicator-item badge badge-error badge-xs<%= ' hidden' if unread_count == 0 %>"><%= unread_count > 0 ? unread_count : '' %></span>
-        </div>
-        <div tabindex="0" class="dropdown-content z-[60] mt-3 w-80 bg-base-100 border-2 border-base-content/15">
+      <div class="dropdown dropdown-end"
+           data-controller="dropdown"
+           data-action="focusout->dropdown#focusout keydown->dropdown#keydown">
+        <% unread_count = Alert.unscoped.where(user_id: current_user.id, checked: false).count %>
+        <button type="button"
+                class="btn btn-ghost btn-circle indicator size-11 min-h-11"
+                id="alerts_link"
+                aria-label="<%= t('pages.header.notifications_count', count: unread_count, default: "%{count} unread notifications") %>"
+                aria-haspopup="dialog"
+                aria-controls="notifications-popover"
+                aria-expanded="false"
+                data-dropdown-target="trigger"
+                data-action="dropdown#toggle">
+          <i class="fa-solid fa-bell text-lg" aria-hidden="true"></i>
+          <span id="notification_badge" aria-hidden="true" class="indicator-item badge badge-error badge-xs<%= ' hidden' if unread_count == 0 %>"><%= unread_count > 0 ? unread_count : '' %></span>
+        </button>
+        <div id="notifications-popover"
+             class="dropdown-content z-[60] mt-3 w-80 bg-base-100 border-2 border-base-content/15"
+             role="dialog"
+             aria-labelledby="alerts_link"
+             aria-hidden="true"
+             data-dropdown-target="content">
           <div class="px-4 py-3 border-b-2 border-base-content/10 flex items-center justify-between">
             <span class="font-bold text-sm"><%= t('pages.header.notifications', default: 'Notifiche') %></span>
           </div>
           <div id="alerts_container" class="max-h-72 overflow-y-auto">
-            <p class="px-4 py-3 text-sm text-base-content/50"><%= t('pages.header.no_alerts') %></p>
+            <p class="px-4 py-3 text-sm text-base-content/75"><%= t('pages.header.no_alerts') %></p>
           </div>
           <div class="px-4 py-2.5 border-t-2 border-base-content/10 text-center">
-            <%= link_to t('pages.header.see_all_notifications', default: 'Vedi tutte le notifiche'), notifications_path, class: 'text-xs text-primary font-bold hover:underline' %>
+            <%= link_to t('pages.header.see_all_notifications', default: 'See all notifications'), alerts_path, class: 'inline-flex min-h-11 items-center text-sm text-primary font-bold hover:underline' %>
           </div>
         </div>
       </div>
 
       <%# User dropdown %>
-      <div class="dropdown dropdown-end">
-        <div tabindex="0" role="button" class="flex items-center gap-3 pl-2 ml-1 border-l-2 border-base-content/10 cursor-pointer group">
+      <div class="dropdown dropdown-end"
+           data-controller="dropdown"
+           data-action="focusout->dropdown#focusout keydown->dropdown#keydown">
+        <button type="button"
+                id="account-menu-trigger"
+                class="flex min-h-11 items-center gap-3 pl-2 ml-1 border-l-2 border-base-content/10 cursor-pointer group"
+                aria-label="<%= t('pages.header.account_menu', name: current_user.fullname, default: 'Account menu for %{name}') %>"
+                aria-haspopup="dialog"
+                aria-controls="account-popover"
+                aria-expanded="false"
+                data-dropdown-target="trigger"
+                data-action="dropdown#toggle">
           <div class="text-right hidden xl:block">
             <p class="font-bold text-sm leading-tight group-hover:text-primary transition-colors"><%= current_user.fullname %></p>
-            <p class="text-[11px] text-base-content/40">
+            <p class="text-xs text-base-content/75">
               <% if is_admin? %><%= t('pages.header.menu.administration', default: 'Amministratore') %>
               <% elsif is_moderator? %><%= t('pages.header.menu.moderator', default: 'Moderatore') %>
               <% else %><%= t('pages.header.member', default: 'Membro') %>
@@ -60,42 +94,47 @@
           </div>
           <div class="avatar<%= ' placeholder' unless current_user.avatar.attached? %>">
             <% if current_user.avatar.attached? %>
-              <div class="w-10"><%= image_tag url_for(current_user.avatar), class: 'object-cover' %></div>
+              <div class="w-10"><%= image_tag url_for(current_user.avatar), class: 'object-cover', alt: '' %></div>
             <% else %>
               <div class="bg-primary text-primary-content w-10"><span class="font-bold text-sm"><%= current_user.name[0..0].upcase %><%= current_user.surname.present? ? current_user.surname[0..0].upcase : '' %></span></div>
             <% end %>
           </div>
-        </div>
-        <div tabindex="0" class="dropdown-content z-[60] mt-3 w-60 bg-base-100 border-2 border-base-content/15">
+        </button>
+        <div id="account-popover"
+             class="dropdown-content z-[60] mt-3 w-60 bg-base-100 border-2 border-base-content/15"
+             role="dialog"
+             aria-labelledby="account-menu-trigger"
+             aria-hidden="true"
+             data-dropdown-target="content">
           <div class="p-4 border-b-2 border-base-content/10 flex items-center gap-3">
             <div class="avatar<%= ' placeholder' unless current_user.avatar.attached? %>">
               <% if current_user.avatar.attached? %>
-                <div class="w-11"><%= image_tag url_for(current_user.avatar), class: 'object-cover' %></div>
+                <div class="w-11"><%= image_tag url_for(current_user.avatar), class: 'object-cover', alt: '' %></div>
               <% else %>
                 <div class="bg-primary text-primary-content w-11"><span class="font-bold"><%= current_user.name[0..0].upcase %><%= current_user.surname.present? ? current_user.surname[0..0].upcase : '' %></span></div>
               <% end %>
             </div>
             <div class="min-w-0">
               <p class="font-bold text-sm"><%= current_user.fullname %></p>
-              <p class="text-[11px] text-base-content/40 truncate"><%= current_user.email %></p>
+              <p class="text-xs text-base-content/75 truncate"><%= current_user.email %></p>
             </div>
           </div>
           <nav class="p-2 space-y-0.5">
             <%= link_to home_path, class: 'flex items-center gap-3 px-3 py-2 text-sm hover:bg-base-200 transition-colors' do %>
-              <i class="fa-solid fa-user w-4 text-center text-base-content/40"></i> <%= t('pages.header.menu.my_page') %>
+              <i class="fa-solid fa-user w-4 text-center text-base-content/75"></i> <%= t('pages.header.menu.my_page') %>
             <% end %>
             <%= link_to groups_path, class: 'flex items-center gap-3 px-3 py-2 text-sm hover:bg-base-200 transition-colors' do %>
-              <i class="fa-solid fa-users w-4 text-center text-base-content/40"></i> <%= t('pages.sidebar.groups', default: 'I miei gruppi') %>
+              <i class="fa-solid fa-users w-4 text-center text-base-content/75"></i> <%= t('pages.sidebar.groups', default: 'I miei gruppi') %>
             <% end %>
             <%= link_to proposals_path, class: 'flex items-center gap-3 px-3 py-2 text-sm hover:bg-base-200 transition-colors' do %>
-              <i class="fa-solid fa-file-lines w-4 text-center text-base-content/40"></i> <%= t('pages.sidebar.proposals', default: 'Le mie proposte') %>
+              <i class="fa-solid fa-file-lines w-4 text-center text-base-content/75"></i> <%= t('pages.sidebar.proposals', default: 'Le mie proposte') %>
             <% end %>
             <%= link_to user_path(current_user), class: 'flex items-center gap-3 px-3 py-2 text-sm hover:bg-base-200 transition-colors' do %>
-              <i class="fa-solid fa-gear w-4 text-center text-base-content/40"></i> <%= t('pages.header.menu.preferences') %>
+              <i class="fa-solid fa-gear w-4 text-center text-base-content/75"></i> <%= t('pages.header.menu.preferences') %>
             <% end %>
             <% if is_admin? %>
               <%= link_to admin_panel_path, class: 'flex items-center gap-3 px-3 py-2 text-sm hover:bg-base-200 transition-colors' do %>
-                <i class="fa-solid fa-crown w-4 text-center text-base-content/40"></i> <%= t('pages.header.menu.administration') %>
+                <i class="fa-solid fa-crown w-4 text-center text-base-content/75"></i> <%= t('pages.header.menu.administration') %>
               <% end %>
             <% end %>
           </nav>
@@ -109,8 +148,8 @@
 
     <% else %>
       <%# Guest: login + register buttons %>
-      <%= link_to t('pages.header.login'), new_user_session_path, class: 'btn btn-ghost btn-sm font-semibold' %>
-      <%= link_to t('pages.header.menu.registration_button'), new_registration_path(:user), class: 'btn btn-primary btn-sm font-semibold' %>
+      <%= link_to t('pages.header.login'), new_user_session_path, class: 'btn btn-ghost btn-sm min-h-11 font-semibold' %>
+      <%= link_to t('pages.header.menu.registration_button'), new_registration_path(:user), class: 'btn btn-primary btn-sm min-h-11 font-semibold' %>
     <% end %>
   </div>
 </nav>

@@ -19,7 +19,7 @@
     </div>
     <div>
       <h1 class="text-3xl lg:text-4xl font-extrabold"><%= @user.fullname %></h1>
-      <p class="text-[11px] text-primary-content/60 mt-1">
+      <p class="text-xs text-primary-content mt-1">
         <i class="fa-solid fa-calendar-check mr-1"></i>
         <%= t('pages.users.show.registered_from') %>: <%= l(@user.confirmed? ? @user.confirmed_at : @user.created_at) %>
       </p>
@@ -38,19 +38,19 @@
   <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
     <div class="bg-base-100 border-2 border-base-content/15 p-4 text-center">
       <p class="text-2xl font-extrabold"><%= @user.group_participations.count %></p>
-      <p class="text-[11px] text-base-content/40 font-bold uppercase"><%= t('pages.users.show.groups_title', default: 'Gruppi') %></p>
+      <p class="text-[11px] text-base-content/75 font-bold uppercase"><%= t('pages.users.show.groups_title', default: 'Gruppi') %></p>
     </div>
     <div class="bg-base-100 border-2 border-base-content/15 p-4 text-center">
       <p class="text-2xl font-extrabold"><%= @user.proposals.count %></p>
-      <p class="text-[11px] text-base-content/40 font-bold uppercase"><%= t('pages.users.show.proposals_count', default: 'Proposte') %></p>
+      <p class="text-[11px] text-base-content/75 font-bold uppercase"><%= t('pages.users.show.proposals_count', default: 'Proposte') %></p>
     </div>
     <div class="bg-base-100 border-2 border-base-content/15 p-4 text-center">
       <p class="text-2xl font-extrabold"><%= @user.proposal_comments.count %></p>
-      <p class="text-[11px] text-base-content/40 font-bold uppercase"><%= t('pages.users.show.comments_count', default: 'Commenti') %></p>
+      <p class="text-[11px] text-base-content/75 font-bold uppercase"><%= t('pages.users.show.comments_count', default: 'Commenti') %></p>
     </div>
     <div class="bg-base-100 border-2 border-base-content/15 p-4 text-center">
       <p class="text-2xl font-extrabold"><%= @user.events.count %></p>
-      <p class="text-[11px] text-base-content/40 font-bold uppercase"><%= t('pages.users.show.events_count', default: 'Eventi') %></p>
+      <p class="text-[11px] text-base-content/75 font-bold uppercase"><%= t('pages.users.show.events_count', default: 'Eventi') %></p>
     </div>
   </div>
 <% end %>
@@ -70,7 +70,7 @@
       </div>
       <div>
         <h2 class="font-bold text-lg"><%= t('pages.users.show.groups_title') %></h2>
-        <p class="text-[11px] text-base-content/40"><%= @group_participations.count %> gruppi attivi</p>
+        <p class="text-[11px] text-base-content/75"><%= t('pages.users.show.active_groups_count', count: @group_participations.count) %></p>
       </div>
     </div>
     <div class="overflow-x-auto">
@@ -80,7 +80,6 @@
             <th><%= t('pages.users.show.group_column') %></th>
             <th><%= t('pages.users.show.role_column') %></th>
             <th class="hidden md:table-cell"><%= t('pages.users.show.registered_from') %></th>
-            <th>registered_from</th>
             <th></th>
           </tr>
         </thead>
@@ -93,58 +92,62 @@
 <% end %>
 
 <% if current_user == @user %>
-  <dialog id="name_modal" class="modal">
+  <dialog id="name_modal" class="modal" aria-labelledby="name-modal-title" data-controller="modal" data-modal-open-on-connect-value="false" data-modal-remove-on-close-value="false">
     <div class="modal-box">
+      <h2 id="name-modal-title" class="text-xl font-bold mb-4"><%= t('pages.users.show.edit_name', default: 'Edit name') %></h2>
       <%= simple_form_for @user do |f| %>
         <div class="w-full lg:w-1/2">
-          <%= f.input :name, size: 20, required: true %>
+          <%= f.input :name, size: 20, required: true, input_html: { autocomplete: 'given-name', data: { modal_target: 'initialFocus' } } %>
           <div class="flex gap-2 mt-2">
-            <input type="button" value="<%= t('buttons.cancel') %>" onclick="document.getElementById('name_modal').close();" class="btn"/>
+            <button type="button" data-action="modal#close" class="btn"><%= t('buttons.cancel') %></button>
             <%= f.submit t('buttons.save'), class: 'btn btn-primary' %>
           </div>
         </div>
       <% end %>
-      <form method="dialog"><button class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2">&times;</button></form>
+      <form method="dialog"><button class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2" aria-label="<%= t('buttons.close') %>">&times;</button></form>
     </div>
   </dialog>
 
-  <dialog id="surname_modal" class="modal">
+  <dialog id="surname_modal" class="modal" aria-labelledby="surname-modal-title" data-controller="modal" data-modal-open-on-connect-value="false" data-modal-remove-on-close-value="false">
     <div class="modal-box">
+      <h2 id="surname-modal-title" class="text-xl font-bold mb-4"><%= t('pages.users.show.edit_surname', default: 'Edit last name') %></h2>
       <%= simple_form_for @user do |f| %>
-        <%= f.input :surname, size: 20, required: true %>
+        <%= f.input :surname, size: 20, required: true, input_html: { autocomplete: 'family-name', data: { modal_target: 'initialFocus' } } %>
         <div class="flex gap-2 mt-2">
-          <input type="button" value="<%= t('buttons.cancel') %>" onclick="document.getElementById('surname_modal').close();" class="btn"/>
+          <button type="button" data-action="modal#close" class="btn"><%= t('buttons.cancel') %></button>
           <%= f.submit t('buttons.save'), class: 'btn btn-primary' %>
         </div>
       <% end %>
-      <form method="dialog"><button class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2">&times;</button></form>
+      <form method="dialog"><button class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2" aria-label="<%= t('buttons.close') %>">&times;</button></form>
     </div>
   </dialog>
 
-  <dialog id="password_modal" class="modal">
+  <dialog id="password_modal" class="modal" aria-labelledby="password-modal-title" data-controller="modal" data-modal-open-on-connect-value="false" data-modal-remove-on-close-value="false">
     <div class="modal-box">
+      <h2 id="password-modal-title" class="text-xl font-bold mb-4"><%= t('pages.users.show.edit_password', default: 'Change password') %></h2>
       <%= simple_form_for @user do |f| %>
-        <%= f.input :password, required: true, type: :password, label: t('pages.password.edit.new_password'), size: 20 %>
-        <%= f.input :password_confirmation, required: true, type: :password, size: 20, label: t('pages.registration.confirm_password'), input_html: { data: { fv_identical_field: 'user[password]', fv_identical: true } } %>
+        <%= f.input :password, required: true, type: :password, label: t('pages.password.edit.new_password'), size: 20, input_html: { autocomplete: 'new-password', data: { modal_target: 'initialFocus' } } %>
+        <%= f.input :password_confirmation, required: true, type: :password, size: 20, label: t('pages.registration.confirm_password'), input_html: { autocomplete: 'new-password', data: { fv_identical_field: 'user[password]', fv_identical: true } } %>
         <div class="flex gap-2 mt-2">
-          <input type="button" value="<%= t('buttons.cancel') %>" onclick="document.getElementById('password_modal').close();" class="btn"/>
+          <button type="button" data-action="modal#close" class="btn"><%= t('buttons.cancel') %></button>
           <%= f.submit t('buttons.save'), class: 'btn btn-primary' %>
         </div>
       <% end %>
-      <form method="dialog"><button class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2">&times;</button></form>
+      <form method="dialog"><button class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2" aria-label="<%= t('buttons.close') %>">&times;</button></form>
     </div>
   </dialog>
 
-  <dialog id="email_modal" class="modal">
+  <dialog id="email_modal" class="modal" aria-labelledby="email-modal-title" data-controller="modal" data-modal-open-on-connect-value="false" data-modal-remove-on-close-value="false">
     <div class="modal-box">
+      <h2 id="email-modal-title" class="text-xl font-bold mb-4"><%= t('pages.users.show.edit_email', default: 'Edit email address') %></h2>
       <%= simple_form_for @user do |f| %>
-        <%= f.input :email, label: t('pages.users.show.email_label'), size: 25, required: true %>
+        <%= f.input :email, label: t('pages.users.show.email_label'), size: 25, required: true, input_html: { autocomplete: 'email', data: { modal_target: 'initialFocus' } } %>
         <div class="flex gap-2 mt-2">
-          <input type="button" value="<%= t('buttons.cancel') %>" onclick="document.getElementById('email_modal').close();" class="btn"/>
+          <button type="button" data-action="modal#close" class="btn"><%= t('buttons.cancel') %></button>
           <%= f.submit t('buttons.save'), class: 'btn btn-primary' %>
         </div>
       <% end %>
-      <form method="dialog"><button class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2">&times;</button></form>
+      <form method="dialog"><button class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2" aria-label="<%= t('buttons.close') %>">&times;</button></form>
     </div>
   </dialog>
 <% end %>
