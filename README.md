@@ -17,7 +17,7 @@ The first open source web application for eDemocracy.
 
 Airesis is a platform for participatory democracy that allows citizens, groups, and organizations to create proposals, discuss them in forums and blogs, organize events, and make collective decisions using the Schulze voting method.
 
-> **Current version: 6.1.3** — Rails 8.1.3.1 · Ruby 4.0.6 · PostgreSQL 18.6 · Node.js 24.20 LTS · Yarn 4.18
+> **Current version: 6.2.0** — Rails 8.1.3.1 · Ruby 4.0.6 · PostgreSQL 18.6 · Node.js 24.20 LTS · Yarn 4.18
 >
 > This is a fork of the original [Airesis](https://github.com/airesis/airesis) project by Alessandro Rodi ([coorasse/airesis](https://github.com/coorasse/airesis)).
 
@@ -103,6 +103,14 @@ This project underwent a comprehensive modernization starting from a legacy Rail
 - Pagy 9 → **43.6.2**, with controllers and the DaisyUI navigation partial migrated to the current offset API
 - Docker services pinned to PostgreSQL 18.6 and Mailpit 1.30.0; obsolete `thin`, `rails_12factor`, Code Climate reporter, Crowdin client and SDoc dependencies removed
 
+### Phase 9 — UI/UX and operations hardening (v6.2.0)
+
+- Completed the G06–G10 UI program across governance, events, blogs, forums and administration, with responsive and accessibility regression coverage
+- Hardened tenant scoping and destructive workflows; removed dead ElFinder, CKEditor and RailsAdmin legacy surfaces
+- Rebuilt newsletter delivery and notification retention as bounded, retryable jobs with explicit administrative feedback
+- Added native Linux ARM64 Chromium/ChromeDriver support for real Selenium system tests in the application container
+- Reconciled the application to 403 controller routes: 360 assigned UI routes and 43 explicitly non-visual endpoints
+
 ### Version history
 
 | Version | Milestone |
@@ -113,7 +121,8 @@ This project underwent a comprehensive modernization starting from a legacy Rail
 | 6.1.0 | UI redesign: Trix theme, collapsible sidebar, auth pages, proposal/new, YARD docs |
 | 6.1.1 | Security fixes (authorize! on move/resize), N+1 eliminated, atomic transactions, XSS sanitize, sidebar mobile gap fix |
 | 6.1.2 | N+1 searches+proposals, authorize! on banner/test_banner, LIKE input limit, territory query in controller, raw t() removed |
-| **6.1.3** | Security audit: CSP attivata, admin GET→POST (CSRF), path traversal stat.json, alert_id validation, rack-attack password reset throttle, SSRF/DoS avatar_url |
+| 6.1.3 | Security audit: CSP attivata, admin GET→POST (CSRF), path traversal stat.json, alert_id validation, rack-attack password reset throttle, SSRF/DoS avatar_url |
+| **6.2.0** | UI/UX G06–G10, tenant and admin hardening, reliable newsletter/notification jobs, Selenium Linux ARM64, dead route and asset cleanup |
 
 ---
 

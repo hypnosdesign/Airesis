@@ -1,4 +1,4 @@
-APP_VERSION = '6.1.3'.freeze
+APP_VERSION = '6.2.0'.freeze
 AIRESIS_VERSION = APP_VERSION # backward compat alias
 
 if defined?(Sentry)

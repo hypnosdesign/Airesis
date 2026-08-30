@@ -6,12 +6,12 @@
 ## Stato in breve
 
 - Repository: `/Users/mattia/Projects/Airesis_Site/airesis-develop`
-- Branch: `main`; il programma UI/UX è chiuso e verificato fino a G10 compreso. G01 resta il solo gruppo non passato, bloccato dall'autorità legale mancante.
-- Versione applicativa: 6.1.3
+- Branch: `main`; la release 6.2.0 consolida il programma UI/UX fino a G10 compreso. G01 resta il solo gruppo non passato, bloccato dall'autorità legale mancante.
+- Versione applicativa: 6.2.0
 - Stack aggiornato localmente: Ruby 4.0.6, Bundler 4.0.19, Rails 8.1.3.1, PostgreSQL 18.6, Node.js 24.20.0 LTS e Yarn 4.18.0
 - Remediation P0, refresh dello stack e inizializzazione PostgreSQL 18 sono consolidati e pubblicati su `origin/main`.
 - La remediation P1 A1-A5 e il programma UI/UX G02-G10 sono completati e verificati; la rimozione della credenziale A1 resta inclusa nella history riscritta.
-- Le modifiche G06-G10 e l'abilitazione ChromeDriver Linux ARM64 sono complete e verificate ma restano intenzionalmente non committate/non pubblicate in questo worktree.
+- Le modifiche G06-G10 e l'abilitazione ChromeDriver Linux ARM64 sono complete, verificate e consolidate nella release 6.2.0.
 - PostgreSQL 18 è ora inizializzato sul volume persistente `airesisDB18`; app e database sono attivi rispettivamente sulle porte host 3001 e 5434.
 - Il volume sorgente PostgreSQL 17 è risultato vuoto: non esistevano dati applicativi storici da trasferire. Il database corrente contiene schema e seed ufficiali del progetto.
 - I volumi legacy PostgreSQL 17/Yarn 1 e le immagini non più usate sono stati rimossi dopo backup, restore di prova e controlli di integrità.
@@ -33,7 +33,7 @@
 - La bonifica finale ha sostituito il database development con il baseline PostgreSQL 18 verificato: conteggi identici al manifest per tutte le tabelle, `ui_audit_rows=0`, 1 utente seed, 0 gruppi e 0 proposte. `pg_amcheck` ha verificato 835/835 relazioni e 2.844 pagine; migrazioni allineate e smoke HTTP 200 su `/` e su `/landing` dopo il redirect canonico.
 - Prima della bonifica è stato salvato il dump recuperabile ignorato da Git `tmp/database_backups/2026-08-30-pre-ui-cleanup/airesis-development.pre-ui-cleanup.dump`, SHA-256 `eb3133106f185b0357ef946381846a87d079b0c4564224c7c4bf2a31352b36b5`. Il database di transizione e i dump temporanei nel container sono stati rimossi.
 - `public/assets` è output generato/ignorato, rigenerato con gli asset correnti e privo di dati applicativi.
-- Prossimo passo funzionale possibile: G01 richiede testi e identità approvati dal titolare; resta `blocked_pending_legal_authority` e non va sbloccato inventando contenuti. In alternativa il worktree è pronto per review e per un eventuale commit/push soltanto su richiesta esplicita.
+- Prossimo passo funzionale possibile: G01 richiede testi e identità approvati dal titolare; resta `blocked_pending_legal_authority` e non va sbloccato inventando contenuti. Non esiste un G11 pianificato.
 
 ## Blocco appena completato — remediation P1 A1-A4
 
@@ -196,15 +196,16 @@ Resta separata la validazione semantica dell'IPN PayPal: destinatario, valuta/im
 - Il PostgreSQL 18 temporaneo usato per test, `airesis-ruby4-pg18-test`, era senza porte, su tmpfs ed è stato arrestato/rimosso.
 - Il PostgreSQL di MrWolf sulla porta 5433 non è stato toccato.
 
-## Worktree da preservare
+## Stato Git da preservare
 
-Non usare restore/reset/clean. Il worktree contiene l'intero blocco G06-G10 e ChromeDriver ARM64 non committato: va preservato integralmente. Le fixture `[UI AUDIT]` sono già state bonificate dal database locale e non devono essere ricreate salvo un nuovo audit esplicito. Non eseguire commit o push senza una nuova richiesta esplicita. La history già pubblicata comprende:
+Non usare restore/reset/clean. La release 6.2.0 consolida l'intero blocco G06-G10 e ChromeDriver ARM64; il commit funzionale è `3be43e2` e il tag di release è `v6.2.0`. Le fixture `[UI AUDIT]` sono già state bonificate dal database locale e non devono essere ricreate salvo un nuovo audit esplicito. Non eseguire ulteriori commit o push senza una nuova richiesta esplicita. La history pubblicata comprende:
 
 - autenticazione token: `app/controllers/tokens_controller.rb`, `config/initializers/rack_attack.rb` e `spec/requests/tokens_controller_spec.rb`;
 - escaping immagini/tag: `lib/image_helper.rb`, `app/helpers/application_helper.rb`, `app/models/concerns/taggable.rb`, le tre view blog e le relative spec;
 - credenziali Facebook: regressione in `spec/config/omniauth_security_spec.rb`; l'initializer bonificato è già nel baseline riscritto;
 - stato operativo: `audit_sicurezza.md` e questo `HANDOFF.md`.
-- programma UI/UX pubblicato: stato fino a G05; nel worktree sono presenti coverage, snapshot e implementazione completa G06-G10, incluse system spec Selenium ARM64;
+- programma UI/UX pubblicato: stato fino a G05; nella release 6.2.0 sono presenti coverage, snapshot e implementazione completa G06-G10, incluse system spec Selenium ARM64;
+- release 6.2.0: G06-G10, hardening amministrativo/tenant, newsletter e cleanup notifiche affidabili, ChromeDriver ARM64 e potatura finale delle route;
 - regressioni G01: request spec di `HomeController`/`GroupsController` e spec helper per il contatto pubblico configurato.
 
 `.claude/settings.local.json` e `meta.json` restano materiale locale e non devono essere aggiunti al repository.
