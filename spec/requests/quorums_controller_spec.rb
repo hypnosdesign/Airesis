@@ -4,15 +4,13 @@ require 'requests_helper'
 RSpec.describe QuorumsController do
   let!(:province) { create(:province) }
   let!(:user) { create(:user) }
-  let(:group) { create(:group, current_user_id: user.id) }
+  let!(:group) { create(:group, current_user_id: user.id) }
   let(:quorum_params) do
     {
-      group_id: group.id,
       best_quorum: {
         name: Faker::Lorem.word,
         description: Faker::Lorem.sentence,
         percentage: 0,
-        valutations: 0,
         days_m: 1,
         hours_m: 0,
         minutes_m: 0,
@@ -23,186 +21,79 @@ RSpec.describe QuorumsController do
     }
   end
 
-  describe 'POST create' do
-    before do
-      sign_in user
-    end
+  it 'requires authentication for group quorum administration' do
+    get group_quorums_path(group)
+    expect(response).to redirect_to(new_user_session_path)
+  end
 
-    it 'responds to turbo_stream' do
-      post best_quorums_path, params: quorum_params,
+  it 'renders the quorum index for the group owner' do
+    sign_in user
+    get group_quorums_path(group)
+    expect(response).to have_http_status(:ok)
+  end
+
+  it 'renders the new quorum form in HTML and Turbo Stream' do
+    sign_in user
+    get new_group_best_quorum_path(group)
+    expect(response).to have_http_status(:ok)
+
+    get new_group_best_quorum_path(group), headers: { 'Accept' => 'text/vnd.turbo-stream.html' }
+    expect(response).to have_http_status(:ok)
+    expect(response.media_type).to eq('text/vnd.turbo-stream.html')
+  end
+
+  it 'creates a quorum in HTML and Turbo Stream' do
+    sign_in user
+    post group_best_quorums_path(group), params: quorum_params
+    expect(response).to redirect_to(group_quorums_path(group))
+
+    expect do
+      post group_best_quorums_path(group), params: quorum_params,
            headers: { 'Accept' => 'text/vnd.turbo-stream.html' }
-      expect(response).to have_http_status :ok
-    end
-
-    it 'responds to html' do
-      post best_quorums_path, params: quorum_params
-      expect(response).to have_http_status :found
-    end
+    end.to change(BestQuorum, :count).by(1)
+    expect(response).to have_http_status(:ok)
   end
 
-  describe 'GET index' do
-    it 'redirects to sign in when not authenticated' do
-      get group_quorums_path(group)
-      expect(response).to redirect_to(new_user_session_path)
-    end
-
-    it 'returns a response for group owner' do
-      sign_in user
-      get group_quorums_path(group)
-      expect([200, 302, 403, 500]).to include(response.status)
-    end
+  it 'returns 422 for invalid quorum creation' do
+    sign_in user
+    post group_best_quorums_path(group), params: { best_quorum: quorum_params[:best_quorum].merge(name: '', good_score: nil) },
+         headers: { 'Accept' => 'text/vnd.turbo-stream.html' }
+    expect(response).to have_http_status(:unprocessable_entity)
   end
 
-  describe 'GET new' do
-    it 'redirects to sign in when not authenticated' do
-      get new_group_quorum_path(group)
-      expect(response).to redirect_to(new_user_session_path)
-    end
+  it 'updates, activates, deactivates and destroys a quorum for the owner' do
+    quorum = create(:best_quorum, group: group)
+    sign_in user
 
-    it 'returns a response for group owner' do
-      sign_in user
-      get new_group_quorum_path(group)
-      expect([200, 302, 403, 500]).to include(response.status)
-    end
+    put group_best_quorum_path(group, quorum), params: { best_quorum: quorum_params[:best_quorum].merge(name: 'Updated') }
+    expect(response).to redirect_to(group_quorums_path(group))
+    expect(quorum.reload.name).to eq('Updated')
 
-    it 'responds to turbo_stream format' do
-      sign_in user
-      get new_group_quorum_path(group),
-          headers: { 'Accept' => 'text/vnd.turbo-stream.html' }
-      expect([200, 302, 403, 500]).to include(response.status)
-    end
+    post change_status_group_quorum_path(group, quorum), params: { active: 'true' }
+    expect(response).to redirect_to(group_quorums_path(group))
+    expect(quorum.reload).to be_active
+
+    post change_status_group_quorum_path(group, quorum), params: { active: 'false' }
+    expect(quorum.reload).not_to be_active
+
+    expect do
+      delete group_best_quorum_path(group, quorum), headers: { 'Accept' => 'text/vnd.turbo-stream.html' }
+    end.to change(BestQuorum, :count).by(-1)
+    expect(response).to have_http_status(:ok)
   end
 
-  describe 'GET help' do
-    it 'returns a response without group' do
-      get help_quorums_path
-      expect([200, 302, 500]).to include(response.status)
-    end
+  it 'renders help after authentication, with and without a group' do
+    sign_in user
+    get help_quorums_path
+    expect(response).to have_http_status(:ok)
 
-    it 'returns a response with group_id' do
-      get help_quorums_path, params: { group_id: group.id }
-      expect([200, 302, 500]).to include(response.status)
-    end
+    get help_quorums_path, params: { group_id: group.id }
+    expect(response).to have_http_status(:ok)
   end
 
-  describe 'GET edit' do
-    let!(:quorum) { create(:best_quorum, group: group) }
-
-    it 'redirects to sign in when not authenticated' do
-      get edit_quorum_path(quorum)
-      expect(response).to redirect_to(new_user_session_path)
-    end
-
-    it 'returns a response for group owner' do
-      sign_in user
-      get edit_quorum_path(quorum)
-      expect([200, 302, 403, 500]).to include(response.status)
-    end
-  end
-
-  describe 'PUT update' do
-    let!(:quorum) { create(:best_quorum, group: group) }
-
-    it 'redirects to sign in when not authenticated' do
-      put quorum_path(quorum),
-          params: { best_quorum: { name: 'Updated', description: 'desc', percentage: 5, good_score: 50, days_m: 7 } }
-      expect(response).to redirect_to(new_user_session_path)
-    end
-
-    it 'returns a response for group owner' do
-      sign_in user
-      put quorum_path(quorum),
-          params: { best_quorum: { name: 'Updated', description: 'desc', percentage: 5, good_score: 50, days_m: 7 } }
-      expect([200, 302, 403, 500]).to include(response.status)
-    end
-
-    it 'responds to JS format' do
-      sign_in user
-      put quorum_path(quorum),
-          params: { best_quorum: { name: 'Updated', description: 'desc', percentage: 5, good_score: 50, days_m: 7 } },
-          xhr: true
-      expect([200, 302, 403, 500]).to include(response.status)
-    end
-
-    it 'renders error for invalid update (JS format)' do
-      sign_in user
-      put quorum_path(quorum),
-          params: { best_quorum: { name: '', good_score: nil } },
-          xhr: true
-      expect([200, 302, 403, 422, 500]).to include(response.status)
-    end
-  end
-
-  describe 'DELETE destroy' do
-    let!(:quorum) { create(:best_quorum, group: group) }
-
-    it 'redirects to sign in when not authenticated' do
-      delete quorum_path(quorum), xhr: true
-      expect([302, 401]).to include(response.status)
-    end
-
-    it 'destroys the quorum for group owner' do
-      sign_in user
-      delete quorum_path(quorum), xhr: true
-      expect([200, 302, 403, 500]).to include(response.status)
-    end
-  end
-
-  describe 'POST change_status' do
-    let!(:quorum) { create(:best_quorum, group: group) }
-
-    it 'redirects to sign in when not authenticated' do
-      post change_status_group_quorum_path(group, quorum), params: { active: 'true' }, xhr: true
-      expect([302, 401]).to include(response.status)
-    end
-
-    it 'activates a quorum for group owner' do
-      sign_in user
-      post change_status_group_quorum_path(group, quorum), params: { active: 'true' }, xhr: true
-      expect([200, 302, 403, 500]).to include(response.status)
-    end
-
-    it 'deactivates a quorum for group owner' do
-      sign_in user
-      post change_status_group_quorum_path(group, quorum), params: { active: 'false' }, xhr: true
-      expect([200, 302, 403, 500]).to include(response.status)
-    end
-  end
-
-  describe 'GET dates' do
-    it 'redirects to sign in when not authenticated' do
-      get dates_quorums_path, xhr: true
-      expect([302, 401]).to include(response.status)
-    end
-
-    it 'returns a response when authenticated' do
-      sign_in user
-      get dates_quorums_path, xhr: true
-      expect([200, 302, 403, 404, 500]).to include(response.status)
-    end
-  end
-
-  describe 'GET help (JS format)' do
-    it 'responds to JS format without group' do
-      sign_in user
-      get help_quorums_path, xhr: true
-      expect([200, 302, 404, 500]).to include(response.status)
-    end
-
-    it 'responds to JS format with group' do
-      sign_in user
-      get help_quorums_path, params: { group_id: group.id }, xhr: true
-      expect([200, 302, 404, 500]).to include(response.status)
-    end
-  end
-
-  describe 'POST create (validation error)' do
-    it 'handles validation errors in turbo_stream format' do
-      sign_in user
-      invalid_params = quorum_params.deep_merge(best_quorum: { name: '', good_score: nil })
-      post best_quorums_path, params: invalid_params,
-           headers: { 'Accept' => 'text/vnd.turbo-stream.html' }
-      expect([200, 302, 422, 500]).to include(response.status)
-    end
+  it 'does not expose legacy quorum routes' do
+    expect { Rails.application.routes.recognize_path('/quorums/dates', method: :get) }.to raise_error(ActionController::RoutingError)
+    expect(Rails.application.routes.recognize_path('/best_quorums', method: :get)[:controller]).not_to eq('quorums')
+    expect(Rails.application.routes.recognize_path('/old_quorums', method: :get)[:controller]).not_to eq('quorums')
   end
 end

@@ -1,8 +1,18 @@
-<h1><%= "List of comments on #{@proposal.title}" %></h1>
-<%= link_to t('pages.proposal_histories.index.back_to_proposal'), @group ? group_proposal_url(@group, @proposal) : proposal_url(@proposal), class: 'btn btn-primary' %>
-<div id="proposalComments" class="blogComments">
-  <%= render partial: 'proposals/comments' %>
+<% @page_title = t('pages.proposal_comments.index.title', title: @proposal.title, default: "Contributions to #{@proposal.title}") %>
+
+<%= render layout: 'layouts/page_title', locals: { title: @page_title } do %>
+  <%= link_to t('pages.proposal_histories.index.back_to_proposal'),
+              @group ? group_proposal_path(@group, @proposal) : proposal_path(@proposal),
+              class: 'btn btn-outline min-h-11' %>
+<% end %>
+
+<div id="proposalCommentsContainer" class="space-y-4">
+  <%= render partial: 'proposal_comments/content', collection: @proposal_comment_search.proposal_comments, as: :comment %>
+  <% unless @proposal_comment_search.proposal_comments.any? %>
+    <p class="border-2 border-base-content/15 bg-base-200 p-5"><%= t('pages.proposals.show.no_contributes_yet') %></p>
+  <% end %>
 </div>
+
 <% content_for :left_panel do %>
   <%= render 'proposals/left_panel' %>
 <% end %>

@@ -29,7 +29,7 @@ class VotationsController < ApplicationController
       flash[:notice] = t('votations.create.confirm')
       respond_to do |format|
         format.turbo_stream
-        format.html { redirect_to votation_path }
+        format.html { redirect_to proposal_path(@proposal) }
       end
     end
   rescue ActiveRecord::ActiveRecordError => e
@@ -42,7 +42,7 @@ Vote errors: #{@proposal.vote.errors.details}")
       flash[:error] = t('errors.votation.already_voted')
       respond_to do |format|
         format.turbo_stream { render 'votations/errors/vote_error' }
-        format.html { redirect_to votation_path }
+        format.html { redirect_to proposal_path(@proposal) }
       end
     end
   end
@@ -75,7 +75,7 @@ Vote errors: #{@proposal.vote.errors.details}")
     respond_to do |format|
       flash[:notice] = t('votations.create.confirm')
       format.turbo_stream { render 'votations/vote_schulze' }
-      format.html { render action: :show }
+      format.html { redirect_to proposal_path(@proposal) }
     end
   rescue StandardError
     respond_to do |format|
@@ -94,6 +94,7 @@ Vote errors: #{@proposal.vote.errors.details}")
     flash[:error] = t('errors.messages.invalid_token')
     respond_to do |format|
       format.turbo_stream { render 'votations/errors/vote_error' }
+      format.html { redirect_to proposal_path(@proposal) }
     end
     false
   end

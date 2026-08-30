@@ -1,11 +1,11 @@
 version: 1
-generated_on: 2026-08-29
+generated_on: 2026-08-30
 minimum_score: 33
 score_maximum: 40
 
 route_snapshot:
-  total_controller_routes: 637
-  assigned_ui_routes: 594
+  total_controller_routes: 548
+  assigned_ui_routes: 505
   excluded_non_visual_routes: 43
 
 completion_evidence_required:
@@ -118,8 +118,8 @@ groups:
   G04:
     name: Deliberazione, commenti, quorum e voto
     mode: operate
-    route_count: 125
-    get_route_count: 62
+    route_count: 36
+    get_route_count: 16
     controllers:
       - proposal_comments
       - proposal_revisions
@@ -127,8 +127,6 @@ groups:
       - proposal_supports
       - quorums
       - votations
-      - candidates
-      - elections
       - proposal_nicknames
     source_targets:
       - app/views/proposal_comments
@@ -140,13 +138,14 @@ groups:
     representative_paths:
       - /proposals/:proposal_id/proposal_comments
       - /proposals/:proposal_id/proposal_revisions
-      - /proposals/:proposal_id/proposal_supports
-      - /quorums
+      - /proposals/:proposal_id/proposal_lives/:id
+      - /proposals/:proposal_id/proposal_supports/new
+      - /quorums/help
       - /groups/:group_id/quorums
-      - /votations
-    status: not_started
-    iterations: 0
-    score: null
+      - /votation
+    status: passed
+    iterations: 2
+    score: 38
 
   G05:
     name: "Gruppi: scoperta, profilo e membership"

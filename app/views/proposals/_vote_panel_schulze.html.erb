@@ -1,30 +1,53 @@
-<% range = @proposal.solutions.count %>
-<p><%= raw t('pages.proposals.vote_panel.schulze_title') %></p>
-<h5><%= @proposal.secret_vote ? t('pages.proposals.vote_panel.secret_vote') : t('pages.proposals.vote_panel.clear_vote') %></h5>
-<div id="solutions_table">
-  <div class="vote-items-external">
-    <span class="badge badge-primary">1</span>
-    <div class="vote-items">
-      <% @proposal.solutions.each_with_index do |solution, j| %>
-        <div class="list-group-item vote-item" data-id="<%= solution.id %>">
-          <i class="fa-solid fa-arrows-up-down-left-right"></i>
-          <a class="vote_solution_title" href="#">
-            <%= raw t("pages.proposals.edit.new_solution_title.#{@proposal.proposal_type.name.downcase}", num: j + 1) %>
-            <%= "#{solution.title}" %>
-          </a>
+<section aria-labelledby="schulze-vote-title" class="space-y-4">
+  <% range = @proposal.solutions.count %>
+  <div>
+    <h3 id="schulze-vote-title" class="text-lg font-bold"><%= raw t('pages.proposals.vote_panel.schulze_title') %></h3>
+    <p class="text-sm text-base-content/70"><%= @proposal.secret_vote ? t('pages.proposals.vote_panel.secret_vote') : t('pages.proposals.vote_panel.clear_vote') %></p>
+  </div>
+
+  <%= form_with url: votation_vote_schulze_path(proposal_id: @proposal.id),
+                method: :put,
+                scope: :data,
+                class: 'space-y-4',
+                data: {
+                  controller: 'vote-ranking',
+                  action: 'submit->vote-ranking#validate',
+                  vote_ranking_error_message_value: t('pages.proposals.vote_panel.unique_ranks')
+                } do |f| %>
+    <%= f.hidden_field :votes, data: { vote_ranking_target: 'votes' } %>
+
+    <fieldset class="space-y-3">
+      <legend class="font-semibold"><%= t('pages.proposals.vote_panel.rank_solutions', default: 'Rank the solutions') %></legend>
+      <% @proposal.solutions.each_with_index do |solution, index| %>
+        <div class="grid gap-2 border-2 border-base-content/15 p-3 sm:grid-cols-[minmax(0,1fr)_10rem] sm:items-center">
+          <label for="solution_rank_<%= solution.id %>" class="font-medium">
+            <span class="text-base-content/60"><%= raw t("pages.proposals.edit.new_solution_title.#{@proposal.proposal_type.name.downcase}", num: index + 1) %></span>
+            <%= solution.title %>
+          </label>
+          <select id="solution_rank_<%= solution.id %>"
+                  class="select select-bordered min-h-11"
+                  required
+                  data-vote-ranking-target="rank"
+                  data-solution-id="<%= solution.id %>"
+                  data-action="change->vote-ranking#update">
+            <% 1.upto(range) do |position| %>
+              <option value="<%= position %>" <%= 'selected' if position == index + 1 %>><%= position %></option>
+            <% end %>
+          </select>
         </div>
       <% end %>
-    </div>
-  </div>
-</div>
-<%= form_with url: { action: "vote_schulze", controller: "votations", proposal_id: @proposal.id }, method: :put do |f| %>
-  <%= f.hidden_field 'votes' %>
-  <% if current_user.rotp_enabled && ::Configuration.rotp %>
-    <%= f.label t('pages.proposals.show.security_token') %>
-    <%= f.text_field 'token', maxlength: 6 %>
+    </fieldset>
+
+    <% if current_user.rotp_enabled && ::Configuration.rotp %>
+      <div class="form-control max-w-xs">
+        <%= f.label :token, t('pages.proposals.show.security_token'), class: 'label font-semibold' %>
+        <%= f.text_field :token, maxlength: 6, inputmode: 'numeric', autocomplete: 'one-time-code', class: 'input input-bordered min-h-11', required: true %>
+      </div>
+    <% end %>
+
+    <%= f.button class: 'btn btn-primary min-h-11', data: { turbo_confirm: t('pages.votations.show.confirm_schulze', name: @proposal.title), disable_with: t('loading') } do %>
+      <i class="fa-solid fa-check" aria-hidden="true"></i>
+      <%= t('pages.proposals.show.vote_button') %>
+    <% end %>
   <% end %>
-  <%= f.button data: { turbo_confirm: t('pages.votations.show.confirm_schulze', name: @proposal.title) }, id: 'schulze-submit', class: 'btn btn-primary' do %>
-    <i class="fa-solid fa-check"></i>
-    <%= t('pages.proposals.show.vote_button') %>
-  <% end %>
-<% end %>
+</section>

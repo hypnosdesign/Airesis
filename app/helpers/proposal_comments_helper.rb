@@ -1,5 +1,5 @@
 module ProposalCommentsHelper
-  RANK_EMOJI = { up: '👍', nil_rank: '😐', down: '👎' }.freeze
+  RANK_ICONS = { up: 'fa-thumbs-up', nil_rank: 'fa-circle-question', down: 'fa-thumbs-down' }.freeze
 
   def link_to_rankup(proposal, proposal_comment)
     link_to_rank(rankup_proposal_proposal_comment_path(proposal, proposal_comment),
@@ -22,18 +22,20 @@ module ProposalCommentsHelper
                  t('pages.proposals.show.votedown'))
   end
 
-  def rank_emoji(type, full: false)
-    emoji = RANK_EMOJI[type]
-    css = "text-xl inline-block transition-transform hover:scale-125"
+  def rank_icon(type, full: false, label: nil)
+    css = "fa-solid #{RANK_ICONS.fetch(type)} text-lg"
     css += " opacity-50" unless full
-    tag.span(emoji, class: css)
+    tag.span(class: 'inline-flex min-h-11 min-w-11 items-center justify-center', aria: (label ? { label: label } : { hidden: true })) do
+      tag.i(class: css, aria: { hidden: true })
+    end
   end
 
   def link_to_rank(url, comment_id, type, title)
-    link_to rank_emoji(type),
+    link_to rank_icon(type),
             url,
             data: { turbo_method: :put, id: comment_id },
-            class: "vote_comment",
-            title: title
+            class: 'vote_comment inline-flex min-h-11 min-w-11 items-center justify-center focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2',
+            title: title,
+            aria: { label: title }
   end
 end

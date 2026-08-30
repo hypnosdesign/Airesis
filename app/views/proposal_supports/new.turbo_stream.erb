@@ -1,10 +1,13 @@
-<%= turbo_stream.replace "proposal_support_modal" do %>
-  <dialog id="proposal_support_modal" data-controller="modal" class="modal">
-    <div class="modal-box shadow-brutal border-2 border-base-content max-w-3xl">
-      <%= render "proposal_supports/panel" %>
+<%= turbo_stream.replace 'proposal_support_modal' do %>
+  <dialog id="proposal_support_modal" data-controller="modal" class="modal" aria-labelledby="proposal-support-title">
+    <div class="modal-box max-w-3xl border-2 border-base-content shadow-brutal">
+      <button type="button" class="btn btn-ghost btn-square min-h-11 min-w-11 absolute right-2 top-2" aria-label="<%= t('buttons.close') %>" data-action="modal#close">
+        <i class="fa-solid fa-xmark" aria-hidden="true"></i>
+      </button>
+      <%= render 'proposal_supports/panel', show_heading: true, modal: true %>
     </div>
     <form method="dialog" class="modal-backdrop" data-action="click->modal#backdropClose">
-      <button>close</button>
+      <button aria-label="<%= t('buttons.close') %>"><%= t('buttons.close') %></button>
     </form>
   </dialog>
 <% end %>

@@ -1,12 +1,11 @@
-<h4 style="float:left"><%= t('pages.proposal_histories.editor_name') %></h4>
-<div style="float:left;margin-top: 4px;margin-left: 15px;">
+<div class="mb-4 flex flex-wrap items-center gap-3 border-b border-base-content/15 pb-3">
+  <h3 class="font-bold"><%= t('pages.proposal_histories.editor_name') %></h3>
   <%= user_tag(proposal_revision.user, proposal_revision.proposal) %>
 </div>
-<div class="clearboth"></div>
 
 <%= render partial: 'proposal_revisions/section_history', collection: proposal_revision.section_histories %>
 
-<% if proposal_revision.solution_histories.size > 0 %>
+<% if proposal_revision.solution_histories.any? %>
   <% proposal_revision.solution_histories.includes(section_histories: :paragraphs).order('section_histories.seq').each_with_index do |solution_history, i| %>
     <%= render partial: 'proposal_revisions/solution_history', locals: {proposal: @proposal, solution_history: solution_history, i: i} %>
   <% end %>

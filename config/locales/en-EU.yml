@@ -298,6 +298,7 @@ en-EU:
         bad_percentage: "% Rejection"
         confirm_deletion: "Are you sure you want to delete the quorum %{quorum}?"
         add_quorum: "Create a new quorum"
+        empty_state: "No quorum has been configured for this group yet. Create one to define when discussion ends and voting begins."
         edit_quorum: "Modify quorum"
         configure_proposal_parameters: "Configure proposals parameters"
         default_anonymous_proposal: "Temporary anonymity active"
@@ -306,6 +307,9 @@ en-EU:
         let_editor_change_settings: "Editors can freely choose the above options"
         time: "Time"
         edit_quorum_warning: "Warning! Modifications to this quorum won't affect the proposals already using it!"
+        debate: "Debate"
+        votation: "Voting"
+        configure_proposal_parameters_help: "Choose the defaults used for new group proposals."
       edit_work_areas:
         index:
           not_enabled: "Work areas not enabled"
@@ -670,6 +674,10 @@ en-EU:
         secret_vote: "Your vote is secret and you will not be able to recover or change it once expressed."
         clear_vote: "Your vote is recorded and will therefore be verifiable."
         single_title: "In this proposal there is only one solution. Make your point!"
+        choose_vote: "Choose your vote"
+        confirm_vote: "Confirm vote"
+        rank_solutions: "Rank the solutions"
+        unique_ranks: "Choose a different position for each solution"
         results_time: "You expressed your vote on %{when}"
         hidden_vote: "The vote was secret so it can't be shown."
         preferences_order: "Your preferences order was:"
@@ -809,6 +817,7 @@ en-EU:
           confirm_neutral: "Confirm your NEUTRAL vote on the proposal  '%{name}'? Once you have voted it cannot be modified."
           confirm_negative: "Confirm your NEGATIVE vote on the proposal  '%{name}'? Once you have voted it cannot be modified."
           confirm_schulze: "Confirm your vote on the proposal %{name}? Once you have voted it cannot be modified."
+          confirm: "Confirm your vote on the proposal %{name}? Once you have voted it cannot be modified."
     blog_posts:
       new:
         title: 'Add a new post'
@@ -925,6 +934,8 @@ en-EU:
         title: "All available quorums"
         how_read: "What is the quorum?"
         debate_end: "end of debate"
+      help:
+        title: "Quorum guide"
     home:
       index:
         whatis: "What is"
@@ -1191,7 +1202,7 @@ en-EU:
   models:
     best_quorum:
       good_score_condition: "The proposal will go to the vote if it has a maturity greater than <b>%{good_score}%</b> and %{participants}, otherwise it will be abandoned"
-      good_score_condition_past: "The proposal would have gone to the vote if it had a maturity greater than <b>%{good_score}%</b> and %{participants}, otherwise it would had been abandoned"
+      good_score_condition_past: "The proposal would have gone to the vote if it had a maturity greater than <b>%{good_score}%</b> and %{participants}; otherwise, it would have been abandoned"
     quorum:
       participants:
         one: '<b>a person</b> will have participated'
@@ -1208,7 +1219,7 @@ en-EU:
       participants_condition_1: "The debate will continue until %{participants_num}."
       participants_condition_1_past: "The debate continued until %{participants_num}."
       good_score_condition: "The proposal will go to the vote if it has a maturity greater than <b>%{good_score}%</b>, otherwise it will be abandoned"
-      good_score_condition_past: "The proposal would have gone to the vote if it had a maturity greater than <b>%{good_score}%</b>, otherwise it would had been abandoned"
+      good_score_condition_past: "The proposal would have gone to the vote if it had a maturity greater than <b>%{good_score}%</b>; otherwise, it would have been abandoned"
       bad_score_explain: |
         If the proposal gets a maturity over <b>%{good_score}%</b> it will go to the voting phase. If however it gets a rank below <b>%{bad_score}%</b>, it will be abandoned.<br/>
         The debate will continue if the rank remains between these two thresholds, regardless of time or the number of evaluations
@@ -1227,6 +1238,9 @@ en-EU:
         participants: "Minimum number of participant:"
         not_specified: "Not specified"
         time_discussion: "Period of discussion:"
+        time_vote: "Voting period:"
+        participants_vote: "Minimum number of voters:"
+        vote_good_score: "Approval threshold:"
         condition: "Condition of passage:"
         at_least_one: "At least one"
         both: "Both"
@@ -1673,7 +1687,11 @@ en-EU:
   proposal_comments:
     manage_noise:
       title: "Manage useless contributions"
-      help: "Drag and drop the contributions you consider useless for the discussion on the right"
+      help: "Move contributions between the two lists by dragging them or by using each contribution's move button."
+      move_to_available: "Move to eligible contributions"
+      move_to_removed: "Move to removed contributions"
+      moved_to_available: "Contribution moved to eligible contributions."
+      moved_to_removed: "Contribution moved to removed contributions."
   votations:
     create:
       confirm: "Vote registered correctly. Thank you!"

@@ -1,74 +1,68 @@
-<% @page_title = t("pages.groups.edit_proposals.title") %>
+<% @page_title = t('pages.groups.edit_proposals.title') %>
 
-<%= render layout: "layouts/page_title", locals: { title: t('pages.groups.edit_proposals.title') } do %>
-  <%= link_to new_group_best_quorum_url(@group), data: { disable_with: t('loading') }, class: "btn btn-primary btn-sm disable" do %>
-    <i class="fa-solid fa-plus"></i>
+<%= render layout: 'layouts/page_title', locals: { title: @page_title } do %>
+  <%= link_to new_group_best_quorum_path(@group), class: 'btn btn-primary min-h-11', data: { disable_with: t('loading') } do %>
+    <i class="fa-solid fa-plus" aria-hidden="true"></i>
     <%= t('pages.groups.edit_quorums.add_quorum') %>
   <% end %>
 <% end %>
 
-<div id="quorum_panel_container">
-  <%= render partial: 'groups/quorums_panel' %>
-</div>
-
-<table class="table">
-  <thead>
-    <tr>
-      <td colspan="2"><%= t('pages.groups.statistics.title', date: @group.statistic.updated_at) %></td>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td>Debate participants</td>
-      <td>
-        <%= @group.statistic.valutations.round(0) %>
-        (<%= (@group.statistic.valutations*100 / @group.scoped_participants(:participate_proposals).count).round(0) %> %)
-      </td>
-    </tr>
-    <tr>
-      <td>Debate maturity</td>
-      <td><%= @group.statistic.good_score.round(0) %>%</td>
-    </tr>
-    <tr>
-      <td>Votation participants</td>
-      <td>
-        <%= @group.statistic.vote_valutations.round(0) %>
-        (<%= (@group.statistic.vote_valutations*100 / @group.scoped_participants(:vote_proposals).count).round(0) %> %)
-      </td>
-    </tr>
-  </tbody>
-</table>
-
-<div class="card bg-base-200 p-4 mt-4">
-  <h2 class="text-lg font-bold mb-2"><%= t('pages.groups.edit_quorums.configure_proposal_parameters') %></h2>
-  <div class="flex flex-col gap-2">
-    <label class="flex items-center gap-2">
-      <%= check_box :group, :default_anonima, data: { change_default_anonimity: '' } %>
-      <%= t('pages.groups.edit_quorums.default_anonymous_proposal') %>
-    </label>
-    <label class="flex items-center gap-2">
-      <%= check_box :group, :default_visible_outside, data: { change_default_visible_outside: '' } %>
-      <%= t('pages.groups.edit_quorums.default_private_proposal') %>
-    </label>
-    <label class="flex items-center gap-2">
-      <%= check_box :group, :default_secret_vote, data: { change_default_secret_vote: '' } %>
-      <%= t('pages.groups.edit_quorums.default_secret_vote') %>
-    </label>
-    <hr>
-    <label class="flex items-center gap-2">
-      <%= check_box :group, :change_advanced_options, data: { change_default_advanced_options: '' } %>
-      <%= t('pages.groups.edit_quorums.let_editor_change_settings') %>
-    </label>
+<section aria-labelledby="quorums-list-title">
+  <h2 id="quorums-list-title" class="sr-only"><%= t('pages.groups.edit_quorums.name') %></h2>
+  <div id="quorum_panel_container">
+    <%= render partial: 'groups/quorums_panel' %>
   </div>
-</div>
+</section>
 
-<script type="text/javascript">
-  QuorumsIndex.groupId = <%= @group.id %>;
-  QuorumsIndex.changeDefaultAnonimityUrl = "<%= change_default_anonima_group_url(@group) %>";
-  QuorumsIndex.changeDefaultVisibleOutsideUrl = "<%= change_default_visible_outside_group_url(@group) %>";
-  QuorumsIndex.changeDefaultSecretVoteUrl = "<%= change_default_secret_vote_group_url(@group) %>";
-  QuorumsIndex.changeDefaultAdvancedOptionsUrl = "<%= change_advanced_options_group_url(@group) %>";
-</script>
+<% debate_participants = @group.scoped_participants(:participate_proposals).count %>
+<% vote_participants = @group.scoped_participants(:vote_proposals).count %>
+<% debate_percentage = debate_participants.positive? ? (@group.statistic.valutations * 100 / debate_participants).round : 0 %>
+<% vote_percentage = vote_participants.positive? ? (@group.statistic.vote_valutations * 100 / vote_participants).round : 0 %>
+
+<section class="mt-8" aria-labelledby="quorum-statistics-title">
+  <div class="mb-3 flex flex-wrap items-baseline justify-between gap-2">
+    <h2 id="quorum-statistics-title" class="text-xl font-bold"><%= t('pages.groups.statistics.title', date: l(@group.statistic.updated_at)) %></h2>
+  </div>
+  <dl class="grid gap-3 sm:grid-cols-3">
+    <div class="border-2 border-base-content/15 bg-base-100 p-4">
+      <dt class="text-sm text-base-content/70"><%= t('pages.groups.edit_quorums.participants') %> · debate</dt>
+      <dd class="mt-1 text-2xl font-bold"><%= @group.statistic.valutations.round %> <span class="text-sm font-normal text-base-content/60">(<%= debate_percentage %>%)</span></dd>
+    </div>
+    <div class="border-2 border-base-content/15 bg-base-100 p-4">
+      <dt class="text-sm text-base-content/70"><%= t('pages.groups.edit_quorums.good_percentage') %></dt>
+      <dd class="mt-1 text-2xl font-bold"><%= @group.statistic.good_score.round %>%</dd>
+    </div>
+    <div class="border-2 border-base-content/15 bg-base-100 p-4">
+      <dt class="text-sm text-base-content/70"><%= t('pages.groups.edit_quorums.participants') %> · vote</dt>
+      <dd class="mt-1 text-2xl font-bold"><%= @group.statistic.vote_valutations.round %> <span class="text-sm font-normal text-base-content/60">(<%= vote_percentage %>%)</span></dd>
+    </div>
+  </dl>
+</section>
+
+<section class="mt-8 border-2 border-base-content/15 bg-base-100 p-4 sm:p-6" aria-labelledby="proposal-defaults-title">
+  <h2 id="proposal-defaults-title" class="text-xl font-bold"><%= t('pages.groups.edit_quorums.configure_proposal_parameters') %></h2>
+  <p class="mt-1 text-sm text-base-content/70"><%= t('pages.groups.edit_quorums.configure_proposal_parameters_help', default: 'Choose the defaults used for new group proposals.') %></p>
+
+  <div class="mt-4 divide-y divide-base-content/15">
+    <% settings = [
+      [change_default_anonima_group_path(@group), :default_anonima, t('pages.groups.edit_quorums.default_anonymous_proposal')],
+      [change_default_visible_outside_group_path(@group), :default_visible_outside, t('pages.groups.edit_quorums.default_private_proposal')],
+      [change_default_secret_vote_group_path(@group), :default_secret_vote, t('pages.groups.edit_quorums.default_secret_vote')],
+      [change_advanced_options_group_path(@group), :change_advanced_options, t('pages.groups.edit_quorums.let_editor_change_settings')]
+    ] %>
+    <% settings.each do |path, attribute, label| %>
+      <%= form_with url: path, method: :post, class: 'py-3', data: { controller: 'autosubmit' } do %>
+        <label class="flex min-h-11 cursor-pointer items-center justify-between gap-4" for="group_<%= attribute %>">
+          <span class="font-medium"><%= label %></span>
+          <%= check_box_tag :active, 'true', @group.public_send(attribute),
+                            id: "group_#{attribute}",
+                            class: 'checkbox checkbox-primary',
+                            data: { action: 'change->autosubmit#submit' } %>
+        </label>
+      <% end %>
+    <% end %>
+  </div>
+</section>
 
 <% content_for :left_panel do %>
   <%= render 'groups/administration_panel' %>

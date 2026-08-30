@@ -1,1 +1,6 @@
-<%= render 'history' %>
+<% @page_title = t('pages.proposals.history_comment', default: 'Contribution history') %>
+<%= render layout: 'layouts/page_title', locals: { title: @page_title } do %>
+  <%= link_to t('pages.proposal_histories.index.back_to_proposal'), @proposal, class: 'btn btn-outline min-h-11' %>
+<% end %>
+
+<%= render 'proposal_comments/history' %>

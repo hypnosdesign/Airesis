@@ -1,42 +1,63 @@
-<h2><%= t('.title') %></h2>
-<div class="flex flex-wrap w-full">
-  <div class="flex flex-wrap">
-    <div class="w-full">
-      <div class="alert alert-info">
-        <%= t('.help') %>
-      </div>
-    </div>
-    <div class="w-full sm:w-1/2">
-      <h4><%= t('pages.proposals.manage_noise.available') %></h4>
-    </div>
-    <div class="w-full sm:w-1/2">
-      <h4><%= t('pages.proposals.manage_noise.removed') %></h4>
-    </div>
-    <div class="w-full sm:w-1/2">
-      <div id="active" class="noise-sortable" data-noise-manager-target="activeList">
+<button type="button" class="btn btn-ghost btn-square min-h-11 min-w-11 absolute right-2 top-2" aria-label="<%= t('buttons.close') %>" data-action="modal#close">
+  <i class="fa-solid fa-xmark" aria-hidden="true"></i>
+</button>
+<h2 id="manage-noise-title" class="text-xl font-bold"><%= t('.title') %></h2>
+<p class="mt-2 border-2 border-info/30 bg-info/10 p-3 text-sm"><%= t('.help') %></p>
+
+<%= form_with url: mark_noise_proposal_proposal_comments_path(@proposal),
+              method: :post,
+              class: 'mt-4',
+              data: { controller: 'noise-manager', action: 'submit->noise-manager#collectIds' } do %>
+  <div class="grid gap-4 sm:grid-cols-2">
+    <section aria-labelledby="available-comments-title">
+      <h3 id="available-comments-title" class="font-bold"><%= t('pages.proposals.manage_noise.available') %></h3>
+      <div class="noise-sortable mt-2 min-h-24 space-y-2 border-2 border-base-content/15 bg-base-200 p-3" data-noise-manager-target="activeList">
         <% @proposal.contributes.unintegrated.removable.each do |contribute| %>
-          <div class="noise_element" data-id="<%= contribute.id %>">
-            <%= parsed_content(contribute, @proposal.is_anonima?) %>
-          </div>
+          <article class="noise_element cursor-move bg-base-100 p-3" data-id="<%= contribute.id %>">
+            <div><%= parsed_content(contribute, @proposal.is_anonima?) %></div>
+            <button type="button"
+                    class="btn btn-outline btn-sm mt-3 min-h-11"
+                    aria-label="<%= t('.move_to_removed') %>"
+                    data-action="noise-manager#toggle"
+                    data-move-to-active-label="<%= t('.move_to_available') %>"
+                    data-move-to-inactive-label="<%= t('.move_to_removed') %>"
+                    data-moved-to-active-announcement="<%= t('.moved_to_available') %>"
+                    data-moved-to-inactive-announcement="<%= t('.moved_to_removed') %>">
+              <i class="fa-solid fa-arrow-right-arrow-left" aria-hidden="true"></i>
+              <span data-noise-manager-label><%= t('.move_to_removed') %></span>
+            </button>
+          </article>
         <% end %>
       </div>
-    </div>
-    <div class="w-full sm:w-1/2">
-      <div id="inactive" class="noise-sortable" data-noise-manager-target="inactiveList">
+    </section>
+    <section aria-labelledby="removed-comments-title">
+      <h3 id="removed-comments-title" class="font-bold"><%= t('pages.proposals.manage_noise.removed') %></h3>
+      <div class="noise-sortable mt-2 min-h-24 space-y-2 border-2 border-base-content/15 bg-base-200 p-3" data-noise-manager-target="inactiveList">
         <% @proposal.contributes.noise.each do |contribute| %>
-          <div class="noise_element" data-id="<%= contribute.id %>">
-            <%= parsed_content(contribute, @proposal.is_anonima?) %>
-          </div>
+          <article class="noise_element cursor-move bg-base-100 p-3" data-id="<%= contribute.id %>">
+            <div><%= parsed_content(contribute, @proposal.is_anonima?) %></div>
+            <button type="button"
+                    class="btn btn-outline btn-sm mt-3 min-h-11"
+                    aria-label="<%= t('.move_to_available') %>"
+                    data-action="noise-manager#toggle"
+                    data-move-to-active-label="<%= t('.move_to_available') %>"
+                    data-move-to-inactive-label="<%= t('.move_to_removed') %>"
+                    data-moved-to-active-announcement="<%= t('.moved_to_available') %>"
+                    data-moved-to-inactive-announcement="<%= t('.moved_to_removed') %>">
+              <i class="fa-solid fa-arrow-right-arrow-left" aria-hidden="true"></i>
+              <span data-noise-manager-label><%= t('.move_to_available') %></span>
+            </button>
+          </article>
         <% end %>
       </div>
-    </div>
+    </section>
   </div>
-</div>
-<%= form_with url: mark_noise_proposal_proposal_comments_path(@proposal.id), method: :post,
-    data: { controller: 'noise-manager', action: 'submit->noise-manager#collectIds' } do |f| %>
-  <%= f.hidden_field 'active', data: { 'noise-manager-target': 'activeField' } %>
-  <%= f.hidden_field 'inactive', data: { 'noise-manager-target': 'inactiveField' } %>
-  <%= link_to t('buttons.cancel'), '#', class: 'btn', data: { action: 'click->modal#close' } %>
-  <%= link_to t('buttons.go_back'), :back, class: 'btn', data: {back: ''} %>
-  <%= f.submit t('buttons.save'), class: 'btn btn-primary', data: {disable_with: t('loading')} %>
+
+  <%= hidden_field_tag 'comments[active]', '', data: { noise_manager_target: 'activeField' } %>
+  <%= hidden_field_tag 'comments[inactive]', '', data: { noise_manager_target: 'inactiveField' } %>
+  <p class="sr-only" role="status" aria-live="polite" data-noise-manager-target="announcement"></p>
+  <div class="mt-4 flex flex-wrap gap-2">
+    <button type="button" class="btn btn-outline min-h-11" data-action="modal#close"><%= t('buttons.cancel') %></button>
+    <%= submit_tag t('buttons.save'), class: 'btn btn-primary min-h-11', data: { disable_with: t('loading') } %>
+  </div>
 <% end %>

@@ -1,10 +1,16 @@
-<%= turbo_stream.replace "revisions_modal" do %>
-  <dialog id="revisions_modal" data-controller="modal" class="modal">
-    <div class="modal-box shadow-brutal border-2 border-base-content max-w-3xl max-h-[80vh] overflow-y-auto">
-      <%= render "proposal_revisions/panel" %>
+<%= turbo_stream.replace 'revisions_modal' do %>
+  <dialog id="revisions_modal" data-controller="modal" class="modal" aria-labelledby="revisions-modal-title">
+    <div class="modal-box max-h-[85vh] max-w-5xl overflow-y-auto border-2 border-base-content shadow-brutal">
+      <div class="mb-5 flex items-center justify-between gap-3">
+        <h2 id="revisions-modal-title" class="text-xl font-bold"><%= t('pages.proposal_histories.title') %></h2>
+        <button type="button" class="btn btn-ghost btn-square min-h-11 min-w-11" aria-label="<%= t('buttons.close') %>" data-action="modal#close">
+          <i class="fa-solid fa-xmark" aria-hidden="true"></i>
+        </button>
+      </div>
+      <%= render 'proposal_revisions/history_explorer' %>
     </div>
     <form method="dialog" class="modal-backdrop" data-action="click->modal#backdropClose">
-      <button>close</button>
+      <button aria-label="<%= t('buttons.close') %>"><%= t('buttons.close') %></button>
     </form>
   </dialog>
 <% end %>

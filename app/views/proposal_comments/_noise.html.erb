@@ -1,10 +1,15 @@
-<h2><%= t('pages.proposal_comments.noise.title') %></h2>
-<% if @proposal.contributes.noise.count > 0 %>
-  <% @proposal.contributes.noise.each do |contribute| %>
-    <div class="noise_element" data-id="<%= contribute.id %>">
-      <%= parsed_content(contribute, @proposal.is_anonima?) %>
-    </div>
+<button type="button" class="btn btn-ghost btn-square min-h-11 min-w-11 absolute right-2 top-2" aria-label="<%= t('buttons.close') %>" data-action="modal#close">
+  <i class="fa-solid fa-xmark" aria-hidden="true"></i>
+</button>
+<h2 id="noise-title" class="text-xl font-bold"><%= t('pages.proposal_comments.noise.title') %></h2>
+<div class="mt-4 space-y-3">
+  <% if @proposal.contributes.noise.any? %>
+    <% @proposal.contributes.noise.each do |contribute| %>
+      <article class="border-2 border-base-content/15 bg-base-100 p-4" data-id="<%= contribute.id %>">
+        <%= parsed_content(contribute, @proposal.is_anonima?) %>
+      </article>
+    <% end %>
+  <% else %>
+    <p class="border-2 border-base-content/15 bg-base-200 p-4"><%= t('pages.proposal_comments.noise.no_contributes') %></p>
   <% end %>
-<% else %>
-  <%= t('pages.proposal_comments.noise.no_contributes') %>
-<% end %>
+</div>

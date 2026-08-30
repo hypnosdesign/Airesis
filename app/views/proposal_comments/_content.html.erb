@@ -1,70 +1,94 @@
-<div id="comment_<%= comment.id %>" class="bg-base-100 border-2 border-neutral p-5 mb-3" style="box-shadow: 3px 3px 0 oklch(var(--n));">
-  <%# Header: autore + data + menu %>
-  <div class="flex items-center justify-between mb-3">
-    <div class="flex items-center gap-3">
-      <div class="w-8 h-8 bg-primary text-primary-content flex items-center justify-center font-bold text-sm border border-neutral">
-        <%= comment.user.name[0].upcase %>
+<% comment_nickname = @proposal.proposal_nicknames.find_by(user_id: comment.user_id) %>
+<article id="comment_<%= comment.id %>" class="bg-base-100 border-2 border-base-content/15 p-4 sm:p-5 mb-4" aria-labelledby="comment_author_<%= comment.id %>">
+  <header class="flex items-start justify-between gap-3 mb-3">
+    <div class="flex min-w-0 items-center gap-3">
+      <div class="w-10 h-10 shrink-0 bg-primary text-primary-content flex items-center justify-center font-bold text-sm" aria-hidden="true">
+        <%= comment.user.name.to_s.first&.upcase || '?' %>
       </div>
-      <div>
-        <% who = if proposal_nickname && @proposal.is_anonima? && comment.user != current_user
-                   proposal_nickname.nickname
+      <div class="min-w-0">
+        <% who = if comment_nickname && @proposal.is_anonima? && comment.user != current_user
+                   comment_nickname.nickname
                  else
                    link_to_user(comment.user, content_text: comment.user.fullname, class: 'font-semibold link link-hover')
                  end %>
-        <span class="font-semibold text-sm"><%= raw who %></span>
-        <span class="text-xs text-base-content/50 ml-2">
-          <i class="fa-regular fa-clock"></i>
-          <%= time_ago_in_words(comment.updated_at || comment.created_at) %> fa
-        </span>
-        <% if comment.created_at != comment.updated_at %>
-          <span class="text-xs text-base-content/40 italic ml-1">(modificato)</span>
-        <% end %>
+        <div id="comment_author_<%= comment.id %>" class="font-semibold text-sm break-words"><%= raw who %></div>
+        <p class="text-xs text-base-content/70">
+          <i class="fa-regular fa-clock" aria-hidden="true"></i>
+          <%= time_ago_in_words(comment.updated_at || comment.created_at) %>
+          <% if comment.created_at != comment.updated_at %>
+            · <%= t('pages.proposals.comments.modified', default: 'modified') %>
+          <% end %>
+        </p>
       </div>
     </div>
 
-    <%# Menu azioni %>
-    <div class="dropdown dropdown-end">
-      <button tabindex="0" class="btn btn-ghost btn-xs">
-        <i class="fa-solid fa-ellipsis-vertical"></i>
+    <div class="dropdown dropdown-end shrink-0">
+      <button type="button"
+              tabindex="0"
+              class="btn btn-ghost btn-sm btn-square min-h-11 min-w-11"
+              aria-label="<%= t('pages.proposals.comments.actions', default: 'Comment actions') %>">
+        <i class="fa-solid fa-ellipsis-vertical" aria-hidden="true"></i>
       </button>
-      <ul tabindex="0" class="dropdown-content menu bg-base-200 shadow-lg border border-neutral z-20 p-2 w-44">
+      <ul tabindex="0" class="dropdown-content menu bg-base-100 shadow-lg border border-base-content/15 z-20 p-2 w-52">
         <% if can? :update, comment %>
           <li>
-            <%= link_to edit_proposal_proposal_comment_path(@proposal, comment, format: :turbo_stream), class: "text-sm", data: { turbo_prefetch: false, turbo_stream: true } do %>
-              <i class="fa-solid fa-pencil"></i> <%= t('pages.proposals.update_comment') %>
+            <%= link_to edit_proposal_proposal_comment_path(@proposal, comment, format: :turbo_stream), class: 'text-sm min-h-11', data: { turbo_prefetch: false, turbo_stream: true } do %>
+              <i class="fa-solid fa-pencil" aria-hidden="true"></i> <%= t('pages.proposals.update_comment') %>
             <% end %>
           </li>
         <% end %>
-        <% if comment.versions.length > 0 %>
+        <% if comment.versions.any? %>
           <li>
-            <%= link_to history_proposal_proposal_comment_path(@proposal, comment, format: :turbo_stream), class: "text-sm", data: { turbo_prefetch: false, turbo_stream: true } do %>
-              <i class="fa-solid fa-clock-rotate-left"></i> <%= t('pages.proposals.history_comment', default: 'History') %>
+            <%= link_to history_proposal_proposal_comment_path(@proposal, comment, format: :turbo_stream), class: 'text-sm min-h-11', data: { turbo_prefetch: false, turbo_stream: true } do %>
+              <i class="fa-solid fa-clock-rotate-left" aria-hidden="true"></i> <%= t('pages.proposals.history_comment', default: 'History') %>
             <% end %>
           </li>
         <% end %>
-        <li>
-          <a href="#" data-report-contribute="<%= comment.id %>" class="text-sm">
-            <i class="fa-solid fa-flag"></i> <%= t('buttons.report') %>
-          </a>
-        </li>
+        <% if current_user %>
+          <li>
+            <button type="button"
+                    class="text-sm min-h-11"
+                    data-action="click->report-contribute#open"
+                    data-comment-id="<%= comment.id %>">
+              <i class="fa-solid fa-flag" aria-hidden="true"></i> <%= t('buttons.report') %>
+            </button>
+          </li>
+        <% end %>
         <% if can? :destroy, comment %>
           <li>
-            <%= link_to [@proposal, comment], data: { turbo_method: :delete, turbo_confirm: t('pages.proposals.show.delete_contribute_confirmation') }, class: "text-sm text-error" do %>
-              <i class="fa-regular fa-trash-can"></i> <%= t('pages.proposals.delete_comment') %>
+            <%= link_to [@proposal, comment], data: { turbo_method: :delete, turbo_confirm: t('pages.proposals.show.delete_contribute_confirmation') }, class: 'text-sm text-error min-h-11' do %>
+              <i class="fa-regular fa-trash-can" aria-hidden="true"></i> <%= t('pages.proposals.delete_comment') %>
             <% end %>
           </li>
         <% end %>
       </ul>
     </div>
-  </div>
+  </header>
 
-  <%# Contenuto %>
-  <div class="prose max-w-none text-base-content/80 mb-3">
+  <div class="prose max-w-[72ch] text-base-content mb-3">
     <%= parsed_content(comment, @proposal.is_anonima?) %>
   </div>
 
-  <%# Footer: ranking %>
-  <div id="rankingpanelcontainer<%= comment.id %>" class="flex items-center gap-4 pt-3 border-t border-base-300">
+  <div id="rankingpanelcontainer<%= comment.id %>" class="flex flex-wrap items-center gap-3 pt-3 border-t border-base-content/15">
     <%= render partial: 'proposal_comments/ranking_panel', locals: { comment: comment } %>
   </div>
-</div>
+
+  <div id="replies_<%= comment.id %>" class="mt-4 space-y-3" aria-label="<%= t('pages.proposals.comments.replies', default: 'Replies') %>">
+    <%= render partial: 'proposal_comments/reply', collection: comment.replies.order(:created_at), as: :reply %>
+  </div>
+
+  <% if can? :participate, @proposal %>
+    <%= form_with model: [@proposal, ProposalComment.new], class: 'mt-4 bg-base-200/70 p-3' do |f| %>
+      <%= f.hidden_field :parent_proposal_comment_id, value: comment.id %>
+      <%= f.label :content, t('pages.proposals.show.reply_placeholder'), class: 'sr-only' %>
+      <div class="flex flex-col sm:flex-row gap-2">
+        <%= f.text_area :content,
+                        rows: 2,
+                        class: 'textarea textarea-bordered min-h-20 w-full flex-1',
+                        placeholder: t('pages.proposals.show.reply_placeholder'),
+                        aria: { label: t('pages.proposals.show.reply_placeholder') } %>
+        <%= f.submit t('pages.proposals.show.reply_button'), class: 'btn btn-primary min-h-11 sm:self-end', data: { disable_with: t('sending') } %>
+      </div>
+    <% end %>
+  <% end %>
+</article>

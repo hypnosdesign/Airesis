@@ -1,10 +1,16 @@
 <%= turbo_stream.replace "history_modal" do %>
-  <dialog id="history_modal" data-controller="modal" class="modal">
+  <dialog id="history_modal" data-controller="modal" class="modal" aria-labelledby="comment-history-title">
     <div class="modal-box shadow-brutal border-2 border-base-content max-w-3xl max-h-[80vh] overflow-y-auto">
-      <%= render "history_panel" %>
+      <div class="mb-4 flex items-center justify-between gap-3">
+        <h2 id="comment-history-title" class="text-xl font-bold"><%= t('pages.proposals.history_comment', default: 'Contribution history') %></h2>
+        <button type="button" class="btn btn-ghost btn-square min-h-11 min-w-11" aria-label="<%= t('buttons.close') %>" data-action="modal#close">
+          <i class="fa-solid fa-xmark" aria-hidden="true"></i>
+        </button>
+      </div>
+      <%= render "proposal_comments/history" %>
     </div>
     <form method="dialog" class="modal-backdrop" data-action="click->modal#backdropClose">
-      <button>close</button>
+      <button aria-label="<%= t('buttons.close') %>"><%= t('buttons.close') %></button>
     </form>
   </dialog>
 <% end %>

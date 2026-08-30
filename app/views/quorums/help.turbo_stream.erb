@@ -1,14 +1,16 @@
-<%= turbo_stream.replace "quorum_help_modal" do %>
-  <dialog id="quorum_help_modal" data-controller="modal" class="modal">
-    <div class="modal-box shadow-brutal border-2 border-base-content max-w-3xl">
-      <h3 class="text-lg font-bold mb-4"><%= t("pages.quorums.help.title") %></h3>
-      <%= render partial: "quorums/help" %>
-      <div class="modal-action">
-        <button class="btn" data-action="click->modal#close"><%= t("buttons.close") %></button>
+<%= turbo_stream.replace 'quorum_help_modal' do %>
+  <dialog id="quorum_help_modal" data-controller="modal" class="modal" aria-labelledby="quorum-help-title">
+    <div class="modal-box max-h-[85vh] max-w-3xl overflow-y-auto border-2 border-base-content shadow-brutal">
+      <div class="mb-4 flex items-center justify-between gap-3">
+        <h2 id="quorum-help-title" class="text-xl font-bold"><%= t('pages.quorums.help.title') %></h2>
+        <button type="button" class="btn btn-ghost btn-square min-h-11 min-w-11" aria-label="<%= t('buttons.close') %>" data-action="modal#close">
+          <i class="fa-solid fa-xmark" aria-hidden="true"></i>
+        </button>
       </div>
+      <%= render partial: 'quorums/help' %>
     </div>
     <form method="dialog" class="modal-backdrop" data-action="click->modal#backdropClose">
-      <button>close</button>
+      <button aria-label="<%= t('buttons.close') %>"><%= t('buttons.close') %></button>
     </form>
   </dialog>
 <% end %>

@@ -5,31 +5,31 @@
     <div class="flex items-center gap-3 text-sm" id="ranking_panel_<%= comment.id %>">
       <div class="flex items-center gap-1">
         <% if my_rank == 1 %>
-          <%= rank_emoji(:up, full: true) %>
+          <%= rank_icon(:up, full: true, label: t('pages.proposals.show.voteup')) %>
         <% elsif can_rank_again %>
           <%= link_to_rankup(@proposal, comment) %>
         <% else %>
-          <%= rank_emoji(:up) %>
+          <%= rank_icon(:up, label: t('pages.proposals.show.voteup')) %>
         <% end %>
         <span class="font-semibold"><%= comment.rankings.positives.count %></span>
       </div>
       <div class="flex items-center gap-1">
         <% if my_rank == 2 %>
-          <%= rank_emoji(:nil_rank, full: true) %>
+          <%= rank_icon(:nil_rank, full: true, label: t('pages.proposals.show.votenil')) %>
         <% elsif can_rank_again %>
           <%= link_to_ranknil(@proposal, comment) %>
         <% else %>
-          <%= rank_emoji(:nil_rank) %>
+          <%= rank_icon(:nil_rank, label: t('pages.proposals.show.votenil')) %>
         <% end %>
         <span class="font-semibold"><%= comment.rankings.neutrals.count %></span>
       </div>
       <div class="flex items-center gap-1">
         <% if my_rank == 3 %>
-          <%= rank_emoji(:down, full: true) %>
+          <%= rank_icon(:down, full: true, label: t('pages.proposals.show.votedown')) %>
         <% elsif can_rank_again %>
           <%= link_to_rankdown(@proposal, comment) %>
         <% else %>
-          <%= rank_emoji(:down) %>
+          <%= rank_icon(:down, label: t('pages.proposals.show.votedown')) %>
         <% end %>
         <span class="font-semibold"><%= comment.rankings.negatives.count %></span>
       </div>
@@ -38,6 +38,6 @@
       <% end %>
     </div>
   <% else %>
-    <%= render 'ranking_panel_others', { comment: comment } %>
+    <%= render 'proposal_comments/ranking_panel_others', comment: comment %>
   <% end %>
 <% end %>

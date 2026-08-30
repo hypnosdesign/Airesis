@@ -1,14 +1,8 @@
-<% content_for :left_panel do %>
-  <%= render partial: 'help_menu' %>
+<% @page_title = t('pages.quorums.help.title') %>
+<%= render layout: 'layouts/page_title', locals: { title: @page_title } do %>
+  <% if @group %>
+    <%= link_to t('buttons.go_back'), group_quorums_path(@group), class: 'btn btn-outline min-h-11' %>
+  <% end %>
 <% end %>
 
-<%= render partial: 'help_content' %>
-
-<script>
-  function showSection(id) {
-    document.querySelectorAll('.quorum_section').forEach(function (el) { el.style.display = 'none'; });
-    document.getElementById(id).style.display = '';
-  }
-  document.querySelectorAll('.quorum_section').forEach(function (el) { el.style.display = 'none'; });
-  document.getElementById('whatis').style.display = '';
-</script>
+<%= render partial: 'quorums/help' %>

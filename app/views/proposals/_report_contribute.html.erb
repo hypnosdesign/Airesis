@@ -1,49 +1,60 @@
-<dialog id="report_contribute" class="modal">
-  <div class="modal-box bg-base-100 max-w-2xl">
-    <form method="dialog">
-      <button class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2">✕</button>
-    </form>
+<dialog id="report_contribute"
+        class="modal"
+        aria-labelledby="report-contribute-title"
+        data-report-contribute-target="dialog"
+        data-action="click->report-contribute#backdropClose">
+  <div class="modal-box bg-base-100 max-w-2xl border-2 border-base-content">
+    <button type="button"
+            class="btn btn-square btn-ghost min-h-11 min-w-11 absolute right-2 top-2"
+            aria-label="<%= t('buttons.close') %>"
+            data-action="report-contribute#close">
+      <i class="fa-solid fa-xmark" aria-hidden="true"></i>
+    </button>
 
-    <%= form_with url: report_proposal_proposal_comments_path(@proposal) do |f| %>
-      <%= cache "report_panel_#{I18n.locale}" do %>
-        <input id="report_contribute_id" type="hidden" name="id" value="0">
+    <%= form_with url: report_proposal_proposal_comments_path(@proposal), class: "space-y-6" do |f| %>
+      <input type="hidden" name="id" value="0" data-report-contribute-target="commentId">
 
-        <h2 class="text-xl font-bold mb-4"><%= t('pages.proposals.report_contribute.mark_title') %></h2>
-        <div class="card bg-info/10 border border-info p-4 mb-4">
+      <section aria-labelledby="report-contribute-title">
+        <h2 id="report-contribute-title" class="text-xl font-bold mb-4"><%= t('pages.proposals.report_contribute.mark_title') %></h2>
+        <div class="bg-info/10 border-2 border-info/30 p-4 mb-4">
           <p><%= raw t('pages.proposals.report_contribute.mark_description', num: CONTRIBUTE_MARKS) %></p>
         </div>
-        <div class="space-y-2 mb-4">
-          <% ProposalCommentReportType.softs.each do |r| %>
-            <label class="flex items-center gap-2">
-              <input type="radio" name="reason" value="<%= r.id %>" class="radio radio-sm">
-              <span><%= r.description %></span>
+        <fieldset class="space-y-2">
+          <legend class="sr-only"><%= t('pages.proposals.report_contribute.mark_title') %></legend>
+          <% ProposalCommentReportType.softs.each_with_index do |report_type, index| %>
+            <label class="flex min-h-11 items-center gap-3 cursor-pointer">
+              <input type="radio" name="reason" value="<%= report_type.id %>" class="radio" required <%= 'autofocus' if index.zero? %>>
+              <span><%= report_type.description %></span>
             </label>
           <% end %>
+        </fieldset>
+        <div class="flex flex-wrap gap-2 mt-4">
+          <button type="button" class="btn btn-outline min-h-11" data-action="report-contribute#close"><%= t('buttons.cancel') %></button>
+          <%= f.submit t('buttons.mark'), class: 'btn btn-primary min-h-11', data: { disable_with: t('loading') } %>
         </div>
-        <div class="flex gap-2 mb-6">
-          <button type="button" class="btn btn-outline" onclick="document.getElementById('report_contribute').close()"><%= t('buttons.cancel') %></button>
-          <%= f.submit t('buttons.mark'), class: 'btn btn-primary', data: { disable_with: t('loading') } %>
-        </div>
+      </section>
 
-        <hr class="my-4">
+      <hr class="border-base-content/20">
 
-        <h2 class="text-xl font-bold mb-4"><%= t('pages.proposals.report_contribute.report_title') %></h2>
-        <div class="card bg-info/10 border border-info p-4 mb-4">
+      <section aria-labelledby="report-contribute-serious-title">
+        <h2 id="report-contribute-serious-title" class="text-xl font-bold mb-4"><%= t('pages.proposals.report_contribute.report_title') %></h2>
+        <div class="bg-info/10 border-2 border-info/30 p-4 mb-4">
           <p><%= raw t('pages.proposals.report_contribute.report_description') %></p>
         </div>
-        <div class="space-y-2 mb-4">
-          <% ProposalCommentReportType.graves.each do |r| %>
-            <label class="flex items-center gap-2">
-              <input type="radio" name="reason" value="<%= r.id %>" class="radio radio-sm">
-              <span><%= r.description %></span>
+        <fieldset class="space-y-2">
+          <legend class="sr-only"><%= t('pages.proposals.report_contribute.report_title') %></legend>
+          <% ProposalCommentReportType.graves.each do |report_type| %>
+            <label class="flex min-h-11 items-center gap-3 cursor-pointer">
+              <input type="radio" name="reason" value="<%= report_type.id %>" class="radio" required>
+              <span><%= report_type.description %></span>
             </label>
           <% end %>
+        </fieldset>
+        <div class="flex flex-wrap gap-2 mt-4">
+          <button type="button" class="btn btn-outline min-h-11" data-action="report-contribute#close"><%= t('buttons.cancel') %></button>
+          <%= f.submit t('buttons.report'), class: 'btn btn-error min-h-11', data: { disable_with: t('loading') } %>
         </div>
-        <div class="flex gap-2">
-          <button type="button" class="btn btn-outline" onclick="document.getElementById('report_contribute').close()"><%= t('buttons.cancel') %></button>
-          <%= f.submit t('buttons.report'), class: 'btn btn-error', data: { disable_with: t('loading') } %>
-        </div>
-      <% end %>
+      </section>
     <% end %>
   </div>
 </dialog>

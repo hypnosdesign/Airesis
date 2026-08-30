@@ -1,6 +1,11 @@
-<div class="card bg-base-200 p-4">
-  <%= render 'proposal_supports/panel' %>
-</div>
+<% @page_title = t('pages.proposal_supports.new.panel_title') %>
+<%= render layout: 'layouts/page_title', locals: { title: @page_title } do %>
+  <%= link_to t('pages.proposal_histories.index.back_to_proposal'), proposal_path(@proposal), class: 'btn btn-outline min-h-11' %>
+<% end %>
+
+<section aria-label="<%= @page_title %>" class="border-2 border-base-content/15 bg-base-100 p-4 sm:p-6">
+  <%= render 'proposal_supports/panel', show_heading: false, modal: false %>
+</section>
 
 <% content_for :left_panel do %>
   <%= render 'proposals/left_panel' %>

@@ -53,7 +53,7 @@ module User::Groupable
   def scoped_groups(abilitation, excluded_groups = nil)
     ret = groups.
           joins(' INNER JOIN participation_roles ON participation_roles.id = group_participations.participation_role_id').
-          where("(participation_roles.name = 'amministratore' OR participation_roles.#{abilitation} = true")
+          where("participation_roles.name = 'amministratore' OR participation_roles.#{abilitation} = true")
     excluded_groups ? ret - excluded_groups : ret
   end
 

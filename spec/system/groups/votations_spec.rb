@@ -16,12 +16,21 @@ RSpec.describe 'check if quorums are working correctly', :js do
     load_database
   end
 
-  def vote(klass = 'votegreen')
+  def vote(kind = :positive)
     visit group_proposal_path(group, proposal)
     expect(page).to have_content(I18n.t('pages.proposals.vote_panel.single_title'))
     expect(page).to have_content(proposal.secret_vote ? I18n.t('pages.proposals.vote_panel.secret_vote') : I18n.t('pages.proposals.vote_panel.clear_vote'))
+    label_key = {
+      positive: 'vote_positive',
+      neutral: 'vote_neutral',
+      negative: 'vote_negative',
+      votegreen: 'vote_positive',
+      voteyellow: 'vote_neutral',
+      votered: 'vote_negative'
+    }.fetch(kind.to_sym)
+    choose I18n.t("pages.votations.show.#{label_key}")
     page.execute_script 'window.confirm = function () { return true }'
-    find(".#{klass}").click
+    click_button I18n.t('pages.proposals.vote_panel.confirm_vote')
     expect(page).to have_content(I18n.t('votations.create.confirm'))
     proposal.reload
   end
@@ -31,8 +40,10 @@ RSpec.describe 'check if quorums are working correctly', :js do
     expect(page.html).to include(I18n.t('pages.proposals.vote_panel.schulze_title'))
     expect(page).to have_content(proposal.secret_vote ? I18n.t('pages.proposals.vote_panel.secret_vote') : I18n.t('pages.proposals.vote_panel.clear_vote'))
 
-    page.execute_script "el = $('.list-group-item[data-id=#{id}]');
-el.parents('.vote-items-external').prev('.vote-items-external').find('.vote-items').append(el);"
+    preferred = proposal.solutions.find(id)
+    other = proposal.solutions.where.not(id: id).first
+    select '1', from: "solution_rank_#{preferred.id}"
+    select '2', from: "solution_rank_#{other.id}"
 
     page.execute_script 'window.confirm = function () { return true }'
     click_button I18n.t('pages.proposals.show.vote_button')
@@ -95,7 +106,7 @@ el.parents('.vote-items-external').prev('.vote-items-external').find('.vote-item
     logout :user
 
     login_as users[1], scope: :user
-    vote('votered')
+    vote(:negative)
     expect(proposal.vote.positive).to eq(2)
     expect(proposal.vote.negative).to eq(1)
 
@@ -103,7 +114,7 @@ el.parents('.vote-items-external').prev('.vote-items-external').find('.vote-item
 
     login_as users[2], scope: :user
     expect(UserVote.find_by(user_id: users[2].id, proposal_id: proposal.id)).to be_nil
-    vote('voteyellow')
+    vote(:neutral)
     expect(proposal.vote.positive).to eq(2)
     expect(proposal.vote.negative).to eq(1)
     expect(proposal.vote.neutral).to eq(1)
@@ -160,21 +171,21 @@ el.parents('.vote-items-external').prev('.vote-items-external').find('.vote-item
     users = group.participants.sample(4)
     expect(Ability.new(users[0])).to be_able_to(:vote, proposal)
     login_as users[0], scope: :user
-    vote('votered')
+    vote(:negative)
     expect(proposal.vote.positive).to eq(0)
     expect(proposal.vote.negative).to eq(1)
 
     logout :user
 
     login_as users[1], scope: :user
-    vote('votered')
+    vote(:negative)
     expect(proposal.vote.positive).to eq(0)
     expect(proposal.vote.negative).to eq(2)
 
     logout :user
 
     login_as users[2], scope: :user
-    vote('voteyellow')
+    vote(:neutral)
     expect(proposal.vote.positive).to eq(0)
     expect(proposal.vote.negative).to eq(2)
     expect(proposal.vote.neutral).to eq(1)
@@ -182,7 +193,7 @@ el.parents('.vote-items-external').prev('.vote-items-external').find('.vote-item
     logout :user
 
     login_as users[3], scope: :user
-    vote('votered')
+    vote(:negative)
     expect(proposal.vote.positive).to eq(0)
     expect(proposal.vote.negative).to eq(3)
     expect(proposal.vote.neutral).to eq(1)

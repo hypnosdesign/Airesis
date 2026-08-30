@@ -85,7 +85,7 @@
 <% end %>
 
 <% if ::Configuration.proposal_support && !@proposal.private %>
-  <div class="support_left_panel_container mb-2">
+  <div id="support_left_panel_container" class="mb-2">
     <%= render partial: 'proposals/support_left_panel' %>
   </div>
 <% end %>

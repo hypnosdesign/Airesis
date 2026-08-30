@@ -2,12 +2,13 @@ class QuorumsController < ApplicationController
   layout :choose_layout
 
   before_action :authenticate_user!
+  before_action :use_content_landmark
 
   before_action :load_group, except: :help
 
-  authorize_resource :group
+  authorize_resource :group, except: :help
 
-  load_and_authorize_resource class: 'BestQuorum', through: :group, shallow: true, parent: false, singleton: true, except: [:index]
+  load_and_authorize_resource class: 'BestQuorum', through: :group, shallow: true, parent: false, singleton: true, except: %i[index help]
 
   def index
     authorize! :index, BestQuorum
@@ -68,7 +69,7 @@ class QuorumsController < ApplicationController
   end
 
   def destroy
-    @quorum = @group.quorums.find_by(id: params[:id])
+    @quorum = @group.quorums.find(params[:id])
     @quorum.destroy
     flash[:notice] = t('info.quorums.quorum_deleted')
     respond_to do |format|
@@ -79,17 +80,15 @@ class QuorumsController < ApplicationController
 
   def change_status
     Quorum.transaction do
-      quorum = @group.quorums.find_by(id: params[:id])
-      if quorum
-        if params[:active] == 'true'
-          quorum.active = true
-          flash[:notice] = t('info.quorums.quorum_activated')
-        else
-          quorum.active = false
-          flash[:notice] = t('info.quorums.quorum_deactivated')
-        end
-        quorum.save!
+      @quorum = @group.quorums.find(params[:id])
+      if params[:active] == 'true'
+        @quorum.active = true
+        flash[:notice] = t('info.quorums.quorum_activated')
+      else
+        @quorum.active = false
+        flash[:notice] = t('info.quorums.quorum_deactivated')
       end
+      @quorum.save!
     end
     respond_to do |format|
       format.turbo_stream { render partial: 'layouts/flash_stream' }
@@ -97,22 +96,10 @@ class QuorumsController < ApplicationController
     end
   end
 
-  def dates
-    starttime = (@quorum.minutes.minutes + DEBATE_VOTE_DIFFERENCE).from_now
-    @dates = if @group
-               @group.events.not_visible.vote_period(starttime).collect { |p| ["da #{l p.starttime} a #{l p.endtime}", p.id, { 'data-start' => (l p.starttime), 'data-end' => (l p.endtime), 'data-title' => p.title }] }
-             else
-               Event.visible.vote_period(starttime).collect { |p| ["da #{l p.starttime} a #{l p.endtime}", p.id] }
-             end
-    respond_to do |format|
-      format.turbo_stream
-      format.html
-    end
-  end
-
   def help
     if params[:group_id]
-      @group = Group.find(params[:group_id])
+      @group = Group.friendly.find(params[:group_id])
+      authorize! :read, @group
       @quorums = @group.quorums.active
     else
       @quorums = Quorum.visible.active.all
@@ -124,6 +111,10 @@ class QuorumsController < ApplicationController
   end
 
   protected
+
+  def use_content_landmark
+    @content_landmark = true
+  end
 
   def best_quorum_params
     quorum_params

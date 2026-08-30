@@ -36,7 +36,7 @@ module Abilities
       can :unintegrate, ProposalComment, user: { id: user.id }, integrated: true
 
 
-      can %i[index list edit_list left_list show_all_replies manage_noise mark_noise], ProposalComment
+      can %i[index list show_all_replies noise manage_noise mark_noise], ProposalComment
       can %i[show history report], ProposalComment, user_id: user.id
       can %i[show history report], ProposalComment,
           proposal: { groups: can_do_on_group(user, :view_proposals) }

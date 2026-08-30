@@ -1,0 +1,13 @@
+<% @page_title = t('pages.proposals.update_comment') %>
+<%= render layout: 'layouts/page_title', locals: { title: @page_title } do %>
+  <%= link_to t('buttons.cancel'), @proposal, class: 'btn btn-outline min-h-11' %>
+<% end %>
+
+<%= form_with model: [@proposal, @proposal_comment], class: 'border-2 border-base-content/15 bg-base-100 p-4 sm:p-6' do |f| %>
+  <%= f.label :content, @page_title, class: 'label font-semibold' %>
+  <%= f.text_area :content, rows: 8, class: 'textarea textarea-bordered min-h-40 w-full', required: true %>
+  <div class="mt-4 flex flex-wrap gap-2">
+    <%= f.submit t('buttons.save'), class: 'btn btn-primary min-h-11' %>
+    <%= link_to t('buttons.cancel'), @proposal, class: 'btn btn-outline min-h-11' %>
+  </div>
+<% end %>

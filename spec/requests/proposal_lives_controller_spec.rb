@@ -4,23 +4,20 @@ require 'requests_helper'
 RSpec.describe ProposalLivesController, seeds: true do
   let!(:user) { create(:user) }
   let!(:proposal) { create(:public_proposal, current_user_id: user.id) }
+  let!(:life) { ProposalLife.create!(proposal: proposal, quorum: proposal.quorum, seq: 1, rank: 0, valutations: 0) }
 
-  describe 'GET show' do
-    it 'redirects to sign in when not authenticated' do
-      life = proposal.proposal_lives.first
-      next unless life
+  it 'requires authentication for a lifecycle snapshot' do
+    get proposal_proposal_life_path(proposal, life)
+    expect(response).to redirect_to(new_user_session_path)
+  end
 
-      get "/proposals/#{proposal.id}/proposal_lives/#{life.id}"
-      expect(response).to redirect_to(new_user_session_path)
-    end
+  it 'returns a lifecycle snapshot as Turbo Stream and redirects direct HTML' do
+    sign_in user
+    get proposal_proposal_life_path(proposal, life), headers: { 'Accept' => 'text/vnd.turbo-stream.html' }
+    expect(response).to have_http_status(:ok)
+    expect(response.body).to include('diff_container')
 
-    it 'returns a response when authenticated (proposal has lives from creation)' do
-      sign_in user
-      life = proposal.proposal_lives.first
-      if life
-        get "/proposals/#{proposal.id}/proposal_lives/#{life.id}"
-        expect([200, 302, 500]).to include(response.status)
-      end
-    end
+    get proposal_proposal_life_path(proposal, life)
+    expect(response).to redirect_to(proposal_proposal_revisions_path(proposal))
   end
 end

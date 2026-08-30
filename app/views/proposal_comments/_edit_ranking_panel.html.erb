@@ -4,12 +4,12 @@
 <span class="ranking-count">
   <%= comment.rankings.positives.count %>
 </span>
-<span class="text-xl" title="<%= t('pages.proposals.show.voteup') %>">👍</span>
+<%= rank_icon(:up, label: t('pages.proposals.show.voteup')) %>
 <span class="ranking-count">
   <%= comment.rankings.neutrals.count %>
 </span>
-<span class="text-xl" title="<%= t('pages.proposals.show.votenil') %>">😐</span>
+<%= rank_icon(:nil_rank, label: t('pages.proposals.show.votenil')) %>
 <span class="ranking-count">
   <%= comment.rankings.negatives.count %>
 </span>
-<span class="text-xl" title="<%= t('pages.proposals.show.votedown') %>">👎</span>
+<%= rank_icon(:down, label: t('pages.proposals.show.votedown')) %>

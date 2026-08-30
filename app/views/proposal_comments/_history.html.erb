@@ -1,21 +1,14 @@
-<div class="flex flex-wrap w-full">
-  <div class="w-full">
-    <% @proposal_comment.versions.each do |version| %>
-      <div class="card bg-base-200 p-4" data-version-id="<%= version.id %>" data-version>
-        <span>
-          <%= parsed_content(version.reify, @proposal.is_anonima?) if version.reify %>
-        </span>
-        <div></div>
-        <div class="baloon-footer" title="<%= l(version.created_at) %>">
-          <%= time_in_words(version.created_at) %>
-        </div>
-      </div>
+<div class="space-y-3">
+  <% if @proposal_comment.versions.any? %>
+    <% @proposal_comment.versions.reverse_each do |version| %>
+      <% restored = version.reify %>
+      <% next unless restored %>
+      <article class="border-2 border-base-content/15 bg-base-100 p-4">
+        <time class="mb-2 block text-xs text-base-content/70" datetime="<%= version.created_at.iso8601 %>"><%= l(version.created_at) %></time>
+        <div class="prose max-w-none"><%= parsed_content(restored, @proposal.is_anonima?) %></div>
+      </article>
     <% end %>
-  </div>
+  <% else %>
+    <p class="border-2 border-base-content/15 bg-base-200 p-4"><%= t('pages.proposal_histories.no_revision') %></p>
+  <% end %>
 </div>
-<div class="card bg-base-200 p-4" style="display: none;">
-  <span>
-    <%= parsed_content(@proposal_comment, @proposal.is_anonima?) %>
-  </span>
-</div>
-<button class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2" data-action="click->modal#close">&times;</button>

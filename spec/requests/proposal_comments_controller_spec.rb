@@ -6,231 +6,94 @@ RSpec.describe ProposalCommentsController, seeds: true do
   let!(:proposal) { create(:public_proposal, current_user_id: user.id) }
   let!(:comment) { create(:proposal_comment, proposal: proposal, user: user) }
 
-  describe 'GET index' do
-    it 'returns 200 or 500 for unauthenticated users' do
-      get proposal_proposal_comments_path(proposal)
-      expect([200, 500]).to include(response.status)
-    end
+  it 'renders the contribution index for guests and authenticated users' do
+    get proposal_proposal_comments_path(proposal)
+    expect(response).to have_http_status(:ok)
 
-    it 'returns 200 or 500 for authenticated users' do
-      sign_in user
-      get proposal_proposal_comments_path(proposal)
-      expect([200, 500]).to include(response.status)
-    end
+    sign_in user
+    get proposal_proposal_comments_path(proposal)
+    expect(response).to have_http_status(:ok)
   end
 
-  describe 'GET show' do
-    it 'returns 200 or 500' do
-      get proposal_proposal_comment_path(proposal, comment)
-      expect([200, 500]).to include(response.status)
-    end
+  it 'does not expose the removed standalone show and new routes' do
+    expect do
+      Rails.application.routes.recognize_path("/proposals/#{proposal.id}/proposal_comments/#{comment.id}", method: :get)
+    end.to raise_error(ActionController::RoutingError)
+    expect do
+      Rails.application.routes.recognize_path("/proposals/#{proposal.id}/proposal_comments/new", method: :get)
+    end.to raise_error(ActionController::RoutingError)
   end
 
-  describe 'GET new' do
-    it 'requires authentication (redirect or 500) when not authenticated' do
-      get new_proposal_proposal_comment_path(proposal)
-      expect([302, 500]).to include(response.status)
-    end
-
-    it 'returns 200 or 500 for authenticated user' do
-      sign_in user
-      get new_proposal_proposal_comment_path(proposal)
-      expect([200, 500]).to include(response.status)
-    end
+  it 'requires authentication to create a contribution' do
+    post proposal_proposal_comments_path(proposal), params: { proposal_comment: { content: 'My comment' } }
+    expect(response).to redirect_to(new_user_session_path)
   end
 
-  describe 'POST create' do
-    it 'redirects to sign in when not authenticated' do
-      post proposal_proposal_comments_path(proposal), params: { proposal_comment: { content: 'My comment' } }
-      expect(response).to redirect_to(new_user_session_path)
-    end
-
-    it 'creates a comment when authenticated' do
-      sign_in user
-      expect {
-        post proposal_proposal_comments_path(proposal),
-             params: { proposal_comment: { content: 'My test comment' } }
-      }.to change(ProposalComment, :count).by(1)
-      expect([200, 302, 500]).to include(response.status)
-    end
+  it 'creates a contribution and redirects back to the proposal' do
+    sign_in user
+    expect do
+      post proposal_proposal_comments_path(proposal), params: { proposal_comment: { content: 'My test comment' } }
+    end.to change(ProposalComment, :count).by(1)
+    expect(response).to redirect_to(proposal_path(proposal))
   end
 
-  describe 'GET edit' do
-    it 'redirects to sign in when not authenticated' do
-      get edit_proposal_proposal_comment_path(proposal, comment)
-      expect(response).to redirect_to(new_user_session_path)
-    end
+  it 'renders and updates the edit form for the author' do
+    sign_in user
+    get edit_proposal_proposal_comment_path(proposal, comment)
+    expect(response).to have_http_status(:ok)
 
-    it 'returns 200 or 500 for the comment author' do
-      sign_in user
-      get edit_proposal_proposal_comment_path(proposal, comment)
-      expect([200, 500]).to include(response.status)
-    end
+    patch proposal_proposal_comment_path(proposal, comment), params: { proposal_comment: { content: 'Updated content' } }
+    expect(response).to redirect_to(proposal_path(proposal))
+    expect(comment.reload.content).to eq('Updated content')
   end
 
-  describe 'DELETE destroy' do
-    it 'redirects to sign in when not authenticated' do
+  it 'destroys the contribution for its author' do
+    sign_in user
+    expect do
       delete proposal_proposal_comment_path(proposal, comment)
-      expect(response).to redirect_to(new_user_session_path)
-    end
-
-    it 'destroys the comment when authenticated as the author' do
-      sign_in user
-      expect {
-        delete proposal_proposal_comment_path(proposal, comment)
-      }.to change(ProposalComment, :count).by(-1)
-      expect([200, 302, 500]).to include(response.status)
-    end
+    end.to change(ProposalComment, :count).by(-1)
+    expect(response).to redirect_to(proposal_path(proposal))
   end
 
-  describe 'PATCH update' do
-    it 'redirects to sign in when not authenticated' do
-      patch proposal_proposal_comment_path(proposal, comment), params: { proposal_comment: { content: 'Updated' } }
-      expect(response).to redirect_to(new_user_session_path)
-    end
+  it 'renders the list and reply history surfaces without server errors' do
+    reply = create(:proposal_comment, proposal: proposal, user: user, contribute: comment)
 
-    it 'updates the comment when authenticated as author' do
-      sign_in user
-      patch proposal_proposal_comment_path(proposal, comment), params: { proposal_comment: { content: 'Updated content' } }
-      expect([200, 302, 500]).to include(response.status)
-    end
+    get list_proposal_proposal_comments_path(proposal)
+    expect(response).to have_http_status(:ok)
+
+    get show_all_replies_proposal_proposal_comment_path(proposal, comment)
+    expect(response).to have_http_status(:ok)
+    expect(response.body).to include(reply.content)
   end
 
-  describe 'PUT rankup' do
-    it 'returns a response (accessible without authentication via CanCanCan)' do
-      put rankup_proposal_proposal_comment_path(proposal, comment), xhr: true
-      expect([200, 302, 403, 500]).to include(response.status)
-    end
-
-    it 'returns a response for authenticated user' do
-      sign_in create(:user)
-      put rankup_proposal_proposal_comment_path(proposal, comment), xhr: true
-      expect([200, 302, 403, 500]).to include(response.status)
-    end
+  it 'requires authentication to report a contribution' do
+    post report_proposal_proposal_comments_path(proposal), params: { id: comment.id, reason: 1 }
+    expect(response).to redirect_to(new_user_session_path)
   end
 
-  describe 'PUT rankdown' do
-    it 'returns a response (accessible without authentication via CanCanCan)' do
-      put rankdown_proposal_proposal_comment_path(proposal, comment), xhr: true
-      expect([200, 302, 403, 500]).to include(response.status)
-    end
-
-    it 'returns a response for authenticated user' do
-      sign_in create(:user)
-      put rankdown_proposal_proposal_comment_path(proposal, comment), xhr: true
-      expect([200, 302, 403, 500]).to include(response.status)
-    end
+  it 'returns a Turbo Stream history dialog' do
+    sign_in user
+    get history_proposal_proposal_comment_path(proposal, comment),
+        headers: { 'Accept' => 'text/vnd.turbo-stream.html' }
+    expect(response).to have_http_status(:ok)
+    expect(response.media_type).to eq('text/vnd.turbo-stream.html')
   end
 
-  describe 'PUT ranknil' do
-    it 'returns a response (accessible without authentication via CanCanCan)' do
-      put ranknil_proposal_proposal_comment_path(proposal, comment), xhr: true
-      expect([200, 302, 403, 500]).to include(response.status)
-    end
+  it 'redirects the modal-only noise pages on direct HTML requests' do
+    sign_in user
+    get noise_proposal_proposal_comments_path(proposal)
+    expect(response).to redirect_to(proposal_path(proposal))
 
-    it 'returns a response for authenticated user' do
-      sign_in create(:user)
-      put ranknil_proposal_proposal_comment_path(proposal, comment), xhr: true
-      expect([200, 302, 403, 500]).to include(response.status)
-    end
+    get manage_noise_proposal_proposal_comments_path(proposal)
+    expect(response).to redirect_to(proposal_path(proposal))
   end
 
-  describe 'GET list' do
-    it 'returns a response' do
-      get list_proposal_proposal_comments_path(proposal)
-      expect([200, 302, 500]).to include(response.status)
-    end
-  end
-
-  describe 'GET left_list' do
-    it 'returns a response' do
-      get left_list_proposal_proposal_comments_path(proposal)
-      expect([200, 302, 500]).to include(response.status)
-    end
-  end
-
-  describe 'GET show_all_replies' do
-    it 'returns a response' do
-      get show_all_replies_proposal_proposal_comment_path(proposal, comment), params: { showed: 0 }, xhr: true
-      expect([200, 302, 500]).to include(response.status)
-    end
-  end
-
-  describe 'POST report (collection route)' do
-    it 'returns a response for unauthenticated users' do
-      post report_proposal_proposal_comments_path(proposal), params: { id: comment.id, reason: 1 }, xhr: true
-      expect([200, 302, 403, 500]).to include(response.status)
-    end
-
-    it 'returns a response for authenticated user' do
-      sign_in create(:user)
-      post report_proposal_proposal_comments_path(proposal), params: { id: comment.id, reason: 1 }, xhr: true
-      expect([200, 302, 500]).to include(response.status)
-    end
-  end
-
-  describe 'GET noise (collection route)' do
-    it 'returns a response' do
-      sign_in user
-      get noise_proposal_proposal_comments_path(proposal)
-      expect([200, 302, 403, 500]).to include(response.status)
-    end
-  end
-
-  describe 'GET manage_noise (collection route)' do
-    it 'returns a response for authenticated user' do
-      sign_in user
-      get manage_noise_proposal_proposal_comments_path(proposal)
-      expect([200, 302, 500]).to include(response.status)
-    end
-  end
-
-  describe 'PUT unintegrate' do
-    it 'returns a response for unauthenticated users' do
-      put unintegrate_proposal_proposal_comment_path(proposal, comment), xhr: true
-      expect([200, 302, 401, 403, 500]).to include(response.status)
-    end
-
-    it 'returns a response for authenticated user' do
-      sign_in user
-      put unintegrate_proposal_proposal_comment_path(proposal, comment), xhr: true
-      expect([200, 302, 403, 500]).to include(response.status)
-    end
-  end
-
-  describe 'POST mark_noise (collection route)' do
-    it 'returns a response for authenticated proposal author' do
-      sign_in user
-      post mark_noise_proposal_proposal_comments_path(proposal),
-           params: { comments: { active: '', inactive: comment.id.to_s } }, xhr: true
-      expect([200, 302, 403, 500]).to include(response.status)
-    end
-  end
-
-  describe 'GET edit_list (collection route)' do
-    it 'returns a response' do
-      get edit_list_proposal_proposal_comments_path(proposal)
-      expect([200, 302, 500]).to include(response.status)
-    end
-  end
-
-  describe 'GET history' do
-    it 'returns a response without authentication' do
-      get history_proposal_proposal_comment_path(proposal, comment)
-      expect([200, 302, 500]).to include(response.status)
-    end
-
-    it 'returns a response when authenticated' do
-      sign_in user
-      get history_proposal_proposal_comment_path(proposal, comment)
-      expect([200, 302, 500]).to include(response.status)
-    end
-  end
-
-  describe 'GET show' do
-    it 'returns a response without authentication' do
-      get proposal_proposal_comment_path(proposal, comment)
-      expect([200, 302, 500]).to include(response.status)
-    end
+  it 'marks noise for the proposal author' do
+    sign_in user
+    post mark_noise_proposal_proposal_comments_path(proposal),
+         params: { comments: { active: '', inactive: comment.id.to_s } },
+         headers: { 'Accept' => 'text/vnd.turbo-stream.html' }
+    expect(response).to have_http_status(:ok)
+    expect(comment.reload).to be_noise
   end
 end

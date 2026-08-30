@@ -18,10 +18,10 @@ module Abilities
     end
 
     def visible_proposals_stuff
-      can %i[read new report history list left_list show_all_replies],
+      can %i[read history list show_all_replies],
           ProposalComment,
           proposal: { private: false }
-      can %i[list left_list index], ProposalComment
+      can %i[list index], ProposalComment
       can :read, Proposal, private: false
       can :read, Proposal, visible_outside: true
     end

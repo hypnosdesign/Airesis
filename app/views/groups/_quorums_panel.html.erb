@@ -1,59 +1,105 @@
-<table class="table">
-  <thead>
-    <tr>
-      <td rowspan="2"><%= t('pages.groups.edit_quorums.active') %></td>
-      <td class="hidden lg:table-cell" rowspan="2"><%= t('pages.groups.edit_quorums.name') %></td>
-      <td colspan="3">Debate</td>
-      <td colspan="2">Votation</td>
-    </tr>
-    <tr>
-      <td>
-        <span class="hidden lg:inline"><%= t('pages.groups.edit_quorums.time') %></span>
-        <span class="lg:hidden"><i class="fa-solid fa-clock"></i></span>
-      </td>
-      <td>
-        <span class="hidden lg:inline"><%= t('pages.groups.edit_quorums.participants') %></span>
-        <span class="lg:hidden"><i class="fa-solid fa-users"></i></span>
-      </td>
-      <td>
-        <span class="hidden lg:inline"><%= t('pages.groups.edit_quorums.good_percentage') %></span>
-        <span class="lg:hidden"><i class="fa-solid fa-gauge"></i></span>
-      </td>
-      <td>
-        <span class="hidden lg:inline"><%= t('pages.groups.edit_quorums.participants') %></span>
-        <span class="lg:hidden"><i class="fa-solid fa-users"></i></span>
-      </td>
-      <td>
-        <span class="hidden lg:inline">Percentage</span>
-        <span class="lg:hidden"><i class="fa-solid fa-gauge"></i></span>
-      </td>
-    </tr>
-  </thead>
-  <tbody>
-    <% @group.quorums.each do |quorum| %>
-      <tr valign="top" title="<%= quorum.description %>">
-        <td>
-          <input type="checkbox" data-quorum-check="<%= quorum.id %>" <%= 'checked="true"' if quorum.active %> />
-        </td>
-        <td class="hidden lg:table-cell">
-          <b><%= quorum.name %>:</b>
-        </td>
-        <td><%= quorum.time %></td>
-        <td><%= desc_percentage(quorum.percentage) %></td>
-        <td><%= quorum.good_score %>%</td>
-        <td><%= desc_percentage(quorum.vote_percentage) %></td>
-        <td><%= quorum.vote_good_score %>%</td>
-        <td>
-          <%= link_to edit_group_best_quorum_url(@group, quorum), title: t('buttons.edit') do %>
-            <i class="fa-solid fa-pencil"></i>
-          <% end %>
-        </td>
-        <td>
-          <%= link_to [@group, quorum], data: { turbo_method: :delete , turbo_confirm: raw(t('pages.groups.edit_quorums.confirm_deletion', quorum: quorum.name))}, title: t('buttons.delete') do %>
-            <i class="fa-solid fa-trash"></i>
-          <% end %>
-        </td>
-      </tr>
+<% if @group.quorums.empty? %>
+  <div class="border-2 border-base-content/15 bg-base-100 p-5">
+    <p class="text-base-content/75"><%= t('pages.groups.edit_quorums.empty_state') %></p>
+    <%= link_to new_group_best_quorum_path(@group), class: 'btn btn-primary mt-4 min-h-11' do %>
+      <i class="fa-solid fa-plus" aria-hidden="true"></i>
+      <%= t('pages.groups.edit_quorums.add_quorum') %>
     <% end %>
-  </tbody>
-</table>
+  </div>
+<% else %>
+<div class="hidden overflow-x-auto lg:block">
+  <table class="table w-full">
+    <thead>
+      <tr>
+        <th><%= t('pages.groups.edit_quorums.active') %></th>
+        <th><%= t('pages.groups.edit_quorums.name') %></th>
+        <th><%= t('pages.groups.edit_quorums.time') %></th>
+        <th><%= t('pages.groups.edit_quorums.participants') %></th>
+        <th><%= t('pages.groups.edit_quorums.good_percentage') %></th>
+        <th><%= t('pages.groups.edit_quorums.participants') %></th>
+        <th><%= t('pages.groups.edit_quorums.good_percentage') %></th>
+        <th><span class="sr-only"><%= t('pages.proposals.comments.actions', default: 'Actions') %></span></th>
+      </tr>
+    </thead>
+    <tbody>
+      <% @group.quorums.each do |quorum| %>
+        <tr>
+          <td>
+            <%= form_with url: change_status_group_quorum_path(@group, quorum), method: :post, data: { controller: 'autosubmit' } do %>
+              <label class="flex min-h-11 min-w-11 cursor-pointer items-center justify-center" for="quorum_active_desktop_<%= quorum.id %>">
+                <span class="sr-only"><%= "#{t('pages.groups.edit_quorums.active')}: #{quorum.name}" %></span>
+                <%= check_box_tag :active, 'true', quorum.active,
+                                  id: "quorum_active_desktop_#{quorum.id}",
+                                  class: 'checkbox checkbox-primary',
+                                  data: { action: 'change->autosubmit#submit' } %>
+              </label>
+            <% end %>
+          </td>
+          <th scope="row">
+            <span class="block"><%= quorum.name %></span>
+            <span class="block max-w-xs text-xs font-normal text-base-content/60"><%= quorum.description %></span>
+          </th>
+          <td><%= quorum.time %></td>
+          <td><%= desc_percentage(quorum.percentage) %></td>
+          <td><%= quorum.good_score %>%</td>
+          <td><%= desc_percentage(quorum.vote_percentage) %></td>
+          <td><%= quorum.vote_good_score %>%</td>
+          <td>
+            <div class="flex gap-1">
+              <%= link_to edit_group_best_quorum_path(@group, quorum), class: 'btn btn-ghost btn-square min-h-11 min-w-11', aria: { label: "#{t('buttons.edit')} #{quorum.name}" } do %>
+                <i class="fa-solid fa-pencil" aria-hidden="true"></i>
+              <% end %>
+              <%= link_to group_best_quorum_path(@group, quorum),
+                          class: 'btn btn-ghost btn-square min-h-11 min-w-11 text-error',
+                          aria: { label: "#{t('buttons.delete')} #{quorum.name}" },
+                          data: { turbo_method: :delete, turbo_confirm: raw(t('pages.groups.edit_quorums.confirm_deletion', quorum: quorum.name)) } do %>
+                <i class="fa-solid fa-trash" aria-hidden="true"></i>
+              <% end %>
+            </div>
+          </td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+</div>
+
+<div class="grid gap-4 lg:hidden">
+  <% @group.quorums.each do |quorum| %>
+    <article class="border-2 border-base-content/15 bg-base-100 p-4" aria-labelledby="quorum_<%= quorum.id %>_title">
+      <header class="flex items-start justify-between gap-3">
+        <div class="min-w-0">
+          <h2 id="quorum_<%= quorum.id %>_title" class="font-bold break-words"><%= quorum.name %></h2>
+          <p class="mt-1 text-sm text-base-content/70"><%= quorum.description %></p>
+        </div>
+        <%= form_with url: change_status_group_quorum_path(@group, quorum), method: :post, data: { controller: 'autosubmit' } do %>
+          <label class="flex min-h-11 min-w-11 cursor-pointer items-center justify-center" for="quorum_active_mobile_<%= quorum.id %>">
+            <span class="sr-only"><%= "#{t('pages.groups.edit_quorums.active')}: #{quorum.name}" %></span>
+            <%= check_box_tag :active, 'true', quorum.active,
+                              id: "quorum_active_mobile_#{quorum.id}",
+                              class: 'checkbox checkbox-primary',
+                              data: { action: 'change->autosubmit#submit' } %>
+          </label>
+        <% end %>
+      </header>
+
+      <dl class="mt-4 grid grid-cols-2 gap-x-4 gap-y-3 text-sm">
+        <div><dt class="text-base-content/60"><%= t('pages.groups.edit_quorums.time') %></dt><dd class="font-semibold"><%= quorum.time %></dd></div>
+        <div><dt class="text-base-content/60"><%= t('pages.groups.edit_quorums.good_percentage') %></dt><dd class="font-semibold"><%= quorum.good_score %>%</dd></div>
+        <div><dt class="text-base-content/60"><%= t('pages.groups.edit_quorums.participants') %></dt><dd class="font-semibold"><%= desc_percentage(quorum.percentage) %></dd></div>
+        <div><dt class="text-base-content/60"><%= t('pages.groups.edit_quorums.participants') %> · vote</dt><dd class="font-semibold"><%= desc_percentage(quorum.vote_percentage) %></dd></div>
+      </dl>
+
+      <div class="mt-4 flex justify-end gap-2 border-t border-base-content/15 pt-3">
+        <%= link_to edit_group_best_quorum_path(@group, quorum), class: 'btn btn-outline min-h-11', aria: { label: "#{t('buttons.edit')} #{quorum.name}" } do %>
+          <i class="fa-solid fa-pencil" aria-hidden="true"></i><%= t('buttons.edit') %>
+        <% end %>
+        <%= link_to group_best_quorum_path(@group, quorum),
+                    class: 'btn btn-outline btn-error min-h-11',
+                    data: { turbo_method: :delete, turbo_confirm: raw(t('pages.groups.edit_quorums.confirm_deletion', quorum: quorum.name)) } do %>
+          <i class="fa-solid fa-trash" aria-hidden="true"></i><%= t('buttons.delete') %>
+        <% end %>
+      </div>
+    </article>
+  <% end %>
+</div>
+<% end %>

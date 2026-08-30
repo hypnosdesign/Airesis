@@ -1,23 +1,33 @@
-<h4><%= t('pages.proposals.vote_panel.single_title') %></h4>
-<h4><%= @proposal.secret_vote ? t('pages.proposals.vote_panel.secret_vote') : t('pages.proposals.vote_panel.clear_vote') %></h4>
-<%= form_with url: votation_vote_path(proposal_id: @proposal.id), method: :put do |f| %>
-  <%= f.hidden_field 'vote_type' %>
-  <% if current_user.rotp_enabled && ::Configuration.rotp %>
-    <%= f.label 'Token di sicurezza' %>
-    <br>
-    <%= f.text_field 'token', maxlength: 6 %>
+<section aria-labelledby="standard-vote-title" class="space-y-4">
+  <div>
+    <h3 id="standard-vote-title" class="text-lg font-bold"><%= t('pages.proposals.vote_panel.single_title') %></h3>
+    <p class="text-sm text-base-content/70"><%= @proposal.secret_vote ? t('pages.proposals.vote_panel.secret_vote') : t('pages.proposals.vote_panel.clear_vote') %></p>
+  </div>
+
+  <%= form_with url: votation_vote_path(proposal_id: @proposal.id), method: :put, scope: :data, class: 'space-y-4' do |f| %>
+    <% if current_user.rotp_enabled && ::Configuration.rotp %>
+      <div class="form-control max-w-xs">
+        <%= f.label :token, t('pages.proposals.show.security_token'), class: 'label font-semibold' %>
+        <%= f.text_field :token, maxlength: 6, inputmode: 'numeric', autocomplete: 'one-time-code', class: 'input input-bordered min-h-11', required: true %>
+      </div>
+    <% end %>
+
+    <fieldset>
+      <legend class="font-semibold mb-3"><%= t('pages.proposals.vote_panel.choose_vote', default: 'Choose your vote') %></legend>
+      <div class="grid gap-3 sm:grid-cols-3">
+        <% [[VoteType::POSITIVE, 'vote_positive', 'border-success has-[:checked]:bg-success/15'],
+            [VoteType::NEUTRAL, 'vote_neutral', 'border-warning has-[:checked]:bg-warning/15'],
+            [VoteType::NEGATIVE, 'vote_negative', 'border-error has-[:checked]:bg-error/15']].each do |value, key, classes| %>
+          <label class="flex min-h-14 cursor-pointer items-center gap-3 border-2 p-3 <%= classes %>">
+            <%= f.radio_button :vote_type, value, class: 'radio', required: true %>
+            <span class="font-semibold"><%= t("pages.votations.show.#{key}") %></span>
+          </label>
+        <% end %>
+      </div>
+    </fieldset>
+
+    <%= f.submit t('pages.proposals.vote_panel.confirm_vote', default: 'Confirm vote'),
+                 class: 'btn btn-primary min-h-11',
+                 data: { turbo_confirm: t('pages.votations.show.confirm', name: @proposal.title, default: 'Confirm your vote?'), disable_with: t('loading') } %>
   <% end %>
-  <ul class="flex gap-2">
-    <li>
-      <%= link_to t('pages.votations.show.vote_positive'), '#', class: "votegreen votebutton btn btn-success", title: t('pages.votations.show.vote_positive'), data: { vote_type: VoteType::POSITIVE } %>
-    </li>
-    <li>
-      <%= link_to t('pages.votations.show.vote_neutral'), '#', class: "voteyellow votebutton btn btn-secondary", title: t('pages.votations.show.vote_neutral'), data: { vote_type: VoteType::NEUTRAL } %>
-    </li>
-    <li>
-      <%= link_to t('pages.votations.show.vote_negative'), '#', class: "votered votebutton btn btn-error", title: t('pages.votations.show.vote_negative'), data: { vote_type: VoteType::NEGATIVE } %>
-    </li>
-  </ul>
-<% end %>
-<%= image_tag "spinner.gif", style: 'display: none;', class: "loading_vote" %>
-<div style="clear: both"></div>
+</section>

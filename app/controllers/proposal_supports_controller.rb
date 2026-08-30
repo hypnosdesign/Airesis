@@ -1,14 +1,13 @@
 class ProposalSupportsController < ApplicationController
   # load_and_authorize_resource
-  layout 'open_space'
+  layout :choose_layout
 
   before_action :load_proposal
 
   authorize_resource only: [:new]
 
   before_action :authenticate_user!
-
-  def index; end
+  before_action :use_content_landmark
 
   def new
     @proposal_support = @proposal.proposal_supports.build
@@ -19,6 +18,7 @@ class ProposalSupportsController < ApplicationController
   end
 
   def create
+    authorize! :create, ProposalSupport
     # the user must have the correct permissions on each group
 
     # required groups
@@ -41,7 +41,7 @@ class ProposalSupportsController < ApplicationController
     @proposal.supporting_group_ids -= no_supp
 
     @proposal.save!
-    flash[:notice] = 'Sostegno alla proposta salvato correttamente'
+    flash[:notice] = t('info.proposal_supports.saved', default: 'Proposal support was saved.')
 
     respond_to do |format|
       format.html do
@@ -50,23 +50,22 @@ class ProposalSupportsController < ApplicationController
       format.turbo_stream
     end
   rescue ActiveRecord::ActiveRecordError
+    flash[:error] = t('error.proposal_supports.save', default: 'Proposal support could not be saved.')
     respond_to do |format|
-      format.html redirect_to proposal_path(@proposal)
-      format.turbo_stream do
-        render :update do |page|
-          page.alert "Errore durante l'operazione"
-        end
-      end
+      format.html { redirect_to proposal_path(@proposal) }
+      format.turbo_stream { render partial: 'layouts/flash_stream', status: :unprocessable_entity }
     end
   end
 
-  def edit; end
-
-  def update; end
-
-  def destroy; end
-
   protected
+
+  def choose_layout
+    @proposal.private? ? 'groups' : 'open_space'
+  end
+
+  def use_content_landmark
+    @content_landmark = true
+  end
 
   def load_proposal
     @proposal = Proposal.find(params[:proposal_id])

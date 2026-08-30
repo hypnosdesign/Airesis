@@ -25,15 +25,11 @@ Rails.application.routes.draw do
   get 'school' => 'home#school'
   get 'municipality' => 'home#municipality'
 
-  resources :quorums do
+  resources :quorums, only: [] do
     collection do
-      get :dates
       get :help
     end
   end
-
-  resources :best_quorums, controller: 'quorums'
-  resources :old_quorums, controller: 'quorums'
 
   resources :proposals do
     collection do
@@ -42,7 +38,7 @@ Rails.application.routes.draw do
       get :tab_list
     end
 
-    resources :proposal_comments do
+    resources :proposal_comments, except: %i[new show] do
       member do
         put :rankup
         put :ranknil
@@ -54,17 +50,15 @@ Rails.application.routes.draw do
       collection do
         post :mark_noise
         get :list
-        get :left_list
-        get :edit_list
         post :report
         get :noise
         get :manage_noise
       end
     end
 
-    resources :proposal_revisions
-    resources :proposal_lives
-    resources :proposal_supports
+    resources :proposal_revisions, only: %i[index show]
+    resources :proposal_lives, only: :show
+    resources :proposal_supports, only: %i[new create]
     resources :proposal_presentations, only: :destroy
 
     resources :blocked_proposal_alerts do
@@ -179,10 +173,9 @@ Rails.application.routes.draw do
 
   get '/tags/:text', to: 'tags#show'
 
-  get '/votation/', to: 'votations#show'
-  put '/votation/vote', to: 'votations#vote'
-  put '/votation/vote_schulze', to: 'votations#vote_schulze'
-  resources :votations
+  get '/votation', to: redirect('/public'), as: :legacy_votation
+  put '/votation/vote', to: 'votations#vote', as: :votation_vote
+  put '/votation/vote_schulze', to: 'votations#vote_schulze', as: :votation_vote_schulze
 
   concern :group_invitations do
     resources :group_invitations do
@@ -308,10 +301,6 @@ Rails.application.routes.draw do
 
     concerns :group_invitations
 
-    resources :elections
-
-    resources :candidates
-
     resources :group_participations do
       collection do
         post :send_email
@@ -340,14 +329,13 @@ Rails.application.routes.draw do
       end
     end
 
-    resources :quorums do
+    resources :quorums, only: :index do
       member do
         post :change_status
       end
     end
 
-    resources :best_quorums, controller: 'quorums'
-    resources :old_quorums, controller: 'quorums'
+    resources :best_quorums, controller: 'quorums', only: %i[new create edit update destroy]
 
     resources :documents do
       collection do

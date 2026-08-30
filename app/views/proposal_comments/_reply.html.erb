@@ -1,0 +1,25 @@
+<article id="comment_<%= reply.id %>" class="ml-3 sm:ml-8 border-l border-base-content/20 pl-4 py-2" aria-labelledby="reply_author_<%= reply.id %>">
+  <% reply_nickname = @proposal.proposal_nicknames.find_by(user_id: reply.user_id) %>
+  <% who = if reply_nickname && @proposal.is_anonima? && reply.user != current_user
+             reply_nickname.nickname
+           else
+             link_to_user(reply.user, content_text: reply.user.fullname, class: 'font-semibold link link-hover')
+           end %>
+  <header class="flex flex-wrap items-center justify-between gap-2 mb-1">
+    <div>
+      <span id="reply_author_<%= reply.id %>" class="text-sm font-semibold"><%= raw who %></span>
+      <span class="text-xs text-base-content/70">· <%= time_ago_in_words(reply.updated_at || reply.created_at) %></span>
+    </div>
+    <% if can? :destroy, reply %>
+      <%= link_to [@proposal, reply],
+                  data: { turbo_method: :delete, turbo_confirm: t('pages.proposals.show.delete_suggestion_confirmation') },
+                  class: 'btn btn-ghost btn-sm btn-square min-h-11 min-w-11 text-error',
+                  aria: { label: t('pages.proposals.show.replies.delete') } do %>
+        <i class="fa-regular fa-trash-can" aria-hidden="true"></i>
+      <% end %>
+    <% end %>
+  </header>
+  <div class="prose max-w-[72ch] text-sm text-base-content">
+    <%= parsed_content(reply, @proposal.is_anonima?) %>
+  </div>
+</article>

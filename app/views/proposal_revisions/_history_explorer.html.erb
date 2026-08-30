@@ -1,0 +1,54 @@
+<% entries = (@proposal.proposal_revisions.to_a.map { |revision| [:revision, revision] } +
+              @proposal.proposal_lives.to_a.map { |life| [:life, life] }).sort_by { |_kind, item| item.created_at }.reverse %>
+
+<div data-controller="revision-history"
+     data-revision-history-error-value="<%= t('pages.proposal_histories.loading_error', default: 'The selected version could not be loaded.') %>"
+     class="grid gap-5 lg:grid-cols-[minmax(15rem,0.8fr)_minmax(0,2fr)]">
+  <section aria-labelledby="revision-list-title">
+    <h2 id="revision-list-title" class="text-lg font-bold"><%= t('pages.proposal_histories.revision') %></h2>
+    <% if entries.any? %>
+      <fieldset class="mt-3 space-y-2">
+        <legend class="sr-only"><%= t('pages.proposal_histories.revision') %></legend>
+        <% entries.each_with_index do |(kind, item), index| %>
+          <% label = kind == :life ? "#{t('pages.proposal_histories.life_cycle')} #{item.seq}" : "#{t('pages.proposal_histories.revision')} #{item.seq}" %>
+          <% url = kind == :life ? proposal_proposal_life_path(@proposal, item, format: :turbo_stream) : proposal_proposal_revision_path(@proposal, item, format: :turbo_stream) %>
+          <label class="flex min-h-14 cursor-pointer items-center gap-3 border-2 border-base-content/15 bg-base-100 p-3 has-[:checked]:border-primary has-[:checked]:bg-primary/10">
+            <input type="radio"
+                   name="proposal_history_version"
+                   value="<%= "#{kind}_#{item.id}" %>"
+                   class="radio radio-primary shrink-0"
+                   <%= 'checked' if index.zero? %>
+                   data-revision-history-target="choice"
+                   data-action="change->revision-history#load"
+                   data-url="<%= url %>">
+            <span class="min-w-0">
+              <span class="block font-semibold"><%= label %></span>
+              <time class="block text-xs text-base-content/70" datetime="<%= item.created_at.iso8601 %>"><%= l(item.created_at) %></time>
+            </span>
+          </label>
+        <% end %>
+      </fieldset>
+    <% else %>
+      <p class="mt-3 border-2 border-base-content/15 bg-base-200 p-4"><%= t('pages.proposal_histories.no_revision') %></p>
+    <% end %>
+  </section>
+
+  <section aria-labelledby="revision-detail-title">
+    <div class="flex items-center justify-between gap-3">
+      <h2 id="revision-detail-title" class="text-lg font-bold"><%= t('pages.proposal_histories.title') %></h2>
+      <div class="hidden items-center gap-2 text-sm text-base-content/70" data-revision-history-target="loading" role="status">
+        <span class="loading loading-spinner loading-sm" aria-hidden="true"></span>
+        <%= t('pages.proposal_histories.loading_revisions') %>
+      </div>
+    </div>
+    <div id="diff_container"
+         class="diffview diffcontainer mt-3 min-h-32 border-2 border-base-content/15 bg-base-100 p-4"
+         aria-live="polite"
+         aria-busy="false"
+         data-revision-history-target="diff">
+      <% unless entries.any? %>
+        <p><%= t('pages.proposal_histories.no_revision') %></p>
+      <% end %>
+    </div>
+  </section>
+</div>

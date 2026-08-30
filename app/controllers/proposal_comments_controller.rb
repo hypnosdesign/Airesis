@@ -1,15 +1,18 @@
 class ProposalCommentsController < ApplicationController
   before_action :save_post_and_authenticate_user, only: [:create]
+  before_action :authenticate_user!, only: :report
+  before_action :use_content_landmark
 
   load_and_authorize_resource :proposal
-  load_and_authorize_resource through: :proposal, collection: %i[list left_list edit_list show_all_replies]
+  load_and_authorize_resource through: :proposal, collection: :list
+  before_action :load_group_context
   before_action :already_ranked, only: %i[rankup rankdown ranknil]
 
   layout :choose_layout
 
   def index
     respond_to do |format|
-      format.html { @proposal_comment_search = ProposalCommentSearch.new({ all: true, disable_limit: true }, @proposal) }
+      format.html { @proposal_comment_search = ProposalCommentSearch.new({ all: true, disable_limit: true }, @proposal, current_user) }
       format.turbo_stream { @proposal_comment_search = ProposalCommentSearch.new(params, @proposal, current_user) }
     end
   end
@@ -17,16 +20,6 @@ class ProposalCommentsController < ApplicationController
   def list
     index
   end
-
-  def left_list
-    index
-  end
-
-  def edit_list
-    index
-  end
-
-  def show; end
 
   def history
     respond_to do |format|
@@ -36,16 +29,11 @@ class ProposalCommentsController < ApplicationController
   end
 
   def show_all_replies
-    @proposal_comment = ProposalComment.find_by(id: params[:id])
-    @replies = ProposalComment.where('parent_proposal_comment_id=?', params[:id]).order('created_at ASC')[0..-(params[:showed].to_i + 1)]
+    @replies = @proposal_comment.replies.order(created_at: :asc).offset(params[:showed].to_i)
     respond_to do |format|
       format.turbo_stream
       format.html
     end
-  end
-
-  def new
-    @proposal_comment = @proposal.proposal_comments.build
   end
 
   def edit
@@ -141,14 +129,14 @@ class ProposalCommentsController < ApplicationController
   def noise
     respond_to do |format|
       format.turbo_stream
-      format.html
+      format.html { redirect_to @proposal }
     end
   end
 
   def manage_noise
     respond_to do |format|
       format.turbo_stream
-      format.html
+      format.html { redirect_to @proposal }
     end
   end
 
@@ -174,6 +162,14 @@ class ProposalCommentsController < ApplicationController
   end
 
   protected
+
+  def use_content_landmark
+    @content_landmark = true
+  end
+
+  def load_group_context
+    @group = @proposal.groups.first if @proposal.private?
+  end
 
   def proposal_comment_update_params
     params.require(:proposal_comment).permit(:content)

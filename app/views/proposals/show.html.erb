@@ -138,7 +138,7 @@
         <div class="bg-accent/10 text-accent p-2 flex items-center justify-center">
           <i class="fa-solid fa-check-to-slot text-lg"></i>
         </div>
-        <p class="font-bold text-sm"><%= t('pages.proposals.show.during_debate') rescue 'Votazione in corso' %></p>
+        <p class="font-bold text-sm"><%= t('pages.proposals.show.during_votation', default: 'Voting in progress') %></p>
       </div>
       <div id="vote_panel_container">
         <%= render partial: 'vote_panel' %>
@@ -300,6 +300,7 @@
     </div>
   <% end %>
 <% else %>
+  <div data-controller="report-contribute">
   <div class="mt-8 mb-6">
     <div class="flex items-center gap-3 mb-4">
       <div class="bg-secondary/10 text-secondary p-2 flex items-center justify-center">
@@ -327,9 +328,8 @@
     <div id="proposalCommentsContainer">
       <% search = ProposalCommentSearch.new({ all: true, disable_limit: true }, @proposal, current_user) %>
       <% if search.proposal_comments.any? %>
-        <% my_nickname = current_user ? current_user.proposal_nicknames.find_by(proposal_id: @proposal.id) : nil %>
         <% search.proposal_comments.each do |comment| %>
-          <%= render partial: 'proposal_comments/content', locals: { comment: comment, proposal_nickname: my_nickname } %>
+          <%= render partial: 'proposal_comments/content', locals: { comment: comment } %>
         <% end %>
       <% else %>
         <div class="bg-base-100 border-2 border-base-content/15 p-6 text-center">
@@ -340,6 +340,7 @@
   </div>
 
   <%= render partial: 'report_contribute' %>
+  </div>
 <% end %>
 
 <%# Turbo Stream for real-time updates %>
@@ -350,6 +351,11 @@
 <%# Modal containers %>
 <div id="vote_results_modal"></div>
 <div id="available_authors_modal"></div>
+<div id="proposal_support_modal"></div>
+<div id="revisions_modal"></div>
+<div id="noise_modal"></div>
+<div id="manage_noise_modal"></div>
+<div id="history_modal"></div>
 
 <%# ===== 5. SIDEBAR (left_panel) ===== %>
 <% content_for :left_panel do %>
@@ -417,7 +423,7 @@
 
     <%# Group support %>
     <% if ::Configuration.proposal_support && !@proposal.private %>
-      <div class="support_left_panel_container">
+      <div id="support_left_panel_container">
         <%= render partial: 'proposals/support_left_panel' %>
       </div>
     <% end %>

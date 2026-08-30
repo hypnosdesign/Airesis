@@ -4,9 +4,9 @@
       <i class="fa-solid fa-comment-dots"></i>
       <%= t('pages.proposals.show.add_contribute') %>
     </label>
-    <%= f.text_area :content, rows: 5, class: 'textarea textarea-bordered w-full', placeholder: t('pages.proposals.show.add_contribute') %>
+    <%= f.text_area :content, rows: 5, class: 'textarea textarea-bordered min-h-28 w-full', placeholder: t('pages.proposals.show.add_contribute'), required: true %>
     <div class="flex justify-end">
-      <%= f.submit t('pages.proposals.show.send_contribute_button'), class: 'btn btn-primary' %>
+      <%= f.submit t('pages.proposals.show.send_contribute_button'), class: 'btn btn-primary min-h-11' %>
     </div>
   </div>
 <% end %>

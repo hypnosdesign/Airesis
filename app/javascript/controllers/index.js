@@ -52,6 +52,18 @@ application.register("right-drawer", RightDrawerController)
 import ProposalEditorController from "./proposal_editor_controller"
 application.register("proposal-editor", ProposalEditorController)
 
+import ReportContributeController from "./report_contribute_controller"
+application.register("report-contribute", ReportContributeController)
+
+import VoteRankingController from "./vote_ranking_controller"
+application.register("vote-ranking", VoteRankingController)
+
+import RevisionHistoryController from "./revision_history_controller"
+application.register("revision-history", RevisionHistoryController)
+
+import QuorumFormController from "./quorum_form_controller"
+application.register("quorum-form", QuorumFormController)
+
 import CalendarController from "./calendar_controller"
 application.register("calendar", CalendarController)
 

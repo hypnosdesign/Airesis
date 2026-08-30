@@ -1,14 +1,31 @@
-<div id="available_quorums" class="help">
-  <%= render partial: 'help_menu' %>
-  <%= render partial: 'help_content' %>
-  <div style="clear: both;"></div>
-</div>
+<div class="space-y-3">
+  <details class="border-2 border-base-content/15 bg-base-100 p-4" open>
+    <summary class="min-h-11 cursor-pointer font-bold"><%= t('pages.quorums.index.how_read') %></summary>
+    <div class="prose mt-3 max-w-none text-base-content/80"><%= t('models.quorum.help_content.description_html') %></div>
+  </details>
 
-<script>
-  function showSection(id) {
-    document.querySelectorAll('.quorum_section').forEach(function (el) { el.style.display = 'none'; });
-    document.getElementById(id).style.display = '';
-  }
-  document.querySelectorAll('.quorum_section').forEach(function (el) { el.style.display = 'none'; });
-  document.getElementById('whatis').style.display = '';
-</script>
+  <% @quorums.each do |quorum| %>
+    <details class="border-2 border-base-content/15 bg-base-100 p-4">
+      <summary class="min-h-11 cursor-pointer font-bold"><%= quorum.name %></summary>
+      <div class="mt-3 space-y-3">
+        <p><%= quorum.description %></p>
+        <p class="text-sm text-base-content/70"><%= quorum.explanation %></p>
+        <dl class="grid gap-3 sm:grid-cols-2">
+          <% [
+            [t('models.quorum.help_content.time_discussion'), quorum.time(true)],
+            [t('models.quorum.help_content.participants'), quorum.percentage ? quorum.min_participants : t('models.quorum.help_content.not_specified')],
+            [t('models.quorum.help_content.good_score'), "#{quorum.good_score}%"],
+            [t('models.quorum.help_content.time_vote'), quorum.vote_time],
+            [t('models.quorum.help_content.participants_vote'), quorum.vote_percentage ? quorum.min_vote_participants : t('models.quorum.help_content.not_specified')],
+            [t('models.quorum.help_content.vote_good_score'), "#{quorum.vote_good_score}%"]
+          ].each do |label, value| %>
+            <div class="bg-base-200 p-3">
+              <dt class="text-xs text-base-content/60"><%= label %></dt>
+              <dd class="font-semibold"><%= value %></dd>
+            </div>
+          <% end %>
+        </dl>
+      </div>
+    </details>
+  <% end %>
+</div>

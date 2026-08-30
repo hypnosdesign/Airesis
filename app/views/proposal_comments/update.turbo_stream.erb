@@ -1,5 +1,4 @@
-<% nickname = current_user ? current_user.proposal_nicknames.find_by(proposal_id: @proposal.id) : nil %>
 <%= turbo_stream.replace "comment_#{@proposal_comment.id}" do %>
-  <%= render partial: "proposal_comments/content", locals: { comment: @proposal_comment, proposal_nickname: nickname } %>
+  <%= render partial: "proposal_comments/content", locals: { comment: @proposal_comment } %>
 <% end %>
 <%= render partial: "layouts/flash_stream" %>

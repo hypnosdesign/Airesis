@@ -1,5 +1,9 @@
-<div class="card bg-base-200 p-4">
-  <%= render(partial: 'quorums/form', locals: { button_name: t('buttons.create') }) %>
+<%= render layout: 'layouts/page_title', locals: { title: @page_title } do %>
+  <%= link_to t('buttons.go_back'), group_quorums_path(@group), class: 'btn btn-outline min-h-11' %>
+<% end %>
+
+<div class="border-2 border-base-content/15 bg-base-100 p-4 sm:p-6">
+  <%= render 'quorums/form', button_name: t('buttons.create'), modal: false %>
 </div>
 
 <% content_for :left_panel do %>
