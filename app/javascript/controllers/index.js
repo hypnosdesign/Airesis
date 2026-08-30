@@ -49,6 +49,9 @@ application.register("sidebar-menu", SidebarMenuController)
 import SidebarDrawerController from "./sidebar_drawer_controller"
 application.register("sidebar-drawer", SidebarDrawerController)
 
+import SkipLinkController from "./skip_link_controller"
+application.register("skip-link", SkipLinkController)
+
 import ChartController from "./chart_controller"
 application.register("chart", ChartController)
 
@@ -75,3 +78,6 @@ application.register("calendar", CalendarController)
 
 import MapController from "./map_controller"
 application.register("map", MapController)
+
+import MunicipalitySelectController from "./municipality_select_controller"
+application.register("municipality-select", MunicipalitySelectController)

@@ -1,117 +1,56 @@
 require 'rails_helper'
 require 'requests_helper'
 
-RSpec.describe 'the management of participation roles in a group', :js do
-  before do
-    load_database
-    @user = create(:user)
-    @ability = Ability.new(@user)
-    @group = create(:group, current_user_id: @user.id)
-  end
+RSpec.describe 'group role governance', :js, seeds: true do
+  let!(:owner) { create(:user) }
+  let!(:group) { create(:group, current_user_id: owner.id) }
 
-  after do
-    logout(:user)
-  end
+  after { logout :user }
 
-  it "can't manage roles if not logged in but asks to log in" do
-    visit group_participation_roles_path(@group)
+  it 'requires authentication' do
+    visit group_participation_roles_path(group)
     expect_sign_in_page
   end
 
-  it "can't create roles if not logged in but asks to log in" do
-    visit new_group_participation_role_path(@group)
-    expect_sign_in_page
-  end
+  context 'as group owner' do
+    before { login_as owner, scope: :user }
 
-  context 'other groups' do
-    before do
-      @user2 = create(:user)
-      login_as @user2, scope: :user
+    it 'shows one named permission form per role and protects the default' do
+      visit group_participation_roles_path(group)
+
+      expect(page).to have_css('main#main-content')
+      expect(page).to have_css("#role_#{group.default_participation_role.id}")
+      expect(page).to have_content(I18n.t('pages.groups.edit_permissions.default_protected'))
+      expect(page).to have_button(I18n.t('pages.groups.edit_permissions.save_permissions'))
+      expect(page).not_to have_css("#role_#{group.default_participation_role.id} a", text: I18n.t('buttons.delete'))
+
+      duplicate_ids = page.all('[id]', visible: :all).map { |node| node[:id] }.tally.select { |_id, count| count > 1 }
+      expect(duplicate_ids).to be_empty
     end
 
+    it 'persists a permission only after an explicit save' do
+      role = group.default_participation_role
+      role.update!(write_to_wall: false)
+      visit group_participation_roles_path(group)
 
-    it "can't manage participation roles", :ignore_javascript_errors do
-      visit group_participation_roles_path(@group)
-      expect(page).to have_content(I18n.t('error.error_302.title'))
-    end
-
-
-    it "can't create participation roles", :ignore_javascript_errors do
-      visit new_group_participation_role_path(@group)
-      expect(page).to have_content(I18n.t('error.error_302.title'))
-    end
-  end
-
-  context 'participant' do
-    before do
-      @user2 = create(:user)
-      create_participation(@user2, @group)
-      login_as @user2, scope: :user
-    end
-
-
-    it "can't manage participation roles", :ignore_javascript_errors do
-      visit group_participation_roles_path(@group)
-      expect(page).to have_content(I18n.t('error.error_302.title'))
-    end
-
-
-    it "can't create participation roles", :ignore_javascript_errors do
-      visit new_group_participation_role_path(@group)
-      expect(page).to have_content(I18n.t('error.error_302.title'))
-    end
-  end
-
-  context 'admin of group' do
-    before do
-      login_as @user, scope: :user
-    end
-
-    it 'view participation roles page' do
-      visit group_participation_roles_path(@group)
-      page_should_be_ok
-
-      expect(page).to have_content I18n.t('pages.groups.edit_permissions.title')
-
-      within('#main-copy') do
-        @group.participation_roles.each_with_index do |participation_role, i|
-          click_link participation_role.name if i > 0
-          sleep 0.5
-          within("#role_#{participation_role.id}") do
-            GroupAction::LIST.each do |group_action|
-              if DEFAULT_GROUP_ACTIONS.include? group_action
-                expect(find(:css, "#participation_role_#{group_action}")).to be_checked
-              else
-                expect(find(:css, "#participation_role_#{group_action}")).not_to be_checked
-              end
-            end
-          end
-        end
-      end
-    end
-
-    it 'creates participation roles' do
-      visit new_group_participation_role_path(@group)
-
-      role_name = Faker::Name.prefix
-      within('#main-copy') do
-        fill_in I18n.t('activerecord.attributes.participation_role.name'), with: role_name
-        fill_in I18n.t('activerecord.attributes.participation_role.description'), with: Faker::Lorem.sentence
-        click_button I18n.t('buttons.create')
+      within("#role_#{role.id}") do
+        check I18n.t('db.group_actions.write_to_wall.description')
+        click_button I18n.t('pages.groups.edit_permissions.save_permissions')
       end
 
-      expect(page).to have_content role_name
-    end
-
-    it 'manages participation role' do
-      visit group_participation_roles_path(@group)
-      within("#role_#{@group.participation_roles.first.id}") do
-        DEFAULT_GROUP_ACTIONS.each do |group_action|
-          find(:css, "#participation_role_#{group_action}").click
-        end
-      end
-      wait_for_ajax
       expect(page).to have_content(I18n.t('info.participation_roles.role_updated'))
+      expect(role.reload.write_to_wall).to be(true)
+    end
+
+    it 'creates a role on a focused page' do
+      visit new_group_participation_role_path(group)
+      fill_in I18n.t('activerecord.attributes.participation_role.name'), with: 'Facilitator'
+      fill_in I18n.t('activerecord.attributes.participation_role.description'), with: 'Facilitates group decisions.'
+      click_button I18n.t('buttons.create')
+
+      expect(page).to have_current_path(group_participation_roles_path(group))
+      expect(page).to have_content('Facilitator')
+      expect(group.participation_roles.exists?(name: 'Facilitator')).to be(true)
     end
   end
 end

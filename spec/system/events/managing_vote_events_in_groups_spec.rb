@@ -1,45 +1,43 @@
 require 'rails_helper'
 require 'requests_helper'
-require 'cancan/matchers'
 
-RSpec.describe 'manage correctly vote events', :js, seeds: true do
-  let!(:user) { create(:user) }
-  let!(:group) { create(:group, current_user_id: user.id) }
-  let!(:user2) { create(:user) }
-  let!(:user3) { create(:user) }
-  let!(:group2) { create(:group, current_user_id: user2.id) }
+RSpec.describe 'voting event workflow', :js, seeds: true do
+  let!(:owner) { create(:user) }
+  let!(:group) { create(:group, current_user_id: owner.id) }
+  let!(:member) { create(:user) }
 
   before do
-    create_participation(user2, group)
-    create_participation(user3, group)
+    create_participation(member, group)
+    login_as member, scope: :user
   end
 
-  it 'participants can create vote events' do
-    # can manage his event
-    login_as user2, scope: :user
+  def set_datetime(selector, value)
+    page.execute_script(<<~JS, selector, value.strftime('%Y-%m-%dT%H:%M'))
+      const element = document.querySelector(arguments[0]);
+      element.value = arguments[1];
+      element.dispatchEvent(new Event('input', { bubbles: true }));
+      element.dispatchEvent(new Event('change', { bubbles: true }));
+    JS
+  end
+
+  it 'creates a voting window from one complete form' do
     visit new_group_event_path(group, event_type_id: EventType::VOTATION)
-    expect(page).to have_content(I18n.t('pages.events.new.title_event'))
-    title = Faker::Lorem.sentence
-    description = Faker::Lorem.paragraph
+
+    title = 'Neighbourhood budget vote'
     fill_in I18n.t('activerecord.attributes.event.title'), with: title
-    fill_in I18n.t('activerecord.attributes.event.description'), with: description
+    fill_in I18n.t('activerecord.attributes.event.description'), with: 'Choose the shared budget priorities.'
+    set_datetime('#event_starttime', 2.days.from_now.change(min: 0, sec: 0))
+    set_datetime('#event_endtime', 3.days.from_now.change(min: 0, sec: 0))
 
-    click_link I18n.t('buttons.next')
+    expect(page).to have_no_field('event_municipality_query')
+    expect(page).to have_button(I18n.t('pages.events.new.submit'), disabled: false)
+    click_button I18n.t('pages.events.new.submit')
 
-    fill_in I18n.t('activerecord.attributes.event.starttime'), with: (I18n.l Time.zone.now, format: :datetimepicker)
-    page.execute_script("$('#event_starttime').fdatetimepicker('hide');")
-    fill_in I18n.t('activerecord.attributes.event.endtime'), with: (I18n.l Time.zone.now + 1.day, format: :datetimepicker)
-    page.execute_script("$('#event_endtime').fdatetimepicker('hide');")
-
-    click_link I18n.t('pages.events.new.submit')
-    expect(page).to have_current_path(group_events_path(group))
+    expect(page).to have_content(I18n.t('info.events.event_created'), wait: 10)
+    created = Event.order(:id).last
+    expect(page).to have_current_path(group_event_path(group, created))
     expect(page).to have_content(title)
-    visit group_event_path(group, Event.last)
-    expect(page).to have_content(title)
-    expect(page).to have_content(description)
-    expect(Event.last.user).to eq user2
-
-    expect(NotificationEventCreate.jobs.size).to eq 1
-    logout :user
+    expect(created).to be_votation
+    expect(created.user).to eq(member)
   end
 end

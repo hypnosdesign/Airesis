@@ -1,4 +1,5 @@
 <% if @group_area.area_participations.count > 0 %>
+  <div class="overflow-x-auto border border-base-content/15 bg-base-100">
   <table id="roles_table" class="table">
     <thead>
       <tr>
@@ -10,16 +11,29 @@
       <% @group_area.area_participations.each do |gp| %>
         <tr>
           <td>
-            <%= avatar(gp.user, size: 16) %>
-            <%= link_to gp.user.fullname, gp.user %>
+            <span class="flex min-w-48 items-center gap-3">
+              <%= avatar(gp.user, size: 32) %>
+              <%= link_to gp.user.fullname, gp.user, class: 'font-semibold underline-offset-4 hover:underline' %>
+            </span>
           </td>
           <td>
-            <%= select_tag "user_role", options_from_collection_for_select(@group_area.area_roles, :id, :name, gp.area_role.id), "data-user_id" => gp.user.id, class: "user_role_changer" %>
+            <%= form_with url: change_permissions_group_group_area_area_roles_path(@group, @group_area), method: :put, class: 'flex min-w-72 items-center gap-2' do %>
+              <%= hidden_field_tag :user_id, gp.user.id %>
+              <%= label_tag "area_role_for_#{gp.user.id}", t('pages.groups.edit_permissions.role_for', name: gp.user.fullname), class: 'sr-only' %>
+              <%= select_tag :id,
+                             options_from_collection_for_select(@group_area.area_roles, :id, :name, gp.area_role.id),
+                             id: "area_role_for_#{gp.user.id}",
+                             class: 'select select-bordered min-h-11 flex-1' %>
+              <%= submit_tag t('buttons.update'), class: 'btn min-h-11' %>
+            <% end %>
           </td>
         </tr>
       <% end %>
     </tbody>
   </table>
+  </div>
 <% else %>
-  <h4><%= t('pages.groups.edit_permissions.no_users_yet') %></h4>
+  <div class="border border-dashed border-base-content/25 bg-base-100 px-6 py-8 text-center">
+    <p class="font-semibold"><%= t('pages.groups.edit_permissions.no_users_yet') %></p>
+  </div>
 <% end %>

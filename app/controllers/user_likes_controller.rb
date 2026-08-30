@@ -7,12 +7,12 @@ class UserLikesController < ApplicationController
     if @user_like.save
       head :ok
     else
-      head :unprocessable_entity
+      head :unprocessable_content
     end
   end
 
   def destroy
-    @user_like = UserLike.find_by(likeable_id: params[:user_like][:likeable_id], likeable_type: params[:user_like][:likeable_type])
+    @user_like = UserLike.where(user_id: current_user.id).find(params[:id])
     @user_like.destroy
     head :ok
   end

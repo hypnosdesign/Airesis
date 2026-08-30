@@ -22,8 +22,8 @@
          role="status"
          data-controller="flash"
          data-flash-auto-dismiss-value="0">
-      <span><%= raw announcement.message %></span>
-      <%= link_to "OK", hide_announcement_path(announcement), class: "btn btn-sm", data: { turbo_method: :post } %>
+      <span><%= sanitize announcement.message, tags: %w[strong em a], attributes: %w[href rel] %></span>
+      <%= link_to t('pages.announcements.dismiss'), hide_announcement_path(announcement), class: "btn btn-sm min-h-11", data: { turbo_method: :post }, aria: { label: t('pages.announcements.dismiss_label') } %>
     </div>
   <% end %>
 </div>

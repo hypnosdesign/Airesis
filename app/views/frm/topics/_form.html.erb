@@ -1,7 +1,11 @@
-<%= simple_form_for @topic, url: group_forum_topics_url(@group, @forum) do |f| %>
-  <%= f.input :subject, label: t('simple_form.labels.topic.subject') %>
+<%= simple_form_for @topic, url: group_forum_topics_url(@group, @forum), html: { class: "space-y-5", novalidate: false } do |f| %>
+  <%= f.input :subject, label: t('simple_form.labels.topic.subject'), input_html: { class: "min-h-11", autocomplete: "off" }, hint: t('frm.topic.form.subject_hint') %>
   <%= f.simple_fields_for :posts do |post| %>
     <%= render partial: 'frm/posts/form', locals: { f: post } %>
   <% end %>
-  <%= f.submit t('helpers.submit.topic.create'), class: 'btn btn-primary mt-4', data: { disable_with: t('loading') } %>
+  <p class="text-sm text-base-content/60"><%= t('frm.topic.form.editor_hint') %></p>
+  <div class="flex flex-wrap gap-3">
+    <%= f.submit t('helpers.submit.topic.create'), class: 'btn btn-primary min-h-11', data: { disable_with: t('loading') } %>
+    <%= link_to t('buttons.cancel'), group_forum_url(@group, @forum), class: 'btn btn-ghost min-h-11' %>
+  </div>
 <% end %>

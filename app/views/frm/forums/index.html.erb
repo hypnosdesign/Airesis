@@ -1,16 +1,27 @@
 <% @page_title = "#{t('.title')} #{@group.name}" %>
 <% @extend = true %>
 
-<div id="forums_container">
-  <h1 id="forums_title" class="text-2xl font-bold mb-4"><%= t('.title') %></h1>
-  <%= render @categories %>
+<div id="forums_container" class="space-y-8">
+  <header class="max-w-3xl">
+    <h1 id="forums_title" class="text-3xl font-bold tracking-tight"><%= t('.title') %></h1>
+    <p class="mt-3 text-base-content/70"><%= t('frm.forums.index.description', group: @group.name) %></p>
+  </header>
+
+  <% if @categories.any? %>
+    <%= render @categories %>
+  <% else %>
+    <div class="rounded-box border border-base-300 bg-base-100 p-6" role="status">
+      <h2 class="text-xl font-semibold"><%= t('frm.forums.index.empty_title') %></h2>
+      <p class="mt-2 max-w-2xl text-base-content/70"><%= t('frm.forums.index.empty_description') %></p>
+    </div>
+  <% end %>
 </div>
 
 <% if is_group_admin? @group %>
   <% content_for :left_panel do %>
-    <div class="card bg-base-200 p-4">
+    <div class="rounded-box border border-base-300 bg-base-100 p-4">
       <h4 class="font-bold mb-2"><%= t('frm.admin.area') %></h4>
-      <%= link_to t("area", scope: "frm.admin"), group_frm_admin_root_url(@group), class: 'btn btn-sm' %>
+      <%= link_to t("area", scope: "frm.admin"), group_frm_admin_root_url(@group), class: 'btn min-h-11' %>
     </div>
   <% end %>
 <% end %>

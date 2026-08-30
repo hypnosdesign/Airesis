@@ -29,12 +29,8 @@ module Frm
     end
 
     def destroy
-      if current_user == @topic.user || current_user.forem_admin?(@group)
-        @topic.destroy
-        destroy_successful
-      else
-        destroy_unsuccessful
-      end
+      @topic.destroy!
+      destroy_successful
     end
 
     def subscribe
@@ -51,34 +47,32 @@ module Frm
       end
     end
 
+    def unsubscribe_confirmation
+      find_topic
+    end
+
     protected
 
     def create_successful
-      redirect_to group_forum_topic_url(@group, @forum, @topic), notice: t('frm.topic.created')
+      redirect_to group_forum_topic_url(@group, @forum, @topic), notice: t('frm.topic.created'), status: :see_other
     end
 
     def create_unsuccessful
       flash.now.alert = t('frm.topic.not_created')
-      render action: 'new'
+      render action: 'new', status: :unprocessable_content
     end
 
     def destroy_successful
       flash[:notice] = t('frm.topic.deleted')
 
-      redirect_to group_forum_url(@group, @topic.forum)
-    end
-
-    def destroy_unsuccessful
-      flash.alert = t('frm.topic.cannot_delete')
-
-      redirect_to group_forum_url(@group, @topic.forum)
+      redirect_to group_forum_url(@group, @topic.forum), status: :see_other
     end
 
     def subscribe_successful
       flash[:notice] = t('frm.topic.subscribed')
       respond_to do |format|
         format.turbo_stream { render 'subscribe' }
-        format.html { redirect_to group_forum_topic_url(@group, @topic.forum, @topic) }
+        format.html { redirect_to group_forum_topic_url(@group, @topic.forum, @topic), status: :see_other }
       end
     end
 
@@ -86,7 +80,7 @@ module Frm
       flash[:notice] = t('frm.topic.unsubscribed')
       respond_to do |format|
         format.turbo_stream { render 'subscribe' }
-        format.html { redirect_to group_forum_topic_url(@group, @topic.forum, @topic) }
+        format.html { redirect_to group_forum_topic_url(@group, @topic.forum, @topic), status: :see_other }
       end
     end
 

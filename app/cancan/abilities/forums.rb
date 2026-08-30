@@ -32,7 +32,7 @@ module Abilities
       can %i[new create], Frm::Topic, forum: { group: participate_in_group(user) }
       can %i[update destroy], Frm::Topic, user_id: user.id
 
-      can %i[reply subscribe unsubscribe], Frm::Topic, forum: { group: participate_in_group(user) }
+      can %i[reply subscribe unsubscribe unsubscribe_confirmation], Frm::Topic, forum: { group: participate_in_group(user) }
     end
 
     def forum_admin_permissions(user)

@@ -6,102 +6,72 @@ RSpec.describe Admin::PanelController, seeds: true do
   let!(:user) { create(:user) }
 
   describe 'GET show' do
-    # Admin routes have routing constraints — non-admins see 404 at the routing layer
-    it 'returns 404 or redirect when not authenticated (routing constraint)' do
+    it 'is not routed for guests or regular users' do
       get admin_panel_path
-      expect([302, 404, 500]).to include(response.status)
-    end
+      expect(response).to have_http_status(:not_found)
 
-    it 'returns 404 for non-admin users (routing constraint)' do
       sign_in user
       get admin_panel_path
-      expect([302, 403, 404, 500]).to include(response.status)
+      expect(response).to have_http_status(:not_found)
     end
 
-    it 'returns 200 or 500 for admin' do
+    it 'renders the operations panel for an administrator' do
       sign_in admin
+
       get admin_panel_path
-      expect([200, 500]).to include(response.status)
+
+      expect(response).to have_http_status(:ok)
+      expect(response.body).to include(I18n.t('admin_ui.panel.title'))
     end
   end
 
-  describe 'GET calculate_rankings' do
-    it 'returns 404 or redirect when not authenticated' do
+  describe 'POST maintenance operations' do
+    before { sign_in admin }
+
+    it 'recalculates rankings and redirects with 303' do
+      allow(AdminHelper).to receive(:calculate_ranking)
+
+      post calculate_rankings_admin_panel_path
+
+      expect(AdminHelper).to have_received(:calculate_ranking)
+      expect(response).to redirect_to(admin_panel_path)
+      expect(response).to have_http_status(:see_other)
+    end
+
+    it 'reconciles proposal states and redirects with 303' do
+      allow(Proposal).to receive_messages(invalid_debate_phase: [], invalid_waiting_phase: [], invalid_vote_phase: [])
+
+      post change_proposals_state_admin_panel_path
+
+      expect(response).to redirect_to(admin_panel_path)
+      expect(response).to have_http_status(:see_other)
+    end
+
+    it 'queues notification cleanup and redirects with 303' do
+      expect do
+        post delete_old_notifications_admin_panel_path
+      end.to have_enqueued_job(DeleteOldNotifications)
+
+      expect(flash[:notice]).to eq(I18n.t('admin_ui.panel.notifications_cleanup_queued'))
+      expect(response).to have_http_status(:see_other)
+    end
+
+    it 'refreshes the sitemap and reenables the task' do
+      task = instance_double(Rake::Task, invoke: true, reenable: true)
+      allow(Rake::Task).to receive(:task_defined?).with('sitemap:refresh').and_return(true)
+      allow(Rake::Task).to receive(:[]).with('sitemap:refresh').and_return(task)
+
+      post write_sitemap_admin_panel_path
+
+      expect(task).to have_received(:invoke)
+      expect(task).to have_received(:reenable)
+      expect(response).to have_http_status(:see_other)
+    end
+
+    it 'does not expose maintenance operations through GET' do
       get calculate_rankings_admin_panel_path
-      expect([302, 404]).to include(response.status)
-    end
 
-    it 'executes for admin and redirects' do
-      sign_in admin
-      get calculate_rankings_admin_panel_path
-      expect([200, 302, 500]).to include(response.status)
+      expect(response).to have_http_status(:not_found)
     end
   end
-
-  describe 'GET delete_old_notifications' do
-    it 'returns 404 or redirect when not authenticated' do
-      get delete_old_notifications_admin_panel_path
-      expect([302, 404]).to include(response.status)
-    end
-
-    it 'executes for admin and redirects' do
-      sign_in admin
-      get delete_old_notifications_admin_panel_path
-      expect([200, 302, 500]).to include(response.status)
-    end
-  end
-
-  describe 'GET change_proposals_state' do
-    it 'returns 404 or redirect when not authenticated' do
-      get change_proposals_state_admin_panel_path
-      expect([302, 404]).to include(response.status)
-    end
-
-    it 'executes for admin' do
-      sign_in admin
-      get change_proposals_state_admin_panel_path
-      expect([200, 302, 500]).to include(response.status)
-    end
-  end
-
-  describe 'GET test_redis' do
-    it 'executes for admin' do
-      sign_in admin
-      get test_redis_admin_panel_path
-      expect([200, 302, 500]).to include(response.status)
-    end
-  end
-
-  describe 'GET test_scheduler' do
-    it 'executes for admin' do
-      sign_in admin
-      get test_scheduler_admin_panel_path
-      expect([200, 302, 500]).to include(response.status)
-    end
-  end
-
-  describe 'GET test_exceptions' do
-    it 'returns a response for admin (may raise 500)' do
-      sign_in admin
-      get test_exceptions_admin_panel_path
-      expect([200, 302, 500]).to include(response.status)
-    end
-  end
-
-  describe 'GET write_sitemap' do
-    it 'executes for admin' do
-      sign_in admin
-      get write_sitemap_admin_panel_path
-      expect([200, 302, 500]).to include(response.status)
-    end
-  end
-
-  describe 'GET calculate_user_group_affinity' do
-    it 'executes for admin' do
-      sign_in admin
-      get calculate_user_group_affinity_admin_panel_path
-      expect([200, 302, 500]).to include(response.status)
-    end
-  end
-
 end

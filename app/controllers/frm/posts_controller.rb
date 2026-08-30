@@ -16,7 +16,7 @@ module Frm
           @post.text = view_context.forem_quote(@reply_to_post.text)
         else
           flash[:notice] = t('frm.post.cannot_quote_deleted_post')
-          redirect_to group_forum_topic_url(@group, @forum, @topic)
+          redirect_to group_forum_topic_url(@group, @forum, @topic), status: :see_other
         end
       end
     end
@@ -43,14 +43,21 @@ module Frm
     end
 
     def destroy
-      @post.destroy
+      @post.destroy!
       destroy_successful
     end
 
     protected
 
     def post_params
-      params.require(:frm_post).permit(:text, :reply_to_id)
+      permitted = params.require(:frm_post).permit(:text, :reply_to_id)
+      attributes = permitted.except(:reply_to_id).to_h
+      if permitted[:reply_to_id].present?
+        attributes[:reply_to] = @topic.posts.find(permitted[:reply_to_id])
+      elsif permitted.key?(:reply_to_id)
+        attributes[:reply_to] = nil
+      end
+      attributes
     end
 
     private
@@ -65,39 +72,39 @@ module Frm
 
     def create_successful
       flash[:notice] = t('frm.post.created')
-      redirect_to group_forum_topic_url(@group, @topic.forum, @topic, page: @topic.last_page)
+      redirect_to group_forum_topic_url(@group, @topic.forum, @topic, page: @topic.last_page), status: :see_other
     end
 
     def create_failed
       params[:reply_to_id] = params[:frm_post][:reply_to_id]
       flash.now.alert = t('frm.post.not_created')
-      render action: 'new'
+      render action: 'new', status: :unprocessable_content
     end
 
     def destroy_successful
       if @post.topic.posts.empty?
         @post.topic.destroy
         flash[:notice] = t('frm.post.deleted_with_topic')
-        redirect_to group_forum_path(@group, @topic.forum)
+        redirect_to group_forum_path(@group, @topic.forum), status: :see_other
       else
         flash[:notice] = t('frm.post.deleted')
-        redirect_to group_forum_topic_path(@group, @topic.forum, @topic)
+        redirect_to group_forum_topic_path(@group, @topic.forum, @topic), status: :see_other
       end
     end
 
     def update_successful
-      redirect_to group_forum_topic_url(@group, @topic.forum, @topic), notice: t('edited', scope: 'frm.post')
+      redirect_to group_forum_topic_url(@group, @topic.forum, @topic), notice: t('edited', scope: 'frm.post'), status: :see_other
     end
 
     def update_failed
       flash.now.alert = t('frm.post.not_edited')
-      render action: 'edit'
+      render action: 'edit', status: :unprocessable_content
     end
 
     def reject_locked_topic!
       if @topic.locked?
         flash.alert = t('frm.post.not_created_topic_locked')
-        redirect_to(group_forum_topic_url(@group, @topic.forum, @topic)) && return
+        redirect_to(group_forum_topic_url(@group, @topic.forum, @topic), status: :see_other) && return
       end
     end
 

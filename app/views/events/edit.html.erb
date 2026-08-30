@@ -1,13 +1,7 @@
-<% @extend = true %>
-<div class="card bg-base-200 p-4">
-  <%= render 'edit_form' %>
-</div>
-
-<% content_for :left_panel do %>
-  <div class="card bg-base-200 p-4">
-    <%= link_to (@group ? group_event_path(@group, @event) : event_path(@event)),
-                class: 'btn', data: {disable_with: t('loading')} do %>
-      <%= t('buttons.go_back') %>
-    <% end %>
+<div class="mb-6 flex flex-col gap-3 border-b-2 border-base-content/15 pb-5 sm:flex-row sm:items-end sm:justify-between">
+  <div>
+    <h1 class="text-3xl font-extrabold leading-tight"><%= t('pages.events.edit.heading') %></h1>
+    <p class="mt-2 max-w-2xl text-base-content/70"><%= t('pages.events.edit.subtitle', title: @event.title) %></p>
   </div>
-<% end %>
+</div>
+<%= render 'form' %>

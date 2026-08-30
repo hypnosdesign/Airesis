@@ -1,4 +1,7 @@
 class EventCommentsController < ApplicationController
+  before_action :authenticate_user!
+  before_action :enable_content_landmark
+
   load_and_authorize_resource :event
   load_and_authorize_resource through: :event
 
@@ -6,44 +9,73 @@ class EventCommentsController < ApplicationController
     @event_comment.user = current_user
     @event_comment.request = request
 
-    respond_to do |format|
-      if @event_comment.save
-        @pagy, @event_comments = pagy(:offset, @event.event_comments.order('created_at DESC'), limit: COMMENTS_PER_PAGE)
-        @saved = @event_comments.find { |comment| comment.id == @event_comment.id }
-        @saved.collapsed = true
-        flash[:notice] = t('info.event.comment_added')
+    if @event_comment.save
+      prepare_comments
+      flash[:notice] = t('info.event.comment_added')
+      respond_to do |format|
+        format.html { redirect_to event_destination, status: :see_other }
         format.turbo_stream
-      else
-        flash[:notice] = t('error.event.comment_added')
-        format.turbo_stream { render 'event_comments/errors/create' }
+      end
+    else
+      flash.now[:error] = t('error.event.comment_added')
+      respond_to do |format|
+        format.html { render_event_show }
+        format.turbo_stream { render 'event_comments/errors/create', status: :unprocessable_content }
       end
     end
   end
 
   def destroy
-    @event_comment.destroy
-    flash[:notice] = 'The comment has been deleted'
+    @event_comment.destroy!
+    flash[:notice] = t('info.event.comment_deleted')
     respond_to do |format|
-      format.turbo_stream do
-        @pagy, @event_comments = pagy(:offset, @event.event_comments.order('created_at DESC'), limit: COMMENTS_PER_PAGE)
-      end
+      format.html { redirect_to event_destination, status: :see_other }
+      format.turbo_stream
     end
   end
 
   def like
-    (@event_comment.likers.include? current_user) ?
-      @event_comment.likers.delete(current_user) :
+    if @event_comment.likers.exists?(current_user.id)
+      @event_comment.likers.delete(current_user)
+    else
       @event_comment.likers << current_user
-    @event_comment.save!
+    end
+
     respond_to do |format|
-      format.turbo_stream { render partial: 'layouts/flash_stream' }
-      format.html { redirect_back fallback_location: event_path(@event) }
+      format.html { redirect_back fallback_location: event_destination, status: :see_other }
+      format.turbo_stream
     end
   end
 
   protected
 
   def event_comment_params
-    params.require(:event_comment).permit(:parent_event_comment_id, :body)
+    params.require(:event_comment).permit(:body)
+  end
+
+  private
+
+  def enable_content_landmark
+    @content_landmark = true
+  end
+
+  def event_destination
+    group = @event.groups.first
+    group ? group_event_path(group, @event) : event_path(@event)
+  end
+
+  def prepare_comments
+    @pagy, @event_comments = pagy(
+      :offset,
+      @event.event_comments.includes(:user, :likes).order(created_at: :desc),
+      limit: COMMENTS_PER_PAGE
+    )
+  end
+
+  def render_event_show
+    @page_title = @event.title
+    @group = @event.groups.first
+    prepare_comments
+    render 'events/show', status: :unprocessable_content, layout: @group ? 'groups' : 'open_space'
   end
 end

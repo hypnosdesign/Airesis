@@ -1,26 +1,39 @@
-<div class="card bg-base-200 p-4">
-  <h4>
-    <%= @event.past? ? t('pages.events.show.participants') : t('pages.events.show.will_partecipate') %>
-  </h4>
-  <div class="mybox_button"></div>
+<div class="flex flex-col gap-1 sm:flex-row sm:items-end sm:justify-between">
   <div>
-    <%= render partial: 'events/participants', locals: {participants: @event.meeting.yes_participations} %>
-    <% if @event.meeting.yes_participations.empty? %>
-      <% if @event.past? %>
-        <h4><%= t('pages.events.show.no_participants') %></h4>
-      <% else %>
-        <h4><%= t('pages.events.show.no_participants_yet') %></h4>
-      <% end %>
-    <% end %>
+    <h2 id="event-participants-title" class="text-xl font-extrabold"><%= t('pages.events.show.participants_heading') %></h2>
+    <p class="mt-1 text-sm text-base-content/65"><%= t('pages.events.show.participants_help') %></p>
   </div>
+  <span class="badge badge-ghost whitespace-nowrap">
+    <%= t('pages.events.show.attending_count', count: @event.meeting.yes_participations.count) %>
+  </span>
 </div>
 
-<div class="card bg-base-200 p-4">
-  <h4>
-    <%= @event.past? ? t('pages.events.show.non_participants') : t('pages.events.show.will_non_participants') %>
-  </h4>
-  <div class="mybox_button close" data-menu2show="0"></div>
-  <div style="display:none">
-    <%= render partial: 'events/participants', locals: {participants: @event.meeting.no_participations} %>
-  </div>
+<div class="mt-5 space-y-3">
+  <details class="border border-base-content/15 bg-base-100" open>
+    <summary class="flex min-h-11 cursor-pointer items-center justify-between gap-3 px-4 py-3 font-extrabold">
+      <span><%= @event.past? ? t('pages.events.show.participants') : t('pages.events.show.will_partecipate') %></span>
+      <span class="badge badge-primary"><%= @event.meeting.yes_participations.count %></span>
+    </summary>
+    <div class="border-t border-base-content/10 p-4">
+      <% if @event.meeting.yes_participations.any? %>
+        <%= render partial: 'events/participants', locals: { participants: @event.meeting.yes_participations } %>
+      <% else %>
+        <p class="text-sm text-base-content/65"><%= @event.past? ? t('pages.events.show.no_participants') : t('pages.events.show.no_participants_yet') %></p>
+      <% end %>
+    </div>
+  </details>
+
+  <details class="border border-base-content/15 bg-base-100">
+    <summary class="flex min-h-11 cursor-pointer items-center justify-between gap-3 px-4 py-3 font-extrabold">
+      <span><%= @event.past? ? t('pages.events.show.non_participants') : t('pages.events.show.will_non_participants') %></span>
+      <span class="badge badge-ghost"><%= @event.meeting.no_participations.count %></span>
+    </summary>
+    <div class="border-t border-base-content/10 p-4">
+      <% if @event.meeting.no_participations.any? %>
+        <%= render partial: 'events/participants', locals: { participants: @event.meeting.no_participations } %>
+      <% else %>
+        <p class="text-sm text-base-content/65"><%= t('pages.events.show.no_declines') %></p>
+      <% end %>
+    </div>
+  </details>
 </div>

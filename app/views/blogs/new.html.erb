@@ -1,6 +1,6 @@
 <div class="card bg-base-200 p-4">
   <h1 class="text-xl font-bold mb-4"><%= t('pages.blogs.new.title') %></h1>
-  <%= simple_form_for @blog do |f| %>
+  <%= simple_form_for @blog, html: { data: { turbo: false } } do |f| %>
     <%= f.error_notification %>
     <%= f.input :title, required: true %>
     <p class="flex gap-2 mt-4">

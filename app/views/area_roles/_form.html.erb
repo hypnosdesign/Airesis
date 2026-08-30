@@ -1,8 +1,17 @@
-<h2><%= t('pages.groups.edit_permissions.new_role_title') %></h2>
-<%= simple_form_for [@group, @group_area, @area_role], remote: remote do |f| %>
+<% modal = local_assigns.fetch(:modal, false) %>
+<% title = @area_role.persisted? ? t('pages.groups.edit_permissions.edit_role_heading', role: @area_role.name) : t('pages.groups.edit_permissions.new_role_title') %>
+<% if modal %>
+  <h2 id="area-role-dialog-title" class="mb-5 text-2xl font-extrabold"><%= title %></h2>
+<% end %>
+<%= simple_form_for [@group, @group_area, @area_role], html: { data: (modal ? {} : { turbo: false }) } do |f| %>
   <%= f.input :name %>
   <%= f.input :description, as: :text unless @group_area.area_role_id == @area_role.id %>
-  <%= link_to t('buttons.cancel'), '#', class: 'btn', data: { action: 'click->modal#close' } %>
-  <%= link_to t('buttons.go_back'), :back, class: 'btn', data: {back: ''} %>
-  <%= f.submit button_name, class: 'btn btn-primary' %>
+  <div class="mt-6 flex flex-wrap gap-3">
+    <% if modal %>
+      <%= button_tag t('buttons.cancel'), type: 'button', class: 'btn', data: { action: 'click->modal#close' } %>
+    <% else %>
+      <%= link_to t('buttons.cancel'), edit_group_group_area_path(@group, @group_area), class: 'btn' %>
+    <% end %>
+    <%= f.submit button_name, class: 'btn btn-primary' %>
+  </div>
 <% end %>

@@ -1,0 +1,8 @@
+<%= turbo_stream.replace "participation_panel_container" do %>
+  <section id="participation_panel_container"
+           class="border-2 border-error/40 bg-base-100 p-5 sm:p-6"
+           aria-labelledby="event-attendance-title">
+    <%= render partial: "events/participation_panel" %>
+  </section>
+<% end %>
+<%= render partial: "layouts/flash_stream" %>

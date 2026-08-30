@@ -1,14 +1,55 @@
-<h2 class="text-xl font-bold mb-2"><%= t('.title', forum: forum) %></h2>
-<h3 class="text-lg mb-4"><%= t('posts_count', count: @posts.count, scope: 'frm.general') %></h3>
+<%= render partial: 'frm/forums/head', locals: { forum: forum } %>
 
-<%= form_tag group_frm_forum_moderate_posts_url(@group, forum), data: { turbo_method: :put } do %>
-  <div id="posts">
-    <% @posts.limit(25).group_by(&:topic).each do |topic, posts| %>
-      <h4 class="font-bold mt-4 mb-2">
-        <%= topic.forum.title %> &raquo; <%= topic.subject %>
-      </h4>
-      <%= render posts, mass_moderation: true %>
+<div class="max-w-5xl">
+  <header class="mb-8 flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+    <div>
+      <h1 class="text-3xl font-bold tracking-tight"><%= t('.title', forum: forum) %></h1>
+      <p class="mt-2 max-w-3xl text-base-content/70"><%= t('frm.moderation.index.description') %></p>
+    </div>
+    <%= link_to t('frm.topic.links.back_to_topics'), group_forum_path(@group, forum), class: "btn btn-ghost min-h-11 shrink-0" %>
+  </header>
+
+  <section aria-labelledby="pending_topics_title">
+    <div class="flex flex-wrap items-baseline justify-between gap-3">
+      <h2 id="pending_topics_title" class="text-2xl font-bold"><%= t('frm.moderation.index.pending_topics') %></h2>
+      <span class="text-sm tabular-nums text-base-content/60"><%= @topics.count %></span>
+    </div>
+    <% if @topics.any? %>
+      <div class="mt-4 space-y-3">
+        <% @topics.limit(25).each do |topic| %>
+          <article class="rounded-box border border-base-300 bg-base-100 p-4">
+            <h3 class="font-semibold"><%= link_to topic.subject, group_forum_topic_path(@group, forum, topic), class: "underline-offset-4 hover:underline" %></h3>
+            <p class="mt-1 text-sm text-base-content/60"><%= t('started_by') %><%= topic.user || t('frm.posts.post.deleted_user') %></p>
+            <%= form_with model: topic, url: group_frm_moderate_forum_topic_path(@group, forum, topic), method: :put, class: "mt-4" do |f| %>
+              <%= render "/frm/moderation/options", f: f, submit: true %>
+            <% end %>
+          </article>
+        <% end %>
+      </div>
+    <% else %>
+      <p class="mt-4 rounded-box border border-base-300 bg-base-100 p-5 text-base-content/70" role="status"><%= t('frm.moderation.index.no_topics') %></p>
     <% end %>
-  </div>
-  <%= submit_tag t('frm.posts.moderation.moderate'), class: "btn btn-primary mt-4" %>
-<% end %>
+  </section>
+
+  <section class="mt-10 border-t border-base-300 pt-8" aria-labelledby="pending_posts_title">
+    <div class="flex flex-wrap items-baseline justify-between gap-3">
+      <h2 id="pending_posts_title" class="text-2xl font-bold"><%= t('frm.moderation.index.pending_posts') %></h2>
+      <span class="text-sm tabular-nums text-base-content/60"><%= t('posts_count', count: @posts.count, scope: 'frm.general') %></span>
+    </div>
+    <% if @posts.any? %>
+      <%= form_tag group_frm_forum_moderate_posts_url(@group, forum), method: :put, class: "mt-4" do %>
+        <div id="posts" class="space-y-6">
+          <% @posts.limit(25).group_by(&:topic).each do |topic, posts| %>
+            <section aria-labelledby="moderation_topic_<%= topic.id %>">
+              <h3 id="moderation_topic_<%= topic.id %>" class="mb-3 text-lg font-semibold"><%= topic.subject %></h3>
+              <div class="space-y-3"><%= render posts, mass_moderation: true %></div>
+            </section>
+          <% end %>
+        </div>
+        <%= submit_tag t('frm.posts.moderation.moderate'), class: "btn btn-primary mt-6 min-h-11", data: { disable_with: t('loading') } %>
+      <% end %>
+    <% else %>
+      <p class="mt-4 rounded-box border border-base-300 bg-base-100 p-5 text-base-content/70" role="status"><%= t('frm.moderation.index.no_posts') %></p>
+    <% end %>
+  </section>
+</div>

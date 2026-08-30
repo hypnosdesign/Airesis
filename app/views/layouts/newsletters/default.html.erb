@@ -3,6 +3,7 @@
 <head>
   <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
   <meta content="width=device-width" name="viewport">
+  <title><%= @page_title.presence || @newsletter&.subject || APP_SHORT_NAME %></title>
   <%= stylesheet_link_tag 'newsletters' %>
 </head>
 <body>

@@ -1,12 +1,12 @@
 <div class="card bg-base-200 p-4 mb-4">
-  <h4 class="font-bold mb-2">Recent comments</h4>
+  <h2 class="font-bold mb-2"><%= t('pages.blogs.show.recent_comments') %></h2>
   <div>
     <% @recent_comments.each do |comment| %>
       <div class="blog_comment flex items-start gap-2 mb-2">
         <div class="comment_avatar"><%= avatar(comment.user, size: 40) %></div>
         <div class="comment_desc">
           <%= link_to_user comment.user, full_name: true %>
-          on
+          <%= t('pages.blogs.show.comment_on') %>
           <%= link_to(h(comment.blog_post.title), [@blog, comment.blog_post]) %>
         </div>
       </div>
@@ -15,7 +15,7 @@
 </div>
 
 <div class="card bg-base-200 p-4 mb-4">
-  <h4 class="font-bold mb-2">Recent posts</h4>
+  <h2 class="font-bold mb-2"><%= t('pages.blogs.show.recent_posts') %></h2>
   <div>
     <% @recent_posts.each do |post| %>
       <div class="blog_comment mb-1">
@@ -26,7 +26,7 @@
 </div>
 
 <div class="card bg-base-200 p-4 mb-4">
-  <h4 class="font-bold mb-2">Archives</h4>
+  <h2 class="font-bold mb-2"><%= t('pages.blogs.show.archives') %></h2>
   <div>
     <% @archives.each do |rec| %>
       <div class="blog_comment mb-1">

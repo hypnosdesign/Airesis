@@ -1,0 +1,7 @@
+<main>
+  <h1><%= @page_title %></h1>
+  <p><%= t('admin_ui.newsletters.preview_hint') %></p>
+  <article aria-label="<%= @newsletter.subject %>">
+    <%= @newsletter_body %>
+  </article>
+</main>

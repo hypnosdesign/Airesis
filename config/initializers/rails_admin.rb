@@ -16,7 +16,7 @@ Rails.application.config.to_prepare do
     config.current_user_method(&:current_user)
 
     ## == Cancan ==
-    config.authorize_with :cancan, Abilities::RailsAdmin
+    config.authorize_with :cancancan, Abilities::RailsAdmin
 
     ## == PaperTrail ==
     # config.audit_with :paper_trail, 'User', 'PaperTrail::Version' # PaperTrail >= 3.0.0
@@ -37,9 +37,6 @@ Rails.application.config.to_prepare do
       end
       delete do
         except %w[User SysPaymentNotification]
-      end
-      login_as do
-        only ['User']
       end
       # show_in_app
 

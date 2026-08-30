@@ -1,0 +1,109 @@
+<%
+  cancel_path = if @event.persisted?
+                  @group ? group_event_path(@group, @event) : event_path(@event)
+                else
+                  @group ? group_events_path(@group) : events_path
+                end
+  municipality = @place&.municipality
+%>
+<div id="event_form" class="bg-base-100 border-2 border-base-content/15 p-5 sm:p-7">
+  <%= simple_form_for(@group ? [@group, @event] : @event, html: { data: { turbo: false } }) do |f| %>
+    <%= f.error_notification %>
+    <%= f.hidden_field :proposal_id %>
+    <%= f.hidden_field :event_type_id %>
+
+    <div class="grid gap-8 xl:grid-cols-[minmax(0,1fr)_minmax(20rem,0.65fr)]">
+      <fieldset class="min-w-0">
+        <legend class="mb-5 text-xl font-extrabold"><%= t('pages.events.form.details') %></legend>
+        <%= f.input :title, input_html: { autofocus: true, autocomplete: 'off' } %>
+        <%= f.input :description, as: :text, input_html: { rows: 6 } %>
+
+        <% if @event.votation? %>
+          <%= f.hidden_field :private %>
+        <% else %>
+          <% private_id = "event_private_#{@event.id || 'new'}" %>
+          <label for="<%= private_id %>" class="flex min-h-11 cursor-pointer items-start gap-3 py-2">
+            <%= f.check_box :private, id: private_id, class: 'checkbox checkbox-primary mt-0.5 shrink-0' %>
+            <span>
+              <span class="block font-bold"><%= t('activerecord.attributes.event.private') %></span>
+              <span class="block text-sm text-base-content/65"><%= t('pages.events.new.private_tooltip') %></span>
+            </span>
+          </label>
+        <% end %>
+      </fieldset>
+
+      <div class="min-w-0 space-y-8">
+        <fieldset>
+          <legend class="mb-5 text-xl font-extrabold"><%= t('pages.events.form.schedule') %></legend>
+          <p class="mb-4 text-sm text-base-content/65"><%= t('pages.events.form.schedule_help') %></p>
+          <div class="grid gap-4 sm:grid-cols-2 xl:grid-cols-1 2xl:grid-cols-2">
+            <%= f.input :starttime,
+                        as: :string,
+                        input_html: { type: 'datetime-local', value: @event.starttime&.strftime('%Y-%m-%dT%H:%M') } %>
+            <%= f.input :endtime,
+                        as: :string,
+                        input_html: { type: 'datetime-local', value: @event.endtime&.strftime('%Y-%m-%dT%H:%M') } %>
+          </div>
+          <% all_day_id = "event_all_day_#{@event.id || 'new'}" %>
+          <label for="<%= all_day_id %>" class="flex min-h-11 cursor-pointer items-center gap-3 py-2">
+            <%= f.check_box :all_day, id: all_day_id, class: 'checkbox checkbox-primary shrink-0' %>
+            <span class="font-bold"><%= t('activerecord.attributes.event.all_day') %></span>
+          </label>
+        </fieldset>
+
+        <% if @event.meeting? %>
+          <fieldset>
+            <legend class="mb-2 text-xl font-extrabold"><%= t('pages.events.form.location') %></legend>
+            <p class="mb-5 text-sm text-base-content/65"><%= t('pages.events.form.location_help') %></p>
+            <%= f.simple_fields_for :meeting, @meeting do |meeting_fields| %>
+              <%= meeting_fields.simple_fields_for :place, @place do |place_fields| %>
+                <div data-controller="municipality-select"
+                     data-municipality-select-url-value="<%= municipalities_path(format: :json) %>">
+                  <%= place_fields.hidden_field :municipality_id, data: { municipality_select_target: 'id' } %>
+                  <label for="event_municipality_query" class="label label-text font-semibold">
+                    <%= t('activerecord.attributes.place.municipality_id') %>
+                  </label>
+                  <input id="event_municipality_query"
+                         type="search"
+                         value="<%= municipality&.description %>"
+                         list="event_municipality_results"
+                         autocomplete="off"
+                         class="input input-bordered w-full"
+                         data-municipality-select-target="query"
+                         data-action="input->municipality-select#queueSearch change->municipality-select#select"
+                         aria-describedby="event_municipality_status">
+                  <datalist id="event_municipality_results" data-municipality-select-target="list"></datalist>
+                  <p id="event_municipality_status"
+                     class="mt-1 min-h-5 text-sm text-base-content/65"
+                     aria-live="polite"
+                     data-municipality-select-target="status"
+                     data-searching="<%= t('pages.events.form.city_searching') %>"
+                     data-selected="<%= t('pages.events.form.city_selected') %>"
+                     data-choose="<%= t('pages.events.form.city_choose') %>"
+                     data-empty="<%= t('pages.events.form.city_empty') %>"
+                     data-error="<%= t('pages.events.form.city_error') %>"></p>
+                  <% if @place.errors[:municipality].any? || @place.errors[:municipality_id].any? %>
+                    <p class="mt-1 text-sm text-error"><%= (@place.errors[:municipality] + @place.errors[:municipality_id]).to_sentence %></p>
+                  <% end %>
+                </div>
+                <%= place_fields.input :address, input_html: { autocomplete: 'street-address' } %>
+                <%= place_fields.hidden_field :latitude_original %>
+                <%= place_fields.hidden_field :longitude_original %>
+                <%= place_fields.hidden_field :latitude_center %>
+                <%= place_fields.hidden_field :longitude_center %>
+                <%= place_fields.hidden_field :zoom %>
+              <% end %>
+            <% end %>
+          </fieldset>
+        <% end %>
+      </div>
+    </div>
+
+    <div class="mt-8 flex flex-col-reverse gap-3 border-t border-base-content/15 pt-5 sm:flex-row sm:justify-end">
+      <%= link_to t('buttons.cancel'), cancel_path, class: 'btn min-h-11' %>
+      <%= f.submit(@event.persisted? ? t('buttons.update') : t('pages.events.new.submit'),
+                   class: 'btn btn-primary min-h-11',
+                   data: { disable_with: @event.persisted? ? t('updating') : t('saving') }) %>
+    </div>
+  <% end %>
+</div>

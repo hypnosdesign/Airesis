@@ -1,14 +1,19 @@
-<div class="breadcrumbs text-sm mb-4">
+<nav class="breadcrumbs text-sm mb-6" aria-label="<%= t('frm.navigation.breadcrumbs') %>">
   <ul>
     <li><%= link_to t('pages.groups.administration_panel.forum'), group_frm_admin_root_url(@group) %></li>
     <li><%= link_to t('frm.admin.forum.index'), group_frm_admin_forums_url(@group) %></li>
     <li><%= @forum.title %></li>
   </ul>
-</div>
+</nav>
 
-<%= simple_form_for @forum, url: group_frm_admin_forum_url(@group, @forum) do |f| %>
-  <%= render partial: "form", locals: { f: f } %>
-<% end %>
+<div class="max-w-3xl">
+  <h1 class="mb-6 text-3xl font-bold tracking-tight"><%= t('frm.forum.edit', title: @forum.title) %></h1>
+  <div class="rounded-box border border-base-300 bg-base-100 p-4 sm:p-6">
+    <%= simple_form_for @forum, url: group_frm_admin_forum_url(@group, @forum) do |f| %>
+      <%= render partial: "form", locals: { f: f } %>
+    <% end %>
+  </div>
+</div>
 
 <% content_for :left_panel do %>
   <%= render partial: 'groups/administration_panel' %>

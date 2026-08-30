@@ -1,15 +1,19 @@
 <% @page_title = "#{@category} - #{@group.name}" %>
 <% @extend = true %>
 
-<div class="breadcrumbs text-sm mb-4">
+<nav class="breadcrumbs text-sm mb-6" aria-label="<%= t('frm.navigation.breadcrumbs') %>">
   <ul>
-    <li><%= link_to t('frm.forum.forums'), group_forums_url(@group) %></li>
-    <li><%= link_to @category, group_frm_category_url(@group, @category) %></li>
+    <li><%= link_to t('frm.forum.forums'), group_forums_url(@group), class: "inline-flex min-h-11 items-center" %></li>
+    <li><span aria-current="page"><%= @category %></span></li>
   </ul>
-</div>
+</nav>
 
-<div class="category">
-  <%= render @category %>
+<div class="space-y-5">
+  <header>
+    <h1 class="text-3xl font-bold tracking-tight"><%= @category %></h1>
+    <p class="mt-2 text-base-content/70"><%= t('frm.categories.show.description') %></p>
+  </header>
+  <%= render "/frm/forums/listing", category: @category %>
 </div>
 
 <% content_for :left_panel do %>

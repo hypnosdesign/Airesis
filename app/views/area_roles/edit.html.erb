@@ -1,11 +1,14 @@
 <nav class="breadcrumbs text-sm">
   <ul>
-    <li><%= link_to 'All working areas', group_group_areas_url(@group) %></li>
+    <li><%= link_to t('pages.groups.edit_work_areas.manage.breadcrumb'), group_group_areas_url(@group) %></li>
     <li><%= link_to @group_area.name, edit_group_group_area_url(@group, @group_area) %></li>
     <li class="current"><%= @area_role.name %></li>
   </ul>
 </nav>
-<%= render partial: 'area_roles/form', locals: {button_name: t('buttons.edit'), remote: false} %>
+<%= render layout: 'layouts/page_title', locals: { title: t('pages.groups.edit_permissions.edit_role_heading', role: @area_role.name) } do %><% end %>
+<div class="max-w-3xl border border-base-content/15 bg-base-100 p-5 sm:p-6">
+  <%= render partial: 'area_roles/form', locals: { button_name: t('buttons.update'), modal: false } %>
+</div>
 <% content_for :left_panel do %>
   <%= render partial: 'groups/administration_panel' %>
 <% end %>

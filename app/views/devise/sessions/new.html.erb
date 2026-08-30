@@ -46,7 +46,7 @@
       <% end %>
 
       <%# Form %>
-      <%= simple_form_for @user, url: user_session_path, html: { class: 'space-y-4' }, data: { turbo: false } do |f| %>
+      <%= simple_form_for @user, url: user_session_path, html: { class: 'space-y-4', id: 'login_user' }, data: { turbo: false } do |f| %>
         <fieldset class="fieldset">
           <%= f.label :email, t('activerecord.attributes.user.email'), class: 'fieldset-label font-medium' %>
           <%= f.input_field :email, required: true, autocomplete: 'email', placeholder: 'name@example.com',

@@ -1,5 +1,7 @@
-<h2 class="text-xl font-bold mb-4"><%= t('frm.admin.category.edit', title: @category.name) %></h2>
-<%= render partial: 'edit', locals: { remote: false } %>
+<div class="max-w-2xl">
+  <h1 class="mb-6 text-3xl font-bold tracking-tight"><%= t('frm.admin.category.edit', title: @category.name) %></h1>
+  <div class="rounded-box border border-base-300 bg-base-100 p-4 sm:p-6"><%= render partial: 'edit', locals: { show_heading: false, turbo: false } %></div>
+</div>
 
 <% content_for :left_panel do %>
   <%= render partial: 'groups/administration_panel' %>

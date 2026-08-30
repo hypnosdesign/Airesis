@@ -29,7 +29,7 @@ module Frm
           flash[:notice] = t('frm.admin.group.created')
           respond_to do |format|
             format.turbo_stream
-            format.html { redirect_to group_frm_admin_frm_mod_url(@group, @frm_mod) }
+            format.html { redirect_to group_frm_admin_mod_url(@group, @frm_mod), status: :see_other }
           end
         else
           flash[:alert] = t('frm.admin.group.not_created')
@@ -40,7 +40,7 @@ module Frm
       def destroy
         @frm_mod.destroy
         flash[:notice] = t('frm.admin.group.deleted')
-        redirect_to group_frm_admin_mods_url(@group)
+        redirect_to group_frm_admin_mods_url(@group), status: :see_other
       end
 
       protected

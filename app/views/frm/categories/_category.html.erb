@@ -1,6 +1,11 @@
 <% if can?(:read, category) %>
-  <div id="category_<%= category.id %>" class="category mb-4">
-    <h2 class="text-xl font-bold mb-2"><%= link_to category.name, group_frm_category_url(@group, category) %></h2>
+  <section id="category_<%= category.id %>" class="category" aria-labelledby="category_<%= category.id %>_title">
+    <div class="mb-3 flex items-end justify-between gap-4">
+      <h2 id="category_<%= category.id %>_title" class="text-xl font-bold">
+        <%= link_to category.name, group_frm_category_url(@group, category), class: "inline-flex min-h-11 items-center rounded-sm underline-offset-4 hover:underline" %>
+      </h2>
+      <span class="text-sm tabular-nums text-base-content/60"><%= t('frm.forums.index.forums_count', count: category.forums.size) %></span>
+    </div>
     <%= render "/frm/forums/listing", category: category %>
-  </div>
+  </section>
 <% end %>

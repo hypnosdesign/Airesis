@@ -32,9 +32,9 @@ class TagsController < ApplicationController
 
   def index
     if params[:q]
-      hint = params[:q] + '%'
+      hint = params.expect(:q) + '%'
       @tags = Tag.includes(:tag_counters).references(:tag_counters).where('upper(text) like upper(?)', hint.strip).
-              order('(groups_count + blog_posts_count + proposals_count) desc').
+              order(Arel.sql('(groups_count + blog_posts_count + proposals_count) desc')).
               limit(10).collect { |t| { id: t.id.to_s, name: t.text } }
 
       respond_to do |format|

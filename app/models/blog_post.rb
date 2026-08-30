@@ -20,6 +20,7 @@ class BlogPost < ApplicationRecord
 
   validates :title, presence: true
   validates :body, presence: true
+  validates :status, inclusion: { in: [PUBLISHED, RESERVED, DRAFT] }
 
   scope :published, -> { where(status: [PUBLISHED, RESERVED]).order('published_at DESC') }
   scope :drafts, -> { where(status: DRAFT).order('published_at DESC') }

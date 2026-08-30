@@ -1,24 +1,34 @@
-<div class="breadcrumbs text-sm mb-4">
+<nav class="breadcrumbs text-sm mb-6" aria-label="<%= t('frm.navigation.breadcrumbs') %>">
   <ul>
     <li><%= link_to t('pages.groups.administration_panel.forum'), group_frm_admin_root_url(@group) %></li>
     <li><%= t("frm.admin.category.index") %></li>
   </ul>
+</nav>
+
+<div>
+  <header class="mb-6 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+    <div>
+      <h1 class="text-3xl font-bold tracking-tight"><%= t('frm.admin.category.index') %></h1>
+      <p class="mt-2 text-base-content/70"><%= t('frm.admin.category.description') %></p>
+    </div>
+    <%= link_to t("frm.admin.category.new_link"), new_group_frm_admin_category_url(@group), class: "btn btn-primary min-h-11" %>
+  </header>
+
+  <div class="overflow-x-auto rounded-box border border-base-300 bg-base-100">
+    <table id="forums" class="table forums" cellspacing="0">
+      <thead>
+        <tr>
+          <th><%= t('category', scope: 'frm.admin.categories') %></th>
+          <th><span class="sr-only"><%= t('edit', scope: 'frm.admin.categories') %></span></th>
+          <th><span class="sr-only"><%= t('delete', scope: 'frm.admin.categories') %></span></th>
+        </tr>
+      </thead>
+      <%= render partial: 'categories' %>
+    </table>
+  </div>
+
+  <div id="category_modal"></div>
 </div>
-
-<table id="forums" class="table forums table-striped" cellspacing="0">
-  <thead>
-    <tr>
-      <th><%= t('category', scope: 'frm.admin.categories') %></th>
-      <th><%= t('edit', scope: 'frm.admin.categories') %></th>
-      <th><%= t('delete', scope: 'frm.admin.categories') %></th>
-    </tr>
-  </thead>
-  <%= render partial: 'categories' %>
-</table>
-
-<%= link_to t("frm.admin.category.new_link"), new_group_frm_admin_category_url(@group), class: "btn btn-primary mt-4" %>
-
-<div id="category_modal"></div>
 
 <% content_for :left_panel do %>
   <%= render partial: 'groups/administration_panel' %>

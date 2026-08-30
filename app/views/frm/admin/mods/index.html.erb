@@ -1,15 +1,21 @@
-<div class="breadcrumbs text-sm mb-4">
+<nav class="breadcrumbs text-sm mb-6" aria-label="<%= t('frm.navigation.breadcrumbs') %>">
   <ul>
     <li><%= link_to t('pages.groups.administration_panel.forum'), group_frm_admin_root_url(@group) %></li>
     <li><%= t('frm.admin.mod.index') %></li>
   </ul>
-</div>
+</nav>
 
-<div id="groups_table">
-  <%= render 'groups' %>
-</div>
+<div>
+  <header class="mb-6 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+    <div>
+      <h1 class="text-3xl font-bold tracking-tight"><%= t('frm.admin.mod.index') %></h1>
+      <p class="mt-2 text-base-content/70"><%= t('frm.admin.mod.description') %></p>
+    </div>
+    <%= link_to t('frm.admin.mod.new'), new_group_frm_admin_mod_url(@group), class: 'btn btn-primary min-h-11', data: { disable_with: t('loading') } %>
+  </header>
 
-<%= link_to t('frm.admin.mod.new'), new_group_frm_admin_mod_url(@group), class: 'btn btn-primary mt-4', data: { disable_with: t('loading') } %>
+  <div id="groups_table"><%= render 'groups' %></div>
+</div>
 
 <% content_for :left_panel do %>
   <%= render 'groups/administration_panel' %>

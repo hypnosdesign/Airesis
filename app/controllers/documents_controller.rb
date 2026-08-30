@@ -1,35 +1,78 @@
 class DocumentsController < ApplicationController
+  include DocumentStorage
+
   layout 'groups'
 
-  before_action :load_group, except: [:view]
+  before_action :load_group
   before_action :authenticate_user!
+  before_action :authorize_document_access
 
   def index
-    authorize! :view_data, @group
-    authorize! :view_documents, @group
+    @documents = document_files
+    @current_storage_size = storage_usage_kilobytes
   end
 
   def view
-    raw_url = params[:url].to_s
-    group_id = raw_url[%r{\A/private/elfinder/([^/]+)/}, 1]
+    file = resolve_document(params[:path])
+    return head :not_found unless file&.file?
 
-    return head :bad_request if group_id.blank?
+    disposition = params[:download].present? || !safe_inline_document?(file) ? 'attachment' : 'inline'
+    send_file file,
+              disposition: disposition,
+              filename: file.basename.to_s
+  end
 
-    @group = Group.find_by(id: group_id)
-    return render_404 if @group.nil?
+  def upload
+    authorize! :manage_documents, @group
+    uploaded_file = params[:document]
 
-    authorize! :view_documents, @group
-
-    # Prevent path traversal: resolve and verify path stays inside group's directory
-    allowed_root = Rails.root.join('private', 'elfinder', @group.id.to_s).cleanpath
-    requested_path = Rails.root.join(raw_url.delete_prefix('/')).cleanpath
-
-    return head :forbidden unless requested_path.to_s.start_with?(allowed_root.to_s + '/')
-
-    if params[:download]
-      send_file requested_path
-    else
-      send_file requested_path, disposition: 'inline'
+    if uploaded_file.blank?
+      redirect_to group_documents_path(@group),
+                  alert: t('pages.groups.documents.upload_missing'),
+                  status: :see_other
+      return
     end
+
+    filename = sanitize_filename(uploaded_file.original_filename)
+    destination = document_root.join(filename)
+    current_bytes = document_files.sum { |document| document[:bytes] }
+    maximum_bytes = @group.max_storage_size.to_i.kilobytes
+
+    if filename.blank? || destination.exist?
+      redirect_to group_documents_path(@group),
+                  alert: t('pages.groups.documents.upload_duplicate'),
+                  status: :see_other
+    elsif maximum_bytes.positive? && current_bytes + uploaded_file.size > maximum_bytes
+      redirect_to group_documents_path(@group),
+                  alert: t('pages.groups.documents.upload_too_large'),
+                  status: :see_other
+    else
+      FileUtils.mkdir_p(document_root)
+      File.open(destination, 'wb') { |file| IO.copy_stream(uploaded_file.tempfile, file) }
+      sync_storage_usage!
+      redirect_to group_documents_path(@group),
+                  notice: t('pages.groups.documents.uploaded', filename: filename),
+                  status: :see_other
+    end
+  end
+
+  def remove
+    authorize! :manage_documents, @group
+    file = resolve_document(params[:path])
+    return head :not_found unless file&.file?
+
+    filename = file.basename.to_s
+    File.delete(file)
+    sync_storage_usage!
+    redirect_to group_documents_path(@group),
+                notice: t('pages.groups.documents.removed', filename: filename),
+                status: :see_other
+  end
+
+  private
+
+  def authorize_document_access
+    authorize! :view_data, @group
+    authorize! :view_documents, @group
   end
 end

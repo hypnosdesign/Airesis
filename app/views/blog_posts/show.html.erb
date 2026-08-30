@@ -1,7 +1,3 @@
-<% if current_user && !Rails.env.test? %>
-  <%= subscribe_to blog_blog_post_path(@blog_post.blog, @blog_post) %>
-<% end %>
-
 <% content_for :html_options do %>
   itemscope itemtype="http://schema.org/Blog"
 <% end %>
@@ -17,21 +13,35 @@
   <meta property="article:tag" content="<%= @blog_post.tags_list %>">
 <% end %>
 
-<% javascript 'endless_page' %>
+<%= render layout: "layouts/page_title", locals: { title: @page_title } do %>
+  <% if can? :update, @blog_post %>
+    <%= link_to (@group ? edit_group_blog_post_path(@group, @blog_post) : edit_blog_blog_post_path(@blog, @blog_post)), class: 'btn min-h-11' do %>
+      <i class="fa-solid fa-pencil" aria-hidden="true"></i>
+      <%= t('pages.blog_posts.show.edit_button') %>
+    <% end %>
+    <details class="relative w-full sm:w-auto">
+      <summary class="btn btn-error min-h-11 w-full sm:w-auto">
+        <i class="fa-regular fa-trash-can" aria-hidden="true"></i>
+        <%= t('pages.blog_posts.show.delete_button') %>
+      </summary>
+      <div class="mt-2 w-full rounded-box border border-base-content/15 bg-base-100 p-4 shadow-lg sm:absolute sm:right-0 sm:z-10 sm:w-72" data-delete-confirmation>
+        <p class="mb-3 text-sm"><%= t('pages.blog_posts.show.delete_button_confirm') %></p>
+        <%= button_to @blog_url,
+                      method: :delete,
+                      class: 'btn btn-error min-h-11 w-full',
+                      form: { data: { turbo: false } } do %>
+          <%= t('pages.blog_posts.show.confirm_delete_button') %>
+        <% end %>
+      </div>
+    </details>
+  <% end %>
+<% end %>
 
 <div class="blogPost">
-  <script type="text/javascript">
-    var pageURL = "<%= @blog_url %>";
-  </script>
-
-  <div class="card bg-base-200 p-4 mb-4">
-    <h1 class="text-2xl font-bold mb-4">
-      <%= blog_post_label @blog_post %>
-      <%= @page_title %>
-    </h1>
-    <div class="blogPostBody mb-4" itemprop="description">
+  <article class="rounded-box bg-base-100 p-5 shadow-sm sm:p-7">
+    <p class="mb-4 text-sm font-semibold text-base-content/70"><%= blog_post_label @blog_post %></p>
+    <div class="blogPostBody prose max-w-[72ch] mb-5" itemprop="description">
       <%= @blog_post.body %>
-      <div class="clearboth"></div>
     </div>
     <div class="blogPostFooter">
       <div class="blogPostPostedAt text-sm text-base-content/60">
@@ -39,7 +49,7 @@
         <%= raw t('pages.blog_posts.list_elements.inserted', name: name, date: (l @blog_post.created_at)) %>
         |
         <span class="blogComments">
-          <%= link_to t('pages.blog_posts.view.comments', count: @blog_post.blog_comments.count), '#blogPostCommentsContainer' %>
+          <%= link_to t('pages.blog_posts.view.comments', count: @blog_post.blog_comments.count), '#blogPostCommentsContainer', class: 'inline-flex min-h-11 items-center' %>
         </span>
       </div>
       <% if ::Configuration::socialnetwork_active %>
@@ -51,57 +61,30 @@
     </div>
     <% unless @blog_post.tags.blank? %>
       <div class="blogPostTags mt-2">
-        <span class="tag_label font-semibold">Tags: </span>
+        <span class="tag_label font-semibold"><%= t('pages.blog_posts.show.tags_title') %> </span>
         <span class="tags_list"><%= tag_links_for(@blog_post) %></span>
       </div>
     <% end %>
+    <% if @blog_post.groups.any? %>
+      <section class="mt-6 border-t border-base-content/15 pt-4" aria-labelledby="published-groups-title">
+        <h2 id="published-groups-title" class="mb-3 text-lg font-bold"><%= t('pages.blog_posts.published_groups') %></h2>
+        <ul class="flex flex-wrap gap-2" role="list">
+          <% @blog_post.groups.each do |group| %>
+            <li><%= link_to group.name, group_url(group), class: 'btn btn-sm min-h-11' %></li>
+          <% end %>
+        </ul>
+      </section>
+    <% end %>
+  </article>
+</div>
+
+<section class="mt-8" aria-labelledby="blog-comments-title">
+  <h2 id="blog-comments-title" class="mb-4 text-2xl font-bold"><%= t('pages.blog_posts.comments_title') %></h2>
+  <div id="blogNewComment" class="blogNewComment mb-6 rounded-box bg-base-100 p-5 shadow-sm">
+    <%= render partial: 'blog_comments/new_blog_comment', locals: { blog_comment: @blog_comment } %>
   </div>
-</div>
-
-<div id="blogNewComment" class="blogNewComment mb-4">
-  <%= render partial: 'blog_comments/new_blog_comment', locals: { blog_comment: @blog_comment } %>
-</div>
-
-<div id="blogPostCommentsContainer">
-  <%= render partial: 'blog_posts/comments' %>
-</div>
-
-<div id="loading_results">
-  <span><%= t('pages.blog_posts.show.previous_comments') %></span>
-</div>
-
-<% content_for :left_panel do %>
-  <% if can? :update, @blog_post %>
-    <div class="card bg-base-200 p-4 mb-4">
-      <%= link_to edit_blog_blog_post_path(@blog_post.blog, @blog_post), class: 'btn btn-sm mb-2 w-full' do %>
-        <i class="fa-solid fa-pencil"></i>
-        <%= t('pages.blog_posts.show.edit_button') %>
-      <% end %>
-      <%= link_to @blog_url, data: { turbo_method: :delete, turbo_confirm: t('pages.blog_posts.show.delete_button_confirm') }, class: 'btn btn-sm w-full' do %>
-        <i class="fa-regular fa-trash-can"></i>
-        <%= t('pages.blog_posts.show.delete_button') %>
-      <% end %>
-    </div>
-  <% end %>
-  <% if ::Configuration.socialnetwork_active %>
-    <div class="card bg-base-200 p-4 mb-4">
-      <a href="https://twitter.com/share" class="twitter-share-button" data-lang="en" data-count="vertical" data-text="<%= t('twitter.share.blog_post', app: APP_SHORT_NAME, tags: @blog_post.tags.for_twitter) %>">Tweet</a>
-      <%= raw facebook_like %>
-      <br>
-    </div>
-  <% end %>
-  <% if @blog_post.groups.count > 0 %>
-    <div class="card bg-base-200 p-4 mb-4">
-      <h4 class="font-bold mb-2">Published on the following groups</h4>
-      <% @blog_post.groups.each do |group| %>
-        <div class="flex items-center gap-2 mb-2 p-2 bg-base-300 rounded">
-          <div class="w-6"><%= group.group_image_tag(24) rescue nil %></div>
-          <div><%= link_to group.name, group_url(group) %></div>
-        </div>
-      <% end %>
-    </div>
-  <% end %>
-  <% if @blog %>
-    <%= render 'blogs/left_panel' %>
-  <% end %>
-<% end %>
+  <div id="blogPostCommentsContainer">
+    <%= render partial: 'blog_posts/comments' %>
+  </div>
+  <div class="mt-6"><%= pagy_nav(@pagy) if @pagy.pages > 1 %></div>
+</section>

@@ -69,7 +69,7 @@
   <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
     <div class="lg:col-span-2">
       <% if params[:action] == 'by_year_and_month' %>
-        <div class="flex items-center gap-3 mb-4">
+        <div class="flex flex-wrap items-center gap-3 mb-4">
           <div class="w-8 h-8 flex items-center justify-center bg-primary/10 text-primary">
             <i class="fa-solid fa-calendar-days text-sm"></i>
           </div>
@@ -96,6 +96,12 @@
             <i class="fa-solid fa-newspaper text-sm"></i>
           </div>
           <h2 class="font-bold text-sm">Blog</h2>
+          <% if can? :post_to, @group %>
+            <%= link_to new_group_blog_post_path(@group), class: 'btn btn-primary btn-sm ml-auto min-h-11' do %>
+              <i class="fa-solid fa-plus" aria-hidden="true"></i>
+              <%= t('pages.groups.show.post_button') %>
+            <% end %>
+          <% end %>
         </div>
         <div id="posts_container">
           <% if @group_posts.any? %>
@@ -167,5 +173,4 @@
 <div id="area_role_modal"></div>
 <div id="participation_role_modal"></div>
 <div id="group_area_modal"></div>
-<div id="event_edit_modal"></div>
 <div id="mod_modal"></div>

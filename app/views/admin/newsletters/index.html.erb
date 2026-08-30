@@ -1,18 +1,23 @@
-<% @newsletters.each do |newsletter| %>
-  <div class="card bg-base-200 p-4 mb-4">
-    <div class="mb-2">
-      <strong><%= newsletter.subject %></strong>
-      <p><%= truncate(newsletter.body.to_s, length: 100) %></p>
-    </div>
-    <div class="mb-2">
-      <%= render 'publish_form', newsletter: newsletter %>
-    </div>
-    <div class="flex gap-2">
-      <%= link_to t('buttons.edit'), edit_admin_newsletter_path(newsletter), class: 'btn btn-sm' %>
-      <%= link_to t('buttons.show'), admin_newsletter_path(newsletter), class: 'btn btn-sm' %>
-      <%= link_to t('buttons.preview'), preview_admin_newsletter_path(newsletter), class: 'btn btn-sm' %>
-    </div>
-  </div>
-<% end %>
+<% @page_title = t('admin_ui.newsletters.title') %>
+<header class="mb-8 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+  <div class="max-w-3xl"><h1 class="text-3xl font-bold tracking-tight"><%= t('admin_ui.newsletters.title') %></h1><p class="mt-2 text-base-content/70"><%= t('admin_ui.newsletters.description') %></p></div>
+  <%= link_to new_admin_newsletter_path, class: 'btn btn-primary min-h-11' do %><i class="fa-solid fa-plus" aria-hidden="true"></i><%= t('buttons.new_newsletter') %><% end %>
+</header>
 
-<%= link_to t('buttons.new_newsletter'), new_admin_newsletter_path, class: 'btn btn-primary' %>
+<% if @newsletters.any? %>
+  <div class="divide-y divide-base-300 rounded-box border border-base-300 bg-base-100">
+    <% @newsletters.order(id: :desc).each do |newsletter| %>
+      <article class="p-4 sm:p-5">
+        <h2 class="break-words text-lg font-semibold"><%= link_to newsletter.subject, admin_newsletter_path(newsletter), class: 'inline-flex min-h-11 items-center underline-offset-4 hover:underline' %></h2>
+        <p class="mt-2 line-clamp-2 break-words text-sm text-base-content/70"><%= strip_tags(newsletter.body.to_s) %></p>
+        <div class="mt-4 flex flex-wrap gap-2">
+          <%= link_to t('buttons.edit'), edit_admin_newsletter_path(newsletter), class: 'btn btn-ghost min-h-11' %>
+          <%= link_to t('buttons.preview'), preview_admin_newsletter_path(newsletter), class: 'btn btn-ghost min-h-11', target: '_blank', rel: 'noopener' %>
+          <%= button_to t('buttons.delete'), admin_newsletter_path(newsletter), method: :delete, class: 'btn btn-error btn-outline min-h-11', data: { turbo_confirm: t('admin_ui.newsletters.delete_confirm', subject: newsletter.subject) } %>
+        </div>
+      </article>
+    <% end %>
+  </div>
+<% else %>
+  <p class="rounded-box border border-base-300 bg-base-100 p-6 text-base-content/70" role="status"><%= t('admin_ui.newsletters.empty') %></p>
+<% end %>

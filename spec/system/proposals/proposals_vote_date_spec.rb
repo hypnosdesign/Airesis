@@ -2,52 +2,62 @@ require 'rails_helper'
 require 'requests_helper'
 require 'cancan/matchers'
 
-RSpec.describe 'decide the votation date for a proposal', :js, seeds: true do
+RSpec.describe 'decide the voting date for a proposal', :js, seeds: true do
   let!(:user) { create(:user) }
   let!(:group) { create(:group, current_user_id: user.id) }
-
-  let!(:proposal) { create(:group_proposal, quorum: group.quorums.active.first, current_user_id: user.id, group_proposals: [GroupProposal.new(group: group)]) }
-  let(:ability) { Ability.new(user) }
+  let!(:proposal) do
+    create(
+      :group_proposal,
+      quorum: group.quorums.active.first,
+      current_user_id: user.id,
+      group_proposals: [GroupProposal.new(group: group)]
+    )
+  end
 
   before do
     login_as user, scope: :user
   end
 
-  it 'can decide the vote date' do
+  def set_datetime(selector, value)
+    page.execute_script(<<~JS, selector, value.strftime('%Y-%m-%dT%H:%M'))
+      const element = document.querySelector(arguments[0]);
+      element.value = arguments[1];
+      element.dispatchEvent(new Event('input', { bubbles: true }));
+      element.dispatchEvent(new Event('change', { bubbles: true }));
+    JS
+  end
+
+  it 'creates a voting window and returns to the proposal' do
     2.times do
-      user = create(:user)
-      create(:positive_ranking, proposal: proposal, user: user)
+      ranker = create(:user)
+      create(:positive_ranking, proposal: proposal, user: ranker)
     end
     proposal.check_phase(true)
     proposal.reload
     expect(proposal).to be_waiting_date
-    expect(ability).to be_able_to(:set_votation_date, proposal)
+
     visit group_proposal_path(group, proposal)
-    expect(page).to have_content I18n.t('pages.proposals.show.create_votation_period')
     click_link I18n.t('pages.proposals.show.choose_new_votation_period_button')
-    within('#create_event_dialog') do
-      title = Faker::Lorem.sentence
-      description = Faker::Lorem.paragraph
-      fill_in I18n.t('activerecord.attributes.event.title'), with: title
-      fill_in I18n.t('activerecord.attributes.event.description'), with: description
 
-      click_link I18n.t('buttons.next')
+    expect(page).to have_current_path(new_group_event_path(group), ignore_query: true)
+    fill_in I18n.t('activerecord.attributes.event.title'), with: 'Proposal voting window'
+    fill_in I18n.t('activerecord.attributes.event.description'), with: 'A clear period for the final decision.'
+    set_datetime('#event_starttime', 2.days.from_now.change(min: 0, sec: 0))
+    set_datetime('#event_endtime', 3.days.from_now.change(min: 0, sec: 0))
+    expect(page).to have_button(I18n.t('pages.events.new.submit'), disabled: false)
+    click_button I18n.t('pages.events.new.submit')
 
-      fill_in I18n.t('activerecord.attributes.event.starttime'), with: (I18n.l 1.day.from_now, format: :datepicker)
-      page.execute_script("$('#event_starttime').fdatetimepicker('hide');")
-      fill_in I18n.t('activerecord.attributes.event.endtime'), with: (I18n.l 3.days.from_now, format: :datepicker)
-      page.execute_script("$('#event_endtime').fdatetimepicker('hide');")
-
-      click_link I18n.t('pages.events.new.submit')
-    end
-    wait_for_ajax
+    expect(page).to have_content(I18n.t('info.events.event_created'), wait: 10)
     expect(page).to have_current_path(group_proposal_path(group, proposal))
-    expect(page).to have_button I18n.t('pages.proposals.show.choose_votation_period_button')
-    visit group_proposal_path(group, proposal)
-    page.execute_script 'window.confirm = function () { return true }'
-    click_button(I18n.t('pages.proposals.show.choose_votation_period_button'))
-    expect(page).to have_content I18n.t('info.proposal.date_selected')
     proposal.reload
+    expect(proposal.vote_period).to be_votation
     expect(proposal).to be_waiting
+    expect(page).to have_content(
+      I18n.t(
+        'pages.proposals.show.votation_message',
+        from: I18n.l(proposal.vote_period.starttime),
+        to: I18n.l(proposal.vote_period.endtime)
+      )
+    )
   end
 end

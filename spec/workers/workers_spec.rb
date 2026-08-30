@@ -90,33 +90,67 @@ RSpec.describe CalculateRankings, type: :worker, seeds: true do
 end
 
 RSpec.describe DeleteOldNotifications, type: :worker, seeds: true do
-  it 'destroys notifications older than 6 months' do
-    user = create(:user)
-    proposal = create(:public_proposal, current_user_id: user.id)
-    notification = Notification.create!(
-      notification_type_id: NotificationType::NEW_PROPOSALS,
-      url: '/',
-      data: { proposal_id: proposal.id },
-      created_at: 7.months.ago
-    )
-    worker = described_class.new
-    result = worker.perform
-    expect(Notification.find_by(id: notification.id)).to be_nil
-    expect(result).to be >= 1
+  before do
+    delivery = instance_double(ActionMailer::MessageDelivery, deliver_later: true)
+    allow(ResqueMailer).to receive(:admin_message).and_return(delivery)
+    allow_any_instance_of(Alert).to receive(:send_email)
+    allow_any_instance_of(Alert).to receive(:broadcast_notification)
+    allow_any_instance_of(Alert).to receive(:complete_alert_job)
   end
 
-  it 'does not destroy recent notifications' do
-    user = create(:user)
-    proposal = create(:public_proposal, current_user_id: user.id)
-    notification = Notification.create!(
+  def create_notification(created_at:)
+    Notification.create!(
       notification_type_id: NotificationType::NEW_PROPOSALS,
       url: '/',
-      data: { proposal_id: proposal.id },
-      created_at: 1.day.ago
+      data: {},
+      created_at: created_at
     )
-    worker = described_class.new
-    worker.perform
-    expect(Notification.find_by(id: notification.id)).to be_present
+  end
+
+  def add_alert(notification, checked:)
+    user = create(:user)
+    Alert.unscoped.create!(notification: notification, user: user, trackable: user, checked: checked, properties: {})
+  end
+
+  it 'deletes unread notifications beyond the absolute six-month retention' do
+    notification = create_notification(created_at: 7.months.ago)
+    add_alert(notification, checked: false)
+
+    expect(described_class.new.perform).to eq(1)
+    expect(Notification.exists?(notification.id)).to be(false)
+  end
+
+  it 'keeps unread notifications inside the absolute retention' do
+    notification = create_notification(created_at: 2.months.ago)
+    add_alert(notification, checked: false)
+
+    expect(described_class.new.perform).to eq(0)
+    expect(Notification.exists?(notification.id)).to be(true)
+  end
+
+  it 'deletes read notifications older than one month without double-counting' do
+    expired = create_notification(created_at: 7.months.ago)
+    stale_read = create_notification(created_at: 2.months.ago)
+    add_alert(expired, checked: true)
+    add_alert(stale_read, checked: true)
+
+    expect(described_class.new.perform).to eq(2)
+  end
+
+  it 'keeps recent read notifications' do
+    notification = create_notification(created_at: 1.day.ago)
+    add_alert(notification, checked: true)
+
+    expect(described_class.new.perform).to eq(0)
+    expect(Notification.exists?(notification.id)).to be(true)
+  end
+
+  it 'processes large scopes through bounded batches' do
+    stub_const('DeleteOldNotifications::BATCH_SIZE', 1)
+    notifications = Array.new(3) { create_notification(created_at: 7.months.ago) }
+
+    expect(described_class.new.perform).to eq(3)
+    expect(Notification.where(id: notifications).count).to eq(0)
   end
 end
 

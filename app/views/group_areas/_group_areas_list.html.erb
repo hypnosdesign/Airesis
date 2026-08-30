@@ -1,32 +1,66 @@
-<ul class="grid grid-cols-1 lg:grid-cols-3 gap-4">
+<% if @group_areas.any? %>
+<ul class="grid grid-cols-1 gap-5 xl:grid-cols-2" role="list">
   <% @group_areas.each do |area| %>
     <li>
-      <div class="card bg-base-200 p-4 group_area" id="group<%= area.id %>">
-        <div>
-          <span class="remove_area_button">
-            <br>
-            <% if can? :destroy, area %>
-              <%= link_to t('buttons.delete'), [@group, area], data: { turbo_method: :delete }, turbo_confirm: t('pages.groups.edit_work_areas.manage.confirm_deletion') %>
+      <section class="h-full border border-base-content/15 bg-base-100 p-5" id="group<%= area.id %>">
+        <div class="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+          <div class="min-w-0">
+            <h2 class="text-xl font-extrabold">
+              <%= link_to area.name, edit_group_group_area_url(@group, area), class: 'inline-flex min-h-11 items-center underline-offset-4 hover:underline' %>
+            </h2>
+            <% if area.description.present? %>
+              <p class="mt-1 text-sm text-base-content/70"><%= area.description %></p>
             <% end %>
-          </span>
+          </div>
+          <% if can? :destroy, area %>
+            <%= link_to [@group, area],
+                        class: 'btn btn-ghost min-h-11 text-error',
+                        data: { turbo_method: :delete, turbo_confirm: t('pages.groups.edit_work_areas.manage.confirm_deletion') } do %>
+              <i class="fa-regular fa-trash-can" aria-hidden="true"></i>
+              <%= t('buttons.delete') %>
+            <% end %>
+          <% end %>
         </div>
-        <div class="group_area_name">
-          <%= link_to area.name, edit_group_group_area_url(@group, area) %>
-        </div>
-        <div style="clear:both;"></div>
-        <%= link_to t('pages.groups.edit_quorums.participants'), '#', class: 'btn areas_button', data: {g_id: area.id} %>
-        <div class="areas_list shadow-box">
-          <ul>
+
+        <% participations_by_user = area.area_participations.index_by(&:user_id) %>
+        <details class="mt-5 border-t border-base-content/10 pt-3">
+          <summary class="flex min-h-11 cursor-pointer items-center gap-2 font-bold">
+            <i class="fa-solid fa-users" aria-hidden="true"></i>
+            <%= t('pages.groups.edit_quorums.participants') %>
+            <span class="badge badge-neutral"><%= participations_by_user.size %></span>
+          </summary>
+          <ul class="mt-3 divide-y divide-base-content/10" role="list">
             <% @group_participations.each do |participant| %>
-              <li>
-                <input type="checkbox" data-user_id="<%= participant.id %>" data-group_area_id="<%= area.id %>" data-change-area-participation <% if area.participants.include? participant %> checked='checked' <% end %>>
-                <%= participant.fullname %>
+              <% participation = participations_by_user[participant.id] %>
+              <li id="area_<%= area.id %>_participant_<%= participant.id %>" class="flex min-h-14 items-center justify-between gap-3 py-2">
+                <span class="flex min-w-0 items-center gap-3">
+                  <%= avatar(participant, size: 32) %>
+                  <span class="truncate font-semibold"><%= participant.fullname %></span>
+                </span>
+                <% if participation %>
+                  <%= button_to t('pages.groups.edit_work_areas.manage.remove_participant'),
+                                [@group, area, participation],
+                                method: :delete,
+                                params: { area_participation: { user_id: participant.id } },
+                                class: 'btn btn-ghost min-h-11 text-error',
+                                form: { data: { turbo_confirm: t('pages.groups.edit_work_areas.manage.confirm_remove_participant', name: participant.fullname) } } %>
+                <% else %>
+                  <%= button_to t('pages.groups.edit_work_areas.manage.add_participant'),
+                                group_group_area_area_participations_path(@group, area),
+                                params: { area_participation: { user_id: participant.id } },
+                                class: 'btn btn-ghost min-h-11' %>
+                <% end %>
               </li>
             <% end %>
           </ul>
-        </div>
-        <div style="clear:both;"></div>
-      </div>
+        </details>
+      </section>
     </li>
   <% end %>
 </ul>
+<% else %>
+  <section class="border border-dashed border-base-content/25 bg-base-100 px-6 py-10 text-center">
+    <h2 class="text-xl font-extrabold"><%= t('pages.groups.edit_work_areas.manage.empty_title') %></h2>
+    <p class="mx-auto mt-2 max-w-xl text-base-content/70"><%= t('pages.groups.edit_work_areas.manage.empty_description') %></p>
+  </section>
+<% end %>

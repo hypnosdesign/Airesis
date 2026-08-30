@@ -1,4 +1,6 @@
 <% @page_title = t('pages.moderator_panel.title') %>
-<% if is_moderator? %>
-  <%= render 'admin/block_users' %>
-<% end %>
+<header class="mb-8 max-w-3xl">
+  <h1 class="text-3xl font-bold tracking-tight"><%= t('pages.moderator_panel.title') %></h1>
+  <p class="mt-2 text-base-content/70"><%= t('admin_ui.users.description') %></p>
+</header>
+<%= render 'admin/block_users' %>

@@ -1,5 +1,7 @@
 en-EU:
   frm:
+    navigation:
+      breadcrumbs: Breadcrumb
     general:
       forum: Forum
       topics: Topics
@@ -16,12 +18,14 @@ en-EU:
     access_denied: "You are not allowed to do that."
     admin:
       area: Admin Area
+      description: "Configure the discussion spaces and moderation team for %{group}."
       back_to_admin: "Back to Admin"
       back_to_forums: "Back to forums"
       back_to_groups: "Back to groups"
       forum:
         moderator_groups: Moderator groups
         index: Manage Forums
+        description: Organize discussion spaces, visibility, and moderation.
         new: Creating a new forum
         new_link: New Forum
         deleted: The selected forum has been deleted
@@ -29,6 +33,14 @@ en-EU:
         not_created: This forum could not be created
         updated: This forum has been updated.
         not_updated: This forum could not be updated
+        empty: No forums have been configured yet.
+        form:
+          category_hint: Choose where this forum appears in the public directory.
+          description_hint: Explain the purpose and scope of this discussion space.
+          visibility_hint: Public forums can be read outside the group.
+          moderators_hint: Assign only the teams that should review content in this forum.
+          no_categories_title: Create a category first
+          no_categories_description: Every forum needs a category before it can be created.
       forums:
         edit: Edit
         delete: Delete
@@ -45,6 +57,11 @@ en-EU:
         default_public_description: "Forum visible to all Airesis users. Also users that are not in the group"
       mod:
         index: Manage Groups
+        description: Create teams that can review specific forums.
+        members_count:
+          one: 1 moderator
+          other: "%{count} moderators"
+        members_description: Add or review the people assigned to this moderation team.
         new: New Group
         created: The group was successfully created
         not_created: Group could not be created
@@ -55,11 +72,15 @@ en-EU:
           add_member: Add
           add_a_new_member: "Add a new member"
           current_members: "Current Members"
+          member_not_found: The selected user could not be found
+          no_members: No moderators have been added yet.
+          select_member: Select a group participant
         edit: Edit
         delete: Delete
         name: Name
       category:
         index: Manage Forum Categories
+        description: Group forums into clear sections for members and visitors.
         new: Creating a new Forum Category
         edit: "Editing the %{title} category"
         new_link: New Forum Category
@@ -108,10 +129,27 @@ en-EU:
     forums:
       index:
         title: Forum
+        description: "Join the discussions and follow the decisions taking shape in %{group}."
+        empty_title: No forum sections yet
+        empty_description: The group has not opened a discussion space yet.
+        forums_count:
+          one: 1 forum
+          other: "%{count} forums"
         forum: Forum
         views: Views
         last_post: 'Last Post:'
         none: None
+      show:
+        topic_count:
+          one: 1 topic in this forum
+          other: "%{count} topics in this forum"
+        empty_description: Start the first discussion when you are ready.
+      visibility:
+        public: Public
+        private: Group members
+    categories:
+      show:
+        description: Browse the discussion spaces in this section.
     topic:
       headings:
         topic: Topic
@@ -140,6 +178,10 @@ en-EU:
         new: New topic
         back_to_topics: Back to topics
         edit: Edit topic
+      form:
+        description: "Open a focused discussion in %{forum}."
+        subject_hint: Use a specific title that makes the question clear.
+        editor_hint: On smaller screens, swipe the formatting toolbar sideways to reveal every tool.
       not_found: The topic you are looking for could not be found
       hidden:
         'true': This topic is now hidden
@@ -168,7 +210,14 @@ en-EU:
           'true': Unpin this topic
           'false': Pin this topic
         related_proposals: "Related proposals"
+      unsubscribe_confirmation:
+        title: Stop following this topic?
+        description: "You will no longer receive updates about “%{topic}”."
     post:
+      actions: Post actions
+      form:
+        description: Add your contribution to the discussion.
+        editor_hint: On smaller screens, swipe the formatting toolbar sideways to reveal every tool.
       buttons:
         reply: Post Reply
         edit: Edit
@@ -189,12 +238,23 @@ en-EU:
         approve: Approve
         spam: Spam
         success: The selected posts have been moderated
+        invalid: The moderation request was invalid. No content outside this forum was changed.
       post:
         pending_review: This post is currently pending review. Only the user who posted it and moderators can view it.
         in_reply_to: in reply to
+        deleted_user: Deleted user
     moderation:
       index:
         title: "Moderation tools for %{forum}"
+        description: Review pending discussions and replies before they become visible to the community.
+        pending_topics: Topics awaiting review
+        pending_posts: Replies awaiting review
+        no_topics: No topics are waiting for review.
+        no_posts: No replies are waiting for review.
+      options:
+        legend: Moderation decision
+      status:
+        pending: Pending review
   helpers:
     submit:
       frm_forum:

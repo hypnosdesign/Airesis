@@ -4,7 +4,10 @@
     <li class="current"><%= @participation_role.name %></li>
   </ul>
 </nav>
-<%= render(partial: 'participation_roles/form', locals: {button_name: t('buttons.update')}) %>
+<%= render layout: 'layouts/page_title', locals: { title: t('pages.groups.edit_permissions.edit_role_heading', role: @participation_role.name) } do %><% end %>
+<div class="max-w-3xl border border-base-content/15 bg-base-100 p-5 sm:p-6">
+  <%= render partial: 'participation_roles/form', locals: { button_name: t('buttons.update'), modal: false } %>
+</div>
 <% content_for :left_panel do %>
   <%= render partial: 'groups/administration_panel' %>
 <% end %>

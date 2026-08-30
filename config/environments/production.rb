@@ -12,8 +12,9 @@ Rails.application.configure do
 
   config.i18n.fallbacks = true
 
-  # JS minification handled by esbuild; CSS by tailwindcss-rails
-  config.assets.css_compressor = :sass
+  # JS is bundled by esbuild and CSS by Tailwind/RailsAdmin. Legacy Sass compressors
+  # cannot parse Tailwind 4 media-range syntax, so Sprockets must preserve the output.
+  config.assets.css_compressor = nil
 
   config.action_mailer.perform_deliveries = true
 

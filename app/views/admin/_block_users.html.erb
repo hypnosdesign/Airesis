@@ -1,23 +1,32 @@
-<div class="card bg-base-200 p-4 mb-4">
-  <h3 class="text-lg font-bold mb-2">Lock users</h3>
-  <%= form_tag block_admin_users_path do %>
-    <%= label_tag 'Blocca utente' %>
-    <%= text_field_tag 'user_id', nil, class: 'input input-bordered w-full max-w-xs' %>
-    <%= submit_tag 'Vai!', class: 'btn btn-primary btn-sm mt-2' %>
-  <% end %>
-</div>
-
-<div class="card bg-base-200 p-4">
-  <h3 class="text-lg font-bold mb-2">Elenco utenti bloccati</h3>
-  <ul class="list-disc pl-4">
-    <% User.blocked.each do |user| %>
-      <li class="mb-1">
-        <%= link_to "#{user.id}: #{user.blocked_name} #{user.blocked_surname} (#{user.email})", user %>
-        <%= link_to unblock_admin_user_path(user), class: 'btn btn-sm btn-ghost' do %>
-          <i class="fa-solid fa-unlock"></i>
-          <%= t('buttons.unlock') %>
-        <% end %>
-      </li>
+<div class="grid gap-6 lg:grid-cols-[minmax(0,2fr)_minmax(18rem,3fr)]">
+  <% heading_tag = local_assigns.fetch(:heading_tag, :h2) %>
+  <div>
+    <%= content_tag heading_tag, t('admin_ui.users.block_title'), class: 'text-lg font-bold' %>
+    <p id="block_user_hint" class="mt-1 text-sm text-base-content/70"><%= t('admin_ui.users.block_hint') %></p>
+    <%= form_with url: block_admin_users_path, method: :post, class: 'mt-4' do |f| %>
+      <%= f.label :user_id, t('admin_ui.users.identifier'), class: 'label font-medium' %>
+      <%= f.text_field :user_id, required: true, autocomplete: 'off', class: 'input input-bordered min-h-11 w-full', aria: { describedby: 'block_user_hint' } %>
+      <%= f.submit t('admin_ui.users.block_action'), class: 'btn btn-error btn-outline mt-3 min-h-11', data: { turbo_confirm: t('admin_ui.users.block_confirm'), disable_with: t('loading') } %>
     <% end %>
-  </ul>
+  </div>
+
+  <div>
+    <%= content_tag heading_tag, t('admin_ui.users.blocked_title'), class: 'text-lg font-bold' %>
+    <% if User.blocked.exists? %>
+      <ul class="mt-3 divide-y divide-base-300 rounded-box border border-base-300 bg-base-100">
+        <% User.blocked.order(:id).find_each do |user| %>
+          <li class="flex flex-col gap-3 p-4 sm:flex-row sm:items-center sm:justify-between">
+            <%= link_to user_path(user), class: 'inline-flex min-h-11 min-w-0 items-center break-all font-medium underline-offset-4 hover:underline' do %>
+              <%= user.id %>: <%= user.blocked_name %> <%= user.blocked_surname %> (<%= user.email %>)
+            <% end %>
+            <%= button_to unblock_admin_user_path(user), method: :patch, class: 'btn btn-outline min-h-11', data: { turbo_confirm: t('admin_ui.users.unblock_confirm', id: user.id) } do %>
+              <i class="fa-solid fa-unlock" aria-hidden="true"></i><%= t('buttons.unlock') %>
+            <% end %>
+          </li>
+        <% end %>
+      </ul>
+    <% else %>
+      <p class="mt-3 rounded-box border border-base-300 bg-base-100 p-5 text-base-content/70" role="status"><%= t('admin_ui.users.empty') %></p>
+    <% end %>
+  </div>
 </div>

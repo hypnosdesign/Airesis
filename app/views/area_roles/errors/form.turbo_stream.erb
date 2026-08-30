@@ -1,0 +1,11 @@
+<%= turbo_stream.replace "area_role_modal" do %>
+  <dialog id="area_role_modal" data-controller="modal" class="modal" aria-labelledby="area-role-dialog-title">
+    <div class="modal-box shadow-brutal border-2 border-base-content max-w-3xl">
+      <%= render partial: "area_roles/form", locals: { button_name: (@area_role.persisted? ? t("buttons.update") : t("buttons.create")), modal: true } %>
+    </div>
+    <form method="dialog" class="modal-backdrop" data-action="click->modal#backdropClose">
+      <button><%= t('buttons.close') %></button>
+    </form>
+  </dialog>
+<% end %>
+<%= render partial: "layouts/flash_stream" %>

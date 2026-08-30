@@ -57,11 +57,16 @@ RSpec.configure do |config|
   end
 
   config.before(:each, type: :system, js: true) do
-    driven_by :selenium_chrome_headless
+    driven_by :selenium, using: :headless_chrome, screen_size: [1400, 1400] do |options|
+      chrome_binary = ENV.fetch('CHROME_BIN', nil)
+      options.binary = chrome_binary if chrome_binary && File.executable?(chrome_binary)
+      options.add_argument('--no-sandbox')
+      options.add_argument('--disable-dev-shm-usage')
+    end
   end
 
   config.after(:each, type: :system, js: true) do |example|
-    errors = page.driver.browser.manage.logs.get(:browser)
+    errors = page.driver.browser.logs.get(:browser)
     if errors.present? && example.metadata[:ignore_javascript_errors].blank?
       aggregate_failures 'javascript errors' do
         errors.each do |error|
@@ -84,7 +89,7 @@ RSpec.configure do |config|
   end
 
   config.before do |x|
-    Rails.logger.debug("RSpec #{x.metadata[:location]} #{x.metadata[:description]}")
+    Rails.logger.debug { "RSpec #{x.metadata[:location]} #{x.metadata[:description]}" }
   end
 end
 

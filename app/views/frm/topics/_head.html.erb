@@ -1,8 +1,8 @@
-<div class="breadcrumbs text-sm mb-4">
+<nav class="breadcrumbs mb-6 text-sm" aria-label="<%= t('frm.navigation.breadcrumbs') %>">
   <ul>
-    <li><%= link_to t('frm.forum.forums'), group_forums_url(@group) %></li>
-    <li><%= link_to topic.forum.category, group_frm_category_url(@group, topic.forum.category) %></li>
-    <li><%= link_to topic.forum.title, group_forum_url(@group, topic.forum) %></li>
-    <li><%= topic.subject %></li>
+    <li><%= link_to t('frm.forum.forums'), group_forums_url(@group), class: "inline-flex min-h-11 items-center" %></li>
+    <li><%= link_to topic.forum.category, group_frm_category_url(@group, topic.forum.category), class: "inline-flex min-h-11 items-center" %></li>
+    <li><%= link_to topic.forum.title, group_forum_url(@group, topic.forum), class: "inline-flex min-h-11 items-center" %></li>
+    <li><span aria-current="page"><%= topic.subject %></span></li>
   </ul>
-</div>
+</nav>

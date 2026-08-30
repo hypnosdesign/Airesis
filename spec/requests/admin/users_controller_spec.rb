@@ -3,70 +3,73 @@ require 'requests_helper'
 
 RSpec.describe Admin::UsersController, seeds: true do
   let!(:admin) { create(:admin) }
+  let!(:moderator) { create(:user, user_type_id: User.user_type_ids[:moderator]) }
   let!(:user) { create(:user) }
 
-  # Admin routes have routing constraints — non-admins/unauthenticated see 404
-  describe 'GET autocomplete' do
-    it 'returns 404 or redirect when not authenticated (routing constraint)' do
-      get autocomplete_admin_users_path
-      expect([302, 404]).to include(response.status)
-    end
+  it 'does not route account controls for guests' do
+    post block_admin_users_path, params: { user_id: user.id }
 
-    it 'returns 404 for non-admin users (routing constraint)' do
-      sign_in user
-      get autocomplete_admin_users_path
-      expect([302, 403, 404]).to include(response.status)
-    end
-
-    it 'returns results for admin' do
-      sign_in admin
-      get autocomplete_admin_users_path, params: { q: user.name }
-      expect([200, 500]).to include(response.status)
-    end
+    expect(response).to have_http_status(:not_found)
   end
 
-  describe 'GET unblock' do
-    it 'returns 404 or redirect when not authenticated' do
-      get unblock_admin_user_path(user)
-      expect([302, 404]).to include(response.status)
-    end
+  it 'allows a moderator to autocomplete regular users' do
+    sign_in moderator
 
-    it 'unblocks the user when admin' do
-      user.update!(blocked: true, blocked_name: user.name, blocked_surname: user.surname)
-      sign_in admin
-      get unblock_admin_user_path(user)
-      expect([200, 302, 500]).to include(response.status)
-    end
+    get autocomplete_admin_users_path, params: { term: user.name }
 
-    it 'handles already-unblocked user' do
-      sign_in admin
-      get unblock_admin_user_path(user)
-      expect([200, 302, 500]).to include(response.status)
-    end
+    expect(response).to have_http_status(:ok)
+    expect(response.parsed_body).to be_an(Array)
+    expect(response.parsed_body.pluck('id')).to contain_exactly(user.id)
   end
 
-  describe 'POST block' do
-    it 'returns 404 or redirect when not authenticated' do
-      post block_admin_users_path, params: { user_id: user.id }
-      expect([302, 404]).to include(response.status)
-    end
+  it 'blocks a regular user by exact email and redirects with 303' do
+    sign_in moderator
 
-    it 'blocks the user when admin (by user_id)' do
-      sign_in admin
-      post block_admin_users_path, params: { user_id: user.id }
-      expect([200, 302, 500]).to include(response.status)
-    end
+    post block_admin_users_path, params: { user_id: user.email.upcase }
 
-    it 'handles lookup by email' do
-      sign_in admin
-      post block_admin_users_path, params: { user_id: user.email }
-      expect([200, 302, 500]).to include(response.status)
-    end
+    expect(response).to have_http_status(:see_other)
+    expect(user.reload).to be_blocked
+    expect(user.name).to eq('Utente')
+    expect(user.blocked_name).to be_present
+  end
 
-    it 'handles non-existent user' do
-      sign_in admin
-      post block_admin_users_path, params: { user_id: 'no-such-user-12345' }
-      expect([200, 302, 500]).to include(response.status)
-    end
+  it 'returns 404 for a missing target without side effects' do
+    sign_in moderator
+
+    expect do
+      post block_admin_users_path, params: { user_id: 'no-such-user@example.test' }
+    end.not_to change(User.where(blocked: true), :count)
+
+    expect(response).to have_http_status(:not_found)
+  end
+
+  it 'protects the current and every privileged account' do
+    sign_in admin
+
+    post block_admin_users_path, params: { user_id: admin.id }
+    expect(response).to have_http_status(:see_other)
+    expect(admin.reload).not_to be_blocked
+
+    post block_admin_users_path, params: { user_id: moderator.id }
+    expect(moderator.reload).not_to be_blocked
+  end
+
+  it 'does not unblock through GET' do
+    user.update!(blocked: true, blocked_name: user.name, blocked_surname: user.surname, name: 'Utente', surname: 'Eliminato')
+    sign_in moderator
+
+    get unblock_admin_user_path(user)
+    expect(response).to have_http_status(:not_found)
+    expect(user.reload).to be_blocked
+  end
+
+  it 'restores a blocked account through PATCH' do
+    user.update!(blocked: true, blocked_name: user.name, blocked_surname: user.surname, name: 'Utente', surname: 'Eliminato')
+    sign_in moderator
+
+    patch unblock_admin_user_path(user)
+    expect(response).to have_http_status(:see_other)
+    expect(user.reload).not_to be_blocked
+    expect(user.name).not_to eq('Utente')
   end
 end

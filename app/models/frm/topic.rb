@@ -4,6 +4,8 @@ module Frm
     include Taggable
     include Workflow
 
+    MODERATION_OPTIONS = %w[approve spam].freeze
+
     workflow_column :state
     workflow do
       state :pending_review do
@@ -43,9 +45,9 @@ module Frm
     validates :user, presence: true
 
     before_validation :set_first_post_user, on: :create
-    after_save :approve_user_and_posts, if: :approved?
+    before_validation :apply_default_moderation_state, on: :create
+    after_update :approve_user_and_posts, if: :saved_change_to_state?
     after_create :subscribe_poster
-    after_create :skip_pending_review
     after_commit :send_notifications, on: :create
 
     class << self
@@ -86,7 +88,33 @@ module Frm
     end
 
     def moderate!(option)
-      send("#{option}!")
+      normalized_option = option.to_s
+      raise ArgumentError, 'Unsupported moderation option' unless MODERATION_OPTIONS.include?(normalized_option)
+
+      public_send("#{normalized_option}!")
+    end
+
+    # Workflow 4.x does not read the custom Rails 8 state column reliably.
+    # Keep UI predicates tied to the persisted source of truth.
+    def pending_review?
+      state == 'pending_review'
+    end
+
+    def approved?
+      state == 'approved'
+    end
+
+    def spam?
+      state == 'spam'
+    end
+
+    # workflow 4.x does not persist its custom state column under Rails 8.
+    def approve!
+      update!(state: 'approved')
+    end
+
+    def spam!
+      update!(state: 'spam')
     end
 
     # A Topic cannot be replied to if it's locked.
@@ -139,15 +167,15 @@ module Frm
       end
     end
 
-    def skip_pending_review
-      update_attribute(:state, 'approved')
+    def apply_default_moderation_state
+      self.state = 'approved' if state.blank? || state == 'pending_review'
     end
 
     def approve_user_and_posts
-      return unless state_changed?
+      return unless approved?
 
       first_post = posts.by_created_at.first
-      first_post.approve! unless first_post.approved?
+      first_post&.approve! unless first_post&.approved?
     end
 
     def send_notifications

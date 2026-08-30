@@ -98,9 +98,10 @@ class ResqueMailer < ApplicationMailer
     @user = User.find(user_id)
     @newsletter = Newsletter.find(newsletter_id)
     I18n.locale = @user.locale.key || 'en-EU'
+    @newsletter_body = ApplicationController.helpers.sanitize(@newsletter.body)
 
     mail(subject: @newsletter.subject, to: @user.email) do |format|
-      format.html { render inline: @newsletter.body, layout: 'newsletters/default' }
+      format.html { render :publish, layout: 'newsletters/default' }
     end
   end
 

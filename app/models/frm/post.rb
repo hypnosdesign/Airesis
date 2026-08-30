@@ -2,6 +2,8 @@ module Frm
   class Post < FrmTable
     include Workflow
 
+    MODERATION_OPTIONS = %w[approve spam].freeze
+
     workflow_column :state
     workflow do
       state :pending_review do
@@ -28,6 +30,7 @@ module Frm
     has_rich_text :text
 
     validates :text, presence: true
+    validate :reply_to_belongs_to_topic
 
     delegate :forum, to: :topic
 
@@ -35,12 +38,10 @@ module Frm
 
     after_create :set_topic_last_post_at
     after_create :subscribe_replier
-    after_create :skip_pending_review
+    before_validation :apply_default_moderation_state, on: :create
 
     before_create :populate_token
 
-    after_save :approve_user, if: :approved?
-    after_save :blacklist_user, if: :spam?
     after_save :email_topic_subscribers, if: proc { |p| p.approved? && !p.notified? }
 
     class << self
@@ -82,13 +83,47 @@ module Frm
         joins(:topic).where(frm_topics: { state: 'approved' })
       end
 
-      def moderate!(posts)
-        posts.each do |post_id, moderation|
-          # We use find_by_id here just in case a post has been deleted.
-          post = Post.find_by(id: post_id)
-          post&.send("#{moderation[:moderation_option]}!")
+      def moderate!(posts, scope: all)
+        transaction do
+          posts.each do |post_id, moderation|
+            option = moderation.fetch('moderation_option', moderation[:moderation_option]).to_s
+            next if option.blank?
+
+            scope.find(post_id).moderate!(option)
+          end
         end
       end
+    end
+
+    def moderate!(option)
+      normalized_option = option.to_s
+      raise ArgumentError, 'Unsupported moderation option' unless MODERATION_OPTIONS.include?(normalized_option)
+
+      public_send("#{normalized_option}!")
+    end
+
+    # Workflow 4.x does not read the custom Rails 8 state column reliably.
+    # Keep UI predicates tied to the persisted source of truth.
+    def pending_review?
+      state == 'pending_review'
+    end
+
+    def approved?
+      state == 'approved'
+    end
+
+    def spam?
+      state == 'spam'
+    end
+
+    # workflow 4.x updates its in-memory state but does not persist the custom
+    # Rails 8 column. Keep the public events while making persistence explicit.
+    def approve!
+      update!(state: 'approved')
+    end
+
+    def spam!
+      update!(state: 'spam')
     end
 
     def user_auto_subscribe?
@@ -127,8 +162,8 @@ module Frm
       topic.update_attribute(:last_post_at, created_at)
     end
 
-    def skip_pending_review
-      approve!
+    def apply_default_moderation_state
+      self.state = 'approved' if state.blank? || state == 'pending_review'
     end
 
     def populate_token
@@ -138,12 +173,8 @@ module Frm
       end
     end
 
-    def approve_user
-
-    end
-
-    def blacklist_user
-      user&.update_attribute(:forem_state, 'spam')
+    def reply_to_belongs_to_topic
+      errors.add(:reply_to, :invalid) if reply_to && topic && reply_to.topic_id != topic_id
     end
   end
 end

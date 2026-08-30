@@ -1,6 +1,15 @@
 <%= turbo_stream.append "eventCommentsContainer" do %>
-  <%= render "events/comments" %>
+  <% @event_comments.each do |comment| %>
+    <%= render partial: "event_comments/comment", locals: { comment: comment } %>
+  <% end %>
 <% end %>
-<% unless @pagy.next %>
-  <%= turbo_stream.remove "loading_results" %>
+<%= turbo_stream.remove "event_comments_pagination" %>
+<% if @pagy.next %>
+  <%= turbo_stream.append "eventCommentsContainer" do %>
+    <div id="event_comments_pagination" class="mt-4 text-center">
+      <% comments_path = @group ? group_event_path(@group, @event, page: @pagy.next) : event_path(@event, page: @pagy.next) %>
+      <%= link_to t('pages.events.show.previous_comments'), comments_path,
+                  class: 'btn min-h-11', data: { turbo_stream: true } %>
+    </div>
+  <% end %>
 <% end %>

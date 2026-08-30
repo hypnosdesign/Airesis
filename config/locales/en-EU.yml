@@ -8,6 +8,9 @@ en-EU:
   open_space: 'Open space'
   hello: 'Hello world'
   pages:
+    announcements:
+      dismiss: "Dismiss"
+      dismiss_label: "Dismiss this announcement"
     accessibility:
       skip_to_content: "Skip to main content"
     sidebar:
@@ -159,6 +162,7 @@ en-EU:
         title: 'Manage group events'
       edit_permissions:
         title: 'Manage roles and permissions'
+        description: 'Define what each role can do. Open one role at a time, review its permissions, then save the changes explicitly.'
         new_role: "Add a new role"
         edit_role_title: "Edit role"
         new_role_title: "New role"
@@ -166,6 +170,15 @@ en-EU:
         role_title: "Role"
         no_users_yet: "Here you will be able to manage participants roles, when there are any."
         default_role: "Default role in the group"
+        default_badge: "Default"
+        default_protected: "Default role — protected from deletion"
+        members_count: "%{count} members"
+        save_permissions: "Save permissions"
+        proposal_permissions: "Proposals and decisions"
+        community_permissions: "Community and events"
+        document_permissions: "Documents"
+        edit_role_heading: "Edit %{role}"
+        role_for: "Role for %{name}"
         confirm_role_deletion: "Are you sure you want to delete this role?"
         remove_user: "Remove user"
         confirm_role_change1: "The role of the user"
@@ -231,6 +244,7 @@ en-EU:
         home_button: "WALL"
         proposals_button: "PROPOSALS"
         calendar: "CALENDAR"
+        navigation_hint: "Swipe to see all group sections."
       show:
         community: "Group community"
         community_hint:
@@ -287,6 +301,24 @@ en-EU:
         max_storage_size: "Maximum storage size available"
         current_storage_usage: "Storage size usage"
         not_authorized: "You don't have the required permissions to view the documents. Please contact the group administrator"
+        storage_progress: "Storage used: %{percentage}%"
+        choose_file: "Choose a document"
+        upload: "Upload"
+        upload_missing: "Choose a file before uploading."
+        upload_duplicate: "A document with that name already exists. Rename it and try again."
+        upload_too_large: "This document would exceed the group's storage limit."
+        uploaded: "%{filename} was uploaded."
+        removed: "%{filename} was removed."
+        files_title: "Shared files"
+        files_count:
+          one: "1 file"
+          other: "%{count} files"
+        open: "Open"
+        download: "Download"
+        remove_confirm: "Remove %{filename}? This cannot be undone."
+        empty_title: "No shared documents yet"
+        empty_manage: "Upload the first file to give participants one reliable place for supporting material."
+        empty_view: "Group managers have not shared any files yet."
       edit_quorums:
         new_quorum:
           title: "New quorum"
@@ -326,6 +358,7 @@ en-EU:
           enable: "Enable work areas"
           description4: "Before activating work areas, check if you can manage groups members directly using "
         manage:
+          breadcrumb: "Work areas"
           new_area: "Create a work area"
           switch_area_participants: "Switch to participant management"
           list_title: "List of the work areas. For each of them select the participants, or click the name to manage roles and permissions in that work area"
@@ -334,6 +367,16 @@ en-EU:
           switch_area_management: "Switch to work area management"
           confirm_deletion: "Are you sure you want to delete this work area?"
           manage_roles_in_area: "Edit roles and permissions in the work area %{area}"
+          area_title: "%{area} settings"
+          area_details: "Work area details"
+          roles_help: "Roles determine which proposals and decisions members can access inside this work area. Save each role after changing its permissions."
+          member_roles: "Member roles"
+          member_roles_help: "Assign one of this area's roles to each member, then confirm the change."
+          add_participant: "Add"
+          remove_participant: "Remove"
+          confirm_remove_participant: "Remove %{name} from this work area?"
+          empty_title: "No work areas yet"
+          empty_description: "Create the first work area to organize members and permissions around a focused activity."
         manage_group_areas: "Manage users inside the work areas"
         form:
           title: "New work area"
@@ -779,9 +822,15 @@ en-EU:
         title: 'Calendar'
         group_title: "Events calendar"
         choose_type: "SELECT EVENT TYPE"
+        group_context: "Plan meetings and voting windows for %{group}."
+        open_context: "Browse public meetings and voting windows."
+        calendar_label: "Events calendar"
+        google_calendar: "Open this calendar in Google Calendar"
+        google_calendar_short: "Google Calendar"
       new:
         private_tooltip: "Only group members can see and participate at the event"
         title: "New Event"
+        subtitle: "Set a clear purpose, schedule and place. You can review everything before saving."
         submit: "Create event"
         type_for_town: "Type some characters to search for a town"
         no_town_found: "No town found"
@@ -792,6 +841,21 @@ en-EU:
         step_2: "Description"
         step_3: "When"
         step_4: "Where"
+      edit:
+        title: "Edit %{title}"
+        heading: "Edit event"
+        subtitle: "Update the practical details for %{title}."
+      form:
+        details: "Purpose and visibility"
+        schedule: "Schedule"
+        schedule_help: "The end date and time must be later than the start."
+        location: "Meeting place"
+        location_help: "Search for a municipality, then add the street or venue. Coordinates are optional."
+        city_searching: "Searching municipalities…"
+        city_selected: "Municipality selected."
+        city_choose: "Choose one of the suggested municipalities."
+        city_empty: "No municipality found. Try a different spelling."
+        city_error: "Municipality search is unavailable. Try again."
       show:
         map: "Map"
         event_place: "Event place"
@@ -816,6 +880,30 @@ en-EU:
         will_non_participants: "Who will not attend?"
         voting_proposals: "During these days these proposals will be voted"
         no_voting_proposals: "No proposal being voted during these days"
+        private: "Private"
+        public: "Public"
+        votation: "Voting window"
+        meeting: "Meeting"
+        description: "Purpose"
+        comments: "Discussion"
+        comments_help: "Share practical information that helps people take part."
+        no_comments: "No comments yet. Start the practical discussion."
+        previous_comments: "Load earlier comments"
+        proposals_count:
+          one: "%{count} proposal"
+          other: "%{count} proposals"
+        practical_details: "Practical event details"
+        attendance_title: "Your attendance"
+        attendance_help: "You can change this response until the meeting begins."
+        save_attendance: "Save attendance"
+        update_attendance: "Update attendance"
+        login_for_attendance: "Sign in to respond to this meeting."
+        participants_heading: "Attendance"
+        participants_help: "See who is attending and whether they are bringing guests."
+        attending_count:
+          one: "%{count} attending"
+          other: "%{count} attending"
+        no_declines: "No one has declined yet."
     votations:
         show:
           vote_positive: 'Positive rating'
@@ -848,6 +936,7 @@ en-EU:
         edit_button: "Edit"
         delete_button: "Delete"
         delete_button_confirm: "Are you sure you want to delete this post?"
+        confirm_delete_button: "Yes, delete this post"
         draft: "Draft"
         comments_says: "says..."
         reserved: "reserved"
@@ -860,6 +949,17 @@ en-EU:
         title: "Edit the post"
       archives:
         title: "Archive for %{month}, %{year}"
+      actions_for: "Actions for %{title}"
+      read_post: "Read %{title}"
+      editor_hint: "Use the formatting toolbar when needed. On a small screen, scroll the toolbar horizontally to reveal more controls."
+      status_help: "Choose who can read this post. You can keep it as a draft until it is ready."
+      published_help: "Visible to everyone immediately."
+      reserved_help: "Visible only in the groups you select."
+      draft_help: "Visible only to you while you work."
+      groups_help: "Select groups only when this post belongs in their shared activity stream."
+      comments_title: "Discussion"
+      no_comments: "No comments yet. Start the discussion with a useful question or update."
+      published_groups: "Shared with these groups"
     alerts:
       polling:
         show_all: "Show all notifications"
@@ -875,6 +975,7 @@ en-EU:
     blog_comments:
       new:
         insert_comment: "Insert comment"
+        help: "Add context that helps readers understand or act on this post."
     header:
       member: "Member"
       groups:
@@ -922,6 +1023,13 @@ en-EU:
         title: "Blogs list"
         no_unpublished_posts: "There are no unpublished posts at the moment"
         other_blogs: "More blogs"
+        recent_comments: "Recent comments"
+        recent_posts: "Recent posts"
+        archives: "Archive"
+        comment_on: "on"
+        manage_blog: "Manage this blog"
+        posts: "Blog posts"
+        activity: "Blog activity"
       new:
         title: "Create your personal blog!"
         cancel_button: "No, thanks!"
@@ -934,9 +1042,15 @@ en-EU:
         blog_subtitle: "%{posts} posts, %{comments} comments"
         find_blog_label: "Find a blog you may be interested in"
         search_description: "Use the search tool or click on a tag to find blogs of your interest"
-        search_with_query: "using a personalized query"
+        search_with_query: "Search by title or author"
         find_title: "Search in the blog title or author name"
-        search_with_place: "or geographic border"
+        search_with_place: "Limit by place (optional)"
+        search_title: "Search the directory"
+        browse_tags: "Browse by topic"
+        results_title: "Blogs"
+        no_results: "No blogs match this view"
+        all_words: "Match all words"
+        clear_search: "Clear search"
     quorums:
       index:
         title: "All available quorums"
@@ -1144,6 +1258,7 @@ en-EU:
         related_title: "Related tags"
         not_found: "Tag '%{tag}' not found"
         title: "List of elements with tag '%{tag}'"
+        on_this_page: "Content with this tag"
       list_proposals_with_tag: "Proposals"
       no_proposals_with_tag: "There are no proposals with this tag yet"
       list_posts_with_tag: "Posts"
@@ -1156,7 +1271,10 @@ en-EU:
       not_found:
         subtitle: "These are the most used keywords on Airesis"
       index:
-        title: "List of most used tag"
+        title: "Popular topics"
+        browse_title: "Explore shared topics"
+        description: "Choose a topic to find related proposals, posts, and groups."
+        empty: "No active topics are available yet. Tags will appear when content is published."
     footer:
       for_edemocracy: "for e-democracy"
       go_to_main_site: "Go to main site"
@@ -1183,6 +1301,11 @@ en-EU:
     event_comments:
       new:
         insert_comment: "Insert a comment"
+      like: "Like"
+      unlike: "Unlike"
+      likes_count:
+        one: "%{count} like"
+        other: "%{count} likes"
     propsoals:
       index:
         type: "of type %{type}"
@@ -1355,6 +1478,9 @@ en-EU:
         area_created: "Error while creating work area"
       creation: "Error while creating the group"
       post_removed: "Error while removing the post from the group"
+    events:
+      creation: "The event could not be created. Review the highlighted fields and try again."
+      update: "The event could not be updated. Review the highlighted fields and try again."
     proposals:
       view_proposal: "You don't have the required permissions to view this proposal"
       participate: "You don't have the required permissions to actively participate in this proposal. Please contact the group admin"
@@ -1509,12 +1635,10 @@ en-EU:
       title_updated: "The title of the blog has been successfully updated"
       comment_added: "Comment successfully created"
       destroyed: "Blog destroyed successfully"
-    events:
-      event_deleted: "Event successfully deleted"
-      event_updated: "Event successfully updated"
     moderator_panel:
       account_blocked: "Account blocked"
       account_unblocked: "Account unblocked"
+      privileged_account: "Privileged accounts cannot be blocked from this panel"
     locale_changed: "Localization changed successfully"
     blog_post_updated: "Your post has been successfully updated"
     blog_post_deleted: "Your post has been successfully deleted"
@@ -1531,6 +1655,12 @@ en-EU:
       status_declined: "The participation request has been rejected"
     event:
       comment_added: "Comment inserted succesfully"
+      comment_deleted: "Comment deleted."
+    events:
+      event_created: "Event created successfully."
+      event_deleted: "Event successfully deleted"
+      event_updated: "Event successfully updated"
+      attendance_saved: "Your attendance response has been saved."
     topic:
       hidden: "This topic is hidden"
     participations_destroyed: "Users deleted. Please refresh the page."
@@ -1740,3 +1870,74 @@ en-EU:
     positive: 'I agree'
     neutral: "I don't know / I do not understand"
     negative: 'I ​​disagree'
+  admin_ui:
+    navigation:
+      label: "Administration navigation"
+      operations: "Operations"
+      data: "Data administration"
+      newsletters: "Newsletters"
+    panel:
+      title: "Platform operations"
+      description: "Run maintenance and diagnostic tasks with explicit scope and confirmation. Each task reports its outcome before you leave this page."
+      maintenance: "Maintenance"
+      maintenance_hint: "These operations can update many records. Run them individually and wait for the result before starting another."
+      rankings: "Recalculate user rankings"
+      rankings_hint: "Recomputes participation rankings for all users."
+      proposals: "Reconcile proposal states"
+      proposals_hint: "Closes expired phases and advances proposals whose voting window has started."
+      sitemap: "Refresh the sitemap"
+      sitemap_hint: "Regenerates the public search-engine sitemap from current content."
+      notifications_cleanup: "Delete old notifications"
+      notifications_cleanup_hint: "Permanently removes notifications that are past the configured retention period."
+      notifications_cleanup_queued: "Notification cleanup queued. Its completion or failure is tracked in the job administration data."
+      delete_old: "Delete old notifications"
+      run: "Run operation"
+      run_named: "Run %{operation}"
+      confirm_operation: "Run “%{operation}” now? Wait for its completion message before running another operation."
+      confirm_cleanup: "Delete notifications past the retention period? This cannot be undone."
+      diagnostics: "Diagnostics"
+      diagnostics_hint: "Use these tools only to verify delivery infrastructure. They may enqueue test jobs or messages."
+      delivery_tests: "Queue checks"
+      delivery_tests_hint: "Verify mail and scheduler queues without changing community content."
+      mail_test: "Send mail test"
+      scheduler_test: "Queue scheduler test"
+      confirm_mail_test: "Send a diagnostic email using the configured delivery service?"
+      alert_test: "Notification test"
+      alert_test_hint: "Enter one alert ID. Leave it empty only when you intend to test the latest alert for every notification type."
+      alert_id: "Alert ID"
+      send_test: "Queue notification test"
+    users:
+      title: "Account controls"
+      description: "Block compromised or abusive regular accounts while keeping privileged accounts protected."
+      block_title: "Block an account"
+      block_hint: "Use the exact user ID or email. Blocking hides the person's name and removes their avatar; unblocking restores the saved name, but not the avatar."
+      identifier: "User ID or email"
+      block_action: "Block account"
+      block_confirm: "Block this account? Its name will be hidden and its avatar permanently removed."
+      blocked_title: "Blocked accounts"
+      unblock_confirm: "Unblock account %{id} and restore its saved name?"
+      empty: "No accounts are currently blocked."
+    newsletters:
+      title: "Newsletters"
+      description: "Draft, review and deliver platform updates to an explicitly selected audience."
+      empty: "No newsletter drafts are available yet."
+      new_title: "Create newsletter"
+      edit_title: "Edit %{subject}"
+      editor_description: "Write HTML content only. Server-side code and ERB are never executed. Preview the sanitized result before delivery."
+      preview_hint: "Sanitized delivery preview. Scripts, event handlers and server-side templates are not executed."
+      subject_hint: "Used as the email subject and in the administration list."
+      body_hint: "Basic HTML is allowed and sanitized. Scripts, event handlers and server-side templates are removed or shown as text."
+      show_description: "Review the sanitized content and choose a recipient group only when it is ready."
+      content: "Sanitized content"
+      delivery: "Delivery"
+      delivery_hint: "Sending creates background jobs. Start with the test audience, then verify the selected count before confirming a broader delivery."
+      audience: "Audience"
+      audiences:
+        admin: "Administrators (%{count})"
+        all: "Confirmed newsletter subscribers (%{count})"
+        not_confirmed: "Unconfirmed accounts (%{count})"
+        test: "Only me — test (%{count})"
+      send: "Queue delivery"
+      queued: "Delivery queued for %{count} recipients. Individual failures are retried and tracked as background jobs."
+      send_confirm: "Queue “%{subject}” for the selected audience? Check the audience and recipient count before continuing."
+      delete_confirm: "Delete the newsletter “%{subject}”? This cannot be undone."

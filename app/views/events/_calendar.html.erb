@@ -1,26 +1,30 @@
 <%# FullCalendar v6 — Cleopatra reference: docs/dashboard_template/src/pages/apps/calendar.html %>
 <%
   events_url  = @group ? group_events_url(@group, format: :json) : events_url(format: :json)
-  editable    = @group ? (can?(:create_event, @group) || can?(:create_any_event, @group)) : is_admin?
+  editable    = user_signed_in?
   new_evt_url = if @group
                   if can?(:create_any_event, @group) || can?(:create_event, @group)
                     new_group_event_url(@group, event_type_id: EventType::MEETING)
                   elsif can?(:create_date, @group)
                     new_group_event_url(@group, event_type_id: EventType::VOTATION)
                   end
-                elsif current_user
-                  # Passa l'URL a tutti gli utenti loggati: la form gestisce l'autorizzazione
+                elsif is_admin?
                   new_event_url
                 end
 %>
 
-<div class="bg-base-100 border-2 border-base-content/15">
+<div class="min-w-0 overflow-hidden bg-base-100 border-2 border-base-content/15" aria-label="<%= t('pages.events.index.calendar_label') %>">
   <div id="fc-calendar"
+       class="min-w-0"
        data-controller="calendar"
        data-calendar-events-url-value="<%= events_url %>"
        data-calendar-new-event-url-value="<%= new_evt_url || '' %>"
        data-calendar-locale-value="<%= I18n.locale %>"
+       data-calendar-today-label-value="<%= t('calendar.today') %>"
+       data-calendar-month-label-value="<%= t('calendar.month') %>"
+       data-calendar-week-label-value="<%= t('calendar.week') %>"
+       data-calendar-day-label-value="<%= t('calendar.day') %>"
+       data-calendar-list-label-value="<%= t('calendar.list') %>"
        data-calendar-editable-value="<%= editable %>">
   </div>
 </div>
-

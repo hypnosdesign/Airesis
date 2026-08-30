@@ -1,7 +1,7 @@
 <%= turbo_stream.replace "category_modal" do %>
-  <dialog id="category_modal" data-controller="modal" class="modal">
-    <div class="modal-box shadow-brutal border-2 border-base-content">
-      <%= render partial: "edit", locals: { remote: false } %>
+  <dialog id="category_modal" data-controller="modal" class="modal" aria-labelledby="category_modal_title">
+    <div class="modal-box border border-base-300">
+      <%= render partial: "edit", locals: { turbo: true } %>
     </div>
     <form method="dialog" class="modal-backdrop" data-action="click->modal#backdropClose">
       <button>close</button>

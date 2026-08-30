@@ -2,6 +2,7 @@ class ParticipationRolesController < ApplicationController
   layout 'groups'
 
   before_action :authenticate_user!
+  before_action :enable_content_landmark
 
   before_action :load_group
 
@@ -29,10 +30,11 @@ class ParticipationRolesController < ApplicationController
         format.html { redirect_to group_participation_roles_path(@group) }
       end
     else
+      @page_title = t('pages.groups.edit_permissions.new_role_title')
       respond_to do |format|
         flash[:error] = t('error.participation_roles.role_created')
-        format.turbo_stream { render 'participation_roles/errors/create' }
-        format.html { render 'new' }
+        format.turbo_stream { render 'participation_roles/errors/create', status: :unprocessable_content }
+        format.html { render 'new', status: :unprocessable_content }
       end
     end
   end
@@ -57,15 +59,22 @@ class ParticipationRolesController < ApplicationController
     else
       respond_to do |format|
         flash[:error] = t('error.participation_roles.role_updated')
-        format.turbo_stream { render partial: 'layouts/flash_stream', status: :unprocessable_entity }
-        format.html { redirect_back fallback_location: group_participation_roles_path(@group) }
+        format.turbo_stream { render 'participation_roles/errors/form', status: :unprocessable_content }
+        format.html { render :edit, status: :unprocessable_content }
       end
     end
   end
 
   def destroy
-    flash[:notice] = t('info.participation_roles.role_deleted') if @participation_role.destroy
-    redirect_to group_participation_roles_path(@group)
+    notice = t('info.participation_roles.role_deleted') if @participation_role.destroy
+    respond_to do |format|
+      format.turbo_stream do
+        flash.now[:notice] = notice
+        @participation_roles = @group.participation_roles
+        render :destroy
+      end
+      format.html { redirect_to group_participation_roles_path(@group), status: :see_other, notice: notice }
+    end
   end
 
   protected
@@ -80,5 +89,9 @@ class ParticipationRolesController < ApplicationController
              :write_to_wall, :create_events, :support_proposals, :accept_participation_requests,
              :view_proposals, :participate_proposals, :insert_proposals, :vote_proposals,
              :choose_date_proposals, :view_documents, :manage_documents)
+  end
+
+  def enable_content_landmark
+    @content_landmark = true
   end
 end

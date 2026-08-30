@@ -1,21 +1,26 @@
-<% javascript 'endless_page' %>
-
 <%= render layout: "layouts/page_title", locals: { title: @page_title } do %>
+  <% if can? :edit, @blog %>
+    <%= link_to @blog, class: 'btn min-h-11' do %>
+      <i class="fa-solid fa-arrow-left" aria-hidden="true"></i>
+      <%= t('pages.blog_posts.published_button') %>
+    <% end %>
+  <% end %>
+<% end %>
+
+<div class="grid gap-6 lg:grid-cols-[minmax(0,1fr)_20rem]">
+  <section aria-label="<%= @page_title %>">
   <% if @blog_posts.size == 0 && !params[:page] %>
     <div class="blogPost card bg-base-200 p-4">
-      <h1 class="text-xl font-bold"><%= t('pages.blogs.show.no_posts') %></h1>
+      <h2 class="text-xl font-bold"><%= t('pages.blogs.show.no_posts') %></h2>
     </div>
   <% else %>
     <div id="blogPostContainer">
       <%= render collection: @blog_posts, partial: 'blog_posts/blog_post' %>
     </div>
   <% end %>
-  <div id="loading_results">
-    <span><%= t('pages.blogs.show.previous_posts') %></span>
-  </div>
-<% end %>
-
-<% content_for :left_panel do %>
-  <%= render 'blog_posts/admin_links' %>
-  <%= render 'blogs/left_panel' %>
-<% end %>
+  <div class="mt-6"><%= pagy_nav(@pagy) if @pagy.pages > 1 %></div>
+  </section>
+  <aside aria-label="<%= t('pages.blogs.show.activity') %>">
+    <%= render 'blogs/left_panel' %>
+  </aside>
+</div>

@@ -4,8 +4,8 @@ minimum_score: 33
 score_maximum: 40
 
 route_snapshot:
-  total_controller_routes: 527
-  assigned_ui_routes: 484
+  total_controller_routes: 403
+  assigned_ui_routes: 360
   excluded_non_visual_routes: 43
 
 completion_evidence_required:
@@ -89,8 +89,8 @@ groups:
   G03:
     name: "Proposte: scoperta, creazione e lettura"
     mode: operate
-    route_count: 47
-    get_route_count: 37
+    route_count: 44
+    get_route_count: 24
     controllers:
       - proposals
       - proposal_categories
@@ -118,8 +118,8 @@ groups:
   G04:
     name: Deliberazione, commenti, quorum e voto
     mode: operate
-    route_count: 36
-    get_route_count: 16
+    route_count: 35
+    get_route_count: 15
     controllers:
       - proposal_comments
       - proposal_revisions
@@ -175,8 +175,8 @@ groups:
   G06:
     name: "Governance gruppi: aree, ruoli e permessi"
     mode: operate
-    route_count: 33
-    get_route_count: 12
+    route_count: 26
+    get_route_count: 9
     controllers:
       - group_areas
       - area_roles
@@ -194,15 +194,15 @@ groups:
       - /groups/:group_id/group_areas/:id
       - /groups/:group_id/group_areas/:group_area_id/area_roles
       - /groups/:group_id/participation_roles
-    status: not_started
-    iterations: 0
-    score: null
+    status: passed
+    iterations: 2
+    score: 33
 
   G07:
     name: Eventi e calendario
     mode: operate
-    route_count: 42
-    get_route_count: 18
+    route_count: 26
+    get_route_count: 8
     controllers:
       - events
       - event_comments
@@ -218,15 +218,15 @@ groups:
       - /events/:id/edit
       - /groups/:group_id/events
       - /events/:event_id/event_comments
-    status: not_started
-    iterations: 0
-    score: null
+    status: passed
+    iterations: 2
+    score: 35
 
   G08:
     name: Blog, tag, documenti e contenuti
     mode: read-operate
-    route_count: 89
-    get_route_count: 48
+    route_count: 39
+    get_route_count: 20
     controllers:
       - blogs
       - blog_posts
@@ -249,15 +249,15 @@ groups:
       - /tags
       - /tags/:id
       - /documents
-    status: not_started
-    iterations: 0
-    score: null
+    status: passed
+    iterations: 3
+    score: 38
 
   G09:
     name: Forum e moderazione
     mode: operate-read
-    route_count: 83
-    get_route_count: 43
+    route_count: 47
+    get_route_count: 20
     controllers:
       - frm/*
     source_targets:
@@ -267,32 +267,33 @@ groups:
       - /groups/:group_id/forum/forums/:id
       - /groups/:group_id/forum/forums/:forum_id/topics/:id
       - /groups/:group_id/forum/admin
-    status: not_started
-    iterations: 0
-    score: null
+    status: passed
+    iterations: 3
+    score: 36
 
   G10:
     name: Amministrazione e strumenti operativi
     mode: operate
-    route_count: 33
-    get_route_count: 13
+    route_count: 22
+    get_route_count: 8
     controllers:
       - admin/*
-      - elfinder
       - rails_admin
     source_targets:
       - app/views/admin
-      - app/views/rails_admin
-      - app/views/ckeditor
       - app/views/layouts/admin.html.erb
+      - app/views/layouts/newsletters
+      - app/views/layouts/rails_admin
+      - app/assets/stylesheets/rails_admin/custom/theming.scss
     representative_paths:
       - /admin/panel
       - /admin/newsletters
       - /admin/users
       - /admin
-    status: not_started
-    iterations: 0
-    score: null
+      - /admin/data
+    status: passed
+    iterations: 3
+    score: 37
 
 excluded_controllers:
   rationale: Endpoints without an end-user HTML interface; covered by security/API tests rather than UI scoring.

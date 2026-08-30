@@ -1,5 +1,8 @@
-<%= simple_form_for [:admin, @newsletter] do |f| %>
-  <%= f.input :subject %>
-  <%= f.input :body, input_html: { rows: 100 } %>
-  <%= f.submit :submit, class: 'btn btn-primary mt-2' %>
+<%= simple_form_for [:admin, @newsletter], html: { class: 'space-y-5' } do |f| %>
+  <%= f.input :subject, input_html: { class: 'min-h-11', maxlength: 255 }, hint: t('admin_ui.newsletters.subject_hint') %>
+  <%= f.input :body, as: :text, input_html: { rows: 18, class: 'min-h-80 font-sans' }, hint: t('admin_ui.newsletters.body_hint') %>
+  <div class="flex flex-wrap gap-3">
+    <%= f.submit class: 'btn btn-primary min-h-11', data: { disable_with: t('loading') } %>
+    <%= link_to t('buttons.cancel'), @newsletter.persisted? ? admin_newsletter_path(@newsletter) : admin_newsletters_path, class: 'btn btn-ghost min-h-11' %>
+  </div>
 <% end %>

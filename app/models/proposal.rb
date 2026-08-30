@@ -149,6 +149,19 @@ class Proposal < ApplicationRecord
   # all proposals visible to not logged users
   scope :visible, -> { where('private = ? or visible_outside = ?', false, true) }
 
+  scope :select_alerts_and_rankings, lambda { |user_id|
+    user_id ||= -1
+    select('proposals.*',
+           Proposal.alerts_count_subquery(user_id).as('alerts_count'),
+           Proposal.ranking_subquery(user_id).as('ranking'))
+  }
+
+  scope :for_list, lambda { |user_id = nil|
+    select_alerts_and_rankings(user_id).
+      includes(:interest_borders, :user_votes, :presentation_areas, :groups,
+               :category, :quorum, :vote_period, :proposal_type)
+  }
+
   # inconsistent proposals
   scope :invalid_debate_phase, -> { in_valutation.joins(:quorum).where('current_timestamp > quorums.ends_at') }
   scope :invalid_waiting_phase, -> { waiting.joins(:vote_period).where('current_timestamp > events.starttime') }
@@ -200,8 +213,8 @@ class Proposal < ApplicationRecord
     alerts = Alert.arel_table
     proposals = Proposal.arel_table
     alerts.
-                   project('count(*)').
-                   where(alerts[:trackable_id].eq(proposals[:id]).
+      project('count(*)').
+      where(alerts[:trackable_id].eq(proposals[:id]).
             and(alerts[:trackable_type].eq('Proposal')).
             and(alerts[:user_id].eq(user_id)).
             and(alerts[:checked].eq(false)))
@@ -216,8 +229,8 @@ class Proposal < ApplicationRecord
     proposals = Proposal.arel_table
     proposal_rankings = ProposalRanking.arel_table
     proposal_rankings.
-              project(proposal_rankings[:ranking_type_id]).
-              where(proposal_rankings[:proposal_id].eq(proposals[:id]).
+      project(proposal_rankings[:ranking_type_id]).
+      where(proposal_rankings[:proposal_id].eq(proposals[:id]).
             and(proposal_rankings[:user_id].eq(user_id)))
   end
 
@@ -266,7 +279,7 @@ class Proposal < ApplicationRecord
                 where(proposals[:id].in(list_c)).
                 order(updated_at: :desc).to_a
     ActiveRecord::Associations::Preloader.new(records: proposals, associations: [:quorum, :category, { users: :image },
-                                                                  :proposal_type, :groups, :supporting_groups]).call
+                                                                                 :proposal_type, :groups, :supporting_groups]).call
     proposals
   end
 
@@ -625,7 +638,6 @@ class Proposal < ApplicationRecord
     rankings.destroy_all
 
     save!
-
   end
 
   # put the proposal back in debate from abandoned
@@ -687,11 +699,12 @@ class Proposal < ApplicationRecord
   # @raise [StandardError] se l'evento è già iniziato
   def set_votation_date(vote_period_id)
     vote_period = Event.find(vote_period_id)
-    raise StandardError unless vote_period.starttime > 5.seconds.from_now # security check
+    unless waiting_date? && vote_period.votation? && vote_period.starttime > 5.seconds.from_now
+      errors.add(:vote_period, :invalid)
+      raise ActiveRecord::RecordInvalid, self
+    end
 
-    self.vote_period_id = vote_period_id
-    self.proposal_state_id = ProposalState::WAIT
-    save!
+    update!(vote_period: vote_period, proposal_state_id: ProposalState::WAIT)
   end
 
   def user_avatar_url(user)
@@ -709,7 +722,8 @@ class Proposal < ApplicationRecord
 
   def generate_short_content
     section = sections.first || solutions.first&.sections&.first
-    truncate_words(section&.paragraphs&.first&.content&.gsub(%r{</?[^>]+?>}, ''), 40)
+    paragraph = section&.paragraphs&.first
+    truncate_words(paragraph&.content&.gsub(%r{</?[^>]+?>}, ''), 40)
   rescue StandardError
     nil
   end
@@ -880,7 +894,6 @@ class Proposal < ApplicationRecord
   end
 
   def save_history
-    false
     seq = (proposal_revisions.maximum(:seq) || 0) + 1
     revision = proposal_revisions.build(user_id: update_user_id, valutations: valutations_was, rank: rank_was, seq: seq)
     something_sections = save_sections_history(revision)
@@ -922,8 +935,8 @@ class Proposal < ApplicationRecord
       if group.present?
         if group.interest_border.country.present?
           interest_borders_tokens << InterestBorder.to_key(group.interest_border.country)
-          self.derived_interest_borders_tokens << InterestBorder.to_key(group.interest_border.country)
-          self.derived_interest_borders_tokens << InterestBorder.to_key(group.interest_border.continent)
+          derived_interest_borders_tokens << InterestBorder.to_key(group.interest_border.country)
+          derived_interest_borders_tokens << InterestBorder.to_key(group.interest_border.continent)
         end
       else
         if user_territory.present?

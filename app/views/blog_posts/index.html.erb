@@ -1,4 +1,3 @@
-<% javascript 'endless_page' %>
 <% if @blog_posts.size == 0 %>
   <div class="blogPost card bg-base-200 p-4">
     <h1 class="text-xl font-bold"><%= t('pages.blogs.show.no_posts') %></h1>
@@ -8,4 +7,5 @@
   <div id="blogPostContainer">
     <%= render collection: @blog_posts, partial: 'blog_post' %>
   </div>
+  <div class="mt-6"><%= pagy_nav(@pagy) if @pagy.pages > 1 %></div>
 <% end %>

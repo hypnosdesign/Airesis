@@ -11,8 +11,7 @@ RSpec.describe BlogCommentsController, seeds: true do
       it 'stores comment in session and redirects' do
         post blog_blog_post_blog_comments_path(blog, blog_post),
              params: { blog_comment: { body: 'A comment' } }
-        # Not authenticated: saves to session and redirects
-        expect([302, 200, 500]).to include(response.status)
+        expect(response).to redirect_to(new_user_session_path)
       end
     end
 
@@ -24,7 +23,8 @@ RSpec.describe BlogCommentsController, seeds: true do
           post blog_blog_post_blog_comments_path(blog, blog_post),
                params: { blog_comment: { body: 'My test comment body' } }
         }.to change(BlogComment, :count).by(1)
-        expect([200, 302, 500]).to include(response.status)
+        expect(response).to have_http_status(:see_other)
+        expect(response).to redirect_to(blog_blog_post_path(blog, blog_post))
       end
     end
   end
@@ -46,13 +46,16 @@ RSpec.describe BlogCommentsController, seeds: true do
         expect {
           delete blog_blog_post_blog_comment_path(blog, blog_post, comment)
         }.to change(BlogComment, :count).by(-1)
-        expect([302, 500]).to include(response.status)
+        expect(response).to have_http_status(:see_other)
+        expect(response).to redirect_to(blog_blog_post_path(blog, blog_post))
       end
 
       it 'destroys the comment and responds to JS format' do
         new_comment = create(:blog_comment, blog_post: blog_post, user: user)
-        delete blog_blog_post_blog_comment_path(blog, blog_post, new_comment), xhr: true
-        expect([200, 302, 500]).to include(response.status)
+        delete blog_blog_post_blog_comment_path(blog, blog_post, new_comment),
+               headers: { 'Accept' => 'text/vnd.turbo-stream.html' }
+        expect(response).to have_http_status(:ok)
+        expect(response.media_type).to eq('text/vnd.turbo-stream.html')
       end
     end
   end
@@ -63,24 +66,17 @@ RSpec.describe BlogCommentsController, seeds: true do
 
       it 'creates a blog comment via JS' do
         post blog_blog_post_blog_comments_path(blog, blog_post),
-             xhr: true,
+             headers: { 'Accept' => 'text/vnd.turbo-stream.html' },
              params: { blog_comment: { body: 'A JS comment body' } }
-        expect([200, 302, 500]).to include(response.status)
+        expect(response).to have_http_status(:ok)
       end
 
       it 'handles invalid comment (empty body)' do
         post blog_blog_post_blog_comments_path(blog, blog_post),
-             xhr: true,
+             headers: { 'Accept' => 'text/vnd.turbo-stream.html' },
              params: { blog_comment: { body: '' } }
-        expect([200, 302, 422, 500]).to include(response.status)
+        expect(response).to have_http_status(:unprocessable_content)
       end
-    end
-  end
-
-  describe 'GET index' do
-    it 'returns a response without authentication' do
-      get blog_blog_post_blog_comments_path(blog, blog_post)
-      expect([200, 302, 500]).to include(response.status)
     end
   end
 end

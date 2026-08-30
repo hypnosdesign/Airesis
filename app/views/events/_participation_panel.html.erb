@@ -1,47 +1,41 @@
+<h2 id="event-attendance-title" class="text-lg font-extrabold"><%= t('pages.events.show.attendance_title') %></h2>
 <% if user_signed_in? %>
-  <% participation = @event.meeting.meeting_participations.find_by(user_id: current_user.id) %>
-  <% if participation %>
-    <% if @event.past? %>
-      <h5>
-        <%= participation.will_come? ?
-              t('pages.events.show.yes_partecipated') :
-              t('pages.events.show.no_partecipated') %>
-      </h5>
-    <% else %>
-      <h5>
-        <%= participation.will_come? ?
-              t('pages.events.show.yes_partecipate') :
-              t('pages.events.show.no_partecipate') %>
-      </h5>
-    <% end %>
-  <% else %>
-    <% if @event.past? %>
-      <h1><%= t('pages.events.show.no_answer') %></h1>
-    <% else %>
-      <h4><%= t('pages.events.show.will_be_in') %></h4>
-      <%= simple_form_for [@event, MeetingParticipation.new] do |f| %>
-        <div class="flex flex-wrap collapse">
-          <div class="w-full sm:w-4/12">
-            <%= f.input :response, as: :radio_buttons, checked: 'Y', collection: [[t('buttons.yes_word'), 'Y'], [t('buttons.no_word'), 'N']], label: false %>
-          </div>
-          <div class="w-full sm:w-8/12">
-            <span id="guests_number">
-              <%= raw t('pages.events.show.with_guests', field: (f.input :guests, label: false, input_html: { type: :number, style: "width: 35px;display:inline;height:21px;padding: 0", maxlength: 2 })) %>
-            </span>
-          </div>
-        </div>
-        <%= f.input :comment, as: :text, input_html: { rows: 4, cols: 10 } %>
-        <%= f.submit t('pages.events.show.reply'), class: 'btn btn-primary', data: { disable_with: t('sending') } %>
+  <% participation = @meeting_participation || @event.meeting.meeting_participations.find_by(user_id: current_user.id) || @event.meeting.meeting_participations.new %>
+  <% if @event.past? %>
+    <p class="mt-3 text-sm text-base-content/70">
+      <% if participation.persisted? %>
+        <%= participation.will_come? ? t('pages.events.show.yes_partecipated') : t('pages.events.show.no_partecipated') %>
+      <% else %>
+        <%= t('pages.events.show.no_answer') %>
       <% end %>
-      <script type="text/javascript">
-        document.querySelectorAll("input[name='meeting_participation[response]']").forEach(function(radio) {
-          radio.addEventListener('change', function() {
-            var selected = document.querySelector("input[name='meeting_participation[response]']:checked");
-            var guests = document.getElementById('guests_number');
-            if (guests) guests.style.display = (selected && selected.value === 'Y') ? '' : 'none';
-          });
-        });
-      </script>
+    </p>
+  <% else %>
+    <p class="mt-1 mb-4 text-sm text-base-content/65"><%= t('pages.events.show.attendance_help') %></p>
+    <%= simple_form_for [@event, participation] do |form| %>
+      <%= form.error_notification %>
+      <fieldset>
+        <legend class="mb-2 font-bold"><%= t('pages.events.show.will_be_in') %></legend>
+        <div class="grid gap-2 sm:grid-cols-2 lg:grid-cols-1 xl:grid-cols-2">
+          <% [[t('buttons.yes_word'), 'Y'], [t('buttons.no_word'), 'N']].each do |label, value| %>
+            <% response_id = "meeting_participation_response_#{participation.id || 'new'}_#{value.downcase}" %>
+            <label for="<%= response_id %>" class="flex min-h-11 cursor-pointer items-center gap-3 border border-base-content/15 px-3 py-2">
+              <%= form.radio_button :response, value, id: response_id, class: 'radio radio-primary shrink-0' %>
+              <span class="font-bold"><%= label %></span>
+            </label>
+          <% end %>
+        </div>
+      </fieldset>
+      <div class="mt-4">
+        <%= form.input :guests,
+                       input_html: { type: :number, min: 0, max: MeetingParticipation::MAX_GUESTS,
+                                     inputmode: 'numeric' } %>
+        <%= form.input :comment, as: :text, input_html: { rows: 3, maxlength: 255 } %>
+      </div>
+      <%= form.submit(participation.persisted? ? t('pages.events.show.update_attendance') : t('pages.events.show.save_attendance'),
+                      class: 'btn btn-primary min-h-11 w-full', data: { disable_with: t('saving') }) %>
     <% end %>
   <% end %>
+<% else %>
+  <p class="mt-3 text-sm text-base-content/70"><%= t('pages.events.show.login_for_attendance') %></p>
+  <%= link_to t('pages.header.login'), new_user_session_path, class: 'btn btn-primary mt-4 min-h-11' %>
 <% end %>

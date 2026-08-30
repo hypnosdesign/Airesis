@@ -1,4 +1,7 @@
-<%= render partial: 'new', locals: { remote: false } %>
+<div class="max-w-2xl">
+  <h1 class="mb-6 text-3xl font-bold tracking-tight"><%= t('new', scope: 'frm.admin.category') %></h1>
+  <div class="rounded-box border border-base-300 bg-base-100 p-4 sm:p-6"><%= render partial: 'new', locals: { show_heading: false, turbo: false } %></div>
+</div>
 
 <% content_for :left_panel do %>
   <%= render partial: 'groups/administration_panel' %>

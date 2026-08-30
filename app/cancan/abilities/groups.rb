@@ -53,7 +53,7 @@ module Abilities
     end
 
     def area_role_permissions(user)
-      can %i[read create update destroy change], AreaRole, group_area: { group: admin_of_group?(user) }
+      can %i[read create update destroy change_permissions], AreaRole, group_area: { group: admin_of_group?(user) }
 
       cannot :destroy, AreaRole do |area_role|
         area_role.id == area_role.group_area.area_role_id

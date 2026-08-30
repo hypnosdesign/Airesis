@@ -1,22 +1,22 @@
 <%= simple_form_for @topic, url: group_frm_admin_forum_topic_url(@group, @forum, @topic) do |f| %>
-  <%= f.input :subject, label: t('simple_form.labels.topic.subject') %>
-  <%= f.association :forum, collection: @group.forums.order(:name), label: t('frm.general.forum') %>
+  <%= f.input :subject, label: t('simple_form.labels.topic.subject'), input_html: { class: 'min-h-11' } %>
+  <%= f.association :forum, collection: @group.forums.order(:name), label: t('frm.general.forum'), input_html: { class: 'min-h-11' } %>
   <div class="flex flex-col gap-2 mb-4">
-    <label class="flex items-center gap-2">
+    <label class="flex min-h-11 items-center gap-2">
       <%= f.check_box :locked %>
       <%= t('simple_form.labels.topic.locked') %>
     </label>
-    <label class="flex items-center gap-2">
+    <label class="flex min-h-11 items-center gap-2">
       <%= f.check_box :pinned %>
       <%= t('simple_form.labels.topic.pinned') %>
     </label>
-    <label class="flex items-center gap-2">
+    <label class="flex min-h-11 items-center gap-2">
       <%= f.check_box :hidden %>
       <%= t('simple_form.labels.topic.hidden') %>
     </label>
   </div>
   <div class="flex gap-2">
-    <%= link_to t('buttons.cancel'), :back, class: "btn" %>
-    <%= f.submit t('update', scope: 'helpers.submit.topic'), class: "btn btn-primary" %>
+    <%= link_to t('buttons.cancel'), group_forum_topic_path(@group, @forum, @topic), class: "btn btn-ghost min-h-11" %>
+    <%= f.submit t('update', scope: 'helpers.submit.topic'), class: "btn btn-primary min-h-11", data: { disable_with: t('loading') } %>
   </div>
 <% end %>

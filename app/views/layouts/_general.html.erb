@@ -24,7 +24,10 @@
     <%# ===== DRAWER CONTENT (navbar + page) ===== %>
     <div class="drawer-content flex flex-col" data-sidebar-drawer-target="background">
 
-      <a href="#main-content" class="sr-only focus:not-sr-only fixed left-4 top-4 z-[100] bg-base-content px-4 py-3 font-bold text-base-100 shadow-lg">
+      <a href="#main-content"
+         class="absolute -left-[9999px] top-auto h-px w-px overflow-hidden focus:fixed focus:left-4 focus:top-4 focus:z-[100] focus:h-auto focus:w-auto focus:overflow-visible focus:bg-base-content focus:px-4 focus:py-3 focus:font-bold focus:text-base-100 focus:shadow-lg"
+         data-controller="skip-link"
+         data-action="click->skip-link#focusMain">
         <%= t('pages.accessibility.skip_to_content', default: 'Skip to main content') %>
       </a>
 

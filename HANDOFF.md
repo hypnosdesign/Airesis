@@ -6,29 +6,34 @@
 ## Stato in breve
 
 - Repository: `/Users/mattia/Projects/Airesis_Site/airesis-develop`
-- Branch: `main`; il programma UI/UX è consolidato fino a G05 e pronto a ripartire da G06.
+- Branch: `main`; il programma UI/UX è chiuso e verificato fino a G10 compreso. G01 resta il solo gruppo non passato, bloccato dall'autorità legale mancante.
 - Versione applicativa: 6.1.3
 - Stack aggiornato localmente: Ruby 4.0.6, Bundler 4.0.19, Rails 8.1.3.1, PostgreSQL 18.6, Node.js 24.20.0 LTS e Yarn 4.18.0
 - Remediation P0, refresh dello stack e inizializzazione PostgreSQL 18 sono consolidati e pubblicati su `origin/main`.
-- La remediation P1 A1-A4 e il programma UI/UX fino a G05 sono completati e verificati; la rimozione della credenziale A1 resta inclusa nella history riscritta.
+- La remediation P1 A1-A5 e il programma UI/UX G02-G10 sono completati e verificati; la rimozione della credenziale A1 resta inclusa nella history riscritta.
+- Le modifiche G06-G10 e l'abilitazione ChromeDriver Linux ARM64 sono complete e verificate ma restano intenzionalmente non committate/non pubblicate in questo worktree.
 - PostgreSQL 18 è ora inizializzato sul volume persistente `airesisDB18`; app e database sono attivi rispettivamente sulle porte host 3001 e 5434.
 - Il volume sorgente PostgreSQL 17 è risultato vuoto: non esistevano dati applicativi storici da trasferire. Il database corrente contiene schema e seed ufficiali del progetto.
 - I volumi legacy PostgreSQL 17/Yarn 1 e le immagini non più usate sono stati rimossi dopo backup, restore di prova e controlli di integrità.
 - Audit applicativo e stato remediation: [`audit_sicurezza.md`](audit_sicurezza.md)
 
-## Punto di ripresa — UI/UX G06 governance gruppi
+## Punto di ripresa — G10 chiuso, bonifica completata
 
-- Per istruzione dell'utente il lavoro si ferma alla chiusura di **G05**, pronto a ripartire da G06 senza riaprire gli audit precedenti.
-- G05 ha superato il gate Impeccable: **33/40**, P0=0 e P1=0. Baseline: `.impeccable/critique/2026-08-30T10-21-19Z__app-views-groups.md`; finale: `.impeccable/critique/2026-08-30T11-08-47Z__app-views-groups.md`.
-- I due P0 iniziali sono chiusi: la gestione membri non dipende più dall'asset inesistente `endless_page.js` e tutte le azioni/navigazioni del gruppo sono ora visibili in una barra locale responsive e role-aware.
-- Listing, profilo, new/edit, membri, inviti e permessi hanno un solo `main`, H1 contestuale, controlli reali, target principali da almeno 44 px, dialog accessibili, copy coerente, contrasto conforme e layout mobile senza overflow. La voce attiva della navigazione orizzontale viene portata automaticamente nel viewport.
-- Le route REST morte o non implementate sono state potate e le operazioni amministrative sono state ristrette al gruppo corrente: invio email e rimozione massiva richiedono autorizzazione, gli ID sono scoped e non è possibile assegnare un ruolo di un altro gruppo. Inventario riconciliato: **527** route totali, **484** UI assegnate e **43** tecniche escluse; G05 è sceso da 55 a **34** route, di cui 14 GET.
-- Browser reale: sette superfici G05 verificate a desktop e 390×844, con un solo `main`, H1 presente, nessun 500/Oops, `href="#"`, immagine rotta o overflow orizzontale. Verificati anche dialog regole/email, focus, Esc e ripristino del trigger senza inviare azioni mutanti.
-- Detector finale eseguito esattamente una volta sui tre alberi G05: exit 0 e JSON `[]`; i limiti source-level sugli ERB sono stati compensati con browser reale e regressioni Turbo.
-- Verifiche finali: **111 request/model/helper spec, 0 failure**; RuboCop sui file Ruby toccati senza offense; build esbuild e Tailwind verdi; locale/coverage YAML validi e `git diff --check` pulito. Le 12 system spec G05 restano non eseguibili nel container ARM perché Selenium Manager non fornisce ChromeDriver Linux ARM64; 11 falliscono per questa sola infrastruttura e i flussi corrispondenti sono stati verificati nella sessione Chrome reale.
-- Fixture di sviluppo riconoscibili e reversibili da conservare fino al cleanup finale esplicito: gruppo id 1 `[UI AUDIT] Civic Lab`; utente id 2 `ui-audit-g05-member@localhost` con membership accettata; utente id 3 `ui-audit-g05-applicant@localhost` con richiesta pendente; proposte id 1 `[UI AUDIT] Safer routes to public services`, id 2 `[UI AUDIT] Shared neighbourhood mobility plan` con commenti/revisione/life e id 3 `[UI AUDIT G04] Accessible neighbourhood vote`; evento id 1 `[UI AUDIT G04] Voting window`; supporto della proposta 1 dal gruppo 1. Non rimuoverle durante G06.
-- Prossimo blocco: baseline dual-agent G06 sulle 33 route assegnate a `group_areas`, `area_roles`, `area_participations`, `participation_roles` e `user_likes`, usando i source target e i representative path di `.impeccable/ui-ux-coverage.yml`.
-- G01 resta separatamente `blocked_pending_legal_authority`; non inventare testi o identità legali per sbloccarlo.
+- **G10 ha superato il gate Impeccable a 37/40**, P0/P1/P2/P3 tutti a zero. Baseline: `.impeccable/critique/2026-08-30T16-06-20Z__app-views-admin.md`; finale: `.impeccable/critique/2026-08-30T16-52-00Z__app-views-admin.md`.
+- Le assessment indipendenti finali hanno dato 39/40 visuale e 37/40 tecnico conservativo. Il detector G10 è stato eseguito esattamente una volta, exit 0 e JSON `[]`, e non è stato rilanciato nei follow-up.
+- G10 ha ripristinato boot e strumenti operativi eliminando il riferimento legacy a `ManagerActions`; admin e moderator hanno gate separati, target utente deterministici, guard per self/ultimo admin e mutazioni soltanto POST/PATCH con 303/422.
+- Newsletter: CRUD, preview e publish sono completi; markup sanitizzato senza ERB eseguibile, receiver allowlisted, conferma e conteggio destinatari, batch deduplicati e un job retryable per destinatario.
+- Cleanup notifiche: enqueue dal panel, batch da 500, retention assoluta a sei mesi, unread recenti preservate, read oltre un mese rimosse senza doppio conteggio e matrice di regressione completa.
+- RailsAdmin è montato a `/admin/data`, usa asset Sprockets reali e precompilabili, `<title>` nel `head`, landmark `main`, H1 e tema responsive con target da almeno 44 px. Rimossi dashboard Haml, login-as e stub vendor obsoleti.
+- ElFinder top-level e le view controller CKEditor morte sono stati rimossi; la route inventory G10 è scesa da 33/13 GET a **22/8 GET**, senza action gap. L'inventario live complessivo è **403 route controller = 360 UI assegnate + 43 tecniche escluse**, senza route non assegnate.
+- I pass cross-surface `animate`, `typeset` e `colorize` sono verdi: riduzione movimento globale, tipografia Sora coerente, misure di lettura controllate e colori semantici DaisyUI. Nessun effetto `overdrive` è stato applicato: per una superficie amministrativa la scelta intenzionale è prevedibilità, velocità e assenza di spettacolarizzazione.
+- ChromeDriver Linux ARM64 è disponibile nel container tramite `chromium`/`chromium-driver`; ambiente `aarch64` verificato con Chromium e ChromeDriver 151.0.7922.173. Le system spec Selenium usano i binari espliciti e il vecchio blocco Selenium Manager è chiuso.
+- Verifica finale sul diff: **332 esempi, 0 failure, 1 pending noto** (`ResqueMailer#invite`, setup legacy con arità errata); suite amministrativa/job finale **33 esempi, 0 failure**; RuboCop **106 file, 0 offense**; 150 ERB compilati; 5 YAML parsati; esbuild, Tailwind, `zeitwerk:check`, precompile production e `git diff --check` verdi.
+- Sicurezza dipendenze: `bundle outdated --strict` riporta “Bundle up to date”; `bundle-audit` nessuna vulnerabilità; `yarn npm audit --all --recursive` nessun advisory. Brakeman termina senza errori di parsing e riporta 21 warning legacy separati (1 command injection, 9 XSS, 3 file access, 8 SQL injection).
+- La bonifica finale ha sostituito il database development con il baseline PostgreSQL 18 verificato: conteggi identici al manifest per tutte le tabelle, `ui_audit_rows=0`, 1 utente seed, 0 gruppi e 0 proposte. `pg_amcheck` ha verificato 835/835 relazioni e 2.844 pagine; migrazioni allineate e smoke HTTP 200 su `/` e su `/landing` dopo il redirect canonico.
+- Prima della bonifica è stato salvato il dump recuperabile ignorato da Git `tmp/database_backups/2026-08-30-pre-ui-cleanup/airesis-development.pre-ui-cleanup.dump`, SHA-256 `eb3133106f185b0357ef946381846a87d079b0c4564224c7c4bf2a31352b36b5`. Il database di transizione e i dump temporanei nel container sono stati rimossi.
+- `public/assets` è output generato/ignorato, rigenerato con gli asset correnti e privo di dati applicativi.
+- Prossimo passo funzionale possibile: G01 richiede testi e identità approvati dal titolare; resta `blocked_pending_legal_authority` e non va sbloccato inventando contenuti. In alternativa il worktree è pronto per review e per un eventuale commit/push soltanto su richiesta esplicita.
 
 ## Blocco appena completato — remediation P1 A1-A4
 
@@ -59,7 +64,7 @@
 ### Verifiche del blocco
 
 - Suite P1 + integrazione blog/tag: **57 esempi, 0 failure** con `NO_COVERAGE=1` (la soglia SimpleCov globale non è significativa su una selezione mirata).
-- Brakeman 8.0.6: i finding A2/A3 non sono più presenti. Il report completo conserva 28 warning estranei al blocco e l'errore di parsing già noto su `app/views/frm/admin/categories/_categories.html.erb`.
+- Brakeman 8.0.6: i finding A2/A3 non sono più presenti. La verifica finale post-G10 non ha errori di parsing e conserva 21 warning legacy separati, inventariati nel punto di ripresa.
 - RuboCop sui file Ruby toccati: nessuna nuova offense; resta il warning preesistente per l'argomento `vars` inutilizzato in `ApplicationHelper#pagy_nav`.
 - `git diff --check`: pulito.
 - Container applicativo riavviato per ricaricare l'initializer Rack::Attack; smoke test finale: HTTP 200 su `http://localhost:3001/`.
@@ -161,23 +166,13 @@ Il controllo Brakeman corrente, successivo alla remediation P1, è riportato nel
 
 L'unico warning di compatibilità osservato al boot proviene da RailsAdmin 3.3.0 e riguarda stringhe che Ruby renderà frozen in futuro; non impedisce l'avvio su Ruby 4.0.6.
 
-## Stato noto della suite estesa
+## Stato corrente delle verifiche
 
-Le 14 failure rimaste appartengono al debito già noto prima del refresh:
-
-- aspettativa obsoleta in `StepsHelper`;
-- `ProposalsHelper` privo di `reload_message` nel contesto dello spec;
-- view spec eventi priva di `for_list`;
-- flussi registrazione/sessione che ricevono `429` perché la cache Rack::Attack resta condivisa nella suite;
-- errori successivi nei flussi auth dovuti agli utenti non creati dopo i `429`;
-- aspettativa della coda job in `NotificationForumTopicCreate`.
-
-Due file bloccano ancora il caricamento della suite completa:
-
-- `spec/lib/resque/failure/notifier2_spec.rb` richiede il file eliminato `lib/resque/failure/notifier2`;
-- `spec/requests/admin/panel_controller_spec.rb` carica `Admin::PanelController`, che include il modulo mancante `ManagerActions`.
-
-Lo stesso `ManagerActions` blocca il `zeitwerk:check` completo. Questi guasti non sono stati ampliati implicitamente nel refresh dello stack.
+- Tutte le spec Ruby modificate o aggiunte dal programma attivo sono state eseguite insieme: **332 esempi, 0 failure, 1 pending**.
+- Il solo pending è `ResqueMailer#invite`: il setup legacy passa due argomenti a un'interfaccia che ne accetta uno. Non riguarda i flussi newsletter G10, coperti separatamente e verdi.
+- `Admin::PanelController` carica correttamente e `zeitwerk:check` è verde; il vecchio blocco `ManagerActions` non esiste più.
+- La vecchia suite globale da 1.516 esempi non è stata rieseguita integralmente in questo blocco; i suoi 14 failure storici non descrivono lo stato del diff G06-G10 e non vanno usati come regressioni correnti.
+- Il file legacy `spec/lib/resque/failure/notifier2_spec.rb` continua a richiedere un'implementazione già eliminata ed è fuori dal perimetro del diff corrente.
 
 ## Remediation P0 preservata
 
@@ -203,28 +198,28 @@ Resta separata la validazione semantica dell'IPN PayPal: destinatario, valuta/im
 
 ## Worktree da preservare
 
-Non usare restore/reset/clean. Al termine del commit G05 il worktree deve risultare pulito; le fixture `[UI AUDIT]` nel database locale restano intenzionali e vanno conservate fino al cleanup finale esplicito. La history pubblicata comprende:
+Non usare restore/reset/clean. Il worktree contiene l'intero blocco G06-G10 e ChromeDriver ARM64 non committato: va preservato integralmente. Le fixture `[UI AUDIT]` sono già state bonificate dal database locale e non devono essere ricreate salvo un nuovo audit esplicito. Non eseguire commit o push senza una nuova richiesta esplicita. La history già pubblicata comprende:
 
 - autenticazione token: `app/controllers/tokens_controller.rb`, `config/initializers/rack_attack.rb` e `spec/requests/tokens_controller_spec.rb`;
 - escaping immagini/tag: `lib/image_helper.rb`, `app/helpers/application_helper.rb`, `app/models/concerns/taggable.rb`, le tre view blog e le relative spec;
 - credenziali Facebook: regressione in `spec/config/omniauth_security_spec.rb`; l'initializer bonificato è già nel baseline riscritto;
 - stato operativo: `audit_sicurezza.md` e questo `HANDOFF.md`.
-- programma UI/UX: `.impeccable/ui-ux-coverage.yml`, snapshot in `.impeccable/critique`, token e componenti condivisi in `app/assets/tailwind/application.css`, controller Stimulus per drawer/dialog/navigation e modifiche G01-G05 nelle relative view;
+- programma UI/UX pubblicato: stato fino a G05; nel worktree sono presenti coverage, snapshot e implementazione completa G06-G10, incluse system spec Selenium ARM64;
 - regressioni G01: request spec di `HomeController`/`GroupsController` e spec helper per il contatto pubblico configurato.
 
 `.claude/settings.local.json` e `meta.json` restano materiale locale e non devono essere aggiunti al repository.
 
-## Programma attivo — revisione UI/UX completa
+## Programma UI/UX — stato consolidato
 
 - Obiettivo richiesto: critique Impeccable, applicazione dei rilievi e nuova critique fino ad almeno 33/40 per ogni gruppo; chiusura con `animate`, `typeset`, `colorize` e `overdrive`.
 - Inventario persistente: `.impeccable/ui-ux-coverage.yml`.
-- Copertura corrente: 10 gruppi, 484 route UI assegnate e 43 endpoint tecnici non visuali esclusi esplicitamente; inventario riconciliato 527/527 dopo la rimozione delle route REST morte emersa in G02-G05.
+- Copertura corrente: 10 gruppi, 360 route UI assegnate e 43 endpoint tecnici non visuali esclusi esplicitamente; inventario live riconciliato **403/403** dopo la potatura finale G10.
 - Autorizzazione sub-agent Impeccable ricevuta dall'utente; ogni iterazione critique usa due assessment indipendenti e read-only, A design/Nielsen e B detector/browser.
 - G01 — pubblico, accesso e onboarding: baseline **17/40**, iterazione 3 **28/40**, iterazione 4 **28/40**. Le correzioni successive hanno chiuso contrasto (6,20:1 misurato), drawer modale, nomi/focus dei dialog, target secondari, landmark, empty state e 404. Il detector dell'iterazione 4 ha restituito `[]`, ma in fallback regex perché mancano `htmlparser2`, `css-select`, `css-tree` e `domutils`; il risultato è un undercount dichiarato.
 - G01 resta `blocked_pending_legal_authority`: il gate 33/40 richiede zero P1, ma Privacy 2018, Termini solo italiani e consenso obbligatorio necessitano testo approvato, data effettiva, identità del titolare/operatore, contatto reale e provider di deployment. Il repository e la history non contengono una fonte più autorevole. Il vecchio `info@airesis.it` non viene più presentato come contatto corrente: è usato solo `APP_EMAIL_ADDRESS` se valido e non-placeholder, altrimenti l'interfaccia dichiara che il contatto non è configurato.
 - Evidenza G01: build esbuild e Tailwind verdi; **73 request spec + 2 spec helper, 0 failure** con `NO_COVERAGE=1`; 13 route guest verificate a 1440×900 e 390×844 senza overflow, con redirect `/landing` e 404 reale. La suite helper più ampia ha un test preesistente dipendente dal cambio data a mezzanotte (`30.minutes.ago` cade nel giorno precedente).
 - Snapshot persistiti: `.impeccable/critique/2026-08-29T20-41-55Z__app-views-devise.md`, `.impeccable/critique/2026-08-29T22-07-25Z__app-views-devise.md` e `.impeccable/critique/2026-08-29T22-21-39Z__app-views-devise.md`.
-- G02 — shell, dashboard, identità e notifiche: **passed 33/40**, iterazione 4, P0/P1 zero. Baseline 13/40, iterazione 2 29/40, iterazione 3 31/40. Corrette route morte/rotte, notifiche con lettura esplicita, ricerca HTML/JSON, dashboard first-run, profilo e preferenze, statistiche senza `NaN`, navigazione locale, contrasto, dialog/drawer/popup, nomi accessibili, skip link e pagine archivio italiane dichiarate. Le 14 superfici HTML passano a desktop/mobile senza overflow, errori runtime, H1/main mancanti o traduzioni assenti; gli endpoint geografici sono JSON di supporto. Build esbuild/Tailwind verdi; **88 request spec, 0 failure, 1 pending noto** per fixture Alert. La system spec Selenium è bloccata nel container ARM dall'assenza di ChromeDriver, mentre i flussi tastiera/focus sono passati nella sessione Chrome reale.
+- G02 — shell, dashboard, identità e notifiche: **passed 33/40**, iterazione 4, P0/P1 zero. Baseline 13/40, iterazione 2 29/40, iterazione 3 31/40. Corrette route morte/rotte, notifiche con lettura esplicita, ricerca HTML/JSON, dashboard first-run, profilo e preferenze, statistiche senza `NaN`, navigazione locale, contrasto, dialog/drawer/popup, nomi accessibili, skip link e pagine archivio italiane dichiarate. Le 14 superfici HTML passano a desktop/mobile senza overflow, errori runtime, H1/main mancanti o traduzioni assenti; gli endpoint geografici sono JSON di supporto. Build esbuild/Tailwind verdi; **88 request spec, 0 failure, 1 pending noto** per fixture Alert. Il blocco infrastrutturale Selenium ARM descritto nello snapshot storico è ora risolto dall'installazione Chromium/ChromeDriver di G07; le specifiche G02 non sono state rilanciate in questo blocco.
 - Snapshot G02: `.impeccable/critique/2026-08-29T22-42-52Z__app-views-users.md`, `2026-08-29T23-11-56Z__app-views-users.md`, `2026-08-29T23-34-22Z__app-views-users.md` e `2026-08-29T23-42-03Z__app-views-users.md`.
 - G03 — proposte, scoperta, creazione e lettura: **passed 37/40**, iterazione 4, P0/P1 zero; il detector finale ha P2 zero. Baseline 15/40, iterazione 2 29/40, iterazione 3 33/40 ma gate fallito per il sort verso la partial. Listing, new, show, edit, JSON categorie, banner/test banner, Trix e drawer sono stati verificati a desktop/mobile. Build verdi; **107 spec helper/request, 0 failure**.
 - Snapshot G03: `.impeccable/critique/2026-08-29T23-58-01Z__app-views-proposals.md` e `.impeccable/critique/2026-08-30T00-42-19Z__app-views-proposals.md`.
@@ -232,14 +227,19 @@ Non usare restore/reset/clean. Al termine del commit G05 il worktree deve risult
 - Snapshot G04: `.impeccable/critique/2026-08-30T09-00-27Z__app-views-proposal-comments.md` e `.impeccable/critique/2026-08-30T09-44-03Z__app-views-proposal-comments.md`.
 - G05 — gruppi, profilo e membership: **passed 33/40**, iterazione 2, P0/P1 zero. Baseline 13/40 con membri in 500 e navigazione/azioni invisibili; ricostruiti listing, profilo, form, gestione membri, inviti e permessi, ristrette le operazioni batch al gruppo autorizzato e potate 21 route morte. Sette superfici desktop/mobile senza overflow o errori runtime; detector finale `[]`; **111 request/model/helper spec, 0 failure**, RuboCop e build verdi.
 - Snapshot G05: `.impeccable/critique/2026-08-30T10-21-19Z__app-views-groups.md` e `.impeccable/critique/2026-08-30T11-08-47Z__app-views-groups.md`.
-- Prossimo passo operativo: iniziare G06 dalla baseline dual-agent descritta nella coverage, preservando tutte le fixture `[UI AUDIT]` fino al cleanup finale esplicito. G01 resta in attesa dell'autorità legale.
+- G06 — governance aree, ruoli e permessi: **passed 33/40**, iterazione 2, P0/P1 zero. Route 26/9 GET; scope tenant-safe, default protetti, form/errori Turbo e accessibilità verificati. Snapshot baseline/finale: `.impeccable/critique/2026-08-30T11-41-07Z__app-views-group-areas.md` e `.impeccable/critique/2026-08-30T12-25-21Z__app-views-group-areas.md`.
+- G07 — eventi e calendario: **passed 35/40**, iterazione 2, P0/P1/P2 zero. Route 26/8 GET; creazione atomica, voting state machine, commenti/RSVP, calendario responsive e mappa verificati con browser reale e Selenium ARM64. Snapshot baseline/finale: `.impeccable/critique/2026-08-30T12-28-03Z__app-views-events.md` e `.impeccable/critique/2026-08-30T13-24-16Z__app-views-events.md`.
+- G08 — blog, tag, documenti e contenuti: **passed 38/40**, iterazione 3, P0/P1/P2 zero. Route 39/20 GET; blog/post/commenti, tag, document lifecycle, hardening path/MIME, delete mobile e skip link verificati con browser reale e Selenium ARM64. Snapshot baseline/finale: `.impeccable/critique/2026-08-30T13-58-52Z__app-views-blogs.md` e `.impeccable/critique/2026-08-30T15-04-24Z__app-views-blogs.md`.
+- G09 — forum e moderazione: **passed 36/40**, iterazione 3, P0/P1/P2 zero. Route 47/20 GET; workflow persistito, moderazione e associazioni tenant-scoped, verbi sicuri, Trix, layout responsive e target da 44 px verificati con browser reale e Selenium ARM64. Snapshot baseline/finale: `.impeccable/critique/2026-08-30T15-11-34Z__app-views-frm.md` e `.impeccable/critique/2026-08-30T15-59-16Z__app-views-frm.md`.
+- G10 — amministrazione e strumenti operativi: **passed 37/40**, iterazione 3, P0/P1/P2/P3 zero. Route 22/8 GET; gate admin/moderator, newsletter, cleanup notifiche, RailsAdmin, asset production e operazioni privilegiate verificati. Snapshot baseline/finale: `.impeccable/critique/2026-08-30T16-06-20Z__app-views-admin.md` e `.impeccable/critique/2026-08-30T16-52-00Z__app-views-admin.md`.
+- Prossimo passo operativo: ottenere dal titolare l'autorità e i contenuti legali necessari a G01, oppure review/commit del worktree su richiesta esplicita. Non esiste un G11 pianificato.
 
-Il finding sicurezza A5 sulla moderazione forum resta separato e non va corretto implicitamente durante una modifica puramente visuale.
+Il finding sicurezza A5 sulla moderazione forum è chiuso in G09 con scope per forum, allowlist, parametri stretti e regressioni cross-tenant/distruttive.
 
 ## Vincoli per la ripresa
 
 - Non fare ulteriori commit, push, merge, deploy, migrazioni o modifiche a servizi esterni senza richiesta esplicita.
 - Conservare insieme le correzioni P0 e il refresh stack appena completato.
 - Se viene recuperato un dump storico, ripristinarlo prima in un database temporaneo e confrontarlo con manifest e vincoli prima di sostituire `airesis-development`.
-- Usare test mirati durante l'implementazione; la suite estesa ha i guasti noti sopra.
+- Usare test mirati durante l'implementazione e mantenere come baseline corrente la suite sul diff da 332 esempi descritta sopra.
 - Aggiornare questo handoff al termine del prossimo blocco, sostituendo il punto di ripresa invece di accumulare note contraddittorie.

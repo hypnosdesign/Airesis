@@ -1,40 +1,21 @@
-<div id="groups_table">
 <% if @frm_mods.empty? %>
-  <h4 class="text-lg"><%= t('pages.forum_groups.index.create_first') %></h4>
+  <p class="rounded-box border border-base-300 bg-base-100 p-6 text-base-content/70" role="status"><%= t('pages.forum_groups.index.create_first') %></p>
 <% else %>
-  <table class="table index table-striped" cellspacing="0">
-    <thead>
-      <tr>
-        <th><%= t('name', scope: 'frm.admin.mods') %></th>
-        <th><%= t('edit', scope: 'frm.admin.mods') %></th>
-        <th><%= t('delete', scope: 'frm.admin.mods') %></th>
-      </tr>
-    </thead>
-    <tbody>
-      <% @frm_mods.each do |group| %>
-        <tr>
-          <td>
-            <%= link_to group.name, group_frm_admin_mod_url(@group, group) %>
-            <br>
-            <% group.members.each do |member| %>
-              <%= avatar(member, size: 20) %>
-            <% end %>
-          </td>
-          <td>
-            <%= link_to group_frm_admin_mod_url(@group, group), class: 'btn btn-sm' do %>
-              <i class="fa-solid fa-pencil"></i>
-              <%= t('edit', scope: 'frm.admin.mods') %>
-            <% end %>
-          </td>
-          <td>
-            <%= link_to group_frm_admin_mod_url(@group, group), data: { turbo_method: :delete, turbo_confirm: t('confirm_delete') }, class: 'btn btn-sm btn-error' do %>
-              <i class="fa-regular fa-trash-can"></i>
-              <%= t('delete', scope: 'frm.admin.mods') %>
-            <% end %>
-          </td>
-        </tr>
-      <% end %>
-    </tbody>
-  </table>
+  <div class="divide-y divide-base-300 rounded-box border border-base-300 bg-base-100">
+    <% @frm_mods.each do |group| %>
+      <article class="p-4 sm:p-5">
+        <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+          <div>
+            <h2 class="text-lg font-semibold"><%= link_to group.name, group_frm_admin_mod_url(@group, group), class: "underline-offset-4 hover:underline" %></h2>
+            <p class="mt-1 text-sm text-base-content/60"><%= t('frm.admin.mod.members_count', count: group.members.size) %></p>
+            <div class="mt-2 flex -space-x-1" aria-hidden="true"><% group.members.first(5).each do |member| %><%= avatar(member, size: 28) %><% end %></div>
+          </div>
+          <div class="flex flex-wrap gap-2">
+            <%= link_to group_frm_admin_mod_url(@group, group), class: 'btn btn-ghost min-h-11' do %><i class="fa-solid fa-user-gear" aria-hidden="true"></i><%= t('edit', scope: 'frm.admin.mods') %><% end %>
+            <%= link_to group_frm_admin_mod_url(@group, group), data: { turbo_method: :delete, turbo_confirm: t('confirm_delete') }, class: 'btn btn-error btn-outline min-h-11' do %><i class="fa-regular fa-trash-can" aria-hidden="true"></i><%= t('delete', scope: 'frm.admin.mods') %><% end %>
+          </div>
+        </div>
+      </article>
+    <% end %>
+  </div>
 <% end %>
-</div>

@@ -1,12 +1,20 @@
 class EventComment < ApplicationRecord
+  MAX_BODY_LENGTH = 2_500
+
   belongs_to :user
   belongs_to :event
-  belongs_to :comment, class_name: 'EventComment', foreign_key: :parent_event_comment_id
+  belongs_to :comment, class_name: 'EventComment', foreign_key: :parent_event_comment_id, optional: true
+
+  has_many :comments,
+           class_name: 'EventComment',
+           foreign_key: :parent_event_comment_id,
+           inverse_of: :comment,
+           dependent: :destroy
 
   has_many :likes, class_name: 'EventCommentLike', foreign_key: :event_comment_id, dependent: :destroy
   has_many :likers, class_name: 'User', through: :likes, source: :user
 
-  validates :body, presence: true
+  validates :body, presence: true, length: { maximum: MAX_BODY_LENGTH }
 
   attr_accessor :collapsed
 

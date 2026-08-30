@@ -1,17 +1,20 @@
-<% participants.each do |participation| %>
-  <div class="participant_left">
-    <div class="participant_image">
-      <%= avatar(participation.user, size: 48) %>
-    </div>
-    <div class="participant_text">
-      <%= link_to_user participation.user, full_name: true %>
-      <% if participation.guests > 0 %>
-        <%= raw t('pages.events.show.with_guests', field: participation.guests) %>
-      <% end %>
-    </div>
-    <div style="margin-top:5px;">
-      <span>"<%= participation.comment %>"</span>
-    </div>
-    <div style="clear: both;"></div>
-  </div>
-<% end %>
+<ul class="divide-y divide-base-content/10" role="list">
+  <% participants.includes(:user).each do |participation| %>
+    <li class="flex min-w-0 gap-3 py-3 first:pt-0 last:pb-0">
+      <div class="shrink-0"><%= avatar(participation.user, size: 44) %></div>
+      <div class="min-w-0 flex-1">
+        <p class="break-words font-bold">
+          <%= link_to_user participation.user,
+                           full_name: true,
+                           class: 'inline-flex min-h-11 items-center' %>
+        </p>
+        <% if participation.guests.positive? %>
+          <p class="mt-1 text-sm text-base-content/65"><%= t('pages.events.show.with_guests', field: participation.guests) %></p>
+        <% end %>
+        <% if participation.comment.present? %>
+          <p class="mt-2 break-words text-sm text-base-content/75">“<%= participation.comment %>”</p>
+        <% end %>
+      </div>
+    </li>
+  <% end %>
+</ul>

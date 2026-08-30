@@ -1,13 +1,13 @@
 <% @extend = true %>
-<h1><%= @tag %></h1>
-<div role="tablist" class="tabs tabs-bordered">
-  <a role="tab" class="tab tab-active" href="#proposals"><%= t('pages.tags.proposals_tab') %></a>
-  <a role="tab" class="tab" href="#posts"><%= t('pages.tags.posts_tab') %></a>
-  <a role="tab" class="tab" href="#groups"><%= t('pages.tags.groups_tab') %></a>
-</div>
-<div class="mt-4">
-  <div id="proposals">
-    <h2><%= t('pages.tags.list_proposals_with_tag') %></h2>
+<%= render layout: 'layouts/page_title', locals: { title: @tag } do %><% end %>
+<nav aria-label="<%= t('pages.tags.show.on_this_page') %>" class="mb-6 flex flex-wrap gap-2 border-b border-base-content/15 pb-4">
+  <%= link_to t('pages.tags.proposals_tab'), '#proposals', class: 'btn btn-ghost min-h-11' %>
+  <%= link_to t('pages.tags.posts_tab'), '#posts', class: 'btn btn-ghost min-h-11' %>
+  <%= link_to t('pages.tags.groups_tab'), '#groups', class: 'btn btn-ghost min-h-11' %>
+</nav>
+<div class="space-y-10">
+  <section id="proposals" aria-labelledby="tag-proposals-title" class="scroll-mt-24">
+    <h2 id="tag-proposals-title" class="mb-4 text-2xl font-bold"><%= t('pages.tags.list_proposals_with_tag') %></h2>
     <% if @proposals.size == 0 %>
       <div class="Proposal">
         <p><%= t('pages.tags.no_proposals_with_tag') %></p>
@@ -19,9 +19,9 @@
         <% end %>
       </ul>
     <% end %>
-  </div>
-  <div id="posts">
-    <h2><%= t('pages.tags.list_posts_with_tag') %></h2>
+  </section>
+  <section id="posts" aria-labelledby="tag-posts-title" class="scroll-mt-24">
+    <h2 id="tag-posts-title" class="mb-4 text-2xl font-bold"><%= t('pages.tags.list_posts_with_tag') %></h2>
     <% if @blog_posts.size == 0 %>
       <div class="blogPost">
         <p><%= t('pages.tags.no_posts_with_tag') %></p>
@@ -33,9 +33,9 @@
         </div>
       <% end %>
     <% end %>
-  </div>
-  <div id="groups">
-    <h2><%= t('pages.tags.list_groups_with_tags') %></h2>
+  </section>
+  <section id="groups" aria-labelledby="tag-groups-title" class="scroll-mt-24">
+    <h2 id="tag-groups-title" class="mb-4 text-2xl font-bold"><%= t('pages.tags.list_groups_with_tags') %></h2>
     <% if @groups.size == 0 %>
       <p><%= t('pages.tags.no_groups_with_tag') %></p>
     <% else %>
@@ -43,17 +43,15 @@
         <%= render collection: @groups, partial: 'groups/group_tag', as: 'group' %>
       </ul>
     <% end %>
-  </div>
+  </section>
 </div>
 <% content_for :left_panel do %>
   <div class="card bg-base-200 p-4">
-    <h4><%= t('pages.tags.show.related_title') %></h4>
-  </div>
-  <div>
-    <% @similars.each do |tag| %>
-      <span class="badge tag">
-        <a href="<%= tag_path tag.text %>"><%= tag.text %></a>
-      </span>
-    <% end %>
+    <h2 class="mb-3 font-bold"><%= t('pages.tags.show.related_title') %></h2>
+    <div class="flex flex-wrap gap-2">
+      <% @similars.each do |tag| %>
+        <%= link_to tag.text, tag_path(tag.text), class: 'badge badge-outline min-h-8 px-3' %>
+      <% end %>
+    </div>
   </div>
 <% end %>

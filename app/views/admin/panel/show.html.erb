@@ -1,24 +1,57 @@
-<% @page_title = 'Pannello amministrazione' %>
-<% if is_admin? %>
-  <div class="flex flex-wrap gap-2 mb-4">
-    <%= button_to 'Ricalcola ranking utenti', calculate_rankings_admin_panel_path, method: :post, class: 'btn btn-sm' %>
-    <%= button_to 'Ricalcola stato proposte', change_proposals_state_admin_panel_path, method: :post, class: 'btn btn-sm', title: 'Verifica lo stato di tutte le proposte in votazione. Se il termine è scaduto e non sono state elaborate, le elabora' %>
-    <%= button_to 'Aggiorna sitemap', write_sitemap_admin_panel_path, method: :post, class: 'btn btn-sm' %>
-    <%= button_to 'Cancella vecchie notifiche', delete_old_notifications_admin_panel_path, method: :post, class: 'btn btn-sm' %>
-    <%= button_to 'Mailer Test', test_mailer_admin_panel_path, method: :post, class: 'btn btn-sm' %>
-    <%= button_to 'Scheduler Test', test_scheduler_admin_panel_path, method: :post, class: 'btn btn-sm' %>
-    <%= button_to 'Test exceptions', test_exceptions_admin_panel_path, method: :post, class: 'btn btn-sm' %>
-    <%= button_to 'Calcola affinità Utenti-Gruppi', calculate_user_group_affinity_admin_panel_path, method: :post, class: 'btn btn-sm' %>
-  </div>
+<% @page_title = t('admin_ui.panel.title') %>
 
-  <div class="card bg-base-200 p-4 mb-4">
-    <h3 class="text-lg font-bold mb-2">Alert Test</h3>
-    <%= form_with url: test_notification_admin_panel_path, method: :post do |f| %>
-      <%= f.label :alert_id, 'Alert ID' %>
-      <%= f.text_field :alert_id, class: 'input input-bordered w-full max-w-xs' %>
-      <%= f.submit 'Send', class: 'btn btn-sm mt-2' %>
-    <% end %>
-  </div>
+<header class="mb-8 max-w-3xl">
+  <h1 class="text-3xl font-bold tracking-tight"><%= t('admin_ui.panel.title') %></h1>
+  <p class="mt-2 text-base-content/70"><%= t('admin_ui.panel.description') %></p>
+</header>
 
-  <%= render 'admin/block_users' %>
-<% end %>
+<section aria-labelledby="maintenance_title">
+  <h2 id="maintenance_title" class="text-xl font-bold"><%= t('admin_ui.panel.maintenance') %></h2>
+  <p class="mt-1 max-w-3xl text-sm text-base-content/70"><%= t('admin_ui.panel.maintenance_hint') %></p>
+  <div class="mt-4 divide-y divide-base-300 rounded-box border border-base-300 bg-base-100">
+    <div class="flex flex-col gap-3 p-4 sm:flex-row sm:items-center sm:justify-between">
+      <div><h3 class="font-semibold"><%= t('admin_ui.panel.rankings') %></h3><p class="mt-1 text-sm text-base-content/60"><%= t('admin_ui.panel.rankings_hint') %></p></div>
+      <%= button_to t('admin_ui.panel.run'), calculate_rankings_admin_panel_path, method: :post, class: 'btn btn-outline min-h-11', aria: { label: t('admin_ui.panel.run_named', operation: t('admin_ui.panel.rankings')) }, data: { turbo_confirm: t('admin_ui.panel.confirm_operation', operation: t('admin_ui.panel.rankings')) } %>
+    </div>
+    <div class="flex flex-col gap-3 p-4 sm:flex-row sm:items-center sm:justify-between">
+      <div><h3 class="font-semibold"><%= t('admin_ui.panel.proposals') %></h3><p class="mt-1 text-sm text-base-content/60"><%= t('admin_ui.panel.proposals_hint') %></p></div>
+      <%= button_to t('admin_ui.panel.run'), change_proposals_state_admin_panel_path, method: :post, class: 'btn btn-outline min-h-11', aria: { label: t('admin_ui.panel.run_named', operation: t('admin_ui.panel.proposals')) }, data: { turbo_confirm: t('admin_ui.panel.confirm_operation', operation: t('admin_ui.panel.proposals')) } %>
+    </div>
+    <div class="flex flex-col gap-3 p-4 sm:flex-row sm:items-center sm:justify-between">
+      <div><h3 class="font-semibold"><%= t('admin_ui.panel.sitemap') %></h3><p class="mt-1 text-sm text-base-content/60"><%= t('admin_ui.panel.sitemap_hint') %></p></div>
+      <%= button_to t('admin_ui.panel.run'), write_sitemap_admin_panel_path, method: :post, class: 'btn btn-outline min-h-11', aria: { label: t('admin_ui.panel.run_named', operation: t('admin_ui.panel.sitemap')) }, data: { turbo_confirm: t('admin_ui.panel.confirm_operation', operation: t('admin_ui.panel.sitemap')) } %>
+    </div>
+    <div class="flex flex-col gap-3 p-4 sm:flex-row sm:items-center sm:justify-between">
+      <div><h3 class="font-semibold"><%= t('admin_ui.panel.notifications_cleanup') %></h3><p class="mt-1 text-sm text-base-content/60"><%= t('admin_ui.panel.notifications_cleanup_hint') %></p></div>
+      <%= button_to t('admin_ui.panel.delete_old'), delete_old_notifications_admin_panel_path, method: :post, class: 'btn btn-error btn-outline min-h-11', data: { turbo_confirm: t('admin_ui.panel.confirm_cleanup') } %>
+    </div>
+  </div>
+</section>
+
+<section class="mt-10" aria-labelledby="diagnostics_title">
+  <h2 id="diagnostics_title" class="text-xl font-bold"><%= t('admin_ui.panel.diagnostics') %></h2>
+  <p class="mt-1 max-w-3xl text-sm text-base-content/70"><%= t('admin_ui.panel.diagnostics_hint') %></p>
+  <div class="mt-4 grid gap-4 lg:grid-cols-2">
+    <div class="rounded-box border border-base-300 bg-base-100 p-4">
+      <h3 class="font-semibold"><%= t('admin_ui.panel.delivery_tests') %></h3>
+      <p class="mt-1 text-sm text-base-content/60"><%= t('admin_ui.panel.delivery_tests_hint') %></p>
+      <div class="mt-4 flex flex-wrap gap-3">
+        <%= button_to t('admin_ui.panel.mail_test'), test_mailer_admin_panel_path, method: :post, class: 'btn btn-outline min-h-11', data: { turbo_confirm: t('admin_ui.panel.confirm_mail_test') } %>
+        <%= button_to t('admin_ui.panel.scheduler_test'), test_scheduler_admin_panel_path, method: :post, class: 'btn btn-outline min-h-11' %>
+      </div>
+    </div>
+    <div class="rounded-box border border-base-300 bg-base-100 p-4">
+      <h3 class="font-semibold"><%= t('admin_ui.panel.alert_test') %></h3>
+      <p id="alert_test_hint" class="mt-1 text-sm text-base-content/60"><%= t('admin_ui.panel.alert_test_hint') %></p>
+      <%= form_with url: test_notification_admin_panel_path, method: :post, class: 'mt-4 flex flex-col gap-3 sm:flex-row sm:items-end' do |f| %>
+        <div class="form-control flex-1"><%= f.label :alert_id, t('admin_ui.panel.alert_id'), class: 'label font-medium' %><%= f.number_field :alert_id, min: 1, class: 'input input-bordered min-h-11 w-full', aria: { describedby: 'alert_test_hint' } %></div>
+        <%= f.submit t('admin_ui.panel.send_test'), class: 'btn btn-outline min-h-11', data: { disable_with: t('loading') } %>
+      <% end %>
+    </div>
+  </div>
+</section>
+
+<section class="mt-10" aria-labelledby="account_controls_title">
+  <h2 id="account_controls_title" class="sr-only"><%= t('admin_ui.users.title') %></h2>
+  <%= render 'admin/block_users', heading_tag: :h3 %>
+</section>

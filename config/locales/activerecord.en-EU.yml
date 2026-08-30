@@ -17,6 +17,10 @@ en-EU:
         period: 'Repeat'
         frequency: 'Repeat every'
         private: 'Private'
+      meeting_participation:
+        response: 'Attendance response'
+        guests: 'Additional guests'
+        comment: 'Practical note'
       group:
         facebook_page_url: 'Facebook page address'
         name: 'Name'
@@ -44,6 +48,7 @@ en-EU:
       blog_post:
         title: 'Title'
         body: 'Text'
+        status: 'Visibility'
         published: 'State'
         published_true: 'Published'
         published_false: 'Draft'

@@ -1,10 +1,16 @@
-<p>
-  <%= f.radio_button "moderation_option", "approve" %>
-  <%= f.label "moderation_option_approve", t('approve', scope: 'forem.posts.moderation'), class: "badge badge-success" %>
-</p>
-<p>
-  <%= f.radio_button "moderation_option", "spam" %>
-  <%= f.label "moderation_option_spam", t('spam', scope: 'forem.posts.moderation'), class: "badge badge-error" %>
-</p>
-<br>
-<%= f.submit t('moderate', scope: 'forem.posts.moderation'), class: "btn btn-primary btn-sm" %>
+<fieldset>
+  <legend class="sr-only"><%= t('frm.moderation.options.legend') %></legend>
+  <div class="flex flex-wrap gap-3">
+    <label class="flex min-h-11 cursor-pointer items-center gap-2 rounded-btn border border-base-300 bg-base-100 px-3">
+      <%= f.radio_button "moderation_option", "approve", class: "radio radio-success radio-sm" %>
+      <span><%= t('frm.posts.moderation.approve') %></span>
+    </label>
+    <label class="flex min-h-11 cursor-pointer items-center gap-2 rounded-btn border border-base-300 bg-base-100 px-3">
+      <%= f.radio_button "moderation_option", "spam", class: "radio radio-error radio-sm" %>
+      <span><%= t('frm.posts.moderation.spam') %></span>
+    </label>
+  </div>
+</fieldset>
+<% if local_assigns.fetch(:submit, true) %>
+  <%= f.submit t('frm.posts.moderation.moderate'), class: "btn btn-primary mt-3 min-h-11" %>
+<% end %>

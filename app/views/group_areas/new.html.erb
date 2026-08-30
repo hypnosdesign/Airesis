@@ -1,10 +1,13 @@
 <nav class="breadcrumbs text-sm">
   <ul>
-    <li><%= link_to 'All working areas', group_group_areas_url(@group) %></li>
-    <li class="current">New group Area</li>
+    <li><%= link_to t('pages.groups.edit_work_areas.manage.breadcrumb'), group_group_areas_url(@group) %></li>
+    <li class="current"><%= t('pages.groups.edit_work_areas.form.title') %></li>
   </ul>
 </nav>
-<%= render 'group_areas/form' %>
+<%= render layout: 'layouts/page_title', locals: { title: t('pages.groups.edit_work_areas.form.title') } do %><% end %>
+<div class="max-w-3xl border border-base-content/15 bg-base-100 p-5 sm:p-6">
+  <%= render 'group_areas/form', modal: false %>
+</div>
 <% content_for :left_panel do %>
   <%= render partial: 'groups/administration_panel' %>
 <% end %>

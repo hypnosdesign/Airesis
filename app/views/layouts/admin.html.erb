@@ -1,4 +1,5 @@
-<% @page_title = 'Admin Area' %>
+<% @page_title ||= 'Admin Area' %>
+<% @content_landmark = true %>
 
 <% content_for :left_panel do %>
   <%= render 'admin/left_panel' %>

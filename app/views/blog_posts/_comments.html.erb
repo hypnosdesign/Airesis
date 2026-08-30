@@ -1,3 +1,9 @@
-<div id="blogPostComments" class="blogComments">
-  <%= render partial: 'blog_posts/comment', collection: @blog_comments, as: :comment %>
+<div id="blogPostComments" class="blogComments space-y-3">
+  <% if @blog_comments.any? %>
+    <%= render partial: 'blog_posts/comment', collection: @blog_comments, as: :comment %>
+  <% else %>
+    <div class="rounded-box border border-base-content/15 bg-base-100 p-5 text-base-content/70">
+      <p><%= t('pages.blog_posts.no_comments') %></p>
+    </div>
+  <% end %>
 </div>

@@ -1,18 +1,35 @@
 <%= render layout: "layouts/page_title", locals: { title: @page_title } do %>
-  <% if @blog_posts.size == 0 && !params[:page] %>
-    <div class="blogPost card bg-base-200 p-4">
-      <h1 class="text-xl font-bold"><%= t('pages.blogs.show.no_posts') %></h1>
-      <p><%= t('pages.blogs.show.no_unpublished_posts') %></p>
-    </div>
-  <% else %>
-    <%= render collection: @blog_posts, partial: 'blog_post' %>
+  <%= link_to new_blog_blog_post_path(@blog), class: 'btn btn-primary min-h-11' do %>
+    <i class="fa-solid fa-plus" aria-hidden="true"></i>
+    <%= t('pages.blog_posts.new_button') %>
   <% end %>
-  <div class="blogPages mt-4">
-    <%= pagy_nav(@pagy) if @pagy.pages > 1 %>
-  </div>
+  <%= link_to @blog, class: 'btn min-h-11' do %>
+    <i class="fa-solid fa-file-lines" aria-hidden="true"></i>
+    <%= t('pages.blog_posts.published_button') %>
+  <% end %>
+  <%= link_to edit_blog_path(@blog), class: 'btn min-h-11' do %>
+    <i class="fa-solid fa-pencil" aria-hidden="true"></i>
+    <%= t('pages.blogs.show.edit_button') %>
+  <% end %>
 <% end %>
 
-<% content_for :left_panel do %>
-  <%= render 'blog_posts/admin_links' %>
-  <%= render 'blogs/left_panel' %>
-<% end %>
+<div class="grid gap-6 lg:grid-cols-[minmax(0,1fr)_20rem]">
+  <section aria-label="<%= t('pages.blog_posts.drafts.title', blog: @blog.title) %>">
+    <% if @blog_posts.size == 0 && !params[:page] %>
+      <div class="blogPost card bg-base-200 p-4">
+        <h2 class="text-xl font-bold"><%= t('pages.blogs.show.no_posts') %></h2>
+        <p><%= t('pages.blogs.show.no_unpublished_posts') %></p>
+      </div>
+    <% else %>
+      <div id="blogPostContainer">
+        <%= render collection: @blog_posts, partial: 'blog_post' %>
+      </div>
+    <% end %>
+    <div class="blogPages mt-4">
+      <%= pagy_nav(@pagy) if @pagy.pages > 1 %>
+    </div>
+  </section>
+  <aside aria-label="<%= t('pages.blogs.show.activity') %>">
+    <%= render 'blogs/left_panel' %>
+  </aside>
+</div>

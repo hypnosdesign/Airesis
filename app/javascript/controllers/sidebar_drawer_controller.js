@@ -12,7 +12,7 @@ export default class extends Controller {
     this.mobileQuery.addEventListener("change", this.handleViewportChange)
     document.addEventListener("keydown", this.handleKeydown)
     this.wasOpen = false
-    this.sync()
+    if (this.hasRequiredTargets()) this.sync()
   }
 
   disconnect() {
@@ -24,6 +24,8 @@ export default class extends Controller {
 
   toggle(event) {
     event?.preventDefault()
+    if (!this.hasRequiredTargets()) return
+
     this.returnFocusTarget = event?.currentTarget || this.toggleTarget
     this.checkboxTarget.checked = !this.checkboxTarget.checked
     this.sync()
@@ -31,12 +33,16 @@ export default class extends Controller {
 
   close(event) {
     event?.preventDefault()
+    if (!this.hasRequiredTargets()) return
+
     this.checkboxTarget.checked = false
     this.sync()
     this.returnFocusTarget?.focus()
   }
 
   sync() {
+    if (!this.hasRequiredTargets()) return
+
     const isOpen = this.checkboxTarget.checked
     const isModal = this.mobileQuery.matches && isOpen
 
@@ -148,5 +154,9 @@ export default class extends Controller {
   cancelFocusRetry() {
     if (this.focusRetryFrame) cancelAnimationFrame(this.focusRetryFrame)
     this.focusRetryFrame = null
+  }
+
+  hasRequiredTargets() {
+    return this.hasCheckboxTarget && this.hasPanelTarget && this.hasDialogTarget && this.hasCloseTarget
   }
 }

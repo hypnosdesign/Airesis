@@ -6,6 +6,8 @@ ARG YARN_VERSION=4.18.0
 # System dependencies
 RUN apt-get update && apt-get install -y --no-install-recommends \
     build-essential \
+    chromium \
+    chromium-driver \
     curl \
     git \
     libpq-dev \
@@ -15,6 +17,9 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     python3 \
     python-is-python3 \
     && rm -rf /var/lib/apt/lists/*
+
+ENV CHROME_BIN=/usr/bin/chromium \
+    SE_CHROMEDRIVER=/usr/bin/chromedriver
 
 # Node.js LTS
 RUN curl -fsSL https://deb.nodesource.com/setup_24.x | bash - \

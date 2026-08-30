@@ -9,7 +9,6 @@ class BlogsController < ApplicationController
     @tags = Tag.most_blogs(current_domain.territory).shuffle unless request.xhr?
     @page_title = t('pages.blogs.show.title')
 
-    params[:interest_border] ||= InterestBorder.to_key(current_domain.territory)
     @pagy, @blogs = pagy(:offset, Blog.look(params), limit: 30)
 
     respond_to do |format|
@@ -58,22 +57,22 @@ class BlogsController < ApplicationController
     if @blog.save
       flash[:notice] = t('info.blog.blog_created')
       if session[:blog_return_to]
-        redirect_to session[:blog_return_to]
+        redirect_to session[:blog_return_to], status: :see_other
       else
-        redirect_to @blog
+        redirect_to @blog, status: :see_other
       end
     else
       @user = current_user
-      render action: 'new'
+      render action: 'new', status: :unprocessable_content
     end
   end
 
   def update
     if @blog.update(blog_params)
       flash[:notice] = t('info.blog.title_updated')
-      redirect_to @blog
+      redirect_to @blog, status: :see_other
     else
-      render action: 'edit'
+      render action: 'edit', status: :unprocessable_content
     end
   end
 
@@ -81,7 +80,7 @@ class BlogsController < ApplicationController
     @blog = Blog.friendly.find(params[:id])
     @blog.destroy
     flash[:notice] = t('info.blog.destroyed')
-    redirect_to root_path
+    redirect_to root_path, status: :see_other
   end
 
   protected

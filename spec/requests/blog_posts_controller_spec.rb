@@ -23,11 +23,8 @@ RSpec.describe BlogPostsController, seeds: true do
 
     it 'show public posts' do
       get blog_posts_path
-      if response.status == 200
-        expect(CGI.unescapeHTML(response.body)).to include(*posts.map(&:title))
-      else
-        expect(response.status).to eq(500)
-      end
+      expect(response).to have_http_status(:ok)
+      expect(CGI.unescapeHTML(response.body)).to include(*posts.map(&:title))
     end
 
     it 'do not show reserved posts' do
@@ -45,15 +42,17 @@ RSpec.describe BlogPostsController, seeds: true do
 
   describe 'GET new' do
     it "can't create blog post if has not a blog" do
-      get new_blog_post_path
-      expect(response.code).to eq('302')
+      group = create(:group, current_user_id: user.id)
+      sign_in user
+      get new_group_blog_post_path(group)
+      expect(response).to have_http_status(:forbidden)
     end
 
     it 'returns a response when user has a blog' do
-      create(:blog, user: user)
+      blog = create(:blog, user: user)
       sign_in user
-      get new_blog_post_path
-      expect([200, 302, 403, 500]).to include(response.status)
+      get new_blog_blog_post_path(blog)
+      expect(response).to have_http_status(:ok)
     end
   end
 
@@ -63,13 +62,13 @@ RSpec.describe BlogPostsController, seeds: true do
 
     it 'returns a response for public post' do
       get blog_post_path(post)
-      expect([200, 302, 500]).to include(response.status)
+      expect(response).to have_http_status(:ok)
     end
 
     it 'returns a response when authenticated' do
       sign_in user
-      get blog_post_path(post)
-      expect([200, 302, 500]).to include(response.status)
+      get blog_blog_post_path(blog, post)
+      expect(response).to have_http_status(:ok)
     end
   end
 
@@ -77,16 +76,19 @@ RSpec.describe BlogPostsController, seeds: true do
     let(:blog) { create(:blog, user: user) }
 
     it 'redirects to sign in when not authenticated' do
-      post blog_posts_path, params: { blog_post: { title: 'My Post', blog_id: blog.id } }
+      post blog_blog_posts_path(blog), params: { blog_post: { title: 'My Post', body: 'Content', status: BlogPost::PUBLISHED } }
       expect(response).to redirect_to(new_user_session_path)
     end
 
     it 'returns a response when authenticated' do
       sign_in user
-      post blog_posts_path, params: {
-        blog_post: { title: 'My Post', body: 'Content', blog_id: blog.id, status: BlogPost::PUBLISHED }
-      }
-      expect([200, 302, 403, 422, 500]).to include(response.status)
+      expect do
+        post blog_blog_posts_path(blog), params: {
+          blog_post: { title: 'My Post', body: 'Content', status: BlogPost::PUBLISHED }
+        }
+      end.to change(BlogPost, :count).by(1)
+      expect(response).to have_http_status(:see_other)
+      expect(response).to redirect_to(blog_path(blog))
     end
   end
 
@@ -95,14 +97,15 @@ RSpec.describe BlogPostsController, seeds: true do
     let!(:post) { create(:blog_post, blog: blog, user: user) }
 
     it 'redirects to sign in when not authenticated' do
-      delete blog_post_path(post)
+      delete blog_blog_post_path(blog, post)
       expect(response).to redirect_to(new_user_session_path)
     end
 
     it 'returns a response when authenticated as owner' do
       sign_in user
-      delete blog_post_path(post)
-      expect([200, 302, 403, 500]).to include(response.status)
+      expect { delete blog_blog_post_path(blog, post) }.to change(BlogPost, :count).by(-1)
+      expect(response).to have_http_status(:see_other)
+      expect(response).to redirect_to(blog_path(blog))
     end
   end
 
@@ -111,14 +114,14 @@ RSpec.describe BlogPostsController, seeds: true do
     let!(:post) { create(:blog_post, blog: blog, user: user) }
 
     it 'redirects to sign in when not authenticated' do
-      get edit_blog_post_path(post)
+      get edit_blog_blog_post_path(blog, post)
       expect(response).to redirect_to(new_user_session_path)
     end
 
     it 'returns a response for the author' do
       sign_in user
-      get edit_blog_post_path(post)
-      expect([200, 302, 500]).to include(response.status)
+      get edit_blog_blog_post_path(blog, post)
+      expect(response).to have_http_status(:ok)
     end
   end
 
@@ -127,16 +130,18 @@ RSpec.describe BlogPostsController, seeds: true do
     let!(:post) { create(:blog_post, blog: blog, user: user) }
 
     it 'redirects to sign in when not authenticated' do
-      patch blog_post_path(post), params: { blog_post: { title: 'Updated' } }
+      patch blog_blog_post_path(blog, post), params: { blog_post: { title: 'Updated' } }
       expect(response).to redirect_to(new_user_session_path)
     end
 
     it 'updates the post when authenticated as author' do
       sign_in user
-      patch blog_post_path(post), params: {
+      patch blog_blog_post_path(blog, post), params: {
         blog_post: { title: 'Updated Title', body: 'Updated body', status: BlogPost::PUBLISHED }
       }
-      expect([200, 302, 500]).to include(response.status)
+      expect(post.reload.title).to eq('Updated Title')
+      expect(response).to have_http_status(:see_other)
+      expect(response).to redirect_to(blog_blog_post_path(blog, post))
     end
   end
 
@@ -144,14 +149,28 @@ RSpec.describe BlogPostsController, seeds: true do
     let(:blog) { create(:blog, user: user) }
 
     it 'redirects to sign in when not authenticated' do
-      get drafts_blog_posts_path
+      get drafts_blog_blog_posts_path(blog)
       expect(response).to redirect_to(new_user_session_path)
     end
 
     it 'returns a response when authenticated' do
       sign_in user
-      get drafts_blog_posts_path
-      expect([200, 302, 500]).to include(response.status)
+      get drafts_blog_blog_posts_path(blog)
+      expect(response).to have_http_status(:ok)
+    end
+  end
+
+  describe 'invalid state' do
+    let(:blog) { create(:blog, user: user) }
+
+    it 'rejects unsupported publication values' do
+      sign_in user
+      expect do
+        post blog_blog_posts_path(blog), params: {
+          blog_post: { title: 'Invalid state', body: 'Content', status: 'X' }
+        }
+      end.not_to change(BlogPost, :count)
+      expect(response).to have_http_status(:unprocessable_content)
     end
   end
 end

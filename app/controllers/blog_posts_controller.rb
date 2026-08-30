@@ -13,6 +13,8 @@ class BlogPostsController < ApplicationController
 
   load_and_authorize_resource through: %i[blog group], shallow: true, collection: [:drafts]
 
+  before_action :assign_blog_from_post, only: %i[show edit update destroy]
+
   before_action :load_blog_data, only: %i[index show drafts]
 
   before_action :check_page_alerts, only: :show
@@ -53,6 +55,7 @@ class BlogPostsController < ApplicationController
   end
 
   def new
+    @blog ||= current_user.blog
     @blog_post.status = 'P'
   end
 
@@ -68,11 +71,11 @@ class BlogPostsController < ApplicationController
       if @blog_post.save
         flash[:notice] = t('info.blog_created')
         format.html do
-          redirect_to @group ? group_url(@group) : @blog
+          redirect_to(@group ? group_url(@group) : @blog, status: :see_other)
         end
       else
         @user = @blog.user
-        format.html { render action: :new }
+        format.html { render action: :new, status: :unprocessable_content }
       end
     end
   end
@@ -81,22 +84,26 @@ class BlogPostsController < ApplicationController
     @blog_post = @blog.blog_posts.find(params[:id])
     if @blog_post.update(blog_post_params)
       flash[:notice] = t('info.blog_post_updated')
-      redirect_to [@blog, @blog_post]
+      redirect_to [@blog, @blog_post], status: :see_other
     else
-      render action: :edit
+      render action: :edit, status: :unprocessable_content
     end
   end
 
   def destroy
     @blog_post.destroy
     flash[:notice] = t('info.blog_post_deleted')
-    redirect_to @group ? group_url(@group) : @blog
+    redirect_to(@group ? group_url(@group) : @blog, status: :see_other)
   end
 
   private
 
   def load_blog
     @blog = Blog.friendly.find(params[:blog_id]) if params[:blog_id]
+  end
+
+  def assign_blog_from_post
+    @blog = @blog_post.blog if @blog.nil?
   end
 
   def choose_layout

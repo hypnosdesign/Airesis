@@ -4,9 +4,9 @@
     <li class="current"><%= @page_title %></li>
   </ul>
 </nav>
-<h2><%= @page_title %></h2>
-<div class="card bg-base-200 p-4">
-  <%= render partial: 'participation_roles/form', locals: {button_name: t('buttons.create')} %>
+<%= render layout: 'layouts/page_title', locals: { title: @page_title } do %><% end %>
+<div class="max-w-3xl border border-base-content/15 bg-base-100 p-5 sm:p-6">
+  <%= render partial: 'participation_roles/form', locals: { button_name: t('buttons.create'), modal: false } %>
 </div>
 <% content_for :left_panel do %>
   <%= render partial: 'groups/administration_panel' %>

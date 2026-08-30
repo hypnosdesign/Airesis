@@ -2,6 +2,7 @@ class GroupAreasController < ApplicationController
   layout :choose_layout
 
   before_action :authenticate_user!
+  before_action :enable_content_landmark
 
   before_action :load_group
   authorize_resource :group
@@ -11,9 +12,10 @@ class GroupAreasController < ApplicationController
   load_and_authorize_resource through: :group
 
   def index
+    @page_title = t('pages.groups.edit_work_areas.manage_group_areas')
     if @group.enable_areas
-      @group_areas = @group.group_areas # .includes(:participants)
-      @group_participations = @group.participants
+      @group_areas = @group.group_areas.includes(area_participations: %i[user area_role])
+      @group_participations = @group.participants.includes(:image).order(:surname, :name)
     else
       render 'area_inactive'
     end
@@ -59,8 +61,8 @@ class GroupAreasController < ApplicationController
     else
       respond_to do |format|
         flash[:error] = t('error.groups.work_area.area_created')
-        format.turbo_stream { render 'group_areas/errors/create' }
-        format.html { render action: :new }
+        format.turbo_stream { render 'group_areas/errors/create', status: :unprocessable_content }
+        format.html { render :new, status: :unprocessable_content }
       end
     end
   end
@@ -73,19 +75,9 @@ class GroupAreasController < ApplicationController
       end
     else
       flash[:error] = t('error.area.update')
-      format.html { render action: :edit }
-    end
-  end
-
-  def change
-    group_area = GroupArea.find(params[:group_area_id])
-    if params[:enable] == 'true'
-      part = group_area.area_participations.new
-      part.user_id = params[:user_id]
-      part.area_role_id = group_area.area_role_id
-      part.save!
-    else
-      group_area.area_participations.where(user_id: params[:user_id]).destroy_all
+      respond_to do |format|
+        format.html { render :edit, status: :unprocessable_content }
+      end
     end
   end
 
@@ -119,5 +111,9 @@ class GroupAreasController < ApplicationController
 
   def choose_layout
     'groups'
+  end
+
+  def enable_content_landmark
+    @content_landmark = true
   end
 end

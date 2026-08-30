@@ -1,13 +1,16 @@
-<div class="card bg-base-200 p-4 mb-4">
-  <h2 class="text-xl font-bold"><%= @newsletter.subject %></h2>
-</div>
+<% @page_title = @newsletter.subject %>
+<header class="mb-8 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+  <div class="min-w-0 max-w-4xl"><h1 class="break-words text-3xl font-bold tracking-tight"><%= @newsletter.subject %></h1><p class="mt-2 text-base-content/70"><%= t('admin_ui.newsletters.show_description') %></p></div>
+  <div class="flex flex-wrap gap-2"><%= link_to t('buttons.edit'), edit_admin_newsletter_path(@newsletter), class: 'btn btn-outline min-h-11' %><%= link_to t('buttons.preview'), preview_admin_newsletter_path(@newsletter), class: 'btn btn-ghost min-h-11', target: '_blank', rel: 'noopener' %></div>
+</header>
 
-<div class="card bg-base-200 p-4 mb-4">
-  <%= sanitize @newsletter.body %>
-</div>
+<section aria-labelledby="newsletter_content_title">
+  <h2 id="newsletter_content_title" class="text-xl font-bold"><%= t('admin_ui.newsletters.content') %></h2>
+  <div class="prose mt-4 max-w-none break-words rounded-box border border-base-300 bg-base-100 p-5"><%= sanitize @newsletter.body %></div>
+</section>
 
-<%= link_to t('buttons.edit'), edit_admin_newsletter_path, class: 'btn btn-primary mb-4' %>
-
-<div class="card bg-base-200 p-4">
-  <%= render 'publish_form', newsletter: @newsletter %>
-</div>
+<section class="mt-10 max-w-3xl" aria-labelledby="newsletter_delivery_title">
+  <h2 id="newsletter_delivery_title" class="text-xl font-bold"><%= t('admin_ui.newsletters.delivery') %></h2>
+  <p class="mt-1 text-sm text-base-content/70"><%= t('admin_ui.newsletters.delivery_hint') %></p>
+  <div class="mt-4"><%= render 'publish_form', newsletter: @newsletter %></div>
+</section>

@@ -72,15 +72,16 @@ class ApplicationController < ActionController::Base
         root_path
       end
     elsif session[:blog_comment] && session[:blog_post_id] && session[:blog_id]
-      blog = Blog.friendly.find(session[:blog_id])
-      blog_post = blog.blog_posts.find_by(id: session[:blog_post_id])
+      blog = Blog.friendly.find_by(id: session[:blog_id]) || Blog.friendly.find_by(slug: session[:blog_id])
+      blog_post = blog&.blog_posts&.find_by(id: session[:blog_post_id])
       pending_comment = session[:blog_comment]
       session[:blog_id] = nil
       session[:blog_post_id] = nil
       session[:blog_comment] = nil
       if blog_post
-        blog_comment = blog_post.blog_comments.build(pending_comment)
-        if save_blog_comment(blog_comment)
+        comment_params = ActionController::Parameters.new(pending_comment).permit(:body, :parent_blog_comment_id)
+        blog_comment = blog_post.blog_comments.build(comment_params)
+        if can?(:create, blog_comment) && save_blog_comment(blog_comment)
           flash[:notice] = t('info.blog.comment_added')
         else
           flash[:error] = t('error.blog.comment_added')
@@ -115,7 +116,7 @@ class ApplicationController < ActionController::Base
   end
 
   def load_group
-    @group = Group.friendly.find(params[:group_id]) if params[:group_id].present?
+    @group = Group.friendly.find(params.expect(:group_id)) if params[:group_id].present?
   end
 
   def load_blog_data
@@ -388,13 +389,13 @@ class ApplicationController < ActionController::Base
   # - Azioni di join/conferma credenziali (flussi OAuth intermedi)
   def skip_store_location?
     request.xhr? || !params[:controller] || !request.get? ||
-      (params[:controller].starts_with? 'devise/') ||
-      (params[:controller] == 'passwords') ||
-      (params[:controller] == 'sessions') ||
-      (params[:controller] == 'users/omniauth_callbacks') ||
-      (params[:controller] == 'alerts' && params[:action] == 'index') ||
-      (params[:controller] == 'users' && (%w[join_accounts confirm_credentials].include? params[:action])) ||
-      (params[:action] == 'feedback')
+      controller_path.start_with?('devise/') ||
+      controller_name == 'passwords' ||
+      controller_name == 'sessions' ||
+      controller_path == 'users/omniauth_callbacks' ||
+      (controller_name == 'alerts' && action_name == 'index') ||
+      (controller_name == 'users' && %w[join_accounts confirm_credentials].include?(action_name)) ||
+      action_name == 'feedback'
   end
 
   # Salva il commento/contributo corrente e assegna automaticamente un ranking positivo.

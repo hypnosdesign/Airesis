@@ -3,136 +3,102 @@ require 'requests_helper'
 
 RSpec.describe AreaRolesController, seeds: true do
   let!(:owner) { create(:user) }
-  let!(:group) { create(:group, current_user_id: owner.id) }
+  let!(:group) { create(:group, current_user_id: owner.id, enable_areas: true) }
   let!(:group_area) { create(:group_area, group: group) }
-  let!(:area_role) do
-    AreaRole.create!(
-      name: 'Test Role',
-      description: 'A test area role',
-      group_area: group_area
-    )
+  let!(:area_role) { create_area_role('Coordinator') }
+
+  def create_area_role(name)
+    AreaRole.create!(name: name, description: "#{name} role", group_area: group_area)
   end
 
-  describe 'GET new' do
-    it 'redirects to sign in when not authenticated' do
+  describe 'authentication' do
+    it 'redirects guests to sign in' do
       get new_group_group_area_area_role_path(group, group_area)
       expect(response).to redirect_to(new_user_session_path)
     end
+  end
 
-    it 'returns a response for group owner' do
-      sign_in owner
+  describe 'HTML forms' do
+    before { sign_in owner }
+
+    it 'renders new and edit with a main landmark' do
       get new_group_group_area_area_role_path(group, group_area)
-      expect([200, 302, 403, 500]).to include(response.status)
-    end
-  end
+      expect(response).to have_http_status(:ok)
+      expect(response.body).to include('main-content')
 
-  describe 'GET edit' do
-    it 'redirects to sign in when not authenticated' do
       get edit_group_group_area_area_role_path(group, group_area, area_role)
-      expect(response).to redirect_to(new_user_session_path)
+      expect(response).to have_http_status(:ok)
+      expect(response.body).to include('main-content')
     end
 
-    it 'returns a response for group owner' do
-      sign_in owner
-      get edit_group_group_area_area_role_path(group, group_area, area_role)
-      expect([200, 302, 403, 500]).to include(response.status)
-    end
-  end
-
-  describe 'POST create' do
-    it 'redirects to sign in when not authenticated' do
-      post group_group_area_area_roles_path(group, group_area),
-           params: { area_role: { name: 'New Role', description: 'desc' } }
-      expect(response).to redirect_to(new_user_session_path)
+    it 'creates a role' do
+      expect do
+        post group_group_area_area_roles_path(group, group_area), params: {
+          area_role: { name: 'Reviewer', description: 'Reviews area proposals.' }
+        }
+      end.to change(group_area.area_roles, :count).by(1)
+      expect(response).to redirect_to(group_group_area_path(group, group_area))
     end
 
-    it 'returns a response for group owner' do
-      sign_in owner
-      post group_group_area_area_roles_path(group, group_area),
-           params: { area_role: { name: 'New Area Role', description: 'desc' } }
-      expect([200, 302, 403, 500]).to include(response.status)
-    end
-  end
-
-  describe 'DELETE destroy' do
-    it 'redirects to sign in when not authenticated' do
-      delete group_group_area_area_role_path(group, group_area, area_role)
-      expect(response).to redirect_to(new_user_session_path)
+    it 'returns 422 for an invalid create' do
+      post group_group_area_area_roles_path(group, group_area), params: { area_role: { name: '', description: '' } }
+      expect(response).to have_http_status(:unprocessable_content)
     end
 
-    it 'returns a response for group owner' do
-      sign_in owner
-      delete group_group_area_area_role_path(group, group_area, area_role)
-      expect([200, 302, 403, 500]).to include(response.status)
-    end
-  end
-
-  describe 'PATCH update' do
-    it 'redirects to sign in when not authenticated' do
-      patch group_group_area_area_role_path(group, group_area, area_role),
-            params: { area_role: { name: 'Updated Role', description: 'updated' } }
-      expect(response).to redirect_to(new_user_session_path)
-    end
-
-    it 'returns a response for group owner' do
-      sign_in owner
-      patch group_group_area_area_role_path(group, group_area, area_role),
-            params: { area_role: { name: 'Updated Role', description: 'updated' } },
-            xhr: true
-      expect([200, 302, 403, 500]).to include(response.status)
-    end
-
-    it 'handles invalid update (empty name)' do
-      sign_in owner
-      patch group_group_area_area_role_path(group, group_area, area_role),
-            params: { area_role: { name: '' } },
-            xhr: true
-      expect([200, 302, 403, 422, 500]).to include(response.status)
-    end
-  end
-
-  describe 'POST create with JS format' do
-    it 'returns a JS response on success' do
-      sign_in owner
-      post group_group_area_area_roles_path(group, group_area),
-           xhr: true,
-           params: { area_role: { name: 'JS Area Role', description: 'desc' } }
-      expect([200, 302, 403, 500]).to include(response.status)
-    end
-
-    it 'returns an error JS response on failure' do
-      sign_in owner
-      post group_group_area_area_roles_path(group, group_area),
-           xhr: true,
-           params: { area_role: { name: '' } }
-      expect([200, 302, 403, 422, 500]).to include(response.status)
+    it 'returns 422 and preserves an invalid update' do
+      patch group_group_area_area_role_path(group, group_area, area_role), params: { area_role: { name: '' } }
+      expect(response).to have_http_status(:unprocessable_content)
+      expect(area_role.reload.name).to eq('Coordinator')
     end
   end
 
   describe 'PUT change_permissions' do
     let!(:member) { create(:user) }
 
-    before do
+    def create_area_participation
       create_participation(member, group)
+      AreaParticipation.create!(group_area: group_area, area_role: group_area.default_area_role, user: member)
     end
 
-    it 'returns a response when not authenticated' do
-      put change_permissions_group_group_area_area_roles_path(group, group_area),
-          xhr: true, params: { user_id: member.id, id: area_role.id }
-      expect([200, 302, 403, 500]).to include(response.status)
-    end
-
-    it 'returns a response for group owner' do
+    it 'lets a regular group owner assign a scoped role' do
+      area_participation = create_area_participation
       sign_in owner
-      area_participation = AreaParticipation.find_or_create_by(
-        group_area: group_area,
-        user: member
-      )
-      skip 'Could not create area participation' unless area_participation
+      put change_permissions_group_group_area_area_roles_path(group, group_area), params: {
+        user_id: member.id, id: area_role.id
+      }
+      expect(response).to redirect_to(group_group_area_path(group, group_area))
+      expect(area_participation.reload.area_role).to eq(area_role)
+    end
 
-      put change_permissions_group_group_area_area_roles_path(group, group_area),
-          xhr: true, params: { user_id: member.id, id: area_role.id }
-      expect([200, 302, 403, 500]).to include(response.status)
+    it 'cannot assign a role from another area' do
+      area_participation = create_area_participation
+      other_area = create(:group_area, group: group)
+      other_role = AreaRole.create!(name: 'Other role', description: 'Other area role', group_area: other_area)
+      sign_in owner
+
+      expect do
+        put change_permissions_group_group_area_area_roles_path(group, group_area), params: {
+          user_id: member.id, id: other_role.id
+        }
+      end.not_to(change { area_participation.reload.area_role_id })
+      expect(response).to have_http_status(:not_found)
+    end
+  end
+
+  describe 'DELETE destroy' do
+    it 'destroys a non-default role' do
+      sign_in owner
+      expect do
+        delete group_group_area_area_role_path(group, group_area, area_role)
+      end.to change(AreaRole, :count).by(-1)
+    end
+
+    it 'protects the default role' do
+      sign_in owner
+      expect do
+        delete group_group_area_area_role_path(group, group_area, group_area.default_area_role)
+      end.not_to change(AreaRole, :count)
+      expect(response).to have_http_status(:forbidden)
     end
   end
 end

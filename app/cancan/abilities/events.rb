@@ -27,6 +27,10 @@ module Abilities
       can :create, MeetingParticipation, meeting: { event: { private: false } }
       can :create, MeetingParticipation, meeting: { event: { groups: participate_in_group(user) } }
       cannot :create, MeetingParticipation, meeting: { event: ['endtime < :limit', limit: Time.zone.now] }
+
+      can :update, MeetingParticipation, user_id: user.id, meeting: { event: { private: false } }
+      can :update, MeetingParticipation, user_id: user.id, meeting: { event: { groups: participate_in_group(user) } }
+      cannot :update, MeetingParticipation, meeting: { event: ['endtime < :limit', limit: Time.zone.now] }
     end
 
     def event_comments_permissions(user)

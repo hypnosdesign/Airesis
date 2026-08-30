@@ -1,5 +1,11 @@
 <%= render partial: 'frm/forums/head', locals: { forum: @topic.forum } %>
 
-<h2 class="text-xl font-bold mb-4"><%= t('frm.topic.new') %></h2>
-
-<%= render "form" %>
+<div class="max-w-3xl">
+  <header class="mb-6">
+    <h1 class="text-3xl font-bold tracking-tight"><%= t('frm.topic.new') %></h1>
+    <p class="mt-2 text-base-content/70"><%= t('frm.topic.form.description', forum: @forum.title) %></p>
+  </header>
+  <div class="rounded-box border border-base-300 bg-base-100 p-4 sm:p-6">
+    <%= render "form" %>
+  </div>
+</div>

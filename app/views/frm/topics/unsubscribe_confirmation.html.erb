@@ -1,0 +1,10 @@
+<%= render partial: 'frm/topics/head', locals: { topic: @topic } %>
+
+<div class="max-w-2xl">
+  <h1 class="text-3xl font-bold tracking-tight"><%= t('frm.topics.unsubscribe_confirmation.title') %></h1>
+  <p class="mt-3 text-base-content/70"><%= t('frm.topics.unsubscribe_confirmation.description', topic: @topic.subject) %></p>
+  <div class="mt-6 flex flex-wrap gap-3">
+    <%= button_to t('frm.topics.show.unsubscribe'), unsubscribe_group_forum_topic_path(@group, @forum, @topic), method: :delete, class: "btn btn-primary min-h-11" %>
+    <%= link_to t('buttons.cancel'), group_forum_topic_path(@group, @forum, @topic), class: "btn btn-ghost min-h-11" %>
+  </div>
+</div>

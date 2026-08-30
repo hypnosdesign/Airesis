@@ -114,9 +114,6 @@ Rails.application.routes.draw do
   resources :interest_borders, only: [:index], defaults: { format: :json }
   resources :municipalities, only: [:index], defaults: { format: :json }
 
-  get 'elfinder' => 'elfinder#elfinder'
-  post 'elfinder' => 'elfinder#elfinder'
-
   devise_for :users, controllers: { omniauth_callbacks: 'users/omniauth_callbacks', sessions: 'sessions', registrations: 'registrations', passwords: 'passwords', confirmations: 'confirmations' } do
     get '/users/sign_in', to: 'devise/sessions#new'
     get '/users/sign_out', to: 'devise/sessions#destroy'
@@ -155,23 +152,17 @@ Rails.application.routes.draw do
     end
   end
 
-  concern :blog_posts do
-    resources :blog_posts do
-      get :drafts, on: :collection
-      resources :blog_comments
-    end
-  end
-
-  concerns :blog_posts
+  resources :blog_posts, only: %i[index show]
 
   resources :blogs do
-    concerns :blog_posts
+    resources :blog_posts, only: %i[index new create show edit update destroy] do
+      get :drafts, on: :collection
+      resources :blog_comments, only: %i[create destroy]
+    end
     get '/:year/:month' => 'blogs#by_year_and_month', as: :posts_by_year_and_month, on: :member
   end
 
-  resources :tags
-
-  get '/tags/:text', to: 'tags#show'
+  resources :tags, only: %i[index show]
 
   get '/votation', to: redirect('/public'), as: :legacy_votation
   put '/votation/vote', to: 'votations#vote', as: :votation_vote
@@ -191,32 +182,29 @@ Rails.application.routes.draw do
 
   concern :eventable do
     resources :events do
-      resources :meeting_participations, only: [:create]
-
-      resources :event_comments do
-        member do
-          post :like
-        end
-      end
       member do
         post :move
         post :resize
       end
-      collection do
-        get :list
+    end
+  end
+
+  concern :event_interactions do
+    resources :events, only: [] do
+      resources :meeting_participations, only: %i[create update]
+
+      resources :event_comments, only: %i[create destroy] do
+        post :like, on: :member
       end
     end
   end
 
   concern :participation_roles do
-    resources :participation_roles do
-      collection do
-        post :change_default_role
-      end
-    end
+    resources :participation_roles, only: %i[index new create edit update destroy]
   end
 
   concerns :eventable
+  concerns :event_interactions
 
   root to: 'home#index'
   namespace :api do
@@ -250,15 +238,14 @@ Rails.application.routes.draw do
     end
 
     resources :forums, controller: 'frm/forums', only: %i[index show] do
-      resources :topics, controller: 'frm/topics' do
+      resources :topics, controller: 'frm/topics', only: %i[new create show destroy] do
         member do
-          get :subscribe
-          get :unsubscribe
+          post :subscribe
+          get :unsubscribe, action: :unsubscribe_confirmation
+          delete :unsubscribe
         end
-      end
 
-      resources :topics, controller: 'frm/topics', only: %i[new create index show destroy] do
-        resources :posts, controller: 'frm/posts'
+        resources :posts, controller: 'frm/posts', only: %i[new create edit update destroy]
       end
     end
 
@@ -268,20 +255,19 @@ Rails.application.routes.draw do
       put 'forums/:forum_id/moderate/posts', to: 'moderation#posts', as: :forum_moderate_posts
       # Moderation of a single topic
       put 'forums/:forum_id/topics/:topic_id/moderate', to: 'moderation#topic', as: :moderate_forum_topic
-      resources :categories, only: %i[index show]
+      resources :categories, only: :show
       namespace :admin do
         root to: 'base#index'
-        resources :mods do
-          resources :members do
+        resources :mods, only: %i[index show new create destroy] do
+          resources :members, only: [] do
             collection do
               post :add
             end
           end
         end
 
-        resources :forums do
-          resources :moderators
-          resources :topics do
+        resources :forums, except: :show do
+          resources :topics, only: %i[edit update destroy] do
             member do
               put :toggle_hide
               put :toggle_lock
@@ -290,7 +276,7 @@ Rails.application.routes.draw do
           end
         end
 
-        resources :categories
+        resources :categories, except: :show
       end
     end
 
@@ -336,37 +322,29 @@ Rails.application.routes.draw do
 
     resources :best_quorums, controller: 'quorums', only: %i[new create edit update destroy]
 
-    resources :documents do
+    resources :documents, only: :index do
       collection do
         get :view
+        post :upload
+        delete :remove
       end
     end
 
     resources :group_areas do
-      resources :area_roles do
-        member do
-          patch :change
-        end
+      resources :area_roles, only: %i[new create edit update destroy] do
         collection do
           put :change_permissions
         end
       end
 
-      resources :area_participations, only: %i[create update destroy]
+      resources :area_participations, only: %i[create destroy]
     end
 
-    concerns :blog_posts
+    resources :blog_posts, only: %i[index new create show edit update destroy] do
+      resources :blog_comments, only: %i[create destroy]
+    end
 
     get '/:year/:month' => 'groups#by_year_and_month', :as => :posts_by_year_and_month, on: :member
-  end
-
-  resources :documents do
-    collection do
-      get :view
-      get :download
-    end
-    member do
-    end
   end
 
   admin_required = lambda do |request|
@@ -379,9 +357,20 @@ Rails.application.routes.draw do
 
   constraints moderator_required do
     get 'moderator_panel', to: 'admin/moderator#show', as: 'moderator/panel'
+    namespace :admin do
+      resources :users, only: [] do
+        patch :unblock, on: :member
+        collection do
+          get :autocomplete
+          post :block
+        end
+      end
+    end
   end
 
   constraints admin_required do
+    mount RailsAdmin::Engine => '/admin/data', as: 'rails_admin'
+
     namespace :admin do
       resources :newsletters do
         member do
@@ -389,27 +378,16 @@ Rails.application.routes.draw do
           patch :publish
         end
       end
-      mount RailsAdmin::Engine => '/data', as: 'rails_admin'
       # mount Sidekiq::Web => '/sidekiq' # removed: sidekiq replaced by solid_queue
       get '/', to: 'panel#show', as: 'panel'
-      resource :panel, controller: 'panel' do
+      resource :panel, controller: 'panel', only: [] do
         post :calculate_rankings
         post :change_proposals_state
         post :write_sitemap
         post :delete_old_notifications
         post :test_mailer
         post :test_scheduler
-        post :test_exceptions
-        post :calculate_user_group_affinity
         post :test_notification
-      end
-
-      resources :users, only: [] do
-        get :unblock, on: :member
-        collection do
-          get :autocomplete
-          post :block
-        end
       end
     end
   end

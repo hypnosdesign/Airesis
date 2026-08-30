@@ -6,7 +6,7 @@ module Abilities
       return unless user.admin?
 
       can :access, :rails_admin
-      can :dashboard
+      can :read, :dashboard
       can :manage, :all
     end
   end

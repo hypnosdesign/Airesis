@@ -1,51 +1,43 @@
-<%= simple_form_for [@blog, @blog_post], html: { multipart: true } do |f| %>
+<%= simple_form_for [@blog, @blog_post], html: { multipart: true, data: { turbo: false } } do |f| %>
   <div class="editBlogPost">
     <%= f.error_notification %>
-    <%= f.input :title, style: 'width:80%' %>
+    <%= f.input :title, required: true, input_html: { maxlength: 255, autocomplete: 'off' } %>
     <div class="form-control mb-4">
       <%= f.label :body, class: "label" %>
-      <%= f.rich_text_area :body, class: "trix-content w-full" %>
+      <p id="blog-post-editor-hint" class="mb-2 text-sm text-base-content/70"><%= t('pages.blog_posts.editor_hint') %></p>
+      <div class="min-w-0 overflow-hidden rounded-box border border-base-content/15 bg-base-100 p-2">
+        <%= f.rich_text_area :body, class: "trix-content w-full", aria: { describedby: 'blog-post-editor-hint' } %>
+      </div>
     </div>
     <%= f.input :tags_list, label: t('pages.groups.new.tags.title') %>
 
-    <%= f.label :status %>
-    <div class="flex flex-col gap-1 mb-4">
-      <%= f.label :status_p, title: t('.published_title') do %>
-        <%= f.radio_button :status, 'P', checked: "checked" %>
-        <%= t('activerecord.attributes.blog_post.published_true') %>
-      <% end %>
-      <%= f.label :status_r, title: t('.reserved_title') do %>
-        <%= f.radio_button :status, 'R' %>
-        <%= t('activerecord.attributes.blog_post.published_reserved') %>
-      <% end %>
-      <%= f.label :status_d, title: t('.draft_title') do %>
-        <%= f.radio_button :status, 'D' %>
-        <%= t('activerecord.attributes.blog_post.published_false') %>
-      <% end %>
-    </div>
+    <fieldset class="mb-5 rounded-box border border-base-content/15 p-4">
+      <legend class="px-1 font-bold"><%= t('activerecord.attributes.blog_post.status') %></legend>
+      <p class="mb-3 text-sm text-base-content/70"><%= t('pages.blog_posts.status_help') %></p>
+      <div class="grid gap-2 sm:grid-cols-3">
+        <% [[BlogPost::PUBLISHED, t('activerecord.attributes.blog_post.published_true'), t('pages.blog_posts.published_help')], [BlogPost::RESERVED, t('activerecord.attributes.blog_post.published_reserved'), t('pages.blog_posts.reserved_help')], [BlogPost::DRAFT, t('activerecord.attributes.blog_post.published_false'), t('pages.blog_posts.draft_help')]].each do |value, label, help| %>
+          <label class="flex min-h-11 cursor-pointer items-start gap-3 rounded-lg p-2 hover:bg-base-200">
+            <%= f.radio_button :status, value, class: 'radio radio-primary mt-0.5' %>
+            <span><strong class="block"><%= label %></strong><span class="text-sm text-base-content/70"><%= help %></span></span>
+          </label>
+        <% end %>
+      </div>
+    </fieldset>
 
     <% if Group.accessible_by(current_ability, :post_to).size > 0 %>
       <% groups = @blog_post.publishings.map(&:group) %>
-      <p>
+      <div class="mb-5">
         <%= f.label :group_ids %>
+        <p class="mb-2 text-sm text-base-content/70"><%= t('pages.blog_posts.groups_help') %></p>
         <%= f.select :group_ids, Group.accessible_by(current_ability, :post_to).map { |group| [group.name, group.id, { 'data-image' => (group.image.attached? ? url_for(group.image) : nil), selected: (groups.include? group) }] }, {}, multiple: true, class: 'select select-bordered w-full' %>
-      </p>
+      </div>
     <% end %>
 
-    <p>
+    <div class="flex flex-wrap gap-2">
       <input type="hidden" name="group_id" value="<%= params[:group_id] %>"/>
-      <%= link_to t('buttons.cancel'), :back, class: 'btn', id: 'cancel_button', data: { disable_with: t('loading') } %>
-      <%= f.submit t('buttons.save'), class: 'btn btn-primary', id: 'save_button', data: { disable_with: t('loading') } %>
-    </p>
-  </div>
-  <div style="clear: both;"></div>
-<% end %>
-
-<% content_for :left_panel do %>
-  <div class="card bg-base-200 p-4">
-    <div class="flex flex-col gap-2">
-      <%= link_to t('buttons.save'), '#', onclick: "document.getElementById('save_button').click();return false;", class: 'btn btn-primary btn-sm' %>
-      <%= link_to t('buttons.cancel'), '#', onclick: "document.getElementById('cancel_button').click();return false;", class: 'btn btn-sm' %>
+      <%= link_to t('buttons.cancel'), (@blog || blogs_path), class: 'btn min-h-11', id: 'cancel_button' %>
+      <%= f.submit t('buttons.save'), class: 'btn btn-primary min-h-11', id: 'save_button', data: { disable_with: t('loading') } %>
     </div>
   </div>
+  <div class="clear-both"></div>
 <% end %>

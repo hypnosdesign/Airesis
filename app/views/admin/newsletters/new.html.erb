@@ -1,3 +1,6 @@
-<div class="card bg-base-200 p-4">
+<% @page_title = t('admin_ui.newsletters.new_title') %>
+<div class="max-w-4xl">
+  <h1 class="mb-2 text-3xl font-bold tracking-tight"><%= t('admin_ui.newsletters.new_title') %></h1>
+  <p class="mb-6 text-base-content/70"><%= t('admin_ui.newsletters.editor_description') %></p>
   <%= render 'form' %>
 </div>

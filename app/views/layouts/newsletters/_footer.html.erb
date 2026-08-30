@@ -4,14 +4,16 @@
       <table class="six columns">
         <tr>
           <td class="left-text-pad">
-            <h5><%= t('mailer.default.footer.connect_with_us') %></h5>
-            <table class="tiny-button facebook">
-              <tr><td><%= link_to 'Facebook', NEWSLETTER_FACEBOOK_URL, target: '_blank' %></td></tr>
-            </table>
-            <br>
-            <table class="tiny-button twitter">
-              <tr><td><%= link_to 'Twitter', NEWSLETTER_TWITTER_URL, target: '_blank' %></td></tr>
-            </table>
+            <% social_links = [['Facebook', NEWSLETTER_FACEBOOK_URL], ['Twitter', NEWSLETTER_TWITTER_URL]].select { |_name, url| url.to_s.start_with?('https://') } %>
+            <% if social_links.any? %>
+              <h2 style="font-size: 18px;"><%= t('mailer.default.footer.connect_with_us') %></h2>
+              <% social_links.each do |name, url| %>
+                <table class="tiny-button <%= name.downcase %>">
+                  <tr><td><%= link_to name, url, target: '_blank', rel: 'noopener noreferrer' %></td></tr>
+                </table>
+                <br>
+              <% end %>
+            <% end %>
           </td>
           <td class="expander"></td>
         </tr>
@@ -21,8 +23,10 @@
       <table class="six columns">
         <tr>
           <td class="last right-text-pad">
-            <h5><%= t('mailer.default.footer.contact_info') %></h5>
-            <%= t('mailer.default.footer.email_label') %> <%= mail_to ENV['APP_EMAIL_ADDRESS'] %>
+            <% if ENV['APP_EMAIL_ADDRESS'].present? %>
+              <h2 style="font-size: 18px;"><%= t('mailer.default.footer.contact_info') %></h2>
+              <%= t('mailer.default.footer.email_label') %> <%= mail_to ENV['APP_EMAIL_ADDRESS'] %>
+            <% end %>
           </td>
           <td class="expander"></td>
         </tr>

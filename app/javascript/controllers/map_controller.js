@@ -8,6 +8,8 @@ const ITALY_ZOOM = 5
 export default class extends Controller {
   static values = {
     query: { type: String, default: "" },
+    latitude: Number,
+    longitude: Number,
     zoom: { type: Number, default: 8 }
   }
 
@@ -47,7 +49,11 @@ export default class extends Controller {
     this.L = L
 
     this.#initMap()
-    if (this.queryValue) {
+    if (this.hasLatitudeValue && this.hasLongitudeValue) {
+      const coordinates = [this.latitudeValue, this.longitudeValue]
+      this.map.setView(coordinates, this.zoomValue)
+      L.marker(coordinates).addTo(this.map)
+    } else if (this.queryValue) {
       await this.#geocodeAndFit(this.queryValue)
     } else {
       this.map.setView(ITALY_CENTER, ITALY_ZOOM)

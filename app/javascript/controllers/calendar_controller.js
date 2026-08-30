@@ -13,9 +13,15 @@ export default class extends Controller {
     newEventUrl: String,
     locale: { type: String, default: "it" },
     editable: { type: Boolean, default: false },
+    todayLabel: { type: String, default: "today" },
+    monthLabel: { type: String, default: "month" },
+    weekLabel: { type: String, default: "week" },
+    dayLabel: { type: String, default: "day" },
+    listLabel: { type: String, default: "list" },
   }
 
   async connect() {
+    this.mobileQuery = window.matchMedia("(max-width: 639px)")
     const [
       { Calendar },
       { default: dayGridPlugin },
@@ -32,20 +38,24 @@ export default class extends Controller {
 
     this.calendar = new Calendar(this.element, {
       plugins: [dayGridPlugin, timeGridPlugin, listPlugin, interactionPlugin],
-      initialView: "timeGridWeek",
+      initialView: this.mobileQuery.matches ? "listWeek" : "timeGridWeek",
       locale: this.localeValue,
       height: "auto",
-      headerToolbar: {
+      headerToolbar: this.mobileQuery.matches ? {
+        left: "prev,next",
+        center: "title",
+        right: "timeGridDay,listWeek",
+      } : {
         left: "prev,next today",
         center: "title",
         right: "dayGridMonth,timeGridWeek,timeGridDay,listWeek",
       },
       buttonText: {
-        today: "oggi",
-        month: "mese",
-        week: "settimana",
-        day: "giorno",
-        list: "lista",
+        today: this.todayLabelValue,
+        month: this.monthLabelValue,
+        week: this.weekLabelValue,
+        day: this.dayLabelValue,
+        list: this.listLabelValue,
       },
       firstDay: 1, // lunedì
       slotMinTime: "07:00:00",
@@ -103,6 +113,10 @@ export default class extends Controller {
       },
     })
     this.calendar.render()
+    this.#applyResponsiveView()
+
+    this._handleViewportChange = () => this.#applyResponsiveView()
+    this.mobileQuery.addEventListener("change", this._handleViewportChange)
 
     // Aggiorna il tema quando si fa toggle dark/light
     this._themeObserver = new MutationObserver(() => this.calendar.render())
@@ -113,8 +127,15 @@ export default class extends Controller {
   }
 
   disconnect() {
+    this.mobileQuery?.removeEventListener("change", this._handleViewportChange)
     this._themeObserver?.disconnect()
     this.calendar?.destroy()
+  }
+
+  #applyResponsiveView() {
+    const preferredView = this.mobileQuery.matches ? "listWeek" : "timeGridWeek"
+    if (this.calendar.view.type !== preferredView) this.calendar.changeView(preferredView)
+    this.element.dataset.calendarView = this.calendar.view.type
   }
 
   async #patchEvent(id, action, data, revert) {

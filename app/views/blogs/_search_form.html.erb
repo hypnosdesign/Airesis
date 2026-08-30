@@ -1,27 +1,23 @@
 <%= form_with url: blogs_path, method: :get do |f| %>
-  <div class="flex flex-wrap gap-4">
-    <div class="w-full">
-      <%= f.label t('buttons.search'), t('pages.blogs.index.search_with_query') %>
+  <div class="space-y-4">
+    <div class="form-control">
+      <%= f.label :search, t('pages.blogs.index.search_with_query'), class: 'label font-semibold' %>
+      <%= f.search_field :search, value: params[:search], placeholder: t('pages.blogs.index.find_title'), class: 'input input-bordered min-h-11 w-full', minlength: 2 %>
+      <label class="mt-2 flex min-h-11 cursor-pointer items-center gap-3">
+        <%= check_box_tag :and, '1', params[:and].present?, class: 'checkbox checkbox-sm' %>
+        <span><%= t('pages.blogs.index.all_words') %></span>
+      </label>
     </div>
-    <div class="flex-1">
-      <%= text_field_tag :search, params[:search], title: t('pages.blogs.index.find_title'), class: 'input input-bordered w-full', minlength: 2 %>
+    <div class="form-control">
+      <%= f.label :interest_border, t('pages.blogs.index.search_with_place'), class: 'label font-semibold' %>
+      <%= f.text_field :interest_border, value: params[:interest_border], title: t('pages.groups.index.find_title'), data: { pre: (params[:interest_border].present? ? [InterestBorder.key_to_json(params[:interest_border])] : []) }, class: 'input input-bordered min-h-11 w-full' %>
     </div>
-    <div class="flex items-center gap-2">
-      <div class="search_words">
-        <%= check_box_tag :and, params[:and] %>
-      </div>
-    </div>
-    <div class="w-full">
-      <%= f.label :interest_border, t('pages.blogs.index.search_with_place') %>
-    </div>
-    <div class="flex-1">
-      <%= text_field_tag :interest_border, params[:interest_border], title: t('pages.groups.index.find_title'), data: { pre: [InterestBorder.key_to_json(params[:interest_border])] }, class: 'input input-bordered w-full' %>
-    </div>
-    <div class="w-full">
-      <%= f.button class: 'btn btn-primary', data: { disable_with: t('loading') } do %>
+    <div class="flex flex-wrap gap-2">
+      <%= f.button class: 'btn btn-primary min-h-11', data: { disable_with: t('loading') } do %>
         <i class="fa-solid fa-search"></i>
         <%= t('buttons.search') %>
       <% end %>
+      <%= link_to t('pages.blogs.index.clear_search'), blogs_path, class: 'btn btn-ghost min-h-11' if params[:search].present? || params[:tag].present? %>
     </div>
   </div>
 <% end %>

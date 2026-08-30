@@ -1,21 +1,33 @@
-<div id="comment<%= comment.id %>" class="blogComment card bg-base-200 p-4 mb-2" <%= 'data-collapsed' if comment.collapsed %>>
-  <div class="blog-comment-image flex items-center gap-2 mb-2">
-    <%= avatar(comment.user, size: 20) %>
-    <span class="blogPoster font-semibold"><%= link_to_user comment.user %></span>
+<article id="event_comment_<%= comment.id %>"
+         class="border border-base-content/15 bg-base-100 p-4 sm:p-5"
+         <%= 'data-collapsed' if comment.collapsed %>>
+  <header class="mb-3 flex items-center gap-3">
+    <%= avatar(comment.user, size: 40) %>
+    <div class="min-w-0">
+      <p class="break-words font-bold">
+        <%= link_to_user comment.user, class: 'inline-flex min-h-11 items-center' %>
+      </p>
+      <p class="text-sm text-base-content/60"><%= time_in_words(comment.created_at) %></p>
+    </div>
+  </header>
+  <div class="prose max-w-[72ch] break-words text-sm">
+    <%= simple_format(comment.body) %>
   </div>
-  <div class="blog-comment-content mb-2">
-    <%= auto_link(h(comment.body).gsub(/\n/, '<br/>'), html: { target: '_blank' }, sanitize: true) { |text| truncate(text, length: 15) } %>
-  </div>
-  <div class="blog-comment-footer text-sm text-base-content/60">
-    <% if comment.likers.include? current_user %>
-      <%= link_to 'Unlike', like_event_event_comment_path(@event, comment), data: { turbo_method: :post } %>
-    <% else %>
-      <%= link_to 'Like', like_event_event_comment_path(@event, comment), data: { turbo_method: :post } %>
+  <footer class="mt-4 flex flex-wrap items-center gap-2 border-t border-base-content/10 pt-3 text-sm">
+    <% if user_signed_in? %>
+      <% if comment.likers.include? current_user %>
+        <%= link_to t('pages.event_comments.unlike'), like_event_event_comment_path(@event, comment),
+                    class: 'btn btn-ghost btn-sm min-h-11', data: { turbo_method: :post } %>
+      <% else %>
+        <%= link_to t('pages.event_comments.like'), like_event_event_comment_path(@event, comment),
+                    class: 'btn btn-ghost btn-sm min-h-11', data: { turbo_method: :post } %>
+      <% end %>
     <% end %>
-    &middot;
-    <%= time_in_words(comment.created_at) %>
-    <% if current_user and (current_user.id == comment.user_id) %>
-      <%= link_to t('pages.blog_posts.comment.delete_button'), [@event, comment], data: { turbo_method: :delete, turbo_confirm: t('pages.blog_posts.comment.confirm_delete') }, class: "deleteCommentLink", style: 'float:right' %>
+    <span class="text-base-content/60"><%= t('pages.event_comments.likes_count', count: comment.likes.size) %></span>
+    <% if current_user&.id == comment.user_id %>
+      <%= link_to t('pages.blog_posts.comment.delete_button'), [@event, comment],
+                  data: { turbo_method: :delete, turbo_confirm: t('pages.blog_posts.comment.confirm_delete') },
+                  class: 'btn btn-ghost btn-sm min-h-11 text-error sm:ml-auto' %>
     <% end %>
-  </div>
-</div>
+  </footer>
+</article>

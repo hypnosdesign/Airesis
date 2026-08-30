@@ -1,15 +1,57 @@
 <% @extend = true %>
 <% @page_title = t('pages.groups.documents.documents_archive') %>
 <%= render layout: "layouts/page_title", locals: {title: @page_title} do %>
+  <% if can? :manage_documents, @group %>
+    <%= form_with url: upload_group_documents_path(@group), method: :post, multipart: true, class: 'flex flex-col gap-2 sm:flex-row sm:items-end' do |form| %>
+      <div class="form-control">
+        <%= form.label :document, t('pages.groups.documents.choose_file'), class: 'label py-0 text-sm font-semibold' %>
+        <%= form.file_field :document, required: true, class: 'file-input file-input-bordered min-h-11 w-full max-w-sm' %>
+      </div>
+      <%= form.submit t('pages.groups.documents.upload'), class: 'btn btn-primary min-h-11' %>
+    <% end %>
+  <% end %>
 <% end %>
 
-<div class="flex flex-wrap w-full">
-  <div class="flex flex-wrap">
-    <div id="storage_size_container" class="w-full md:w-1/4 p-2">
+<div class="grid gap-6 lg:grid-cols-[18rem_minmax(0,1fr)]">
+    <aside id="storage_size_container">
       <%= render partial: 'storage_size' %>
-    </div>
-    <div class="w-full md:w-3/4 p-2">
-      <div id="elfinder"></div>
-    </div>
-  </div>
+    </aside>
+    <section aria-labelledby="document-list-title" class="min-w-0 rounded-box bg-base-100 p-5 shadow-sm">
+      <div class="mb-4 flex flex-wrap items-baseline justify-between gap-2">
+        <h2 id="document-list-title" class="text-2xl font-bold"><%= t('pages.groups.documents.files_title') %></h2>
+        <p class="text-sm text-base-content/70"><%= t('pages.groups.documents.files_count', count: @documents.size) %></p>
+      </div>
+
+      <% if @documents.any? %>
+        <ul class="divide-y divide-base-content/10" role="list">
+          <% @documents.each do |document| %>
+            <li class="flex flex-col gap-3 py-4 sm:flex-row sm:items-center sm:justify-between">
+              <div class="min-w-0">
+                <p class="truncate font-semibold"><i class="fa-regular fa-file mr-2 text-base-content/50" aria-hidden="true"></i><%= document[:name] %></p>
+                <p class="mt-1 text-sm text-base-content/70"><%= number_to_human_size(document[:bytes]) %> · <%= l(document[:updated_at], format: :short) %></p>
+              </div>
+              <div class="flex flex-wrap gap-2">
+                <%= link_to view_group_documents_path(@group, path: document[:path]), class: 'btn btn-ghost min-h-11', target: '_blank', rel: 'noopener noreferrer' do %>
+                  <i class="fa-regular fa-eye" aria-hidden="true"></i><%= t('pages.groups.documents.open') %>
+                <% end %>
+                <%= link_to view_group_documents_path(@group, path: document[:path], download: 1), class: 'btn btn-ghost min-h-11' do %>
+                  <i class="fa-solid fa-download" aria-hidden="true"></i><%= t('pages.groups.documents.download') %>
+                <% end %>
+                <% if can? :manage_documents, @group %>
+                  <%= button_to remove_group_documents_path(@group, path: document[:path]), method: :delete, class: 'btn btn-ghost min-h-11 text-error', form: { data: { turbo_confirm: t('pages.groups.documents.remove_confirm', filename: document[:name]) } } do %>
+                    <i class="fa-regular fa-trash-can" aria-hidden="true"></i><%= t('buttons.delete') %>
+                  <% end %>
+                <% end %>
+              </div>
+            </li>
+          <% end %>
+        </ul>
+      <% else %>
+        <div class="rounded-box border border-base-content/15 p-7 text-center">
+          <i class="fa-regular fa-folder-open mb-3 text-3xl text-base-content/50" aria-hidden="true"></i>
+          <h3 class="text-xl font-bold"><%= t('pages.groups.documents.empty_title') %></h3>
+          <p class="mx-auto mt-2 max-w-prose text-base-content/70"><%= t(can?(:manage_documents, @group) ? 'pages.groups.documents.empty_manage' : 'pages.groups.documents.empty_view') %></p>
+        </div>
+      <% end %>
+    </section>
 </div>

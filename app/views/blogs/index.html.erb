@@ -1,47 +1,42 @@
 <% @extend = true %>
 
-<h1 class="text-2xl font-bold mb-4"><%= t('pages.blogs.index.find_blog_label') %></h1>
+<%= render layout: 'layouts/page_title', locals: { title: t('pages.blogs.index.find_blog_label') } do %>
+  <% if current_user && current_user.blog.nil? %>
+    <%= link_to new_blog_path, class: 'btn btn-primary min-h-11' do %>
+      <i class="fa-solid fa-plus" aria-hidden="true"></i>
+      <%= t('pages.blogs.new.create_button') %>
+    <% end %>
+  <% end %>
+<% end %>
 
-<div class="flex flex-wrap gap-4 mb-4">
-  <div id="blog_search_form" class="w-full lg:w-1/2">
-    <div class="card bg-base-200 p-4">
+<div class="grid gap-6 lg:grid-cols-[minmax(0,3fr)_minmax(16rem,2fr)]">
+  <section id="blog_search_form" aria-labelledby="blog-search-title" class="rounded-box bg-base-100 p-5 shadow-sm">
+    <h2 id="blog-search-title" class="mb-3 text-xl font-bold"><%= t('pages.blogs.index.search_title') %></h2>
       <%= render 'blogs/search_form' %>
-    </div>
-  </div>
-  <div class="w-full lg:w-1/2 hidden lg:block">
-    <div class="card bg-base-200 p-4" data-tag-cloud>
+  </section>
+  <aside aria-labelledby="blog-tags-title" class="rounded-box bg-base-100 p-5 shadow-sm">
+    <h2 id="blog-tags-title" class="mb-3 text-xl font-bold"><%= t('pages.blogs.index.browse_tags') %></h2>
+    <div class="flex flex-wrap gap-2" data-tag-cloud>
       <% @tags.each do |tag| %>
-        <%= link_to tag.text, blogs_url(tag: tag.text), rel: tag.blog_posts_count, class: 'badge badge-outline mr-1 mb-1' %>
+        <%= link_to tag.text, blogs_url(tag: tag.text), class: 'badge badge-outline min-h-11 px-3' %>
       <% end %>
     </div>
-  </div>
+  </aside>
 </div>
 
 <% if @blogs.count > 0 %>
-  <ul id="blogs_list" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
+  <h2 class="mb-3 mt-8 text-xl font-bold"><%= t('pages.blogs.index.results_title') %></h2>
+  <ul id="blogs_list" class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
     <% @blogs.each do |blog| %>
       <%= render partial: "blog", locals: { blog: blog } %>
     <% end %>
   </ul>
 <% else %>
-  <h2 class="text-lg"><%= t('pages.blogs.index.search_description') %></h2>
+  <section class="mt-8 rounded-box border border-base-content/15 bg-base-100 p-6 text-center" aria-labelledby="blogs-empty-title">
+    <i class="fa-regular fa-newspaper mb-3 text-3xl text-base-content/50" aria-hidden="true"></i>
+    <h2 id="blogs-empty-title" class="text-xl font-bold"><%= t('pages.blogs.index.no_results') %></h2>
+    <p class="mx-auto mt-2 max-w-prose text-base-content/70"><%= t('pages.blogs.index.search_description') %></p>
+  </section>
 <% end %>
 
-<div class="clearboth"></div>
-
-<div id="more_blogs_container">
-  <%= render partial: 'more_blogs' %>
-</div>
-
-<script type="text/javascript">
-  function checkCharacters() {
-    var search = document.getElementById('search');
-    var border = document.getElementById('interest_border');
-    if ((search && search.value.length > 2) || (border && border.value !== '')) {
-      return true;
-    } else {
-      alert('<%= t('pages.groups.index.insert_query_or_place') %>');
-      return false;
-    }
-  }
-</script>
+<div class="mt-6"><%= pagy_nav(@pagy) if @pagy.pages > 1 %></div>

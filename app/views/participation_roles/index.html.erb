@@ -1,17 +1,14 @@
 <%= render layout: "layouts/page_title", locals: { title: t('pages.groups.edit_permissions.title') } do %>
+  <%= link_to new_group_participation_role_url(@group), data: { turbo_stream: true, disable_with: t('loading') }, class: 'btn btn-primary' do %>
+    <i class="fa-solid fa-plus" aria-hidden="true"></i>
+    <%= t('pages.groups.edit_permissions.new_role') %>
+  <% end %>
 <% end %>
+<p class="mb-6 max-w-3xl text-base-content/70"><%= t('pages.groups.edit_permissions.description') %></p>
 <div id="roles_panel_container">
   <%= render partial: 'groups/roles_panel' %>
 </div>
-<br>
-<%= link_to t('pages.groups.edit_permissions.new_role'), new_group_participation_role_url(@group), data: { disable_with: t('loading') }, class: 'btn btn-primary' %>
-<div id="edit_role" title="<%= t('pages.groups.edit_permissions.edit_role_title') %>" class="small">
-</div>
-<div id="new_role" class="small">
-  <h2><%= t('pages.groups.edit_permissions.new_role_title') %></h2>
-  <% @participation_role = ParticipationRole.new(group_id: @group.id) %>
-  <%= render(partial: 'participation_roles/form', locals: { button_name: t('buttons.create') }) %>
-</div>
+<div id="participation_role_modal"></div>
 <% content_for :left_panel do %>
   <%= render 'groups/administration_panel' %>
 <% end %>

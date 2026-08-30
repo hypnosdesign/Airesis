@@ -4,6 +4,10 @@
       <%= @group.group_image_tag 36 %>
       <p class="min-w-0 truncate text-sm font-extrabold"><%= @group.name %></p>
     </div>
+    <p class="pt-2 text-xs font-semibold text-base-content/60 sm:hidden">
+      <i class="fa-solid fa-arrows-left-right mr-1" aria-hidden="true"></i>
+      <%= t('pages.groups.layout.navigation_hint') %>
+    </p>
     <ul class="flex max-w-full gap-1 overflow-x-auto py-2" role="list" data-controller="active-navigation">
       <% items = [] %>
       <% items << [group_path(@group), 'fa-house', t('pages.groups.layout.home_button'), controller_name == 'groups' && %w[show by_year_and_month].include?(action_name)] %>

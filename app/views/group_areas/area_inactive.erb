@@ -1,6 +1,6 @@
-<div class="card bg-base-200 p-4">
-  <h2><%= t('pages.groups.edit_work_areas.index.not_enabled') %></h2>
-  <p>
+<%= render layout: 'layouts/page_title', locals: { title: t('pages.groups.edit_work_areas.index.not_enabled') } do %><% end %>
+<section class="border border-base-content/15 bg-base-100 p-5 sm:p-6">
+  <p class="max-w-3xl leading-relaxed text-base-content/75">
     <%= t('pages.groups.edit_work_areas.index.description', app_short_name: APP_SHORT_NAME) %>
     <br>
     <%= t('pages.groups.edit_work_areas.index.description2') %>
@@ -10,12 +10,13 @@
     <%= t('pages.groups.edit_work_areas.index.description4') %>
     <%= link_to t('pages.groups.administration_panel.permissions').downcase, group_participation_roles_path(@group) %>
   </p>
-  <div style="margin:auto; text-align: center;">
+  <div class="mt-6">
     <%= link_to t('pages.groups.edit_work_areas.index.enable'),
-                enable_areas_group_url(@group), method: :put, class: 'btn btn-primary',
-                style: 'margin:auto; font-size: 4em; padding: 30px 30px !important;' %>
+                enable_areas_group_url(@group),
+                class: 'btn btn-primary',
+                data: { turbo_method: :put } %>
   </div>
   <% content_for :left_panel do %>
     <%= render partial: 'groups/administration_panel' %>
   <% end %>
-</div>
+</section>

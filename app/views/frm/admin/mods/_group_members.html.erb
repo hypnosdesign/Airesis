@@ -1,12 +1,13 @@
 <div id="group_members_container">
   <% if @frm_mod.members.any? %>
-    <label><%= t('frm.admin.mods.show.current_members') %></label>
     <div class="flex flex-wrap gap-2">
-      <ul>
+      <ul class="flex flex-wrap gap-2" aria-label="<%= t('frm.admin.mods.show.current_members') %>">
         <% @frm_mod.members.each do |member| %>
-          <%= user_tag member %>
+          <li><%= user_tag member %></li>
         <% end %>
       </ul>
     </div>
+  <% else %>
+    <p class="text-base-content/60"><%= t('frm.admin.mods.show.no_members') %></p>
   <% end %>
 </div>

@@ -1,48 +1,50 @@
 require 'rails_helper'
 require 'requests_helper'
 
-RSpec.describe 'the management of forum', :js do
+RSpec.describe 'forum management', :js do
+  let(:owner) { create(:user) }
+  let(:group) { create(:group, current_user_id: owner.id) }
+  let(:category) { create(:frm_category, group: group, visible_outside: true) }
+  let(:forum) { create(:frm_forum, group: group, category: category, visible_outside: true) }
+
   before do
     load_database
-    @user = create(:user)
-    @ability = Ability.new(@user)
-    @group = create(:group, current_user_id: @user.id)
-    login_as @user, scope: :user
+    forum
+    login_as owner, scope: :user
   end
 
-  after do
-    logout(:user)
+  it 'exposes the three scoped administration areas' do
+    visit group_frm_admin_root_path(group)
+
+    expect(page).to have_selector('h1', text: I18n.t('frm.admin.area'))
+    expect(page).to have_link(I18n.t('frm.admin.category.index'))
+    expect(page).to have_link(I18n.t('frm.admin.forum.index'))
+    expect(page).to have_link(I18n.t('frm.admin.mod.index'))
   end
 
-  it 'can manage categories' do
-    visit group_frm_admin_root_path(@group)
-    page_should_be_ok
-    click_link I18n.t('frm.admin.category.index')
-    page_should_be_ok
-    @group.categories.each do |category|
-      expect(page).to have_content(category.name)
-    end
-    within('table tbody') do
-      first(:link, I18n.t('buttons.edit')).click
-    end
-    new_name = Faker::Lorem.sentence
-    fill_in I18n.t('simple_form.labels.frm_category.name'), with: new_name
-    click_button I18n.t('buttons.update')
-    page_should_be_ok
-    expect(page).to have_content(new_name)
-  end
-
-  it 'can manage moderators' do
-    visit group_frm_admin_root_path(@group)
-    page_should_be_ok
-    click_link I18n.t('frm.admin.mod.index')
-    expect(page).to have_content(I18n.t('pages.forum_groups.index.create_first'))
-
+  it 'creates a moderator team' do
+    visit group_frm_admin_mods_path(group)
     click_link I18n.t('frm.admin.mod.new')
-    new_name = Faker::Lorem.sentence
-    fill_in I18n.t('simple_form.labels.frm_category.name'), with: new_name
-    click_button I18n.t('buttons.create')
-    page_should_be_ok
-    expect(page).to have_content(new_name)
+
+    fill_in I18n.t('simple_form.labels.frm_mod.name'), with: 'Civic moderation team'
+    click_button I18n.t('helpers.submit.frm_mod.create')
+
+    expect(page).to have_content(I18n.t('frm.admin.group.created'))
+    expect(page).to have_selector('h1', text: 'Civic moderation team')
+  end
+
+  it 'moderates a pending reply inside the current forum' do
+    topic = create(:approved_topic, forum: forum, user: owner)
+    post_record = create(:post, topic: topic, user: owner)
+    post_record.update!(state: 'pending_review')
+
+    visit group_frm_forum_moderator_tools_path(group, forum)
+
+    expect(page).to have_selector('h1', text: I18n.t('frm.moderation.index.title', forum: forum))
+    within('#post_1') { choose I18n.t('frm.posts.moderation.approve') }
+    click_button I18n.t('frm.posts.moderation.moderate')
+
+    expect(page).to have_content(I18n.t('frm.posts.moderation.success'))
+    expect(post_record.reload.state).to eq('approved')
   end
 end

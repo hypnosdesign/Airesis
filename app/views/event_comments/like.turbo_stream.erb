@@ -1,0 +1,3 @@
+<%= turbo_stream.replace "event_comment_#{@event_comment.id}" do %>
+  <%= render partial: "event_comments/comment", locals: { comment: @event_comment } %>
+<% end %>

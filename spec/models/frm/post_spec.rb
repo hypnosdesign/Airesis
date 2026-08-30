@@ -2,6 +2,19 @@ require 'rails_helper'
 
 
 RSpec.describe Frm::Post do
+  describe 'moderation state predicates' do
+    it 'reflects the persisted state column' do
+      post = described_class.new(state: 'approved')
+
+      expect(post).to be_approved
+      expect(post).not_to be_pending_review
+
+      post.state = 'pending_review'
+      expect(post).to be_pending_review
+      expect(post).not_to be_approved
+    end
+  end
+
   describe 'validations' do
     it { is_expected.to validate_presence_of(:text) }
   end

@@ -1,0 +1,17 @@
+{
+  "detector": {
+    "ignoreRules": [],
+    "ignoreFiles": [],
+    "ignoreValues": [
+      {
+        "rule": "side-tab",
+        "value": "*",
+        "files": [
+          "app/assets/tailwind/application.css"
+        ],
+        "createdAt": "2026-08-30T13:27:58.355Z",
+        "reason": "Agent: the matched selector is trix-editor blockquote; the border is the conventional semantic quotation marker, not a card accent"
+      }
+    ]
+  }
+}

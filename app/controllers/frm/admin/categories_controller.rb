@@ -18,7 +18,7 @@ module Frm
           flash[:notice] = t('frm.admin.category.created')
           respond_to do |format|
             format.turbo_stream
-            format.html { redirect_to group_frm_admin_categories_url(@group) }
+            format.html { redirect_to group_frm_admin_categories_url(@group), status: :see_other }
           end
         else
           flash.now.alert = t('frm.admin.category.not_created')
@@ -39,12 +39,12 @@ module Frm
           flash[:notice] = t('frm.admin.category.updated')
           respond_to do |format|
             format.turbo_stream
-            format.html { redirect_to group_frm_admin_categories_url(@group) }
+            format.html { redirect_to group_frm_admin_categories_url(@group), status: :see_other }
           end
         else
           flash.now.alert = t('frm.admin.category.not_updated')
           respond_to do |format|
-            format.turbo_stream { render :edit }
+            format.turbo_stream { render :edit, status: :unprocessable_entity }
             format.html { render action: :edit, status: :unprocessable_entity }
           end
         end
@@ -56,7 +56,7 @@ module Frm
         flash[:notice] = t('frm.admin.category.deleted')
         respond_to do |format|
           format.turbo_stream
-          format.html { redirect_to group_frm_admin_categories_url(@group) }
+          format.html { redirect_to group_frm_admin_categories_url(@group), status: :see_other }
         end
       end
 

@@ -23,6 +23,8 @@ module Frm
     validates :description, presence: true, length: { maximum: 1.megabyte }
 
     validate :visibility
+    validate :category_belongs_to_group
+    validate :moderator_groups_belong_to_group
 
     alias_attribute :title, :name
 
@@ -54,6 +56,14 @@ module Frm
 
     def visibility
       errors.add(:visible_outside, I18n.t('activerecord.errors.messages.forum_visibility')) if visible_outside && !category.visible_outside
+    end
+
+    def category_belongs_to_group
+      errors.add(:category, :invalid) if category && group && category.group_id != group_id
+    end
+
+    def moderator_groups_belong_to_group
+      errors.add(:mods, :invalid) if group && mods.any? { |mod| mod.group_id != group_id }
     end
   end
 end

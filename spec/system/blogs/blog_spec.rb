@@ -11,7 +11,7 @@ RSpec.describe 'the blogs process', :js do
 
     # fill form fields
     blog_name = Faker::Company.name
-    within('#main-copy') do
+    within('main#main-content') do
       fill_in I18n.t('activerecord.attributes.blog.title'), with: blog_name
       click_button I18n.t('pages.blogs.new.create_button')
     end
@@ -36,20 +36,16 @@ RSpec.describe 'the blogs process', :js do
     expect(page).to have_content(I18n.t('pages.blog_posts.drafts_button'))
     expect(page).not_to have_content(I18n.t('pages.blog_posts.published_button'))
     expect(page).to have_content(I18n.t('pages.blogs.show.edit_button'))
-    within_left_menu do
-      click_link I18n.t('pages.blog_posts.drafts_button')
-    end
+    click_link I18n.t('pages.blog_posts.drafts_button')
     expect(page).to have_content(I18n.t('pages.blog_posts.new_button'))
     expect(page).not_to have_content(I18n.t('pages.blog_posts.drafts_button'))
     expect(page).to have_content(I18n.t('pages.blog_posts.published_button'))
     expect(page).to have_content(I18n.t('pages.blogs.show.edit_button'))
-    within_left_menu do
-      click_link I18n.t('pages.blogs.show.edit_button')
-    end
+    click_link I18n.t('pages.blogs.show.edit_button')
 
     # fill form fields
     blog_name = Faker::Company.name
-    within('#main-copy') do
+    within('main#main-content') do
       fill_in I18n.t('activerecord.attributes.blog.title'), with: blog_name
 
       click_button I18n.t('buttons.update')
@@ -58,8 +54,6 @@ RSpec.describe 'the blogs process', :js do
     expect(page).to have_content(I18n.t('info.blog.title_updated'))
     # the new blog name is certainly displayed somewhere
     expect(page).to have_content blog_name
-    within_left_menu do
-      click_link I18n.t('pages.blog_posts.new_button')
-    end
+    click_link I18n.t('pages.blog_posts.new_button')
   end
 end

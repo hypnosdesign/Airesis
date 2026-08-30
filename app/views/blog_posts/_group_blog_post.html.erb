@@ -1,19 +1,19 @@
 <% blog_post = post_publishing.blog_post %>
 <div class="card blogPost bg-base-200 p-4 mb-4" id="blogPost<%= blog_post.id %>">
   <% if (can? :remove_post, @group) || (can? :update, blog_post) %>
-    <div class="dropdown dropdown-end float-right">
-      <button tabindex="0" class="btn btn-ghost btn-xs"><i class="fa-solid fa-ellipsis-vertical"></i></button>
-      <ul tabindex="0" class="dropdown-content menu bg-base-300 rounded-box shadow-lg z-10 p-2 w-40">
+    <details class="dropdown dropdown-end float-right">
+      <summary class="btn btn-ghost min-h-11 min-w-11 list-none" aria-label="<%= t('pages.blog_posts.actions_for', title: blog_post.title) %>"><i class="fa-solid fa-ellipsis-vertical" aria-hidden="true"></i></summary>
+      <ul class="dropdown-content menu bg-base-300 rounded-box shadow-lg z-10 p-2 w-48">
         <% if can? :remove_post, @group %>
-          <li><%= link_to t("pages.groups.show.featured_post.#{post_publishing.featured}"), feature_post_group_path(@group, post_id: blog_post.id), data: { turbo_method: :put }, class: 'menu_item' %></li>
+          <li><%= link_to t("pages.groups.show.featured_post.#{post_publishing.featured}"), feature_post_group_path(@group, post_id: blog_post.id), data: { turbo_method: :put }, class: 'menu_item min-h-11' %></li>
         <% end %>
-        <li><%= link_to t('pages.groups.show.remove_post'), remove_post_group_path(@group, post_id: blog_post.id), data: { turbo_method: :put, turbo_confirm: "Sei sicuro di voler rimuovere il post '#{blog_post.title}' dalla bacheca del gruppo?" }, class: 'menu_item' %></li>
+        <li><%= link_to t('pages.groups.show.remove_post'), remove_post_group_path(@group, post_id: blog_post.id), data: { turbo_method: :put, turbo_confirm: "Sei sicuro di voler rimuovere il post '#{blog_post.title}' dalla bacheca del gruppo?" }, class: 'menu_item min-h-11' %></li>
         <% if can? :update, blog_post %>
-          <li><%= link_to t('pages.blog_posts.edit_button'), edit_blog_blog_post_path(blog_post.blog, blog_post), class: 'menu_item' %></li>
-          <li><%= link_to t('pages.blog_posts.delete_button'), blog_blog_post_path(blog_post.blog, blog_post), data: { turbo_method: :delete, turbo_confirm: "Sei sicuro di voler cancellare il post '#{blog_post.title}'. Esso scomparirà sia dall bacheca del gruppo che dal tuo blog personale e non sarà più possibile recuperarlo." }, class: 'menu_item' %></li>
+          <li><%= link_to t('pages.blog_posts.edit_button'), edit_blog_blog_post_path(blog_post.blog, blog_post), class: 'menu_item min-h-11' %></li>
+          <li><%= link_to t('pages.blog_posts.delete_button'), blog_blog_post_path(blog_post.blog, blog_post), data: { turbo_method: :delete, turbo_confirm: t('pages.blog_posts.show.delete_button_confirm') }, class: 'menu_item min-h-11 text-error' %></li>
         <% end %>
       </ul>
-    </div>
+    </details>
   <% end %>
 
   <h3 class="blogPostTitle text-lg font-bold mb-2">
@@ -21,11 +21,8 @@
     <%= link_to blog_post.title, group_blog_post_url(@group, blog_post) %>
   </h3>
 
-  <div class="blogPostBody mb-4">
-    <%= truncate(blog_post.body.to_plain_text, length: 800) %>
-    <%= link_to t('keep_reading'), group_blog_post_url(@group, blog_post) %>
-    <div class="clearboth"></div>
-  </div>
+  <p class="blogPostBody mb-3 max-w-[72ch] text-base-content/80"><%= truncate(blog_post.body.to_plain_text, length: 420) %></p>
+  <%= link_to t('keep_reading'), group_blog_post_url(@group, blog_post), class: 'mb-4 inline-flex min-h-11 items-center font-semibold underline decoration-2 underline-offset-4', aria: { label: t('pages.blog_posts.read_post', title: blog_post.title) } %>
 
   <div class="blogPostFooter">
     <div class="blogPostPostedAt text-sm text-base-content/60">
@@ -33,7 +30,7 @@
       <%= raw t('pages.blog_posts.list_elements.inserted', name: name, date: (l blog_post.created_at)) %>
       |
       <span class="blogComments">
-        <%= link_to t('pages.blog_posts.view.comments', count: blog_post.blog_comments_count), group_blog_post_url(@group, blog_post) %>
+        <%= link_to t('pages.blog_posts.view.comments', count: blog_post.blog_comments_count), group_blog_post_url(@group, blog_post), class: 'inline-flex min-h-11 items-center' %>
       </span>
     </div>
     <% if ::Configuration::socialnetwork_active %>
@@ -46,9 +43,9 @@
 
   <% unless blog_post.tags.blank? %>
     <div class="blogPostTags mt-2">
-      <span class="tag_label font-semibold">Tags: </span>
+      <span class="tag_label font-semibold"><%= t('pages.blog_posts.show.tags_title') %> </span>
       <span class="tags_list"><%= tag_links_for(blog_post) %></span>
     </div>
   <% end %>
-  <div style="clear: both;"></div>
+  <div class="clear-both"></div>
 </div>

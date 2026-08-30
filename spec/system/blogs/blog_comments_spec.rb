@@ -29,14 +29,26 @@ RSpec.describe 'the management of the blog posts', :js do
     visit blog_blog_post_path(@blog, @blog_post)
 
     expect(page).to have_content(@blog_post.title)
-    comment = fill_and_submit(page)
+    expect { @comment = fill_and_submit(page) }.not_to change(BlogComment, :count)
     expect(page).to have_selector('form#login_user')
     within('form#login_user') do
       fill_in 'user_email', with: @user.email
       fill_in 'user_password', with: 'topolino'
       click_button 'Login'
     end
-    expect(page).to have_content(comment)
+    expect(page).to have_content(@comment)
+    expect(BlogComment.where(body: @comment)).to exist
+  end
+
+  it 'moves keyboard focus from the skip link to the main content' do
+    visit blog_blog_post_path(@blog, @blog_post)
+    page.driver.browser.action.send_keys(:tab).perform
+
+    skip_link = page.evaluate_script('document.activeElement.textContent.trim()')
+    expect(skip_link).to eq(I18n.t('pages.accessibility.skip_to_content'))
+
+    page.driver.browser.action.send_keys(:enter).perform
+    expect(page).to have_css('#main-content:focus')
   end
 
   it 'can create blog comments if logged in' do

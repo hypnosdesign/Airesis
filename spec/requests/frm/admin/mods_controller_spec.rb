@@ -14,7 +14,7 @@ RSpec.describe Frm::Admin::ModsController, seeds: true do
     it 'returns a response for group owner' do
       sign_in owner
       get group_frm_admin_mods_path(group)
-      expect([200, 302, 403, 500]).to include(response.status)
+      expect(response).to have_http_status(:ok)
     end
   end
 
@@ -27,7 +27,7 @@ RSpec.describe Frm::Admin::ModsController, seeds: true do
     it 'returns a response for group owner' do
       sign_in owner
       get new_group_frm_admin_mod_path(group)
-      expect([200, 302, 403, 500]).to include(response.status)
+      expect(response).to have_http_status(:ok)
     end
   end
 
@@ -42,7 +42,9 @@ RSpec.describe Frm::Admin::ModsController, seeds: true do
       sign_in owner
       post group_frm_admin_mods_path(group),
            params: { frm_mod: { name: 'Moderators' } }
-      expect([200, 302, 403, 500]).to include(response.status)
+      created_mod = group.mods.order(:id).last
+      expect(response).to redirect_to(group_frm_admin_mod_url(group, created_mod))
+      expect(response).to have_http_status(:see_other)
     end
   end
 end

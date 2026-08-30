@@ -3,115 +3,75 @@ require 'requests_helper'
 
 RSpec.describe GroupAreasController, seeds: true do
   let!(:owner) { create(:user) }
-  let!(:group) { create(:group, current_user_id: owner.id) }
+  let!(:group) { create(:group, current_user_id: owner.id, enable_areas: true) }
 
-  describe 'GET index' do
-    it 'redirects to sign in when not authenticated' do
+  describe 'authentication and authorization' do
+    it 'redirects guests to sign in' do
       get group_group_areas_path(group)
       expect(response).to redirect_to(new_user_session_path)
     end
 
-    it 'returns a response for group owner' do
+    it 'renders the work-area index for the group owner' do
       sign_in owner
       get group_group_areas_path(group)
-      # May redirect if areas config is disabled, or show index
-      expect([200, 302, 500]).to include(response.status)
-    end
-
-    it 'is accessible to non-members (Guest ability allows :index on GroupArea)' do
-      outsider = create(:user)
-      sign_in outsider
-      get group_group_areas_path(group)
-      expect([200, 302, 403, 500]).to include(response.status)
-    end
-  end
-
-  describe 'GET new' do
-    it 'redirects to sign in when not authenticated' do
-      get new_group_group_area_path(group)
-      expect(response).to redirect_to(new_user_session_path)
-    end
-
-    it 'returns a response for group owner (may redirect if areas config disabled)' do
-      sign_in owner
-      get new_group_group_area_path(group)
-      # configuration_required may redirect; or 200/403/500 depending on config
-      expect([200, 302, 403, 500]).to include(response.status)
+      expect(response).to have_http_status(:ok)
+      expect(response.body).to include('main-content')
     end
   end
 
   describe 'POST create' do
-    it 'redirects to sign in when not authenticated' do
-      post group_group_areas_path(group), params: { group_area: { name: 'Test Area' } }
-      expect(response).to redirect_to(new_user_session_path)
+    before { sign_in owner }
+
+    it 'creates a complete work area and its default role' do
+      expect do
+        post group_group_areas_path(group), params: {
+          group_area: { name: 'Accessibility team', description: 'Reviews inclusive participation.', default_role_name: 'Contributor' }
+        }
+      end.to change(group.group_areas, :count).by(1)
+
+      area = group.group_areas.order(:created_at).last
+      expect(response).to redirect_to(group_group_area_path(group, area))
+      expect(area.default_area_role.name).to eq('Contributor')
     end
 
-    it 'responds to create request when owner (may fail if areas config disabled)' do
-      sign_in owner
-      post group_group_areas_path(group), params: { group_area: { name: 'New Area' } }
-      # configuration_required may redirect to edit_group_path
-      expect([200, 302, 403, 500]).to include(response.status)
-    end
-  end
+    it 'returns 422 and preserves validation errors' do
+      expect do
+        post group_group_areas_path(group), params: {
+          group_area: { name: 'ab', description: 'Short name', default_role_name: 'Member' }
+        }
+      end.not_to change(GroupArea, :count)
 
-  describe 'GET show' do
-    let!(:group_area) { create(:group_area, group: group) }
-
-    it 'redirects to sign in when not authenticated' do
-      get group_group_area_path(group, group_area)
-      expect(response).to redirect_to(new_user_session_path)
-    end
-
-    it 'returns 200 or 500 for group owner' do
-      sign_in owner
-      get group_group_area_path(group, group_area)
-      expect([200, 302, 500]).to include(response.status)
-    end
-  end
-
-  describe 'GET edit' do
-    let!(:group_area) { create(:group_area, group: group) }
-
-    it 'redirects to sign in when not authenticated' do
-      get edit_group_group_area_path(group, group_area)
-      expect(response).to redirect_to(new_user_session_path)
-    end
-
-    it 'returns a response for group owner' do
-      sign_in owner
-      get edit_group_group_area_path(group, group_area)
-      expect([200, 302, 403, 500]).to include(response.status)
+      expect(response).to have_http_status(:unprocessable_content)
+      expect(response.body).to include('ab')
     end
   end
 
   describe 'PATCH update' do
     let!(:group_area) { create(:group_area, group: group) }
 
-    it 'redirects to sign in when not authenticated' do
-      patch group_group_area_path(group, group_area), params: { group_area: { name: 'Updated' } }
-      expect(response).to redirect_to(new_user_session_path)
+    before { sign_in owner }
+
+    it 'updates the area' do
+      patch group_group_area_path(group, group_area), params: { group_area: { name: 'Updated accessibility team' } }
+      expect(group_area.reload.name).to eq('Updated accessibility team')
+      expect(response).to redirect_to(group_group_area_path(group, group_area))
     end
 
-    it 'returns a response for group owner' do
-      sign_in owner
-      patch group_group_area_path(group, group_area), params: { group_area: { name: 'Updated Area' } }
-      expect([200, 302, 403, 500]).to include(response.status)
+    it 'renders the edit page with 422 for invalid data' do
+      patch group_group_area_path(group, group_area), params: { group_area: { name: 'ab' } }
+      expect(response).to have_http_status(:unprocessable_content)
+      expect(group_area.reload.name).not_to eq('ab')
+      expect(response.body).to include('ab')
     end
   end
 
   describe 'DELETE destroy' do
     let!(:group_area) { create(:group_area, group: group) }
 
-    it 'redirects to sign in when not authenticated' do
-      delete group_group_area_path(group, group_area)
-      expect(response).to redirect_to(new_user_session_path)
-    end
-
-    it 'returns a response for group owner' do
+    it 'destroys an empty area for the owner' do
       sign_in owner
-      delete group_group_area_path(group, group_area)
-      expect([200, 302, 403, 500]).to include(response.status)
+      expect { delete group_group_area_path(group, group_area) }.to change(GroupArea, :count).by(-1)
+      expect(response).to redirect_to(group_group_areas_path(group))
     end
   end
-
 end

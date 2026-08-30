@@ -1,4 +1,8 @@
-<%= form_with model: newsletter, url: publish_admin_newsletter_path(newsletter) do |f| %>
-  <%= f.select :receiver, { admin: 'admin', tutti: 'all', 'account non confermato' => 'not_confirmed', test: 'test' }, {}, class: 'select select-bordered' %>
-  <%= f.submit t('buttons.send'), class: 'btn btn-sm' %>
+<%= form_with model: newsletter, url: publish_admin_newsletter_path(newsletter), method: :patch, class: 'flex flex-col gap-3 sm:flex-row sm:items-end' do |f| %>
+  <div class="form-control flex-1">
+    <%= f.label :receiver, t('admin_ui.newsletters.audience'), class: 'label font-medium' %>
+    <% receiver_options = Newsletter::RECEIVERS.map { |receiver| [t("admin_ui.newsletters.audiences.#{receiver}", count: newsletter.recipient_count(receiver: receiver, test_user_id: current_user.id)), receiver] } %>
+    <%= f.select :receiver, receiver_options, { selected: newsletter.receiver.presence || 'test' }, class: 'select select-bordered min-h-11 w-full' %>
+  </div>
+  <%= f.submit t('admin_ui.newsletters.send'), class: 'btn btn-primary min-h-11', data: { turbo_confirm: t('admin_ui.newsletters.send_confirm', subject: newsletter.subject), disable_with: t('loading') } %>
 <% end %>

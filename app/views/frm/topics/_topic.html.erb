@@ -1,14 +1,20 @@
-<tr class="topic <%= cycle('odd', 'even') %> <%= topic.locked? ? 'locked' : 'unlocked' %>">
-  <td class="<%= icon_classes(topic) %>"></td>
-  <td class="byline topic-title">
-    <div class="subject">
-      <%= link_to topic.subject, group_forum_topic_url(@group, @forum, topic) %>
+<article class="topic <%= topic.locked? ? 'locked' : 'unlocked' %> p-4 sm:p-5" role="listitem">
+  <div class="grid gap-4 md:grid-cols-[minmax(0,1fr)_auto] md:items-center">
+    <div class="min-w-0">
+      <div class="flex flex-wrap items-center gap-2">
+        <% if topic.pinned? %><span class="badge badge-primary badge-outline"><%= t('simple_form.labels.topic.pinned') %></span><% end %>
+        <% if topic.locked? %><span class="badge badge-outline"><%= t('simple_form.labels.topic.locked') %></span><% end %>
+        <% if topic.pending_review? %><span class="badge badge-warning"><%= t('frm.moderation.status.pending') %></span><% end %>
+      </div>
+      <h2 class="subject mt-2 text-lg font-semibold leading-snug">
+        <%= link_to topic.subject, group_forum_topic_url(@group, @forum, topic), class: "rounded-sm underline-offset-4 hover:underline" %>
+      </h2>
+      <p class="started-by mt-1 text-sm text-base-content/60"><%= t("started_by") %><%= topic.user || t('frm.posts.post.deleted_user') %></p>
     </div>
-    <div class="started-by text-sm text-base-content/60">
-      <%= t("started_by") %> <%= relevant_posts(topic).first.user %>
-    </div>
-  </td>
-  <td class="posts-count text-center"><%= relevant_posts(topic).count %></td>
-  <td class="views-count text-center"><%= topic.views_count %></td>
-  <td class="latest-post"><%= link_to_latest_post(topic) %></td>
-</tr>
+    <dl class="grid grid-cols-3 gap-x-5 gap-y-2 text-sm md:min-w-72">
+      <div><dt class="text-base-content/60"><%= t('frm.topic.headings.posts') %></dt><dd class="mt-1 font-semibold tabular-nums"><%= relevant_posts(topic).count %></dd></div>
+      <div><dt class="text-base-content/60"><%= t('frm.topic.headings.views') %></dt><dd class="mt-1 font-semibold tabular-nums"><%= topic.views_count %></dd></div>
+      <div class="latest-post"><dt class="text-base-content/60"><%= t('frm.topic.headings.latest') %></dt><dd class="mt-1 break-words"><%= link_to_latest_post(topic) %></dd></div>
+    </dl>
+  </div>
+</article>

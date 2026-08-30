@@ -124,12 +124,14 @@ RSpec.describe ResqueMailer, type: :mailer, seeds: true do
   end
 
   describe '#publish' do
-    it 'sends a newsletter to a user' do
-      newsletter = Newsletter.create!(subject: 'Test', body: '<p>Hello</p>')
+    it 'sends sanitized markup without evaluating stored ERB' do
+      newsletter = Newsletter.create!(subject: 'Test', body: '<p>Safe</p><script>alert(1)</script><%= raise "EXECUTED" %>')
       mail = ResqueMailer.publish(newsletter.id, user.id)
-      expect(mail).to be_present
-    rescue ActiveRecord::RecordInvalid, ActionView::Template::Error => e
-      skip "publish setup issue: #{e.message.truncate(80)}"
+
+      expect(mail.to).to eq([user.email])
+      expect(mail.body.encoded).to include('<p>Safe</p>')
+      expect(mail.body.encoded).not_to include('<script>')
+      expect(mail.body.encoded).to include('raise')
     end
   end
 

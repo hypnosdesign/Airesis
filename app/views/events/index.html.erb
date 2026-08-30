@@ -1,15 +1,14 @@
 <% @extend = true %>
 
-<%# Hero banner — ispirato a Cleopatra Dashboard (docs/dashboard_template/src/pages/apps/calendar.html) %>
 <div class="bg-primary text-primary-content p-6 lg:p-8 mb-6 border-2 border-base-content/15 relative overflow-hidden">
   <div class="relative z-10 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
     <div>
-      <p class="text-[11px] font-bold tracking-widest text-primary-content/50 uppercase mb-2">
-        <%= @group ? @group.name : t('open_space') %>
-      </p>
       <h1 class="text-2xl lg:text-3xl font-extrabold leading-tight">
         <%= t('pages.events.index.title') %>
       </h1>
+      <p class="mt-2 max-w-2xl text-sm text-primary-content/80">
+        <%= @group ? t('pages.events.index.group_context', group: @group.name) : t('pages.events.index.open_context') %>
+      </p>
     </div>
     <div class="flex items-center gap-2 shrink-0">
       <% if @group %>
@@ -21,23 +20,24 @@
             <%= t('pages.calendar.create_event_button') %>
           <% end %>
         <% end %>
-        <%= link_to "http://www.google.com/calendar/render?cid=#{group_events_url(@group, format: :ics)}",
+        <%= link_to "https://www.google.com/calendar/render?cid=#{CGI.escape(group_events_url(@group, format: :ics))}",
                     target: '_blank',
+                    rel: 'noopener noreferrer',
                     class: 'btn btn-sm bg-white/10 hover:bg-white/20 border-white/20 text-white gap-2',
-                    title: 'Esporta su Google Calendar' do %>
-          <i class="fa-brands fa-google"></i>
-          <span class="hidden sm:inline">Google Cal</span>
+                    title: t('pages.events.index.google_calendar') do %>
+          <i class="fa-brands fa-google" aria-hidden="true"></i>
+          <span><%= t('pages.events.index.google_calendar_short') %></span>
         <% end %>
       <% elsif is_admin? %>
-        <span class="btn btn-sm bg-white/10 border-white/20 text-white/50 font-bold gap-2 cursor-not-allowed">
-          <i class="fa-solid fa-plus"></i>
+        <%= link_to new_event_path,
+                    class: 'btn btn-sm bg-white/20 hover:bg-white/30 border-white/30 text-white font-bold gap-2' do %>
+          <i class="fa-solid fa-plus" aria-hidden="true"></i>
           <%= t('pages.calendar.create_event_button') %>
-        </span>
+        <% end %>
       <% end %>
     </div>
   </div>
-  <i class="fa-solid fa-calendar-days absolute -right-4 -bottom-4 text-[120px] text-primary-content/5"></i>
+  <i class="fa-solid fa-calendar-days absolute -right-4 -bottom-4 text-[120px] text-primary-content/5" aria-hidden="true"></i>
 </div>
 
-<%# Calendario — Cleopatra reference: docs/dashboard_template/src/pages/apps/calendar.html %>
 <%= render partial: "calendar", locals: { group: @group } %>

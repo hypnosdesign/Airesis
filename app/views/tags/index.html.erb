@@ -1,14 +1,24 @@
 <% @extend = true %>
-<div class="card bg-base-200 p-4">
-  <h1><%= @page_title %></h1>
+<%= render layout: 'layouts/page_title', locals: { title: @page_title } do %><% end %>
+<section class="rounded-box bg-base-100 p-5 shadow-sm" aria-labelledby="tag-directory-title">
+  <h2 id="tag-directory-title" class="mb-2 text-xl font-bold"><%= t('pages.tags.index.browse_title') %></h2>
+  <p class="mb-4 max-w-prose text-base-content/70"><%= t('pages.tags.index.description') %></p>
   <div data-tag-cloud>
-    <p>
+    <% if @tags.any? %>
+      <ul class="flex flex-wrap gap-2" role="list">
       <% @tags.each do |tag| %>
-        <%= link_to tag.text, tag_path(tag.text), rel: tag.groups_count, class: 'badge',
-                    title: t('.tag_title', proposals: tag.proposals_count,
-                                            blog_posts: tag.blog_posts_count,
-                                            groups: tag.groups_count) %>
+        <li>
+          <%= link_to tag.text, tag_path(tag.text), class: 'badge badge-outline min-h-11 px-4',
+                      title: t('.tag_title', proposals: tag.proposals_count,
+                                              blog_posts: tag.blog_posts_count,
+                                              groups: tag.groups_count) %>
+        </li>
       <% end %>
-    </p>
+      </ul>
+    <% else %>
+      <div class="rounded-box border border-base-content/15 p-5 text-base-content/70">
+        <p><%= t('pages.tags.index.empty') %></p>
+      </div>
+    <% end %>
   </div>
-</div>
+</section>

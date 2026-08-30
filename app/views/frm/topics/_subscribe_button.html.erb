@@ -1,12 +1,12 @@
 <div id="subscribe_container">
   <% if !@topic.subscriber?(current_user.id) %>
-    <%= link_to subscribe_group_forum_topic_url(@group, @forum, @topic), data: { turbo_method: :post }, class: "btn btn-sm" do %>
-      <i class="fa-solid fa-bell"></i>
+    <%= link_to subscribe_group_forum_topic_url(@group, @forum, @topic), data: { turbo_method: :post }, class: "btn btn-outline min-h-11" do %>
+      <i class="fa-solid fa-bell" aria-hidden="true"></i>
       <%= t("frm.topics.show.subscribe") %>
     <% end %>
   <% else %>
-    <%= link_to unsubscribe_group_forum_topic_url(@group, @forum, @topic), data: { turbo_method: :post }, class: "btn btn-sm" do %>
-      <i class="fa-solid fa-bell-slash"></i>
+    <%= link_to unsubscribe_group_forum_topic_url(@group, @forum, @topic), data: { turbo_method: :delete }, class: "btn btn-outline min-h-11" do %>
+      <i class="fa-solid fa-bell-slash" aria-hidden="true"></i>
       <%= t("frm.topics.show.unsubscribe") %>
     <% end %>
   <% end %>

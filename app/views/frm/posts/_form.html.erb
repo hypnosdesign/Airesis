@@ -1,7 +1,8 @@
-<div class="form-control mb-4">
-  <%= f.label :text, class: "label" %>
-  <%= f.rich_text_area :text, class: "trix-content w-full" %>
+<div class="form-control">
+  <%= f.label :text, class: "label font-medium" %>
+  <%= f.rich_text_area :text, class: "trix-content min-h-48 w-full", required: true, aria: { describedby: "post_editor_hint" } %>
+  <p id="post_editor_hint" class="mt-2 text-sm text-base-content/60"><%= t('frm.post.form.editor_hint') %></p>
 </div>
-<% if params[:reply_to_id] %>
-  <%= f.hidden_field :reply_to_id, value: params[:reply_to_id] %>
+<% if params[:reply_to_id] || f.object.reply_to_id %>
+  <%= f.hidden_field :reply_to_id, value: params[:reply_to_id] || f.object.reply_to_id %>
 <% end %>

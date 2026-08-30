@@ -1,5 +1,7 @@
-<h2 class="text-xl font-bold mb-4"><%= @page_title %></h2>
-<%= render partial: 'form', locals: { remote: false } %>
+<div class="max-w-2xl">
+  <h1 class="mb-6 text-3xl font-bold tracking-tight"><%= @page_title %></h1>
+  <div class="rounded-box border border-base-300 bg-base-100 p-4 sm:p-6"><%= render partial: 'form', locals: { show_heading: false, turbo: false } %></div>
+</div>
 
 <% content_for :left_panel do %>
   <%= render partial: 'groups/administration_panel' %>

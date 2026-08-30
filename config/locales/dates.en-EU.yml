@@ -73,6 +73,7 @@ en-EU:
     month: 'month'
     week: 'week'
     day: 'day'
+    list: 'list'
     firstDay: 0
     timeFormat: 'h:mm TT{ - [ddd] [dd] h:mm TT}'
     changed: 'Changed!'
